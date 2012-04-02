@@ -11,10 +11,11 @@ function Choc([string] $package) {
 function Setup-Choc-Packages {
 $consolePath = Get-Item -path $env:systemdrive\chocolatey\lib\Console2*\bin
     Copy-Item $scriptPath\PackageAssets\console.xml $consolePath
-    Copy-Item (Join-Path $scriptPath "PackageAssets\Package Control.sublime-package") (Join-Path $env:appdata "Sublime Text 2\Installed Packages")
-    Copy-Item (Join-Path $scriptPath "PackageAssets\AAAPackageDev") (Join-Path $env:appdata "Sublime Text 2\Packages")
-    Copy-Item (Join-Path $scriptPath "PackageAssets\PowerShell") (Join-Path $env:appdata "Sublime Text 2\Packages")
-    Copy-Item (Join-Path $scriptPath "PackageAssets\PowerShellUtils") (Join-Path $env:appdata "Sublime Text 2\Packages")
+    New Item  (Join-Path $env:appdata "Sublime Text 2\Installed Packages") -type directory
+    Copy-Item (Join-Path $scriptPath "PackageAssets\SublimePackages\Package Control.sublime-package") (Join-Path $env:appdata "Sublime Text 2\Installed Packages")
+    Copy-Item (Join-Path $scriptPath "PackageAssets\SublimePackages\AAAPackageDev") (Join-Path $env:appdata "Sublime Text 2\Packages")
+    Copy-Item (Join-Path $scriptPath "PackageAssets\SublimePackages\PowerShell") (Join-Path $env:appdata "Sublime Text 2\Packages")
+    Copy-Item (Join-Path $scriptPath "PackageAssets\SublimePackages\PowerShellUtils") (Join-Path $env:appdata "Sublime Text 2\Packages")
     setx PATH "$env:path;$env:localappdata\Google\Chrome\Application;$env:programfiles\Sublime Text 2" -m
 }
 Disable-UAC
