@@ -1,0 +1,11 @@
+<!-- Documentation is available at http://www.sublimetext.com/docs/projects -->
+<project>
+    <mount name="src" dir="." exclude="*.pyc,*.png,*.jpg,*.exe,*.dll,*.obj" direxclude=".svn,.git,.hg,CVS,bin"/>
+    <mount name="dev-notes" dir="C:\Users\guillermo\Documents\My Dropbox\Dev-Notes\powershell-utils" exclude="*.png,*.jpg,*.exe,*.dll,*.obj" direxclude=".svn,.git,.hg,CVS,bin"/>
+
+	<options>
+<![CDATA[
+buildFile Packages/Python/Python.sublime-build
+]]>
+	</options>
+</project>

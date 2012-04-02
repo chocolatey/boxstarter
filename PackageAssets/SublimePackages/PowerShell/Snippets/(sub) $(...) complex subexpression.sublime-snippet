@@ -1,0 +1,8 @@
+<!-- See http://www.sublimetext.com/docs/snippets for more information -->
+<snippet>
+    <content><![CDATA[\$($1)]]></content>
+    <!-- Optional: Tab trigger to activate the snippet -->
+    <tabTrigger>sub</tabTrigger>
+    <!-- Optional: Scope the tab trigger will be active in -->
+    <scope>source.powershell</scope>
+</snippet>

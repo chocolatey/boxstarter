@@ -1,0 +1,16 @@
+syntax: glob
+
+dist/
+
+*.hgignore
+*.hgtags
+
+*.pyc
+
+*.cache
+*.sublime-project
+*.sublime-workspace
+
+MANIFEST
+
+_.txt

@@ -1,0 +1,3 @@
+{
+	"cmd": ["powershell.exe", "-noprofile", "-file", "$file"]
+}
