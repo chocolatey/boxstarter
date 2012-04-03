@@ -12,6 +12,9 @@ function Disable-UAC {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA  -Value 0
 }
 function Add-ExplorerMenuItem([string]$label, [string]$command){
+    if( -not (Test-Path -path HKCR:) ) {
+        New-PSDrive -Name HKCR -PSProvider registry -Root Hkey_Classes_Root
+    }
     new-item -Path "HKCR:\*\shell\$label"
     new-item -Path "HKCR:\*\shell\$label\command"
     New-ItemProperty -Path "HKCR:\*\shell\$label\command" -Name "(Default)"  -Value "$command `"%1`""
@@ -56,7 +59,9 @@ function Enable-Telnet-Win7 {
     DISM /Online /Enable-Feature /FeatureName:TelnetClient 
 }
 function Force-Windows-Update {
-    remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
+    if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
+        remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
+    }
     $updateSession =new-object -comobject "Microsoft.Update.Session"
     $updatesToDownload =new-Object -com "Microsoft.Update.UpdateColl"
     $updatesToInstall =new-object -com "Microsoft.Update.UpdateColl"
