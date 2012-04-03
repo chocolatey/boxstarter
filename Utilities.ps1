@@ -51,6 +51,7 @@ function Enable-Telnet-Win7 {
     DISM /Online /Enable-Feature /FeatureName:TelnetClient 
 }
 function Force-Windows-Update {
+    remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
     $updateSession =new-object -comobject "Microsoft.Update.Session"
     $updatesToDownload =new-Object -com "Microsoft.Update.UpdateColl"
     $updatesToInstall =new-object -com "Microsoft.Update.UpdateColl"
@@ -62,26 +63,30 @@ function Force-Windows-Update {
     If ($Result.updates.count -ne 0)
     {
         foreach($update in $result.updates) {
-            write-host "Downloading Updates:" $update.title
-            write-host "Downloading Updates:" $update.MsrcSeverity 
+            write-host "Downloading Update:" $update.title
             if ($update.isDownloaded -ne "true") {
                 $updatesToDownload.add($update)
             }
         }
-<#
+
         If ($updatesToDownload.Count -gt 0) {
             $Downloader.Updates =$updatesToDownload
             $Downloader.Download()
         }
 
-        foreach($update in $updatesToDownload) {
+        foreach($update in $result.updates) {
             write-host "Installing Updates:" $update.title
             $updatesToinstall.add($update)
         }
 
         $Installer.updates =$UpdatesToInstall
-        $Installer.Install()
-        #>
+        $result = $Installer.Install()
+
+        if($result.rebootRequired) {
+            $myLocation = (Split-Path -parent $MyInvocation.MyCommand.path)
+            New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"& '%~dp0bootstrap.ps1' -JustFinishedUpdates`""
+            Restart-Computer -force
+        }
     }
     else{write-host "There is no update applicable to this machine"}    
 }
