@@ -27,7 +27,7 @@ if($justFinishedUpdates -eq $false){
     switch ($sku) {
         "Light" { Choc googlechrome }
         "dev" {
-            Choc console2
+            Choc console-devel
             Choc sublimetext2
             Choc fiddler
             Choc mysgit
@@ -36,6 +36,8 @@ if($justFinishedUpdates -eq $false){
             Choc dotpeek
             Choc Paint.net
             Choc VirtualBox
+            Choc windirstat
+            Choc sysinternals
             Enable-Telnet-Win7
             Enable-IIS-Win7
             Install-VS11-Beta
