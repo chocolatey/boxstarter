@@ -11,6 +11,11 @@ function Install-VS11-Beta {
 function Disable-UAC {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA  -Value 0
 }
+function Add-ExplorerMenuItem([string]$label, [string]$command){
+    new-item -Path "HKCR:\*\shell\$label"
+    new-item -Path "HKCR:\*\shell\$label\command"
+    New-ItemProperty -Path "HKCR:\*\shell\$label\command" -Name "(Default)"  -Value $command
+}
 function Enable-IIS-Win7 {
     DISM /Online /Enable-Feature /FeatureName:IIS-WebServerRole 
     DISM /Online /Enable-Feature /FeatureName:IIS-WebServer 

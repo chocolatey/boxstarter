@@ -10,8 +10,7 @@ function Choc([string] $package) {
     .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install $package
 }
 function Setup-Choc-Packages {
-    $consolePath = Get-Item -path $env:systemdrive\chocolatey\lib\Console2*\bin
-    Copy-Item $scriptPath\PackageAssets\console.xml $consolePath
+    Copy-Item $scriptPath\PackageAssets\console.xml $env:appdata\Console
     New Item  (Join-Path $env:appdata "Sublime Text 2\Installed Packages") -type directory
     Copy-Item (Join-Path $scriptPath "PackageAssets\SublimePackages\Package Control.sublime-package") (Join-Path $env:appdata "Sublime Text 2\Installed Packages")
     Copy-Item (Join-Path $scriptPath "PackageAssets\SublimePackages\AAAPackageDev") (Join-Path $env:appdata "Sublime Text 2\Packages")
@@ -47,10 +46,12 @@ if($justFinishedUpdates -eq $false){
             Enable-Telnet-Win7
             Enable-IIS-Win7
             Install-VS11-Beta
-
+            Add-ExplorerMenuItem "Open with Sublime Text 2" "$env:programfiles\Sublime Text 2\sublime_text.exe"
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:localappdata\Google\Chrome\Application\chrome.exe"
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:windir\system32\mstsc.exe"
+            Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\Sublime Text 2\sublime_text.exe"
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
+            Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\console\console.exe"            
         }
     }
 }
