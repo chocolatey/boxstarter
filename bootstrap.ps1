@@ -21,12 +21,18 @@ function Setup-Choc-Packages {
 }
 
 if($justFinishedUpdates -eq $false){
+    Import-Module .$scriptPath\PinnedApplications.psm1
     Disable-UAC
     iex ((new-object net.webclient).DownloadString('http://bit.ly/psChocInstall'))
+    if($env:ProgramFiles(x86) -ne $null){ $programFiles86 = $env:ProgramFiles(x86) } else { $programFiles86 = $env:ProgramFiles }
 
     switch ($sku) {
-        "Light" { Choc googlechrome }
-        "dev" {
+        "Light" { #sku for wife, kids or grandma
+            Choc googlechrome 
+            Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:localappdata\Google\Chrome\Application\chrome.exe"
+        }
+        "dev" { #super ultra beta dev sku
+            Choc googlechrome
             Choc console-devel
             Choc sublimetext2
             Choc fiddler
@@ -41,6 +47,10 @@ if($justFinishedUpdates -eq $false){
             Enable-Telnet-Win7
             Enable-IIS-Win7
             Install-VS11-Beta
+
+            Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:localappdata\Google\Chrome\Application\chrome.exe"
+            Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:windir\system32\mstsc.exe"
+            Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
         }
     }
 }
