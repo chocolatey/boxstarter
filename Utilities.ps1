@@ -14,7 +14,7 @@ function Disable-UAC {
 function Add-ExplorerMenuItem([string]$label, [string]$command){
     new-item -Path "HKCR:\*\shell\$label"
     new-item -Path "HKCR:\*\shell\$label\command"
-    New-ItemProperty -Path "HKCR:\*\shell\$label\command" -Name "(Default)"  -Value $command
+    New-ItemProperty -Path "HKCR:\*\shell\$label\command" -Name "(Default)"  -Value "$command `"%1`""
 }
 function Enable-IIS-Win7 {
     DISM /Online /Enable-Feature /FeatureName:IIS-WebServerRole 
