@@ -6,9 +6,6 @@ param(
 $scriptPath = (Split-Path -parent $MyInvocation.MyCommand.path)
 . $scriptPath\utilities.ps1
 
-function Choc([string] $package) {
-    .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install $package
-}
 function Setup-Choc-Packages {
     Copy-Item $scriptPath\PackageAssets\console.xml $env:appdata\Console
     New Item  (Join-Path $env:appdata "Sublime Text 2\Installed Packages") -type directory
@@ -45,6 +42,7 @@ if($justFinishedUpdates -eq $false){
             Choc sysinternals
             Enable-Telnet-Win7
             Enable-IIS-Win7
+            Install-SqlExpress
             Install-VS11-Beta
             Add-ExplorerMenuItem "Open with Sublime Text 2" "$env:programfiles\Sublime Text 2\sublime_text.exe"
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\Google\Chrome\Application\chrome.exe"
