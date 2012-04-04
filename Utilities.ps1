@@ -32,7 +32,7 @@ function Enable-Telnet-Win7 {
     DISM /Online /Enable-Feature /FeatureName:TelnetClient 
 }
 function Install-SqlExpress {
-    .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install sqlexpress -source webpi
+    .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install sqlexpressmanagementstudio -source webpi
 }
 function Force-Windows-Update {
     if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
@@ -75,4 +75,17 @@ function Force-Windows-Update {
         }
     }
     else{write-host "There is no update applicable to this machine"}    
+}
+function Set-FileAssociation([string]$extOrType, [string]$command) {
+    if(-not($extOrType.StartsWith("."))) {$fileType=$extOrType}
+    if($fileType -eq $null) {
+        $testType = (cmd /c assoc $extOrType)
+        if($testType.Contains("=")) {$fileType=$testType.Split("=")[1]}
+    }
+    if($fileType -eq $null) {
+        write-host "Unable to Find File Type for $extOrType"
+    }
+    else {
+        cmd /c ftype $fileType=$command %1
+    }
 }

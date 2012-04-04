@@ -49,7 +49,11 @@ if($justFinishedUpdates -eq $false){
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:windir\system32\mstsc.exe"
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\Sublime Text 2\sublime_text.exe"
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
-            Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\console\console.exe"            
+            Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\console\console.exe"
+            $dotPeekDir = (Get-ChildItem $env:systemdrive\chocolatey\lib\dotpeek* | select $_.last)
+            Set-FileAssociation ".dll" "$dotPeekDir\tools\dotPeek.exe"
+            Set-FileAssociation ".txt" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+            cmd /c assoc .=txtfile
         }
     }
 }
