@@ -1,2 +1,2 @@
 . ./utilities.ps1
-Set-FileAssociation ".dll" "$env:userprofile\downloads\dotPeek\dotPeek.exe"
+Set-Hotkey "$env:programfiles\console\console.exe" "CTRL+SHIFT+C"
