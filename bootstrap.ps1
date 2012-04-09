@@ -5,7 +5,7 @@ param(
 
 $scriptPath = (Split-Path -parent $MyInvocation.MyCommand.path)
 . $scriptPath\utilities.ps1
-
+$p86 = if(test-path ${env:programfiles(x86)}){${env:programfiles(x86)}} else {$env:programfiles}
 function Setup-Choc-Packages {
     Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" -Name Path  -Value "$env:path;$env:programfiles\Google\Chrome\Application;$env:programfiles\Sublime Text 2;$env:programfiles\console"
 }
