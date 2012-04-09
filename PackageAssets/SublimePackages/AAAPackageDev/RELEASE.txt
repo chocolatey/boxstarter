@@ -1,5 +1,0 @@
-0.5
-	- Escaped regexp syntax def. (For regexes in JSON files.)
-	- Improvements to syntax defs for .sublime-keymap and .sublime-build.
-	- .sublime-build files will load their specific syntax automatically.
-	- Improved documentation.

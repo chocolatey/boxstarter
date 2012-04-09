@@ -1,8 +1,0 @@
-<!-- See http://www.sublimetext.com/docs/snippets for more information -->
-<snippet>
-    <content><![CDATA[${1:\$mydocs} = [environment]::GetFolderPath([environment+specialfolder]::MyDocuments)]]></content>
-    <!-- Optional: Tab trigger to activate the snippet -->
-    <tabTrigger>mydocs</tabTrigger>
-    <!-- Optional: Scope the tab trigger will be active in -->
-    <scope>source.powershell</scope>
-</snippet>

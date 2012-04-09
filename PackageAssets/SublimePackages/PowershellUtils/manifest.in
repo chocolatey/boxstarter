@@ -1,5 +1,0 @@
-include *.py *.rst
-
-exclude setup.py
-
-prune test

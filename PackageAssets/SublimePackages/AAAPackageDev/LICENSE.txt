@@ -1,1 +1,0 @@
-The license under which this package is released.

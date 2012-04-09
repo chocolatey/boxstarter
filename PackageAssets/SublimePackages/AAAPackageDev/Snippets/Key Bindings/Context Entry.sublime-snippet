@@ -1,5 +1,0 @@
-<snippet>
-	<content><![CDATA[{ "key": "$1", "operator": "$2", "operand": "$3" }$0]]></content>
-	<scope>source.sublimekeymap</scope>
-	<tabTrigger>c</tabTrigger>	
-</snippet>

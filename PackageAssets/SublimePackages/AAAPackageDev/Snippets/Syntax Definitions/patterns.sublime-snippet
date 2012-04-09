@@ -1,6 +1,0 @@
-<snippet>
-    <content><![CDATA["patterns": [$0
-]]]></content>
-    <tabTrigger>patterns</tabTrigger>
-    <scope>source.json-tmlanguage</scope>
-</snippet>
