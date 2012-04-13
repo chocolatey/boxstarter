@@ -1,3 +1,5 @@
+$chocolatey=$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd
+
 function Download-File([string] $url, [string] $path) {
     Write-Host "Downloading $url to $path"
     $downloader = new-object System.Net.WebClient
@@ -20,7 +22,7 @@ function Add-ExplorerMenuItem([string]$label, [string]$command){
     New-ItemProperty -Path "HKCR:\*\shell\$label\command" -Name "(Default)"  -Value "$command `"%1`""
 }
 function Choc([string] $package) {
-    .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install $package
+    .$chocolatey install $package
 }
 function Enable-IIS-Win7 {
     .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install iis7 -source webpi
