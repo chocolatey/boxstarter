@@ -33,6 +33,9 @@ function Enable-IIS-Win7 {
 function Enable-Telnet-Win7 {
     DISM /Online /Enable-Feature /FeatureName:TelnetClient 
 }
+function Enable-Net35-Win7 {
+    DISM /Online /Enable-Feature /FeatureName:NetFx3 
+}
 function Install-SqlExpress {
     .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install sqlexpressmanagementstudio -source webpi
 }
