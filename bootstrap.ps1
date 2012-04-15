@@ -36,9 +36,9 @@ if($justFinishedUpdates -eq $false){
             Choc sysinternals
             Choc evernote
             Choc AutoHotKey
-            Import-Module $env:systemdrive\chocolatey\chocolateyinstall\helpers\chocolateyInstaller.psm1
-            Enable-Net35-Win7
-            Install-ChocolateyPackage 'WindowsLiveWriter' 'exe' '/q /NOToolbarCEIP /NOhomepage /Nolaunch /nosearch /AppSelect:writer,wlsync' 'http://g.live.com/1rewlive3/en/wlsetup-all.exe'
+            Choc NugetPackageExplorer
+            Choc WindowsLiveWriter
+            Choc WindowsLiveMesh
             Enable-Telnet-Win7
             Enable-IIS-Win7
             Install-SqlExpress

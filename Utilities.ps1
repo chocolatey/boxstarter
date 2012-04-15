@@ -85,7 +85,7 @@ function Set-FileAssociation([string]$extOrType, [string]$command) {
     if(-not($extOrType.StartsWith("."))) {$fileType=$extOrType}
     if($fileType -eq $null) {
         $testType = (cmd /c assoc $extOrType)
-        if($testType.Contains("=")) {$fileType=$testType.Split("=")[1]}
+        if($testType -ne $null) {$fileType=$testType.Split("=")[1]}
     }
     if($fileType -eq $null) {
         write-host "Unable to Find File Type for $extOrType"
