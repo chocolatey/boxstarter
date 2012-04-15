@@ -18,6 +18,7 @@ if($justFinishedUpdates -eq $false){
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\Google\Chrome\Application\chrome.exe"
         }
         "dev" { #super ultra beta dev sku
+            Enable-Net35-Win7
             Enable-IIS-Win7
             Enable-Telnet-Win7
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:windir\system32\mstsc.exe"

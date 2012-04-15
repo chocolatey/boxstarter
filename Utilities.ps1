@@ -1,5 +1,3 @@
-$chocolatey=$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd
-
 function Download-File([string] $url, [string] $path) {
     Write-Host "Downloading $url to $path"
     $downloader = new-object System.Net.WebClient
@@ -21,6 +19,7 @@ function Add-ExplorerMenuItem([string]$label, [string]$command){
     New-ItemProperty -Path "HKCR:\*\shell\$label\command" -Name "(Default)"  -Value "$command `"%1`""
 }
 function Choc([string] $package, [string]$source) {
+    $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
     .$chocolatey install $package $source
 }
 function Enable-IIS-Win7 {
