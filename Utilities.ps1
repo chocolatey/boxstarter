@@ -5,7 +5,6 @@ function Download-File([string] $url, [string] $path) {
     $downloader = new-object System.Net.WebClient
     $downloader.DownloadFile($url, $path) 
 }
-
 function Install-VS11-Beta {
     Download-File http://go.microsoft.com/fwlink/?linkid=237587 vs.exe
     vs /Passive /NoRestart /Full
@@ -21,8 +20,8 @@ function Add-ExplorerMenuItem([string]$label, [string]$command){
     new-item -Path "HKCR:\*\shell\$label\command"
     New-ItemProperty -Path "HKCR:\*\shell\$label\command" -Name "(Default)"  -Value "$command `"%1`""
 }
-function Choc([string] $package) {
-    .$chocolatey install $package
+function Choc([string] $package, [string]$source) {
+    .$chocolatey install $package $source
 }
 function Enable-IIS-Win7 {
     .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install iis7 -source webpi
@@ -35,9 +34,6 @@ function Enable-Telnet-Win7 {
 }
 function Enable-Net35-Win7 {
     DISM /Online /Enable-Feature /FeatureName:NetFx3 
-}
-function Install-SqlExpress {
-    .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install sqlexpressmanagementstudio -source webpi
 }
 function Force-Windows-Update {
     if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
