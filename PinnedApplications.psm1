@@ -62,7 +62,7 @@ Set-PinnedApplication -Action UnPinFromStartMenu -FilePath "C:\WINDOWS\system32\
         $item = $folder.Parsename((split-path $FilePath -leaf)) 
         $itemVerb = $item.Verbs() | ? {$_.Name.Replace("&","") -eq $verb} 
         if($itemVerb -eq $null){ 
-            throw "Verb $verb not found."             
+            write-host "Verb $verb not found. It may have already been pinned"             
         } else { 
             $itemVerb.DoIt() 
         } 
