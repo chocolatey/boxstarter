@@ -10,13 +10,14 @@ function Install-VS11-Beta {
 function Disable-UAC {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA  -Value 0
 }
-function Add-ExplorerMenuItem([string]$label, [string]$command){
+function Add-ExplorerMenuItem([string]$name, [string]$label, [string]$command){
     if( -not (Test-Path -path HKCR:) ) {
         New-PSDrive -Name HKCR -PSProvider registry -Root Hkey_Classes_Root
     }
-    new-item -Path "HKCR:\*\shell\$label"
-    new-item -Path "HKCR:\*\shell\$label\command"
-    New-ItemProperty -Path "HKCR:\*\shell\$label\command" -Name "(Default)"  -Value "$command `"%1`""
+    if(!(test-path "HKCR:\Directory\shell\$name")) { new-item -Path "HKCR:\Directory\shell\$name" }
+    Set-ItemProperty -Path "HKCR:\Directory\shell\$name" -Name "(Default)"  -Value "$label"
+    if(!(test-path "HKCR:\Directory\shell\$name\command")) { new-item -Path "HKCR:\Directory\shell\$name\command" }
+    Set-ItemProperty -Path "HKCR:\Directory\shell\$name\command" -Name "(Default)"  -Value "$command `"%1`""
 }
 function Choc([string] $package, [string]$source) {
     $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
@@ -24,15 +25,15 @@ function Choc([string] $package, [string]$source) {
 }
 function Enable-IIS-Win7 {
     .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install iis7 -source webpi
-    DISM /Online /Enable-Feature /FeatureName:IIS-HttpCompressionDynamic 
-    DISM /Online /Enable-Feature /FeatureName:IIS-ManagementScriptingTools 
-    DISM /Online /Enable-Feature /FeatureName:IIS-WindowsAuthentication
+    DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-HttpCompressionDynamic 
+    DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-ManagementScriptingTools 
+    DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-WindowsAuthentication
 }
 function Enable-Telnet-Win7 {
-    DISM /Online /Enable-Feature /FeatureName:TelnetClient 
+    DISM /Online /NoRestart /Enable-Feature /FeatureName:TelnetClient 
 }
 function Enable-Net35-Win7 {
-    DISM /Online /Enable-Feature /FeatureName:NetFx3 
+    DISM /Online /NoRestart /Enable-Feature /FeatureName:NetFx3 
 }
 function Force-Windows-Update {
     if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
@@ -86,6 +87,7 @@ function Set-FileAssociation([string]$extOrType, [string]$command) {
         write-host "Unable to Find File Type for $extOrType"
     }
     else {
-        cmd /c ftype $fileType=$command %1
+        write-host "Associating $fileType with $command"
+        cmd /c ftype $fileType="$command" %1
     }
 }
