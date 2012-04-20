@@ -33,9 +33,8 @@ if($justFinishedUpdates -eq $false){
             cmd /c assoc .=txtfile
     
             Choc fiddler
-            Choc msysgit
-            Choc poshgit 
-            Choc hg
+            Choc posh-git-hg
+            Choc tortoisehg
 
             Choc dotpeek
             $dotPeekDir = (Get-ChildItem $env:systemdrive\chocolatey\lib\dotpeek* | select $_.last)
