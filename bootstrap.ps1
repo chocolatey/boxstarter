@@ -2,11 +2,11 @@ param(
     [string]$sku="dev",
     [switch]$justFinishedUpdates
 )
-
 $scriptPath = (Split-Path -parent $MyInvocation.MyCommand.path)
 . $scriptPath\utilities.ps1
 
 if($justFinishedUpdates -eq $false){
+    Start-Transcript -path $scriptPath/transcript.log
     Import-Module $scriptPath\PinnedApplications.psm1
     Disable-UAC
     Configure-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
@@ -64,9 +64,14 @@ if($justFinishedUpdates -eq $false){
         }
     }
 }
+else {
+    Start-Transcript -path $scriptPath/transcript.log -Append
+}
 
 Force-Windows-update
 if( Test-Path $scriptPath\bootstrap\post-bootstrap.ps1) {
     Invoke-Expression "$scriptPath\post-bootstrap.ps1 $args"
 }
+
+Stop-Transcript
 
