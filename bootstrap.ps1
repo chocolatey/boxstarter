@@ -9,6 +9,7 @@ $scriptPath = (Split-Path -parent $MyInvocation.MyCommand.path)
 if($justFinishedUpdates -eq $false){
     Import-Module $scriptPath\PinnedApplications.psm1
     Disable-UAC
+    Configure-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
     iex ((new-object net.webclient).DownloadString('http://bit.ly/psChocInstall'))
     if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
 
