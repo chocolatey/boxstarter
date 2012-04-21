@@ -28,7 +28,8 @@ if($justFinishedUpdates -eq $false){
 
             Choc sublimetext2
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\Sublime Text 2\sublime_text.exe"
-            Add-ExplorerMenuItem "Open with Sublime Text 2" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+            Add-ExplorerMenuItem "sublime" "Open with Sublime Text 2" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+            Add-ExplorerMenuItem "sublime" "Open with Sublime Text 2" "$env:programfiles\Sublime Text 2\sublime_text.exe" "folder"
             Set-FileAssociation ".txt" "$env:programfiles\Sublime Text 2\sublime_text.exe"
             cmd /c assoc .=txtfile
     

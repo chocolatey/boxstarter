@@ -10,14 +10,15 @@ function Install-VS11-Beta {
 function Disable-UAC {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA  -Value 0
 }
-function Add-ExplorerMenuItem([string]$name, [string]$label, [string]$command){
+function Add-ExplorerMenuItem([string]$name, [string]$label, [string]$command, [string]$type = "file"){
     if( -not (Test-Path -path HKCR:) ) {
         New-PSDrive -Name HKCR -PSProvider registry -Root Hkey_Classes_Root
     }
-    if(!(test-path "HKCR:\Directory\shell\$name")) { new-item -Path "HKCR:\Directory\shell\$name" }
-    Set-ItemProperty -Path "HKCR:\Directory\shell\$name" -Name "(Default)"  -Value "$label"
-    if(!(test-path "HKCR:\Directory\shell\$name\command")) { new-item -Path "HKCR:\Directory\shell\$name\command" }
-    Set-ItemProperty -Path "HKCR:\Directory\shell\$name\command" -Name "(Default)"  -Value "$command `"%1`""
+    if($type -eq "file") {$key = "*"} elseif($type -eq "directory") {$key="directory"} else{ return }
+    if(!(test-path -LiteralPath "HKCR:\$key\shell\$name")) { new-item -Path "HKCR:\$key\shell\$name" }
+    Set-ItemProperty -LiteralPath "HKCR:\$key\shell\$name" -Name "(Default)"  -Value "$label"
+    if(!(test-path -LiteralPath "HKCR:\$key\shell\$name\command")) { new-item -Path "HKCR:\$key\shell\$name\command" }
+    Set-ItemProperty -LiteralPath "HKCR:\$key\shell\$name\command" -Name "(Default)"  -Value "$command `"%1`""
 }
 function Choc([string] $package, [string]$source) {
     $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
