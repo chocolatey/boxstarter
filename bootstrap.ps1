@@ -8,6 +8,7 @@ $scriptPath = (Split-Path -parent $MyInvocation.MyCommand.path)
 
 if($justFinishedUpdates -eq $false){
     Import-Module $scriptPath\PinnedApplications.psm1
+    Import-Module $env:systemdrive\chocolatey\chocolateyinstall\helpers\chocolateyInstaller.psm1
     Disable-UAC
     Configure-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
     iex ((new-object net.webclient).DownloadString('http://bit.ly/psChocInstall'))
@@ -56,8 +57,10 @@ if($justFinishedUpdates -eq $false){
             Choc WindowsLiveWriter
             Choc WindowsLiveMesh
             Choc sqlexpressmanagementstudio -source webpi
+
             Install-VS11-Beta
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
+            Install-ChocolateyPackage 'resharper' 'msi' '/quiet' 'http://download.jetbrains.com/resharper/ReSharperSetup.7.0.20.111.msi' 
         }
     }
 }
