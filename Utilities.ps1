@@ -4,8 +4,7 @@ function Download-File([string] $url, [string] $path) {
     $downloader.DownloadFile($url, $path) 
 }
 function Install-VS11-Beta {
-    Download-File http://go.microsoft.com/fwlink/?linkid=237587 vs.exe
-    vs /Passive /NoRestart /Full
+    Install-ChocolateyPackage 'vs' 'exe' '/Passive /NoRestart /Full' 'http://go.microsoft.com/fwlink/?linkid=237587' 
 }
 function Disable-UAC {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA  -Value 0
