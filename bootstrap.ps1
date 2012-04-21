@@ -13,7 +13,7 @@ if($justFinishedUpdates -eq $false){
     if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
 
     switch ($sku) {
-        "Light" { #skuu for wife, kids or grandma
+        "Light" { #sku for wife, kids or grandma
             Choc googlechrome 
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\Google\Chrome\Application\chrome.exe"
         }
