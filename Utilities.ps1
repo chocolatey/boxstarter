@@ -89,6 +89,7 @@ function Set-FileAssociation([string]$extOrType, [string]$command) {
     }
     else {
         write-host "Associating $fileType with $command"
-        cmd /c ftype $fileType="$command" %1
+        $assocCmd = "ftype $fileType=`"$command`" %1"
+        cmd /c $assocCmd
     }
 }
