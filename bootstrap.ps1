@@ -68,7 +68,7 @@ else {
     Start-Transcript -path $scriptPath/transcript.log -Append
 }
 
-Force-Windows-update
+Force-Windows-update -GetUpdatesFromMS
 if( Test-Path $scriptPath\bootstrap\post-bootstrap.ps1) {
     Invoke-Expression "$scriptPath\post-bootstrap.ps1 $args"
 }

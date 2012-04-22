@@ -39,6 +39,9 @@ function Force-Windows-Update {
     if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
         remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
     }
+    Remove-Item -Path HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate -Force -Recurse -ErrorAction SilentlyContinue
+    Stop-Service -Name wuauserv
+    Start-Service -Name wuauserv
     $updateSession =new-object -comobject "Microsoft.Update.Session"
     $updatesToDownload =new-Object -com "Microsoft.Update.UpdateColl"
     $updatesToInstall =new-object -com "Microsoft.Update.UpdateColl"
