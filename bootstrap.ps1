@@ -10,7 +10,7 @@ if($justFinishedUpdates -eq $false){
     Import-Module $scriptPath\PinnedApplications.psm1
     Disable-UAC
     Configure-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
-    iex ((new-object net.webclient).DownloadString('https://raw.github.com/mwrock/chocolatey/master/chocolateyInstall/InstallChocolatey.ps1'))
+    iex ((new-object net.webclient).DownloadString('http://bit.ly/psChocInstall'))
     Import-Module $env:systemdrive\chocolatey\chocolateyinstall\helpers\chocolateyInstaller.psm1
     if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
 
