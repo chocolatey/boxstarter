@@ -35,13 +35,16 @@ function Enable-Telnet-Win7 {
 function Enable-Net35-Win7 {
     DISM /Online /NoRestart /Enable-Feature /FeatureName:NetFx3 
 }
-function Force-Windows-Update {
+function Force-Windows-Update([switch]$getUpdatesFromMS) {
     if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
         remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
     }
-    Remove-Item -Path HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate -Force -Recurse -ErrorAction SilentlyContinue
-    Stop-Service -Name wuauserv
-    Start-Service -Name wuauserv
+
+    if($getUpdatesFromMS) {
+        Remove-Item -Path HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate -Force -Recurse -ErrorAction SilentlyContinue
+        Stop-Service -Name wuauserv
+        Start-Service -Name wuauserv
+    }
     $updateSession =new-object -comobject "Microsoft.Update.Session"
     $updatesToDownload =new-Object -com "Microsoft.Update.UpdateColl"
     $updatesToInstall =new-object -com "Microsoft.Update.UpdateColl"
@@ -100,5 +103,5 @@ function Configure-ExplorerOptions([switch]$showHidenFilesFoldersDrives, [switch
     if($showHidenFilesFoldersDrives) {Set-ItemProperty $key Hidden 1}
     if($showFileExtensions) {Set-ItemProperty $key HideFileExt 0}
     if($showProtectedOSFiles) {Set-ItemProperty $key ShowSuperHidden 1}
-    Stop-Process -processname explorer
+    Stop-Process -processname explorer -Force
 }
