@@ -17,7 +17,7 @@ if($justFinishedUpdates -eq $false){
     switch ($sku) {
         "Light" { #skuu for wife, kids or grandma
             Choc googlechrome 
-            Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\Google\Chrome\Application\chrome.exe"
+            Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Google\Chrome\Application\chrome.exe"
         }
         "dev" { #super ultra beta dev sku
             Enable-Net35-Win7
@@ -52,7 +52,7 @@ if($justFinishedUpdates -eq $false){
             Choc NugetPackageExplorer
 
             Choc googlechrome
-            Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\Google\Chrome\Application\chrome.exe"
+            Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Google\Chrome\Application\chrome.exe"
 
             Choc WindowsLiveWriter
             Choc WindowsLiveMesh
