@@ -63,6 +63,13 @@ if($justFinishedUpdates -eq $false){
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
             Install-ChocolateyPackage 'resharper' 'msi' '/quiet' 'http://download.jetbrains.com/resharper/ReSharperSetup.7.0.20.111.msi' 
             InstallVsixSilently http://visualstudiogallery.msdn.microsoft.com/463c5987-f82b-46c8-a97e-b1cde42b9099/file/66837/1/xunit.runner.visualstudio.vsix xunit.runner.visualstudio.vsix, "11.0"
+            $drop = Join-Path $env:TEMP "testdriven"
+            $exe = "$drop\Setup.exe"
+            Install-ChocolateyZipPackage 'TestDriven' 'http://www.testdriven.net/downloads/TestDriven.NET-3.3.2779_Personal_Beta2.zip' $drop
+            Install-ChocolateyInstallPackage "TestDriven" 'exe' "/quiet" $exe
+            $newAddin = "$programFiles86\TestDriven.NET 3\TestDriven2011.AddIn"
+            copy-item "$programFiles86\TestDriven.NET 3\TestDriven2010.AddIn" $newAddin
+            (Get-Content $newAddin) | % {$_ -replace "<Version>10.0</Version>", "<Version>11.0</Version>"} | Set-Content -path $newAddin
         }
     }
 }
