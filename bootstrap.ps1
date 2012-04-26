@@ -4,6 +4,7 @@ param(
 )
 $scriptPath = (Split-Path -parent $MyInvocation.MyCommand.path)
 . $scriptPath\utilities.ps1
+. $scriptPath\VsixInstallFunctions.ps1
 
 if($justFinishedUpdates -eq $false){
     Start-Transcript -path $scriptPath/transcript.log
@@ -61,6 +62,7 @@ if($justFinishedUpdates -eq $false){
             Install-VS11-Beta
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
             Install-ChocolateyPackage 'resharper' 'msi' '/quiet' 'http://download.jetbrains.com/resharper/ReSharperSetup.7.0.20.111.msi' 
+            InstallVsixSilently http://visualstudiogallery.msdn.microsoft.com/463c5987-f82b-46c8-a97e-b1cde42b9099/file/66837/1/xunit.runner.visualstudio.vsix xunit.runner.visualstudio.vsix, "11.0"
         }
     }
 }
