@@ -53,6 +53,7 @@ if($justFinishedUpdates -eq $false){
             Choc evernote
             Choc AutoHotKey
             Choc NugetPackageExplorer
+            Choc PowerGUI
 
             Choc googlechrome
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Google\Chrome\Application\chrome.exe"
