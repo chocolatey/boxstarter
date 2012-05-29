@@ -36,8 +36,10 @@ if($justFinishedUpdates -eq $false){
             Set-FileAssociation ".txt" "$env:programfiles\Sublime Text 2\sublime_text.exe"
             cmd /c assoc .=txtfile
     
+            Choc skydrive
             Choc fiddler
             Choc posh-git-hg
+            Choc git-credentials-winstore
             Choc tortoisehg
 
             Choc dotpeek
