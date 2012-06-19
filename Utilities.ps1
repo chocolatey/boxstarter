@@ -1,3 +1,4 @@
+function Is64Bit {  [IntPtr]::Size -eq 8  }
 function Download-File([string] $url, [string] $path) {
     Write-Host "Downloading $url to $path"
     $downloader = new-object System.Net.WebClient
@@ -32,8 +33,29 @@ function Enable-IIS-Win7 {
 function Enable-Telnet-Win7 {
     DISM /Online /NoRestart /Enable-Feature /FeatureName:TelnetClient 
 }
-function Enable-Net35-Win7 {
-    DISM /Online /NoRestart /Enable-Feature /FeatureName:NetFx3 
+function Enable-Net35 {
+    $os = (Get-WmiObject -class Win32_OperatingSystem).Caption
+    if($os.Contains('Server')){
+        import-module servermanager
+        Add-WindowsFeature "Net-Framework-Core"
+    }
+    elseif ($os.Contains('Windows 7')){DISM /Online /NoRestart /Enable-Feature /FeatureName:NetFx3}
+}
+function Enable-Net40 {
+    if(Is64Bit) {$fx="framework64"} else {$fx="framework"}
+    if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319") -and -not $GetRepoOnly) {
+        Import-Module $env:systemdrive\chocolatey\chocolateyinstall\helpers\chocolateyInstaller.psm1
+        Install-ChocolateyZipPackage 'webcmd' 'http://www.iis.net/community/files/webpi/webpicmdline_anycpu.zip' $env:temp
+        .$env:temp\WebpiCmdLine.exe /products: NetFramework4 /accepteula
+    }
+}
+function Disable-InternetExplorerESC {
+    $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
+    $UserKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
+    Set-ItemProperty -Path $AdminKey -Name "IsInstalled" -Value 0
+    Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
+    Stop-Process -Name Explorer -Force
+    Write-Host "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
 }
 function Force-Windows-Update([switch]$getUpdatesFromMS) {
     if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
@@ -68,7 +90,7 @@ function Force-Windows-Update([switch]$getUpdatesFromMS) {
         }
 
         foreach($update in $result.updates) {
-            write-host "Installing Updates:" $update.title
+            write-host "Installing Updates: $update.title"
             $updatesToinstall.add($update)
         }
 
