@@ -3,6 +3,7 @@ param(
     [switch]$justFinishedUpdates
 )
 Start-Transcript -path $env:temp\transcript.log -Append
+Stop-Service -Name wuauserv
 $scriptPath = (Split-Path -parent $MyInvocation.MyCommand.path)
 . $scriptPath\utilities.ps1
 . $scriptPath\VsixInstallFunctions.ps1
@@ -67,7 +68,7 @@ if($justFinishedUpdates -eq $false){
             InstallVsixSilently http://visualstudiogallery.msdn.microsoft.com/463c5987-f82b-46c8-a97e-b1cde42b9099/file/66837/1/xunit.runner.visualstudio.vsix xunit.runner.visualstudio.vsix, "11.0"
             Choc TestDriven.Net
 
-            Force-Windows-update -GetUpdatesFromMS
+            RunUpdatesWhenDone -GetUpdatesFromMS
         }
 
         "tfs-vm" {
@@ -106,10 +107,12 @@ else
     WinActivate
 }
 "@
-            Force-Windows-update         
+            RunUpdatesWhenDone         
         }
     }
 }
 
+if($global:RunUpdatesWhenDone -or $justFinishedUpdates){Force-Windows-Update $global:GetUpdatesFromMSWhenDone}
+Start-Service -Name wuauserv
 Stop-Transcript
 

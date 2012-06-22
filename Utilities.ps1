@@ -58,6 +58,11 @@ function Disable-InternetExplorerESC {
     Stop-Process -Name Explorer -Force
     Write-Host "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
 }
+function RunUpdatesWhenDone([switch]$getUpdatesFromMS)
+{
+    $global:RunUpdatesWhenDone = $true
+    $global:GetUpdatesFromMSWhenDone = $getUpdatesFromMS
+}
 function Force-Windows-Update([switch]$getUpdatesFromMS) {
     if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
         remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
