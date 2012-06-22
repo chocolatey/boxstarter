@@ -21,6 +21,7 @@ function Add-ExplorerMenuItem([string]$name, [string]$label, [string]$command, [
     Set-ItemProperty -LiteralPath "HKCR:\$key\shell\$name\command" -Name "(Default)"  -Value "$command `"%1`""
 }
 function Choc([string] $package, [string]$source) {
+    Check-Chocolatey
     $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
     .$chocolatey install $package $source
 }
@@ -126,4 +127,11 @@ function Configure-ExplorerOptions([switch]$showHidenFilesFoldersDrives, [switch
     if($showFileExtensions) {Set-ItemProperty $key HideFileExt 0}
     if($showProtectedOSFiles) {Set-ItemProperty $key ShowSuperHidden 1}
     Stop-Process -processname explorer -Force
+}
+function Check-Chocolatey{
+    if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
+        New-Item $env:systemdrive\chocolatey -Force -type directory
+        iex ((new-object net.webclient).DownloadString('http://bit.ly/psChocInstall'))
+        Import-Module $env:systemdrive\chocolatey\chocolateyinstall\helpers\chocolateyInstaller.psm1
+    }
 }
