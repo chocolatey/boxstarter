@@ -1,4 +1,5 @@
 *.sublime-workspace
 *.exe
 *.log
-BuildPackages
+BuildPackages/*
+!/BuildPackages/example

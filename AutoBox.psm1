@@ -1,3 +1,24 @@
+Import-Module $PSScriptRoot\Externals\PinnedApplications.psm1
+import-module $PSScriptRoot\Externals\psake\psake.psm1
+. $PSScriptRoot\Externals\VsixInstallFunctions.ps1
+
+function Invoke-Autobox{
+      param(
+          [string]$bootstrapPackage="default",
+          [switch]$justFinishedUpdates
+      )
+      try{Start-Transcript -path $env:temp\transcript.log -Append}catch{$autoboxIsNotTranscribing=$true}
+      Stop-Service -Name wuauserv
+
+      if($justFinishedUpdates -eq $false){
+            $buildFile = "$PSScriptRoot\BuildPackages\$bootstrapPackage\default.ps1"
+            invoke-psake $buildFile
+      }
+
+      if($global:RunUpdatesWhenDone -or $justFinishedUpdates){Force-Windows-Update $global:GetUpdatesFromMSWhenDone}
+      Start-Service -Name wuauserv
+      if(!$autoboxIsNotTranscribing){Stop-Transcript}
+}
 function Is64Bit {  [IntPtr]::Size -eq 8  }
 function Download-File([string] $url, [string] $path) {
     Write-Host "Downloading $url to $path"
@@ -111,7 +132,6 @@ function Force-Windows-Update([switch]$getUpdatesFromMS) {
             $myLocation = (Split-Path -parent $MyInvocation.MyCommand.path)
             New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"& '%~dp0bootstrap.ps1' -JustFinishedUpdates`""
 			Write-Host "Restart Required. Restarting now..."
-			Read-Host 
             Restart-Computer -force
         }
 		Write-Host "All updates installed"
@@ -147,3 +167,5 @@ function Check-Chocolatey{
         Import-Module $env:systemdrive\chocolatey\chocolateyinstall\helpers\chocolateyInstaller.psm1
     }
 }
+
+Export-ModuleMember Invoke-Autobox
