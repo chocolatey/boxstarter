@@ -83,31 +83,38 @@ function Force-Windows-Update([switch]$getUpdatesFromMS) {
 
     If ($Result.updates.count -ne 0)
     {
+        write-host $Result.updates.count " Updates found"
         foreach($update in $result.updates) {
-            write-host "Downloading Update:" $update.title
             if ($update.isDownloaded -ne "true") {
-                $updatesToDownload.add($update)
+            	write-host " * Adding " $update.title " to list of updates to download"
+                $updatesToDownload.add($update) | Out-Null
             }
+			else {write-host " * " $update.title " already downloaded"}
         }
 
         If ($updatesToDownload.Count -gt 0) {
-            $Downloader.Updates =$updatesToDownload
+			Write-Host "Beginning to download " $updatesToDownload.Count " updates"
+            $Downloader.Updates = $updatesToDownload
             $Downloader.Download()
         }
-
+		
+        write-host "Downloading complete"
         foreach($update in $result.updates) {
-            write-host "Installing Updates: $update.title"
-            $updatesToinstall.add($update)
+            $updatesToinstall.add($update) | Out-Null
         }
 
-        $Installer.updates =$UpdatesToInstall
+		Write-Host "Beginning to install"
+        $Installer.updates = $UpdatesToInstall
         $result = $Installer.Install()
 
         if($result.rebootRequired) {
             $myLocation = (Split-Path -parent $MyInvocation.MyCommand.path)
             New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"& '%~dp0bootstrap.ps1' -JustFinishedUpdates`""
+			Write-Host "Restart Required. Restarting now..."
+			Read-Host 
             Restart-Computer -force
         }
+		Write-Host "All updates installed"
     }
     else{write-host "There is no update applicable to this machine"}    
 }

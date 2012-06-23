@@ -1,5 +1,5 @@
 param(
-    [string]$sku="dev",
+    [string]$sku="Light",
     [switch]$justFinishedUpdates
 )
 Start-Transcript -path $env:temp\transcript.log -Append
@@ -13,10 +13,13 @@ if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86
 if($justFinishedUpdates -eq $false){
     switch ($sku) {
         "Light" { #skuu for wife, kids or grandma
+            RunUpdatesWhenDone -GetUpdatesFromMS
+            <#
             Disable-UAC
             Configure-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
             Choc googlechrome 
             Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Google\Chrome\Application\chrome.exe"
+            #>
         }
         "dev" { #super ultra beta dev sku
             Disable-UAC
