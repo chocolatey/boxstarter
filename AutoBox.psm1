@@ -129,7 +129,6 @@ function Force-Windows-Update([switch]$getUpdatesFromMS) {
         $result = $Installer.Install()
 
         if($result.rebootRequired) {
-            $myLocation = (Split-Path -parent $MyInvocation.MyCommand.path)
             New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"& '%~dp0bootstrap.ps1' -JustFinishedUpdates`""
 			Write-Host "Restart Required. Restarting now..."
             Restart-Computer -force
