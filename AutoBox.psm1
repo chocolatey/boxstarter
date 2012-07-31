@@ -41,10 +41,10 @@ function Add-ExplorerMenuItem([string]$name, [string]$label, [string]$command, [
     if(!(test-path -LiteralPath "HKCR:\$key\shell\$name\command")) { new-item -Path "HKCR:\$key\shell\$name\command" }
     Set-ItemProperty -LiteralPath "HKCR:\$key\shell\$name\command" -Name "(Default)"  -Value "$command `"%1`""
 }
-function Choc([string] $package, [string]$source) {
+function cinst {
     Check-Chocolatey
     $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
-    .$chocolatey install $package $source
+    .$chocolatey install $args
 }
 function Enable-IIS-Win7 {
     .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install iis7 -source webpi
