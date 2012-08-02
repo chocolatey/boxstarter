@@ -101,5 +101,3 @@ Set-PinnedApplication -Action UnPinFromStartMenu -FilePath "C:\WINDOWS\system32\
     } 
     InvokeVerb -FilePath $FilePath -Verb $(GetVerb -VerbId $verbs.$action) 
 } 
- 
-Export-ModuleMember Set-PinnedApplication

@@ -3,3 +3,4 @@
 *.log
 BuildPackages/*
 !/BuildPackages/example
+*.nupkg

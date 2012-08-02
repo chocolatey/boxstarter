@@ -1,5 +1,4 @@
-Import-Module $PSScriptRoot\Externals\PinnedApplications.psm1
-import-module $PSScriptRoot\Externals\psake\psake.psm1
+. $PSScriptRoot\Externals\PinnedApplications.ps1
 . $PSScriptRoot\Externals\VsixInstallFunctions.ps1
 
 function Invoke-Autobox{
@@ -11,8 +10,13 @@ function Invoke-Autobox{
       Stop-Service -Name wuauserv
 
       if($justFinishedUpdates -eq $false){
-            $buildFile = "$PSScriptRoot\BuildPackages\$bootstrapPackage\default.ps1"
-            invoke-psake $buildFile
+            $localRepo = "$PSScriptRoot\BuildPackages"
+            if( Test-Path "$localRepo\$bootstrapPackage") {
+                cinst $bootstrapPackage -source $localRepo
+            }
+            else {
+                cinst all -source http://www.myget.org/F/$bootstrapPackage/
+            }
       }
 
       if($global:RunUpdatesWhenDone -or $justFinishedUpdates){Force-Windows-Update $global:GetUpdatesFromMSWhenDone}
@@ -46,13 +50,18 @@ function cinst {
     $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
     .$chocolatey install $args
 }
+function cinstm {
+    Check-Chocolatey
+    $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
+    .$chocolatey installmissing $args
+}
 function Enable-IIS-Win7 {
     .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install iis7 -source webpi
     DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-HttpCompressionDynamic 
     DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-ManagementScriptingTools 
     DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-WindowsAuthentication
 }
-function Enable-Telnet-Win7 {
+function Enable-Telnet {
     DISM /Online /NoRestart /Enable-Feature /FeatureName:TelnetClient 
 }
 function Enable-Net35 {
@@ -161,10 +170,11 @@ function Configure-ExplorerOptions([switch]$showHidenFilesFoldersDrives, [switch
 }
 function Check-Chocolatey{
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
-        New-Item $env:systemdrive\chocolatey -Force -type directory
+        $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
+        New-Item $env:ChocolateyInstall -Force -type directory
         iex ((new-object net.webclient).DownloadString('http://bit.ly/psChocInstall'))
-        Import-Module $env:systemdrive\chocolatey\chocolateyinstall\helpers\chocolateyInstaller.psm1
+        Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
     }
 }
 
-Export-ModuleMember Invoke-Autobox
+Export-ModuleMember Invoke-Autobox, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, cinst, cinstm

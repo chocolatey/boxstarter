@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <version>0.0.5</version>
+    <authors>Matt Wrock</authors>
+    <owners>Matt Wrock</owners>
+    <projectUrl>https://autobox.codeplex.com</projectUrl>
+    <id>autobox</id>
+    <title>Autobox</title>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Powershell functions that assist in bootstraping an environment</description>
+    <tags>devops bootstraper setup</tags>
+  </metadata>
+  <files>
+    <file src="..\Autobox.psm1" target="tools\Autobox"/>
+    <file src="..\Autobox.bat" target="tools\Autobox"/>    
+    <file src="..\Externals\*.*" target="tools\Autobox\Externals"/>
+    <file src="..\nuget\ChocolateyInstall.ps1" target="tools"/>
+  </files>
+</package>
