@@ -1,12 +1,12 @@
 . $PSScriptRoot\Externals\PinnedApplications.ps1
 . $PSScriptRoot\Externals\VsixInstallFunctions.ps1
 
-function Invoke-Autobox{
+function Invoke-BoxStarter{
       param(
           [string]$bootstrapPackage="default",
           [switch]$justFinishedUpdates
       )
-      try{Start-Transcript -path $env:temp\transcript.log -Append}catch{$autoboxIsNotTranscribing=$true}
+      try{Start-Transcript -path $env:temp\transcript.log -Append}catch{$BoxStarterIsNotTranscribing=$true}
       Stop-Service -Name wuauserv
 
       if($justFinishedUpdates -eq $false){
@@ -21,7 +21,7 @@ function Invoke-Autobox{
 
       if($global:RunUpdatesWhenDone -or $justFinishedUpdates){Force-Windows-Update $global:GetUpdatesFromMSWhenDone}
       Start-Service -Name wuauserv
-      if(!$autoboxIsNotTranscribing){Stop-Transcript}
+      if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
 }
 function Is64Bit {  [IntPtr]::Size -eq 8  }
 function Download-File([string] $url, [string] $path) {
@@ -55,7 +55,7 @@ function cinstm {
     $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
     .$chocolatey installmissing $args
 }
-function Enable-IIS-Win7 {
+function Enable-IIS {
     .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install iis7 -source webpi
     DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-HttpCompressionDynamic 
     DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-ManagementScriptingTools 
@@ -65,12 +65,7 @@ function Enable-Telnet {
     DISM /Online /NoRestart /Enable-Feature /FeatureName:TelnetClient 
 }
 function Enable-Net35 {
-    $os = (Get-WmiObject -class Win32_OperatingSystem).Caption
-    if($os.Contains('Server')){
-        import-module servermanager
-        Add-WindowsFeature "Net-Framework-Core"
-    }
-    elseif ($os.Contains('Windows 7')){DISM /Online /NoRestart /Enable-Feature /FeatureName:NetFx3}
+    DISM /Online /NoRestart /Enable-Feature /FeatureName:NetFx3
 }
 function Enable-Net40 {
     if(Is64Bit) {$fx="framework64"} else {$fx="framework"}
@@ -168,6 +163,11 @@ function Configure-ExplorerOptions([switch]$showHidenFilesFoldersDrives, [switch
     if($showProtectedOSFiles) {Set-ItemProperty $key ShowSuperHidden 1}
     Stop-Process -processname explorer -Force
 }
+function Set-TaskbarSmall {
+    $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
+    Set-ItemProperty $key TaskbarSmallIcons 1
+    Stop-Process -processname explorer -Force
+}
 function Check-Chocolatey{
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
         $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
@@ -177,4 +177,4 @@ function Check-Chocolatey{
     }
 }
 
-Export-ModuleMember Invoke-Autobox, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, cinst, cinstm
+Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, cinst, cinstm, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, RunUpdatesWhenDone, Configure-ExplorerOptions, Set-TaskbarSmall

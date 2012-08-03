@@ -1,16 +1,16 @@
 try {
   $sysDrive = $env:SystemDrive
-  $autoboxPath = "$sysDrive\tools\autobox"
-  if ([System.IO.Directory]::Exists($autoboxPath)) {[System.IO.Directory]::Delete($autoboxPath,$true)}
-  [System.IO.Directory]::CreateDirectory($autoboxPath)
+  $BoxStarterPath = "$sysDrive\tools\BoxStarter"
+  if ([System.IO.Directory]::Exists($BoxStarterPath)) {[System.IO.Directory]::Delete($BoxStarterPath,$true)}
+  [System.IO.Directory]::CreateDirectory($BoxStarterPath)
   
-  $autoboxFiles = Join-Path $(Split-Path -parent $MyInvocation.MyCommand.Definition) 'autobox'
+  $BoxStarterFiles = Join-Path $(Split-Path -parent $MyInvocation.MyCommand.Definition) 'BoxStarter'
   
-  write-host "Copying the contents of `'$autoboxFiles`' to `'$autoboxPath`'" 
-  Copy-Item "$($autoboxFiles)\*" $autoboxPath -recurse -force
+  write-host "Copying the contents of `'$BoxStarterFiles`' to `'$BoxStarterPath`'" 
+  Copy-Item "$($BoxStarterFiles)\*" $BoxStarterPath -recurse -force
 
-  Write-ChocolateySuccess 'autobox'
+  Write-ChocolateySuccess 'BoxStarter'
 } catch {
-  Write-ChocolateyFailure 'autobox' $($_.Exception.Message)
+  Write-ChocolateyFailure 'BoxStarter' $($_.Exception.Message)
   throw 
 }
