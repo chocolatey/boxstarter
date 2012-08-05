@@ -6,46 +6,46 @@ Enable-IIS-Win7
 Enable-Telnet-Win7
 Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:windir\system32\mstsc.exe"
 
-cinst console-devel
+Install-FromChocolatey console-devel
 Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\console\console.exe"
 
-cinst sublimetext2
+Install-FromChocolatey sublimetext2
 Set-PinnedApplication -Action PinToTaskbar -FilePath "$env:programfiles\Sublime Text 2\sublime_text.exe"
 Add-ExplorerMenuItem "sublime" "Open with Sublime Text 2" "$env:programfiles\Sublime Text 2\sublime_text.exe"
 Add-ExplorerMenuItem "sublime" "Open with Sublime Text 2" "$env:programfiles\Sublime Text 2\sublime_text.exe" "folder"
 Set-FileAssociation ".txt" "$env:programfiles\Sublime Text 2\sublime_text.exe"
 cmd /c assoc .=txtfile
 
-cinst skydrive
-cinst fiddler
-cinst posh-git-hg
-cinst git-credentials-winstore
-cinst tortoisehg
+Install-FromChocolatey skydrive
+Install-FromChocolatey fiddler
+Install-FromChocolatey posh-git-hg
+Install-FromChocolatey git-credentials-winstore
+Install-FromChocolatey tortoisehg
 
-cinst dotpeek
+Install-FromChocolatey dotpeek
 $dotPeekDir = (Get-ChildItem $env:systemdrive\chocolatey\lib\dotpeek* | select $_.last)
 Set-FileAssociation ".dll" "$dotPeekDir\tools\dotPeek.exe"
 
-cinst Paint.net
-cinst VirtualBox
-cinst windirstat
-cinst sysinternals
-cinst evernote
-cinst AutoHotKey
-cinst NugetPackageExplorer
-cinst PowerGUI
+Install-FromChocolatey Paint.net
+Install-FromChocolatey VirtualBox
+Install-FromChocolatey windirstat
+Install-FromChocolatey sysinternals
+Install-FromChocolatey evernote
+Install-FromChocolatey AutoHotKey
+Install-FromChocolatey NugetPackageExplorer
+Install-FromChocolatey PowerGUI
 
-cinst googlechrome
+Install-FromChocolatey googlechrome
 Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Google\Chrome\Application\chrome.exe"
 
-cinst WindowsLiveWriter
-cinst WindowsLiveMesh
-cinst sqlexpressmanagementstudio -source webpi
+Install-FromChocolatey WindowsLiveWriter
+Install-FromChocolatey WindowsLiveMesh
+Install-FromChocolatey sqlexpressmanagementstudio -source webpi
 
 Install-VS11-Beta
 Set-PinnedApplication -Action PinToTaskbar -FilePath "$programFiles86\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
 Install-ChocolateyPackage 'resharper' 'msi' '/quiet' 'http://download.jetbrains.com/resharper/ReSharperSetup.7.0.20.111.msi' 
-InstallVsixSilently http://visualstudiogallery.msdn.microsoft.com/463c5987-f82b-46c8-a97e-b1cde42b9099/file/66837/1/xunit.runner.visualstudio.vsix xunit.runner.visualstudio.vsix, "11.0"
-cinst TestDriven.Net
+Install-VsixSilently http://visualstudiogallery.msdn.microsoft.com/463c5987-f82b-46c8-a97e-b1cde42b9099/file/66837/1/xunit.runner.visualstudio.vsix xunit.runner.visualstudio.vsix, "11.0"
+Install-FromChocolatey TestDriven.Net
 
-RunUpdatesWhenDone -GetUpdatesFromMS
+Install-WindowsUpdatesWhenDone -GetUpdatesFromMS

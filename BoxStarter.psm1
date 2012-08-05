@@ -16,7 +16,7 @@ function Invoke-BoxStarter{
         cinst all -source http://www.myget.org/F/$bootstrapPackage/
     }
 
-    if($global:RunUpdatesWhenDone){Force-Windows-Update $global:GetUpdatesFromMSWhenDone}
+    if($global:InstallWindowsUpdateWhenDone){Install-WindowsUpdate $global:GetUpdatesFromMSWhenDone}
     Start-Service -Name wuauserv
     if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
 }
@@ -47,7 +47,7 @@ function cinst {
     $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
     .$chocolatey install $args
 }
-function cinstm {
+function Install-FromChocolatey {
     Check-Chocolatey
     $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
     .$chocolatey installmissing $args
@@ -80,12 +80,12 @@ function Disable-InternetExplorerESC {
     Stop-Process -Name Explorer -Force
     Write-Output "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
 }
-function RunUpdatesWhenDone([switch]$getUpdatesFromMS)
+function Install-WindowsUpdateWhenDone([switch]$getUpdatesFromMS)
 {
-    $global:RunUpdatesWhenDone = $true
+    $global:InstallWindowsUpdateWhenDone = $true
     $global:GetUpdatesFromMSWhenDone = $getUpdatesFromMS
 }
-function Force-Windows-Update([switch]$getUpdatesFromMS) {
+function Install-WindowsUpdate([switch]$getUpdatesFromMS) {
     if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
         remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
     }
@@ -131,7 +131,7 @@ function Force-Windows-Update([switch]$getUpdatesFromMS) {
         $result = $Installer.Install()
 
         if($result.rebootRequired) {
-            New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"Import-Module '$scriptPath\BoxStarter.psm1';Force-Windows-Update`""
+            New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"Import-Module '$scriptPath\BoxStarter.psm1';Install-WindowsUpdate`""
 			Write-Output "Restart Required. Restarting now..."
             Restart-Computer -force
         }
@@ -154,7 +154,7 @@ function Set-FileAssociation([string]$extOrType, [string]$command) {
         cmd /c $assocCmd
     }
 }
-function Configure-ExplorerOptions([switch]$showHidenFilesFoldersDrives, [switch]$showProtectedOSFiles, [switch]$showFileExtensions) {
+function Set-ExplorerOptions([switch]$showHidenFilesFoldersDrives, [switch]$showProtectedOSFiles, [switch]$showFileExtensions) {
     $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
     if($showHidenFilesFoldersDrives) {Set-ItemProperty $key Hidden 1}
     if($showFileExtensions) {Set-ItemProperty $key HideFileExt 0}
@@ -175,4 +175,4 @@ function Check-Chocolatey{
     }
 }
 
-Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, cinst, cinstm, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, RunUpdatesWhenDone, Configure-ExplorerOptions, Set-TaskbarSmall, Force-Windows-Update
+Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently

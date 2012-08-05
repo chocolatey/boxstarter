@@ -38,7 +38,7 @@ function curlex($url, $filename) {
 	return new-object io.fileinfo $path
 }
 
-function InstallVsixSilently($url, $name, $version = "10.0") {
+function Install-VsixSilently($url, $name, $version = "10.0") {
   vsvars32 $version
   vsixinstaller /q (curlex $url $name).FullName
 }
