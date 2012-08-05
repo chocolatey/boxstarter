@@ -2,30 +2,27 @@
 . $PSScriptRoot\Externals\VsixInstallFunctions.ps1
 
 function Invoke-BoxStarter{
-      param(
-          [string]$bootstrapPackage="default",
-          [switch]$justFinishedUpdates
-      )
-      try{Start-Transcript -path $env:temp\transcript.log -Append}catch{$BoxStarterIsNotTranscribing=$true}
-      Stop-Service -Name wuauserv
+    param(
+      [string]$bootstrapPackage="default"
+    )
+    try{Start-Transcript -path $env:temp\transcript.log -Append}catch{$BoxStarterIsNotTranscribing=$true}
+    Stop-Service -Name wuauserv
 
-      if($justFinishedUpdates -eq $false){
-            $localRepo = "$PSScriptRoot\BuildPackages"
-            if( Test-Path "$localRepo\$bootstrapPackage") {
-                cinst $bootstrapPackage -source $localRepo
-            }
-            else {
-                cinst all -source http://www.myget.org/F/$bootstrapPackage/
-            }
-      }
+    $localRepo = "$PSScriptRoot\BuildPackages"
+    if( Test-Path "$localRepo\$bootstrapPackage") {
+        cinst $bootstrapPackage -source $localRepo
+    }
+    else {
+        cinst all -source http://www.myget.org/F/$bootstrapPackage/
+    }
 
-      if($global:RunUpdatesWhenDone -or $justFinishedUpdates){Force-Windows-Update $global:GetUpdatesFromMSWhenDone}
-      Start-Service -Name wuauserv
-      if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
+    if($global:RunUpdatesWhenDone){Force-Windows-Update $global:GetUpdatesFromMSWhenDone}
+    Start-Service -Name wuauserv
+    if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
 }
 function Is64Bit {  [IntPtr]::Size -eq 8  }
 function Download-File([string] $url, [string] $path) {
-    Write-Host "Downloading $url to $path"
+    Write-Output "Downloading $url to $path"
     $downloader = new-object System.Net.WebClient
     $downloader.DownloadFile($url, $path) 
 }
@@ -81,7 +78,7 @@ function Disable-InternetExplorerESC {
     Set-ItemProperty -Path $AdminKey -Name "IsInstalled" -Value 0
     Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
     Stop-Process -Name Explorer -Force
-    Write-Host "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
+    Write-Output "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
 }
 function RunUpdatesWhenDone([switch]$getUpdatesFromMS)
 {
@@ -98,6 +95,7 @@ function Force-Windows-Update([switch]$getUpdatesFromMS) {
         Stop-Service -Name wuauserv
         Start-Service -Name wuauserv
     }
+    Write-Output "Checking for updates..."
     $updateSession =new-object -comobject "Microsoft.Update.Session"
     $updatesToDownload =new-Object -com "Microsoft.Update.UpdateColl"
     $updatesToInstall =new-object -com "Microsoft.Update.UpdateColl"
@@ -108,38 +106,38 @@ function Force-Windows-Update([switch]$getUpdatesFromMS) {
 
     If ($Result.updates.count -ne 0)
     {
-        write-host $Result.updates.count " Updates found"
+        Write-Output $Result.updates.count " Updates found"
         foreach($update in $result.updates) {
             if ($update.isDownloaded -ne "true") {
-            	write-host " * Adding " $update.title " to list of updates to download"
+            	Write-Output " * Adding " $update.title " to list of updates to download"
                 $updatesToDownload.add($update) | Out-Null
             }
-			else {write-host " * " $update.title " already downloaded"}
+			else {Write-Output " * " $update.title " already downloaded"}
         }
 
         If ($updatesToDownload.Count -gt 0) {
-			Write-Host "Beginning to download " $updatesToDownload.Count " updates"
+			Write-Output "Beginning to download " $updatesToDownload.Count " updates"
             $Downloader.Updates = $updatesToDownload
             $Downloader.Download()
         }
 		
-        write-host "Downloading complete"
+        Write-Output "Downloading complete"
         foreach($update in $result.updates) {
             $updatesToinstall.add($update) | Out-Null
         }
 
-		Write-Host "Beginning to install"
+		Write-Output "Beginning to install"
         $Installer.updates = $UpdatesToInstall
         $result = $Installer.Install()
 
         if($result.rebootRequired) {
-            New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"& '%~dp0bootstrap.ps1' -JustFinishedUpdates`""
-			Write-Host "Restart Required. Restarting now..."
+            New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"Import-Module '$scriptPath\BoxStarter.psm1';Force-Windows-Update`""
+			Write-Output "Restart Required. Restarting now..."
             Restart-Computer -force
         }
-		Write-Host "All updates installed"
+		Write-Output "All updates installed"
     }
-    else{write-host "There is no update applicable to this machine"}    
+    else{Write-Output "There is no update applicable to this machine"}    
 }
 function Set-FileAssociation([string]$extOrType, [string]$command) {
     if(-not($extOrType.StartsWith("."))) {$fileType=$extOrType}
@@ -148,10 +146,10 @@ function Set-FileAssociation([string]$extOrType, [string]$command) {
         if($testType -ne $null) {$fileType=$testType.Split("=")[1]}
     }
     if($fileType -eq $null) {
-        write-host "Unable to Find File Type for $extOrType"
+        Write-Output "Unable to Find File Type for $extOrType"
     }
     else {
-        write-host "Associating $fileType with $command"
+        Write-Output "Associating $fileType with $command"
         $assocCmd = "ftype $fileType=`"$command`" %1"
         cmd /c $assocCmd
     }
@@ -177,4 +175,4 @@ function Check-Chocolatey{
     }
 }
 
-Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, cinst, cinstm, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, RunUpdatesWhenDone, Configure-ExplorerOptions, Set-TaskbarSmall
+Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, cinst, cinstm, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, RunUpdatesWhenDone, Configure-ExplorerOptions, Set-TaskbarSmall, Force-Windows-Update
