@@ -3,6 +3,9 @@
 	[
 		{
 			"path": "/D/dev/boxstarter"
+		},
+		{
+			"path": "/C/dev/boxstarter"
 		}
 	]
 }
