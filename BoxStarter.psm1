@@ -5,12 +5,12 @@ function Invoke-BoxStarter{
     param(
       [string]$bootstrapPackage="default"
     )
-    try{Start-Transcript -path $env:temp\transcript.log -Append}catch{$BoxStarterIsNotTranscribing=$true}
+    try{Start-Transcript -path $env:temp\boxstrter.log -Append}catch{$BoxStarterIsNotTranscribing=$true}
     Stop-Service -Name wuauserv
 
     $localRepo = "$PSScriptRoot\BuildPackages"
     if( Test-Path "$localRepo\$bootstrapPackage") {
-        cinst $bootstrapPackage -source $localRepo
+        .$localRepo\$bootstrapPackage\boxstarterInstall.ps1
     }
     else {
         cinst all -source http://www.myget.org/F/$bootstrapPackage/
@@ -20,6 +20,7 @@ function Invoke-BoxStarter{
     Start-Service -Name wuauserv
     if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
 }
+
 function Is64Bit {  [IntPtr]::Size -eq 8  }
 function Download-File([string] $url, [string] $path) {
     Write-Output "Downloading $url to $path"
