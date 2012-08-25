@@ -50,6 +50,12 @@ function Install-FromChocolatey {
     $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
     .$chocolatey installmissing $args
 }
+function Sync-Skydrive ([string]$skydriveDirectory, [string]$targetDirectory) {
+    Cmd /c mklink /d "$targetDirectory" "$env:userprofile\skydrive\$skydriveDirectory"
+}
+function Enable-HyperV {
+    DISM /Online /NoRestart /Enable-Feature /FeatureName:Microsoft-Hyper-V-All 
+}
 function Enable-IIS {
     .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install iis7 -source webpi
     DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-HttpCompressionDynamic 
@@ -177,4 +183,4 @@ function Add-PersistentEnvVar ($name, $value) {
     Set-content "env:\$name" $value
 }
 
-Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently,Add-PersistentEnvVar
+Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently,Add-PersistentEnvVar, Sync-Skydrive, Enable-HyperV
