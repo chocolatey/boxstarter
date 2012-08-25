@@ -50,8 +50,12 @@ function Install-FromChocolatey {
     $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
     .$chocolatey installmissing $args
 }
-function Sync-Skydrive ([string]$skydriveDirectory, [string]$targetDirectory) {
-    Cmd /c mklink /d "$targetDirectory" "$env:userprofile\skydrive\$skydriveDirectory"
+function Set-PersonalDirectory ([string]$path, [switch]$admin) {
+    Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' Personal $path
+    if($admin){
+        Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders' Personal $path
+    }
+    Stop-Process -processname explorer -Force
 }
 function Enable-HyperV {
     DISM /Online /NoRestart /Enable-Feature /FeatureName:Microsoft-Hyper-V-All 
@@ -183,4 +187,4 @@ function Add-PersistentEnvVar ($name, $value) {
     Set-content "env:\$name" $value
 }
 
-Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently,Add-PersistentEnvVar, Sync-Skydrive, Enable-HyperV
+Export-ModuleMember Invoke-BoxStater, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently,Add-PersistentEnvVar, Set-PersonalDirectory, Enable-HyperV
