@@ -50,12 +50,19 @@ function Install-FromChocolatey {
     $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
     .$chocolatey installmissing $args
 }
-function Set-PersonalDirectory ([string]$path, [switch]$admin) {
-    Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' Personal $path
-    if($admin){
-        Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders' Personal $path
+function Move-LibraryDirectory ([string]$libraryName, [string]$newPath) {
+    $shells = (Get-Item 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders')
+    if(-not $shells.Property.Contains($libraryName)) {
+        throw "$libraryName is not a valid Library"
     }
+    $oldPath =  (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' -name "$libraryName")."$libraryName"
+    if(-not (test-path "$newPath")){
+        New-Item $newPath -type directory
+    }
+    Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' $libraryName $newPath
+    Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders' $libraryName $newPath
     Stop-Process -processname explorer -Force
+    Move-Item -Force $oldPath/* $newPath
 }
 function Enable-HyperV {
     DISM /Online /NoRestart /Enable-Feature /FeatureName:Microsoft-Hyper-V-All 
@@ -187,4 +194,4 @@ function Add-PersistentEnvVar ($name, $value) {
     Set-content "env:\$name" $value
 }
 
-Export-ModuleMember Invoke-BoxStater, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently,Add-PersistentEnvVar, Set-PersonalDirectory, Enable-HyperV
+Export-ModuleMember Invoke-BoxStater, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently,Add-PersistentEnvVar, Move-LibraryDirectory, Enable-HyperV
