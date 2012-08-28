@@ -9,7 +9,7 @@ function Invoke-BoxStarter{
     Stop-Service -Name wuauserv
 
     $localRepo = "$PSScriptRoot\BuildPackages"
-    Add-PersistentEnvVar bs_package, $args
+    Add-PersistentEnvVar bs_package $args
     if( Test-Path "$localRepo\$bootstrapPackage") {
         cinst $bootstrapPackage -source $localRepo -force
     }
@@ -58,10 +58,10 @@ function Move-LibraryDirectory ([string]$libraryName, [string]$newPath) {
         throw "$libraryName is not a valid Library"
     }
     $oldPath =  (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' -name "$libraryName")."$libraryName"
-    if((resolve-path $oldPath).Path -eq (resolve-path $newPath).Path) {return}
     if(-not (test-path "$newPath")){
         New-Item $newPath -type directory
     }
+    if((resolve-path $oldPath).Path -eq (resolve-path $newPath).Path) {return}
     Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' $libraryName $newPath
     Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders' $libraryName $newPath
     Stop-Process -processname explorer -Force
