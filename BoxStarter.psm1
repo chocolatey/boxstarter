@@ -5,22 +5,28 @@ function Invoke-BoxStarter{
     param(
       [string]$bootstrapPackage="default"
     )
-    try{Start-Transcript -path $env:temp\boxstrter.log -Append}catch{$BoxStarterIsNotTranscribing=$true}
-    Stop-Service -Name wuauserv
+    try{
+        try{Start-Transcript -path $env:temp\boxstrter.log -Append}catch{$BoxStarterIsNotTranscribing=$true}
+        Stop-Service -Name wuauserv
 
-    $localRepo = "$PSScriptRoot\BuildPackages"
-    Add-PersistentEnvVar "bs_package" $bootstrapPackage
-    if( Test-Path "$localRepo\$bootstrapPackage") {
-        cinst $bootstrapPackage -source $localRepo -force
-    }
-    else {
-        cinst all -source http://www.myget.org/F/$bootstrapPackage/ -force
-    }
+        $localRepo = "$PSScriptRoot\BuildPackages"
+        New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$PSScriptRoot\BoxStarter.bat %bs_package%"
+        if( Test-Path "$localRepo\$bootstrapPackage") {
+            cinst $bootstrapPackage -source $localRepo -force
+        }
+        else {
+            cinst all -source http://www.myget.org/F/$bootstrapPackage/ -force
+        }
 
-    if($global:InstallWindowsUpdateWhenDone){Install-WindowsUpdate $global:GetUpdatesFromMSWhenDone}
-    Start-Service -Name wuauserv
-    Add-PersistentEnvVar bs_package, ""
-    if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
+        if($global:InstallWindowsUpdateWhenDone){Install-WindowsUpdate $global:GetUpdatesFromMSWhenDone}
+        Start-Service -Name wuauserv
+        if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
+    }
+    finally{
+        if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
+            remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
+        }
+    }
 }
 
 function Is64Bit {  [IntPtr]::Size -eq 8  }
@@ -32,15 +38,15 @@ function Download-File([string] $url, [string] $path) {
 function Disable-UAC {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA  -Value 0
 }
-function Add-ExplorerMenuItem([string]$name, [string]$label, [string]$command, [string]$type = "file"){
+function Add-ExplorerMenuItem([string]$menuKey, [string]$menuLabel, [string]$command, [ValidateSet('file','directory')][string]$type = "file"){
     if( -not (Test-Path -path HKCR:) ) {
         New-PSDrive -Name HKCR -PSProvider registry -Root Hkey_Classes_Root
     }
     if($type -eq "file") {$key = "*"} elseif($type -eq "directory") {$key="directory"} else{ return }
-    if(!(test-path -LiteralPath "HKCR:\$key\shell\$name")) { new-item -Path "HKCR:\$key\shell\$name" }
-    Set-ItemProperty -LiteralPath "HKCR:\$key\shell\$name" -Name "(Default)"  -Value "$label"
-    if(!(test-path -LiteralPath "HKCR:\$key\shell\$name\command")) { new-item -Path "HKCR:\$key\shell\$name\command" }
-    Set-ItemProperty -LiteralPath "HKCR:\$key\shell\$name\command" -Name "(Default)"  -Value "$command `"%1`""
+    if(!(test-path -LiteralPath "HKCR:\$key\shell\$menuKey")) { new-item -Path "HKCR:\$key\shell\$menuKey" }
+    Set-ItemProperty -LiteralPath "HKCR:\$key\shell\$menuKey" -Name "(Default)"  -Value "$menuLabel"
+    if(!(test-path -LiteralPath "HKCR:\$key\shell\$menuKey\command")) { new-item -Path "HKCR:\$key\shell\$menuKey\command" }
+    Set-ItemProperty -LiteralPath "HKCR:\$key\shell\$menuKey\command" -Name "(Default)"  -Value "$command `"%1`""
 }
 function cinst {
     Check-Chocolatey
@@ -104,10 +110,6 @@ function Install-WindowsUpdateWhenDone([switch]$getUpdatesFromMS)
     $global:GetUpdatesFromMSWhenDone = $getUpdatesFromMS
 }
 function Install-WindowsUpdate([switch]$getUpdatesFromMS) {
-    if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
-        remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
-    }
-
     if($getUpdatesFromMS) {
         Remove-Item -Path HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate -Force -Recurse -ErrorAction SilentlyContinue
         Stop-Service -Name wuauserv
@@ -151,9 +153,6 @@ function Install-WindowsUpdate([switch]$getUpdatesFromMS) {
         if($result.rebootRequired) {
             if($global:InstallWindowsUpdateWhenDone) {
                 New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"Import-Module '$PSScriptRoot\BoxStarter.psm1';Install-WindowsUpdate`""
-            }
-            else {
-                New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$PSScriptRoot\BoxStarter.bat %bs_package%"
             }
 			Write-Output "Restart Required. Restarting now..."
             Restart-Computer -force
