@@ -9,15 +9,17 @@ function Invoke-BoxStarter{
     Stop-Service -Name wuauserv
 
     $localRepo = "$PSScriptRoot\BuildPackages"
+    Add-PersistentEnvVar bs_package, $args
     if( Test-Path "$localRepo\$bootstrapPackage") {
-        .$localRepo\$bootstrapPackage\boxstarterInstall.ps1
+        cinst $bootstrapPackage -source $localRepo -force
     }
     else {
-        cinst all -source http://www.myget.org/F/$bootstrapPackage/
+        cinst all -source http://www.myget.org/F/$bootstrapPackage/ -force
     }
 
     if($global:InstallWindowsUpdateWhenDone){Install-WindowsUpdate $global:GetUpdatesFromMSWhenDone}
     Start-Service -Name wuauserv
+    Add-PersistentEnvVar bs_package, ""
     if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
 }
 
@@ -56,6 +58,7 @@ function Move-LibraryDirectory ([string]$libraryName, [string]$newPath) {
         throw "$libraryName is not a valid Library"
     }
     $oldPath =  (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' -name "$libraryName")."$libraryName"
+    if((resolve-path $oldPath).Path -eq (resolve-path $newPath).Path) {return}
     if(-not (test-path "$newPath")){
         New-Item $newPath -type directory
     }
@@ -146,7 +149,12 @@ function Install-WindowsUpdate([switch]$getUpdatesFromMS) {
         $result = $Installer.Install()
 
         if($result.rebootRequired) {
-            New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"Import-Module '$scriptPath\BoxStarter.psm1';Install-WindowsUpdate`""
+            if($global:InstallWindowsUpdateWhenDone) {
+                New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"Import-Module '$PSScriptRoot\BoxStarter.psm1';Install-WindowsUpdate`""
+            }
+            else {
+                New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$PSScriptRoot\BoxStarter.bat %bs_package%"
+            }
 			Write-Output "Restart Required. Restarting now..."
             Restart-Computer -force
         }
@@ -194,4 +202,4 @@ function Add-PersistentEnvVar ($name, $value) {
     Set-content "env:\$name" $value
 }
 
-Export-ModuleMember Invoke-BoxStater, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently,Add-PersistentEnvVar, Move-LibraryDirectory, Enable-HyperV
+Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently,Add-PersistentEnvVar, Move-LibraryDirectory, Enable-HyperV
