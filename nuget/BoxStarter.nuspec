@@ -13,7 +13,8 @@
   </metadata>
   <files>
     <file src="..\BoxStarter.psm1" target="tools\BoxStarter"/>
-    <file src="..\BoxStarter.bat" target="tools\BoxStarter"/>    
+    <file src="..\BoxStarter.bat" target="tools\BoxStarter"/>
+    <file src="..\adminproxy.ps1" target="tools\BoxStarter"/>    
     <file src="..\Externals\*.*" target="tools\BoxStarter\Externals"/>
     <file src="..\nuget\ChocolateyInstall.ps1" target="tools"/>
   </files>

@@ -9,7 +9,7 @@ function Invoke-BoxStarter{
     Stop-Service -Name wuauserv
 
     $localRepo = "$PSScriptRoot\BuildPackages"
-    Add-PersistentEnvVar bs_package $args
+    Add-PersistentEnvVar "bs_package" $bootstrapPackage
     if( Test-Path "$localRepo\$bootstrapPackage") {
         cinst $bootstrapPackage -source $localRepo -force
     }
