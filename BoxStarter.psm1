@@ -10,7 +10,7 @@ function Invoke-BoxStarter{
         Stop-Service -Name wuauserv
 
         $localRepo = "$PSScriptRoot\BuildPackages"
-        New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$PSScriptRoot\BoxStarter.bat %bs_package%"
+        New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$PSScriptRoot\BoxStarter.bat $bootstrapPackage
         if( Test-Path "$localRepo\$bootstrapPackage") {
             cinst $bootstrapPackage -source $localRepo -force
         }
