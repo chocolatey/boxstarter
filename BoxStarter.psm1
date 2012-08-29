@@ -1,5 +1,5 @@
 . $PSScriptRoot\Externals\PinnedApplications.ps1
-. $PSScriptRoot\Externals\VsixInstallFunctions.ps1
+. $PSScriptRoot\Externals\VsixInstallFunctions.psm1
 
 function Invoke-BoxStarter{
     param(
@@ -59,6 +59,8 @@ function Install-FromChocolatey {
     .$chocolatey installmissing $args
 }
 function Move-LibraryDirectory ([string]$libraryName, [string]$newPath) {
+    #why name the key downloads when you can name it {374DE290-123F-4565-9164-39C4925E467B}? duh.
+    if($libraryName.ToLower() -eq "downloads") {$libraryName="{374DE290-123F-4565-9164-39C4925E467B}"}
     $shells = (Get-Item 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders')
     if(-not $shells.Property.Contains($libraryName)) {
         throw "$libraryName is not a valid Library"
@@ -200,5 +202,7 @@ function Add-PersistentEnvVar ($name, $value) {
     [Environment]::SetEnvironmentVariable($name,$value, 'Machine')
     Set-content "env:\$name" $value
 }
-
-Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently,Add-PersistentEnvVar, Move-LibraryDirectory, Enable-HyperV
+function Enable-RemoteDesktop {
+    (Get-WmiObject -Class "Win32_TerminalServiceSetting" -Namespace root\cimv2\terminalservices).SetAllowTsConnections(1)
+}
+Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently,Add-PersistentEnvVar, Move-LibraryDirectory, Enable-HyperV, Enable-RemoteDesktop
