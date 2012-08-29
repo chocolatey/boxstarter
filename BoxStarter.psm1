@@ -1,5 +1,5 @@
 . $PSScriptRoot\Externals\PinnedApplications.ps1
-. $PSScriptRoot\Externals\VsixInstallFunctions.psm1
+. $PSScriptRoot\Externals\VsixInstallFunctions.ps1
 
 function Invoke-BoxStarter{
     param(
