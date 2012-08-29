@@ -76,7 +76,7 @@ function Move-LibraryDirectory ([string]$libraryName, [string]$newPath) {
     Move-Item -Force $oldPath/* $newPath
 }
 function Enable-HyperV {
-    DISM /Online /NoRestart /Enable-Feature /FeatureName:Microsoft-Hyper-V-All 
+    DISM /Online /NoRestart /Enable-Feature /FeatureName:Microsoft-Hyper-V 
 }
 function Enable-IIS {
     .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install iis7 -source webpi
