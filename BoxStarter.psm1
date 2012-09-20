@@ -1,4 +1,3 @@
-. $PSScriptRoot\Externals\PinnedApplications.ps1
 . $PSScriptRoot\Externals\VsixInstallFunctions.ps1
 
 function Invoke-BoxStarter{
@@ -6,6 +5,7 @@ function Invoke-BoxStarter{
       [string]$bootstrapPackage="default"
     )
     try{
+        Check-Chocolatey
         try{Start-Transcript -path $env:temp\boxstrter.log -Append}catch{$BoxStarterIsNotTranscribing=$true}
         Stop-Service -Name wuauserv
 
@@ -30,33 +30,8 @@ function Invoke-BoxStarter{
 }
 
 function Is64Bit {  [IntPtr]::Size -eq 8  }
-function Download-File([string] $url, [string] $path) {
-    Write-Output "Downloading $url to $path"
-    $downloader = new-object System.Net.WebClient
-    $downloader.DownloadFile($url, $path) 
-}
 function Disable-UAC {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA  -Value 0
-}
-function Add-ExplorerMenuItem([string]$menuKey, [string]$menuLabel, [string]$command, [ValidateSet('file','directory')][string]$type = "file"){
-    if( -not (Test-Path -path HKCR:) ) {
-        New-PSDrive -Name HKCR -PSProvider registry -Root Hkey_Classes_Root
-    }
-    if($type -eq "file") {$key = "*"} elseif($type -eq "directory") {$key="directory"} else{ return }
-    if(!(test-path -LiteralPath "HKCR:\$key\shell\$menuKey")) { new-item -Path "HKCR:\$key\shell\$menuKey" }
-    Set-ItemProperty -LiteralPath "HKCR:\$key\shell\$menuKey" -Name "(Default)"  -Value "$menuLabel"
-    if(!(test-path -LiteralPath "HKCR:\$key\shell\$menuKey\command")) { new-item -Path "HKCR:\$key\shell\$menuKey\command" }
-    Set-ItemProperty -LiteralPath "HKCR:\$key\shell\$menuKey\command" -Name "(Default)"  -Value "$command `"%1`""
-}
-function cinst {
-    Check-Chocolatey
-    $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
-    .$chocolatey install $args
-}
-function Install-FromChocolatey {
-    Check-Chocolatey
-    $chocolatey="$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd"
-    .$chocolatey installmissing $args
 }
 function Move-LibraryDirectory ([string]$libraryName, [string]$newPath) {
     #why name the key downloads when you can name it {374DE290-123F-4565-9164-39C4925E467B}? duh.
@@ -75,26 +50,10 @@ function Move-LibraryDirectory ([string]$libraryName, [string]$newPath) {
     Stop-Process -processname explorer -Force
     Move-Item -Force $oldPath/* $newPath
 }
-function Enable-HyperV {
-    DISM /Online /NoRestart /Enable-Feature /FeatureName:Microsoft-Hyper-V
-    DISM /Online /NoRestart /Enable-Feature /all /FeatureName:Microsoft-Hyper-V-Management-Clients
-}
-function Enable-IIS {
-    .$env:systemdrive\chocolatey\chocolateyinstall\chocolatey.cmd install iis7 -source webpi
-    DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-HttpCompressionDynamic 
-    DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-ManagementScriptingTools 
-    DISM /Online /NoRestart /Enable-Feature /FeatureName:IIS-WindowsAuthentication
-}
-function Enable-Telnet {
-    DISM /Online /NoRestart /Enable-Feature /FeatureName:TelnetClient 
-}
-function Enable-Net35 {
-    DISM /Online /NoRestart /Enable-Feature /FeatureName:NetFx3
-}
+
 function Enable-Net40 {
     if(Is64Bit) {$fx="framework64"} else {$fx="framework"}
-    if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319") -and -not $GetRepoOnly) {
-        Import-Module $env:systemdrive\chocolatey\chocolateyinstall\helpers\chocolateyInstaller.psm1
+    if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
         Install-ChocolateyZipPackage 'webcmd' 'http://www.iis.net/community/files/webpi/webpicmdline_anycpu.zip' $env:temp
         .$env:temp\WebpiCmdLine.exe /products: NetFramework4 /accepteula
     }
@@ -164,21 +123,6 @@ function Install-WindowsUpdate([switch]$getUpdatesFromMS) {
     }
     else{Write-Output "There is no update applicable to this machine"}    
 }
-function Set-FileAssociation([string]$extOrType, [string]$command) {
-    if(-not($extOrType.StartsWith("."))) {$fileType=$extOrType}
-    if($fileType -eq $null) {
-        $testType = (cmd /c assoc $extOrType)
-        if($testType -ne $null) {$fileType=$testType.Split("=")[1]}
-    }
-    if($fileType -eq $null) {
-        Write-Output "Unable to Find File Type for $extOrType"
-    }
-    else {
-        Write-Output "Associating $fileType with $command"
-        $assocCmd = "ftype $fileType=`"$command`" %1"
-        cmd /c $assocCmd
-    }
-}
 function Set-ExplorerOptions([switch]$showHidenFilesFoldersDrives, [switch]$showProtectedOSFiles, [switch]$showFileExtensions) {
     $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
     if($showHidenFilesFoldersDrives) {Set-ItemProperty $key Hidden 1}
@@ -195,16 +139,14 @@ function Check-Chocolatey{
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
         $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
         New-Item $env:ChocolateyInstall -Force -type directory
-        iex ((new-object net.webclient).DownloadString('http://bit.ly/psChocInstall'))
-        Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
+        $url="http://chocolatey.org/packages/chocolatey/0.9.8.20-alpha1"
+        iex ((new-object net.webclient).DownloadString('https://raw.github.com/mwrock/chocolatey/BootstrapUrlOverride/chocolateyInstall/InstallChocolatey.ps1'))
+        Enable-Net40
     }
-}
-function Add-PersistentEnvVar ($name, $value) {
-    [Environment]::SetEnvironmentVariable($name,$value, 'Machine')
-    Set-content "env:\$name" $value
+        Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
 }
 function Enable-RemoteDesktop {
     (Get-WmiObject -Class "Win32_TerminalServiceSetting" -Namespace root\cimv2\terminalservices).SetAllowTsConnections(1)
     netsh advfirewall firewall set rule group="Remote Desktop" new enable=yes
 }
-Export-ModuleMember Invoke-BoxStarter, Set-PinnedApplication, Enable-Telnet, Add-ExplorerMenuItem, Set-FileAssociation, Install-FromChocolatey, Disable-UAC, Enable-IIS, Enable-Net35, Enable-Net40, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently,Add-PersistentEnvVar, Move-LibraryDirectory, Enable-HyperV, Enable-RemoteDesktop
+Export-ModuleMember Invoke-BoxStarter, Disable-UAC, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently, Move-LibraryDirectory, Enable-RemoteDesktop
