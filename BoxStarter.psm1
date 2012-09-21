@@ -1,4 +1,5 @@
 . $PSScriptRoot\Externals\VsixInstallFunctions.ps1
+[xml]$config = Get-Content "$PSScriptRoot\BoxStarter.config"
 
 function Invoke-BoxStarter{
     param(
@@ -139,8 +140,8 @@ function Check-Chocolatey{
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
         $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
         New-Item $env:ChocolateyInstall -Force -type directory
-        $url="http://chocolatey.org/packages/chocolatey/0.9.8.20-alpha1"
-        iex ((new-object net.webclient).DownloadString('https://raw.github.com/mwrock/chocolatey/BootstrapUrlOverride/chocolateyInstall/InstallChocolatey.ps1'))
+        $url=$config.ChocolateyPackage
+        iex ((new-object net.webclient).DownloadString($config.ChocolateyRepo))
         Enable-Net40
     }
         Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
