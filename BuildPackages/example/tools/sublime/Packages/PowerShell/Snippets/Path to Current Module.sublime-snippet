@@ -1,0 +1,5 @@
+<snippet>
+    <content><![CDATA[\$script:thisDir = split-path \$MyInvocation.MyCommand.Path -parent]]></content>
+    <tabTrigger>thisdir</tabTrigger>
+    <scope>source.powershell</scope>
+</snippet>

@@ -1,0 +1,5 @@
+<snippet>
+    <content><![CDATA[set-psdebug ${1:-${2:Step}}$0]]></content>
+    <tabTrigger>sd</tabTrigger>
+    <scope>source.powershell</scope>
+</snippet>

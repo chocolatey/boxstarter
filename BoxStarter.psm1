@@ -1,25 +1,24 @@
-. $PSScriptRoot\Externals\VsixInstallFunctions.ps1
-[xml]$config = Get-Content "$PSScriptRoot\BoxStarter.config"
+if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
+$Boxstarter = @{ProgramFiles86="$programFiles86";ChocolateyBin="$env:systemdrive\chocolatey\bin"}
+[xml]$configXml = Get-Content "$PSScriptRoot\BoxStarter.config"
+$config = $configXml.config
 
 function Invoke-BoxStarter{
     param(
       [string]$bootstrapPackage="default"
     )
     try{
-        Check-Chocolatey
         try{Start-Transcript -path $env:temp\boxstrter.log -Append}catch{$BoxStarterIsNotTranscribing=$true}
+        Check-Chocolatey
         Stop-Service -Name wuauserv
 
         $localRepo = "$PSScriptRoot\BuildPackages"
         New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$PSScriptRoot\BoxStarter.bat $bootstrapPackage"
-        if( Test-Path "$localRepo\$bootstrapPackage.*.nupkg") {
-            cinst $bootstrapPackage -source $localRepo -force
-        }
-        else {
-            cinst all -source http://www.myget.org/F/$bootstrapPackage/ -force
-        }
+        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install boxstarter -source "http://www.myget.org/F/work/api/v2/"
+        import-module $env:systemdrive\tools\boxStarter\boxstarter.psm1
+        del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force
+        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install $bootstrapPackage -source "$localRepo;http://chocolatey.org/api/v2/" -force
 
-        if($global:InstallWindowsUpdateWhenDone){Install-WindowsUpdate $global:GetUpdatesFromMSWhenDone}
         Start-Service -Name wuauserv
         if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
     }
@@ -31,6 +30,7 @@ function Invoke-BoxStarter{
 }
 
 function Is64Bit {  [IntPtr]::Size -eq 8  }
+
 function Disable-UAC {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA  -Value 0
 }
@@ -38,7 +38,7 @@ function Move-LibraryDirectory ([string]$libraryName, [string]$newPath) {
     #why name the key downloads when you can name it {374DE290-123F-4565-9164-39C4925E467B}? duh.
     if($libraryName.ToLower() -eq "downloads") {$libraryName="{374DE290-123F-4565-9164-39C4925E467B}"}
     $shells = (Get-Item 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders')
-    if(-not $shells.Property.Contains($libraryName)) {
+    if(-not ($shells.Property -Contains $libraryName)) {
         throw "$libraryName is not a valid Library"
     }
     $oldPath =  (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' -name "$libraryName")."$libraryName"
@@ -48,7 +48,7 @@ function Move-LibraryDirectory ([string]$libraryName, [string]$newPath) {
     if((resolve-path $oldPath).Path -eq (resolve-path $newPath).Path) {return}
     Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' $libraryName $newPath
     Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders' $libraryName $newPath
-    Stop-Process -processname explorer -Force
+    Restart-Explorer
     Move-Item -Force $oldPath/* $newPath
 }
 
@@ -64,7 +64,7 @@ function Disable-InternetExplorerESC {
     $UserKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
     Set-ItemProperty -Path $AdminKey -Name "IsInstalled" -Value 0
     Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
-    Stop-Process -Name Explorer -Force
+    Restart-Explorer
     Write-Output "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
 }
 function Install-WindowsUpdateWhenDone([switch]$getUpdatesFromMS)
@@ -129,12 +129,12 @@ function Set-ExplorerOptions([switch]$showHidenFilesFoldersDrives, [switch]$show
     if($showHidenFilesFoldersDrives) {Set-ItemProperty $key Hidden 1}
     if($showFileExtensions) {Set-ItemProperty $key HideFileExt 0}
     if($showProtectedOSFiles) {Set-ItemProperty $key ShowSuperHidden 1}
-    Stop-Process -processname explorer -Force
+    Restart-Explorer
 }
 function Set-TaskbarSmall {
     $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
     Set-ItemProperty $key TaskbarSmallIcons 1
-    Stop-Process -processname explorer -Force
+    Restart-Explorer
 }
 function Check-Chocolatey{
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
@@ -144,10 +144,15 @@ function Check-Chocolatey{
         iex ((new-object net.webclient).DownloadString($config.ChocolateyRepo))
         Enable-Net40
     }
-        Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
+    Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
 }
 function Enable-RemoteDesktop {
     (Get-WmiObject -Class "Win32_TerminalServiceSetting" -Namespace root\cimv2\terminalservices).SetAllowTsConnections(1)
     netsh advfirewall firewall set rule group="Remote Desktop" new enable=yes
 }
-Export-ModuleMember Invoke-BoxStarter, Disable-UAC, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Install-VsixSilently, Move-LibraryDirectory, Enable-RemoteDesktop
+function Restart-Explorer {
+    Stop-Process -processname explorer -Force
+    start-process $env:systemroot\explorer.exe
+}
+Export-ModuleMember Invoke-BoxStarter, Disable-UAC, Disable-InternetExplorerESC, Install-WindowsUpdateWhenDone, Set-ExplorerOptions, Set-TaskbarSmall, Install-WindowsUpdate, Move-LibraryDirectory, Enable-RemoteDesktop
+Export-ModuleMember -Variable $Boxstarter
