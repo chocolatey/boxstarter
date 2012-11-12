@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>example</id>
-    <version>1.0.0</version>
+    <version>$version$</version>
     <authors>mwrock</authors>
     <owners>mwrock</owners>
     <description>An example boxstarter package</description>

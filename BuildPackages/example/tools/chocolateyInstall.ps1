@@ -8,6 +8,8 @@ Enable-RemoteDesktop
 
 cinstm VisualStudio2012Ultimate
 cinstm fiddler -source "http://www.myget.org/F/work/api/v2/"
+cinstm mssqlserver2012express
+cinstm office2013ProPlusPreview
 
 cinstm git-credential-winstore
 cinstm console-devel

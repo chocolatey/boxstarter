@@ -4,3 +4,4 @@
 BuildPackages/*
 !/BuildPackages/example
 *.nupkg
+!/BuildPackages/example.*.*.*.*.nupkg
