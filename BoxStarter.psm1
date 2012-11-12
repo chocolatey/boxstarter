@@ -1,5 +1,5 @@
 # Boxstarter
-# Version: $version$
+# Version: 1
 # Changeset: $sha$
 
 if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
