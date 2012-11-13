@@ -1,7 +1,7 @@
 *.sublime-workspace
 *.exe
 *.log
-Build/*
+BuildArtifacts/*
 BuildPackages/*
 !/BuildPackages/example
 *.nupkg

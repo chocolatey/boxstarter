@@ -29,7 +29,7 @@ Task Pack-Nuget -description 'Packs the module and example package' {
     }
     exec { .$nugetExe pack "$baseDir\BuildPackages\example\example.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }
     mkdir "$baseDir\build"
-    exec { .$nugetExe pack "$baseDir\nuget\boxstarter.nuspec" -OutputDirectory "$baseDir\build" -NoPackageAnalysis -version $version }
+    exec { .$nugetExe pack "$baseDir\nuget\boxstarter.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
 }
 
 Task Push-Nuget -description 'Pushes the module to Myget work feed' {
