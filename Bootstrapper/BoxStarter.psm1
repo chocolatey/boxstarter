@@ -5,6 +5,7 @@
 if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
 $Boxstarter = @{ProgramFiles86="$programFiles86";ChocolateyBin="$env:systemdrive\chocolatey\bin"}
 [xml]$configXml = Get-Content "$PSScriptRoot\BoxStarter.config"
+$baseDir = (Split-Path -parent $PSScriptRoot)
 $config = $configXml.config
 
 function Invoke-BoxStarter{
@@ -16,8 +17,8 @@ function Invoke-BoxStarter{
         Check-Chocolatey
         Stop-Service -Name wuauserv
 
-        $localRepo = "$PSScriptRoot\BuildPackages"
-        New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$PSScriptRoot\BoxStarter.bat $bootstrapPackage"
+        $localRepo = "$baseDir\BuildPackages"
+        New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $bootstrapPackage"
         ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install boxstarter.helpers
         $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers* | select $_.last)
         import-module $helperDir\boxstarter.helpers.psm1
