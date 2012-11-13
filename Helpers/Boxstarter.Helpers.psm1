@@ -14,4 +14,5 @@ Export-ModuleMember Disable-UAC, `
                     Set-TaskbarSmall, `
                     Install-WindowsUpdate, `
                     Move-LibraryDirectory, `
-                    Enable-RemoteDesktop
+                    Enable-RemoteDesktop, `
+                    Set-ExplorerOptions

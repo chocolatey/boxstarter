@@ -40,9 +40,7 @@ function Install-WindowsUpdate([switch]$getUpdatesFromMS) {
         $result = $Installer.Install()
 
         if($result.rebootRequired) {
-            if($global:InstallWindowsUpdateWhenDone) {
-                New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command `"Import-Module '$PSScriptRoot\BoxStarter.psm1';Install-WindowsUpdate`""
-            }
+            $Rebooting=$true
             Write-Output "Restart Required. Restarting now..."
             Restart-Computer -force
         }

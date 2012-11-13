@@ -19,7 +19,9 @@ function Invoke-BoxStarter{
 
         $localRepo = "$baseDir\BuildPackages"
         New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $bootstrapPackage"
-        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install boxstarter.helpers
+        cinstm boxstarter.helpers
+        cup boxstarter.helpers
+        if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
         $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers* | select $_.last)
         import-module $helperDir\boxstarter.helpers.psm1
         del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force
@@ -29,7 +31,7 @@ function Invoke-BoxStarter{
         if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
     }
     finally{
-        if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
+        if( !$Rebooting -and (Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat")) {
             remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
         }
     }
