@@ -2,6 +2,7 @@ $scriptPath = (Split-Path -parent $MyInvocation.MyCommand.path)
 $identity  = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 $principal = New-Object System.Security.Principal.WindowsPrincipal( $identity )
 $isAdmin = $principal.IsInRole( [System.Security.Principal.WindowsBuiltInRole]::Administrator )
+if(Get-Module boxstarter){Remove-Module boxstarter}
 $command = "Import-Module `"$scriptPath\BoxStarter.psm1`";Invoke-BoxStarter $args"
 if($isAdmin) {  
   Invoke-Expression $command

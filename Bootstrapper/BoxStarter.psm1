@@ -19,10 +19,12 @@ function Invoke-BoxStarter{
 
         $localRepo = "$baseDir\BuildPackages"
         New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $bootstrapPackage"
-        cinstm boxstarter.helpers
-        cup boxstarter.helpers
+        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" installmissing boxstarter.helpers
+        write-host "Checking for helper updates..."
+        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" update boxstarter.helpers
         if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
-        $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers* | select $_.last)
+        $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers*)
+        if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
         import-module $helperDir\boxstarter.helpers.psm1
         del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force
         ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install $bootstrapPackage -source "$localRepo;http://chocolatey.org/api/v2/" -force

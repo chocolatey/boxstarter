@@ -24,6 +24,9 @@ Task Pack-Nuget -description 'Packs the module and example package' {
     if (Test-Path "$baseDir\buildArtifacts") {
       Remove-Item "$baseDir\buildArtifacts" -Recurse -Force
     }
+    if (Test-Path "$baseDir\buildPackages\example*") {
+      Remove-Item "$baseDir\buildPackages\example*" -Force
+    }
     exec { .$nugetExe pack "$baseDir\BuildPackages\example\example.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }
     mkdir "$baseDir\buildArtifacts"
     exec { .$nugetExe pack "$baseDir\helpers\boxstarter.helpers.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
