@@ -20,7 +20,7 @@ function Invoke-BoxStarter{
         New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$PSScriptRoot\BoxStarter.bat $bootstrapPackage"
         ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install boxstarter.helpers
         $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers* | select $_.last)
-        import-module $helperDir\tools\boxstarter.helpers.psm1
+        import-module $helperDir\boxstarter.helpers.psm1
         del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force
         ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install $bootstrapPackage -source "$localRepo;http://chocolatey.org/api/v2/" -force
 

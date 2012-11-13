@@ -2,6 +2,7 @@ param (
     [string]$Action="default",
     [switch]$Help
 )
+$here = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 
 if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
     iex ((new-object net.webclient).DownloadString("http://bit.ly/psChocInstall"))
@@ -18,4 +19,4 @@ if($Help){
   return
 }
 
-psake $Action
+psake "$here/default.ps1" $Action

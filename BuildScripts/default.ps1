@@ -1,10 +1,10 @@
 $psake.use_exit_on_error = $true
 properties {
     $baseDir = (Split-Path -parent $psake.build_script_dir)
-    $version = git describe --abbrev=0 --tags
-    $version += "."
+    $versionTag = git describe --abbrev=0 --tags
+    $version = $versionTag + "."
     $version += (git log $($version + '..') --pretty=oneline | measure-object).Count
-    $changeset=(git log -1 $($version + '..') --pretty=format:%H)
+    $changeset=(git log -1 $($versionTag + '..') --pretty=format:%H)
     $nugetExe = "$env:ChocolateyInstall\ChocolateyInstall\nuget"
 }
 
