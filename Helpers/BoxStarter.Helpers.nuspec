@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <version>$version$</version>
+    <authors>Matt Wrock</authors>
+    <owners>Matt Wrock</owners>
+    <projectUrl>https://BoxStarter.codeplex.com</projectUrl>
+    <id>BoxStarter.Helpers</id>
+    <title>BoxStarter Helper Functions</title>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Helper functions that Boxstarter uses to customize the windows environment.</description>
+    <tags>devops chocolatey bootstraper setup windows customizations</tags>
+  </metadata>
+</package>
