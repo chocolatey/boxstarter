@@ -7,7 +7,7 @@ Set-TaskbarSmall
 Enable-RemoteDesktop
 
 cinstm VisualStudio2012Ultimate
-cinstm fiddler -source "http://www.myget.org/F/work/api/v2/"
+cinstm fiddler -source "http://www.myget.org/F/chocopackages/api/v2/"
 cinstm mssqlserver2012express
 cinstm office2013ProPlusPreview
 
@@ -20,7 +20,7 @@ cinstm dotpeek
 cinstm AutoHotKey_L
 cinstm googlechrome
 cinstm Paint.net
-cinstm VirtualBox -source "http://www.myget.org/F/work/api/v2/"
+cinstm VirtualBox -source "http://www.myget.org/F/chocopackages/api/v2/"
 cinstm windirstat
 cinstm sysinternals
 cinstm evernote
@@ -33,6 +33,7 @@ cinstm firefox
 cinstm windbg
 cinstm qttabbar
 cinstm testdriven.net
+cinstm adobereader
 
 cinst IIS-WebServerRole -source windowsfeatures
 cinst IIS-HttpCompressionDynamic -source windowsfeatures

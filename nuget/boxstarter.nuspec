@@ -11,10 +11,11 @@
     <tags>boxstarter bootstrapper environment setup</tags>
   </metadata>
   <files>
-    <file src="boxstarter.bat" target="tools"/>
-    <file src="bootstrapper\boxstarter.psm1" target="tools\bootstrapper"/>
-    <file src="bootstrapper\AdminProxy.ps1" target="tools\bootstrapper"/>
-    <file src="bootstrapper\boxstarter.config" target="tools\bootstrapper"/>
-    <file src="buildpackages\**\*.*" target="tools\buildpackages"/>
+    <file src="chocolateyinstall.ps1" target="tools"/>
+    <file src="..\boxstarter.bat" target="tools"/>
+    <file src="..\bootstrapper\boxstarter.psm1" target="tools\bootstrapper"/>
+    <file src="..\bootstrapper\AdminProxy.ps1" target="tools\bootstrapper"/>
+    <file src="..\bootstrapper\boxstarter.config" target="tools\bootstrapper"/>
+    <file src="..\buildpackages\**\*.*" target="tools\buildpackages"/>
   </files>
 </package>

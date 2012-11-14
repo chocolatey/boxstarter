@@ -33,7 +33,7 @@ Task Pack-Nuget -description 'Packs the module and example package' {
     exec { .$nugetExe pack "$baseDir\BuildPackages\example-light\example-light.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }    
     mkdir "$baseDir\buildArtifacts"
     exec { .$nugetExe pack "$baseDir\helpers\boxstarter.helpers.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
-    exec { .$nugetExe pack "$baseDir\boxstarter.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
+    exec { .$nugetExe pack "$baseDir\nuget\boxstarter.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
 }
 
 Task Push-Nuget -description 'Pushes the module to Myget feed' {
