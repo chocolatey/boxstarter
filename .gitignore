@@ -4,5 +4,5 @@
 BuildArtifacts/*
 BuildPackages/*
 !/BuildPackages/example
+!/BuildPackages/example-light
 *.nupkg
-!/BuildPackages/example.*.*.*.nupkg

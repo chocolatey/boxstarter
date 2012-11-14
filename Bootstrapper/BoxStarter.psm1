@@ -27,15 +27,15 @@ function Invoke-BoxStarter{
         if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
         import-module $helperDir\boxstarter.helpers.psm1
         del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force
-        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install $bootstrapPackage -source "$localRepo;http://chocolatey.org/api/v2/" -force
+        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install $bootstrapPackage -source "$localRepo;http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2" -force
 
-        Start-Service -Name wuauserv
         if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
     }
     finally{
         if( !$Rebooting -and (Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat")) {
             remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
         }
+        Start-Service -Name wuauserv
     }
 }
 

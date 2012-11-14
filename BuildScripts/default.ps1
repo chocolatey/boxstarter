@@ -33,7 +33,9 @@ Task Pack-Nuget -description 'Packs the module and example package' {
     exec { .$nugetExe pack "$baseDir\helpers\boxstarter.helpers.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
 }
 
-Task Push-Nuget -description 'Pushes the module to Myget work feed' {
-    $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.helpers.*.*.*.nupkg
-    exec { cpush $pkg.FullName -source "http://www.myget.org/F/work/api/v2/package" }
+Task Push-Nuget -description 'Pushes the module to Myget feed' {
+    $pkg = Get-Item -path $baseDir\buildPackages\example.*.*.*.nupkg
+    exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
+    $pkg = Get-Item -path $baseDir\buildPackages\example-light.*.*.*.nupkg   
+    exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
 }

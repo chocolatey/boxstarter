@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>example-light</id>
+    <version>$version$</version>
+    <authors>mwrock</authors>
+    <owners>mwrock</owners>
+    <description>An example "light" boxstarter package</description>
+    <tags>boxstarter</tags>
+  </metadata>
+  <files>
+    <file src="tools\**\*.*" target="tools"/>
+  </files>
+</package>

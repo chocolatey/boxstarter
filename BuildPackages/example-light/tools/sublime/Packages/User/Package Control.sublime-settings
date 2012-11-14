@@ -1,0 +1,10 @@
+{
+	"auto_upgrade_last_run": 1343795540,
+	"installed_packages":
+	[
+		"AAAPackageDev",
+		"Package Control",
+		"PowerShell",
+		"PowershellUtils"
+	]
+}

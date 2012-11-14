@@ -1,0 +1,9 @@
+<!-- See http://www.sublimetext.com/docs/snippets for more information -->
+<snippet>
+    <content><![CDATA[\$tmpfile = [io.path]::GetTempFileName()
+]]></content>
+    <!-- Optional: Tab trigger to activate the snippet -->
+    <tabTrigger>tmp</tabTrigger>
+    <!-- Optional: Scope the tab trigger will be active in -->
+    <scope>source.powershell</scope>
+</snippet>

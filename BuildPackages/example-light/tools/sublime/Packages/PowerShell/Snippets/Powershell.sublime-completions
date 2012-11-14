@@ -1,0 +1,17 @@
+{
+    "scope": "source.powershell",
+
+    "completions": [
+        { "trigger": "dict", "contents": "@{$1$0}" },
+        { "trigger": "arr", "contents": "@($0)" },
+        { "trigger": "req", "contents": "#requires -$0" },
+        { "trigger": "reqp", "contents": "#requires -pssnapin $0" },
+        { "trigger": "reqv", "contents": "#requires -version ${0:2}" },
+        { "trigger": "void", "contents": "[void] ($1)$0" },
+        { "trigger": "sb", "contents": "\\${$1}$0" },
+        { "trigger": "wd", "contents": "write-debug -message \"$1\"$0" },
+        { "trigger": "wh", "contents": "write-host \"$1\"" },
+        { "trigger": "ww", "contents": "write-warning $0" },
+        { "trigger": "param", "contents": "param(\\$${1:paramName})" }
+    ]
+}
