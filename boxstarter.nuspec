@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>boxstarter</id>
+    <version>$version$</version>
+    <authors>Matt Wrock</authors>
+    <owners>Matt Wrock</owners>
+    <projectUrl>https://BoxStarter.codeplex.com</projectUrl>    
+    <summary>Creates a fresh .Net developer environment from a bare OS utilizing powershell and chocolatey.</summary>
+    <description>Creates a fresh developer (or non developer) environment from a bare OS utilizing powershell and chocolatey. Installs chocolatey, cutomizes windows settings, installs windows updates, handles reboots, installs windows features and your favorite applications.</description>    
+    <tags>boxstarter bootstrapper environment setup</tags>
+  </metadata>
+  <files>
+    <file src="boxstarter.bat" target="tools"/>
+    <file src="bootstrapper\boxstarter.psm1" target="tools\bootstrapper"/>
+    <file src="bootstrapper\AdminProxy.ps1" target="tools\bootstrapper"/>
+    <file src="bootstrapper\boxstarter.config" target="tools\bootstrapper"/>
+    <file src="buildpackages\**\*.*" target="tools\buildpackages"/>
+  </files>
+</package>
