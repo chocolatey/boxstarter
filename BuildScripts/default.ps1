@@ -29,8 +29,12 @@ Task Pack-Nuget -description 'Packs the module and example package' {
     if (Test-Path "$baseDir\buildPackages\example*.nupkg") {
       Remove-Item "$baseDir\buildPackages\example*.nupkg" -Force
     }
+    rename-item "$baseDir\buildPackages\example\tools\chocolatey_Install.ps1" "$baseDir\buildPackages\example\tools\chocolateyInstall.ps1"
+    rename-item "$baseDir\buildPackages\example-light\tools\chocolatey_Install.ps1" "$baseDir\buildPackages\example-light\tools\chocolateyInstall.ps1"
     exec { .$nugetExe pack "$baseDir\BuildPackages\example\example.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }
     exec { .$nugetExe pack "$baseDir\BuildPackages\example-light\example-light.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }    
+    rename-item "$baseDir\buildPackages\example\tools\chocolateyInstall.ps1" "$baseDir\buildPackages\example\tools\chocolatey_Install.ps1"
+    rename-item "$baseDir\buildPackages\example-light\tools\chocolateyInstall.ps1" "$baseDir\buildPackages\example-light\tools\chocolatey_Install.ps1"
     mkdir "$baseDir\buildArtifacts"
     exec { .$nugetExe pack "$baseDir\helpers\boxstarter.helpers.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
     exec { .$nugetExe pack "$baseDir\nuget\boxstarter.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
@@ -40,5 +44,7 @@ Task Push-Nuget -description 'Pushes the module to Myget feed' {
     $pkg = Get-Item -path $baseDir\buildPackages\example.*.*.*.nupkg
     exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
     $pkg = Get-Item -path $baseDir\buildPackages\example-light.*.*.*.nupkg   
+    exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
+    $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.*.*.*.nupkg   
     exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
 }
