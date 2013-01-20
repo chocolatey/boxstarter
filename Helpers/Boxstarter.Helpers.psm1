@@ -15,4 +15,5 @@ Export-ModuleMember Disable-UAC, `
                     Install-WindowsUpdate, `
                     Move-LibraryDirectory, `
                     Enable-RemoteDesktop, `
-                    Set-ExplorerOptions
+                    Set-ExplorerOptions, `
+                    Get-LibraryNames
