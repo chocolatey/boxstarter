@@ -1,4 +1,4 @@
-function Install-WindowsUpdate([switch]$getUpdatesFromMS) {
+function Install-WindowsUpdate([switch]$getUpdatesFromMS, [switch]$acceptEula) {
     if($getUpdatesFromMS) {
         Remove-Item -Path HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate -Force -Recurse -ErrorAction SilentlyContinue
         Stop-Service -Name wuauserv
@@ -32,6 +32,9 @@ function Install-WindowsUpdate([switch]$getUpdatesFromMS) {
         
         Write-Output "Downloading complete"
         foreach($update in $result.updates) {
+            if(!($update.EulaAccepted) -and $acceptEula){
+                $update.AcceptEula()
+            }
             $updatesToinstall.add($update) | Out-Null
         }
 

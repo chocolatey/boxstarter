@@ -1,5 +1,5 @@
 Disable-UAC
-Install-WindowsUpdate
+Install-WindowsUpdate -AcceptEula
 
 Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
 Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
