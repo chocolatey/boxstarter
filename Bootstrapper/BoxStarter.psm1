@@ -20,6 +20,7 @@ This essentially wraps Chocolatey Install and provides these additional features
  - Turns off the windows update service during installation to prevent installation conflicts and minimize the need for reboots
  - Imports the Boxstarter.Helpers module that provides functions for customizing windows
  - Provides Reboot Resiliency by ensuring the package installation is immediately restarted up on reboot if there is a reboot during the installation.
+ - Ensures everything runs under admin
 
  The .nupkg file for the provided package name is searched in the following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
@@ -38,7 +39,6 @@ This essentially wraps Chocolatey Install and provides these additional features
       [string]$bootstrapPackage="default"
     )
     try{
-        try{Start-Transcript -path $env:temp\boxstrter.log -Append}catch{$BoxStarterIsNotTranscribing=$true}
         Check-Chocolatey
         Stop-Service -Name wuauserv
 
@@ -46,20 +46,20 @@ This essentially wraps Chocolatey Install and provides these additional features
         New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $bootstrapPackage"
         ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" installmissing boxstarter.helpers
         write-host "Checking for helper updates..."
-        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" update boxstarter.helpers
+        if(Test-Path "$baseDir\tests\boxstarter.Helpers-*.nupkg") { $helperSrc = "$baseDir\tests"}
+        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" update boxstarter.helpers -source -$helperSrc
         if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
         $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers*)
         if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
         import-module $helperDir\boxstarter.helpers.psm1
         del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force
         ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install $bootstrapPackage -source "$localRepo;http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2" -force
-
-        if(!$BoxStarterIsNotTranscribing){Stop-Transcript}
     }
     finally{
         if( !$Rebooting -and (Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat")) {
             remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
         }
+        rename-item function:\Write-Host function:\Write-BoxstarterHost -force
         Start-Service -Name wuauserv
     }
 }

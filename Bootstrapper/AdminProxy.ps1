@@ -5,9 +5,9 @@ $isAdmin = $principal.IsInRole( [System.Security.Principal.WindowsBuiltInRole]::
 if(Get-Module boxstarter){Remove-Module boxstarter}
 $command = "Import-Module `"$scriptPath\BoxStarter.psm1`";Invoke-BoxStarter $args"
 if($isAdmin) {  
-  Invoke-Expression $command
+  Invoke-Expression $command 2>&1 | tee-object $env:temp\boxstarter.log -Append
 }
 else {
   $command = "-ExecutionPolicy bypass -noexit -command " + $command
-  Start-Process powershell -verb runas -argumentlist $command
+  Start-Process powershell -verb runas -argumentlist $command  2>&1 | tee-object $env:temp\boxstarter.log -Append
 }
