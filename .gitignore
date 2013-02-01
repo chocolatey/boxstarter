@@ -6,3 +6,4 @@ BuildPackages/*
 !/BuildPackages/example
 !/BuildPackages/example-light
 *.nupkg
+Test.xml
