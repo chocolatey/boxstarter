@@ -1,0 +1,1 @@
+Write-Host "a test package just installed."

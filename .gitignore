@@ -2,8 +2,6 @@
 *.exe
 *.log
 BuildArtifacts/*
-BuildPackages/*
-!/BuildPackages/example
-!/BuildPackages/example-light
+BuildPackages/*.nupkg
 *.nupkg
 Test.xml
