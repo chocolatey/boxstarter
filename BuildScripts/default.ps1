@@ -35,8 +35,8 @@ Task Pack-Nuget -description 'Packs the module and example package' {
     if (Test-Path "$baseDir\buildArtifacts") {
       Remove-Item "$baseDir\buildArtifacts" -Recurse -Force
     }
-    if (Test-Path "$baseDir\buildPackages\example*.nupkg") {
-      Remove-Item "$baseDir\buildPackages\example*.nupkg" -Force
+    if (Test-Path "$baseDir\buildPackages\*.nupkg") {
+      Remove-Item "$baseDir\buildPackages\*.nupkg" -Force
     }
     rename-item "$baseDir\buildPackages\example\tools\chocolatey_Install.ps1" "$baseDir\buildPackages\example\tools\chocolateyInstall.ps1" -ErrorAction SilentlyContinue
     rename-item "$baseDir\buildPackages\example-light\tools\chocolatey_Install.ps1" "$baseDir\buildPackages\example-light\tools\chocolateyInstall.ps1" -ErrorAction SilentlyContinue

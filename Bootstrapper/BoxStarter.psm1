@@ -36,29 +36,28 @@ This essentially wraps Chocolatey Install and provides these additional features
 
 #>    
     param(
-      [string]$bootstrapPackage="default"
+      [string]$bootstrapPackage="default",
+      [string]$localRepo="$baseDir\BuildPackages"
     )
     try{
         Check-Chocolatey
         Stop-Service -Name wuauserv
-
-        $localRepo = "$baseDir\BuildPackages"
-        Write-Host "localrepo $localRepo"
-        New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $bootstrapPackage"
-        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" installmissing boxstarter.helpers
-        write-host "Checking for helper updates..."
-        if(Test-Path "$baseDir\tests\boxstarter.Helpers.*.nupkg") { $helperSrc = "$baseDir\tests"}
-        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" update boxstarter.helpers -source -$helperSrc
+        write-output "LocalRepo is at $localRepo"
+        New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $bootstrapPackage" | Out-Null
+        if(Test-Path "$localRepo\boxstarter.Helpers.*.nupkg") { $helperSrc = "$localRepo" }
+        write-output "Checking for latest helper $(if($helperSrc){'locally'})"
+        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" update boxstarter.helpers $helperSrc
         if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
         $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers*)
         if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
         import-module $helperDir\boxstarter.helpers.psm1
-        del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force
+        del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force -ErrorAction Ignore
         if(test-path "$localRepo\$bootstrapPackage.*.nupkg"){
             $source = $localRepo
         } else {
             $source = "http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
         }
+        write-output "Installing Boxstarter package from $source"
         ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install $bootstrapPackage -source "$source" -force
     }
     finally{
