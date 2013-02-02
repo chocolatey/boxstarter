@@ -9,8 +9,17 @@ properties {
 }
 
 Task default -depends Build
-Task Build -depends Package, Push-Nuget -description 'Versions, packages and pushes to Myget'
+Task Build -depends Test, Package
+Task Deploy -depends Test, Package, Push-Nuget -description 'Versions, packages and pushes to Myget'
 Task Package -depends Version-Module, Pack-Nuget, Unversion-Module -description 'Versions the psm1 and packs the module and example package'
+
+Task Test {
+    pushd "$baseDir"
+    $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
+    if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}
+    ."$pesterDir\tools\bin\pester.bat"
+    popd
+}
 
 Task Version-Module -description 'Stamps the psm1 with the version and last changeset SHA' {
     (Get-Content "$baseDir\Helpers\boxstarter.helpers.psm1") | % {$_ -replace "\`$version\`$", "$version" } | % {$_ -replace "\`$sha\`$", "$changeset" } | Set-Content "$baseDir\helpers\boxstarter.helpers.psm1"
