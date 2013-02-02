@@ -58,7 +58,7 @@ Task Push-Nuget -description 'Pushes the module to Myget feed' {
 }
 
 Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
-    $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.*.*.*.nupkg   
+    $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.0.*.*.nupkg   
     exec { cpush $pkg.FullName }
     $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.helpers.*.*.*.nupkg   
     exec { cpush $pkg.FullName }
