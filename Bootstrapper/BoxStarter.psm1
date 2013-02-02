@@ -41,6 +41,7 @@ This essentially wraps Chocolatey Install and provides these additional features
     )
     try{
         Check-Chocolatey
+        del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction Ignore
         Stop-Service -Name wuauserv
         write-output "LocalRepo is at $localRepo"
         New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $bootstrapPackage" | Out-Null

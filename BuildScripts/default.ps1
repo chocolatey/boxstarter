@@ -17,7 +17,7 @@ Task Test {
     pushd "$baseDir"
     $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
     if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}
-    ."$pesterDir\tools\bin\pester.bat"
+    exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests}
     popd
 }
 
@@ -38,16 +38,16 @@ Task Pack-Nuget -description 'Packs the module and example package' {
     if (Test-Path "$baseDir\buildPackages\*.nupkg") {
       Remove-Item "$baseDir\buildPackages\*.nupkg" -Force
     }
+    mkdir "$baseDir\buildArtifacts"
     rename-item "$baseDir\buildPackages\example\tools\chocolatey_Install.ps1" "$baseDir\buildPackages\example\tools\chocolateyInstall.ps1" -ErrorAction SilentlyContinue
     rename-item "$baseDir\buildPackages\example-light\tools\chocolatey_Install.ps1" "$baseDir\buildPackages\example-light\tools\chocolateyInstall.ps1" -ErrorAction SilentlyContinue
     rename-item "$baseDir\buildPackages\test-package\tools\chocolatey_Install.ps1" "$baseDir\buildPackages\test-package\tools\chocolateyInstall.ps1"  -ErrorAction SilentlyContinue
     exec { .$nugetExe pack "$baseDir\BuildPackages\example\example.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }
     exec { .$nugetExe pack "$baseDir\BuildPackages\example-light\example-light.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }    
-    exec { .$nugetExe pack "$baseDir\BuildPackages\test-package\test-package.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }    
+    exec { .$nugetExe pack "$baseDir\BuildPackages\test-package\test-package.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis }    
     rename-item "$baseDir\buildPackages\example\tools\chocolateyInstall.ps1" "$baseDir\buildPackages\example\tools\chocolatey_Install.ps1"
     rename-item "$baseDir\buildPackages\example-light\tools\chocolateyInstall.ps1" "$baseDir\buildPackages\example-light\tools\chocolatey_Install.ps1"
     rename-item "$baseDir\buildPackages\test-package\tools\chocolateyInstall.ps1" "$baseDir\buildPackages\test-package\tools\chocolatey_Install.ps1"
-    mkdir "$baseDir\buildArtifacts"
     exec { .$nugetExe pack "$baseDir\helpers\boxstarter.helpers.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
     exec { .$nugetExe pack "$baseDir\nuget\boxstarter.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
 }
