@@ -43,17 +43,23 @@ This essentially wraps Chocolatey Install and provides these additional features
         Stop-Service -Name wuauserv
 
         $localRepo = "$baseDir\BuildPackages"
+        Write-Host "localrepo $localRepo"
         New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $bootstrapPackage"
         ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" installmissing boxstarter.helpers
         write-host "Checking for helper updates..."
-        if(Test-Path "$baseDir\tests\boxstarter.Helpers-*.nupkg") { $helperSrc = "$baseDir\tests"}
+        if(Test-Path "$baseDir\tests\boxstarter.Helpers.*.nupkg") { $helperSrc = "$baseDir\tests"}
         ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" update boxstarter.helpers -source -$helperSrc
         if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
         $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers*)
         if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
         import-module $helperDir\boxstarter.helpers.psm1
         del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force
-        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install $bootstrapPackage -source "$localRepo;http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2" -force
+        if(test-path "$localRepo\$bootstrapPackage.*.nupkg"){
+            $source = $localRepo
+        } else {
+            $source = "http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
+        }
+        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install $bootstrapPackage -source "$source" -force
     }
     finally{
         if( !$Rebooting -and (Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat")) {
