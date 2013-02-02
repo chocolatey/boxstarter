@@ -53,4 +53,13 @@ Task Push-Nuget -description 'Pushes the module to Myget feed' {
     exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
     $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.*.*.*.nupkg   
     exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
+    $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.helpers.*.*.*.nupkg   
+    exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
+}
+
+Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
+    $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.*.*.*.nupkg   
+    exec { cpush $pkg.FullName }
+    $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.helpers.*.*.*.nupkg   
+    exec { cpush $pkg.FullName }
 }
