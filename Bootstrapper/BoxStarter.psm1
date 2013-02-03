@@ -3,7 +3,7 @@
 # Changeset: $sha$
 
 if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
-$Boxstarter = @{ProgramFiles86="$programFiles86";ChocolateyBin="$env:systemdrive\chocolatey\bin"}
+$Boxstarter = @{ProgramFiles86="$programFiles86";ChocolateyBin="$env:systemdrive\chocolatey\bin";Log="env:temp\boxstarter.log"}
 [xml]$configXml = Get-Content "$PSScriptRoot\BoxStarter.config"
 $baseDir = (Split-Path -parent $PSScriptRoot)
 $config = $configXml.config
@@ -89,5 +89,5 @@ function Check-Chocolatey{
     }
     Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
 }
-Export-ModuleMember Invoke-BoxStarter
+Export-ModuleMember Invoke-BoxStarter, Test-PendingReboot
 Export-ModuleMember -Variable $Boxstarter
