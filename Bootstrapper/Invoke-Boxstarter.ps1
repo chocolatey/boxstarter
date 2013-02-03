@@ -36,11 +36,11 @@ This essentially wraps Chocolatey Install and provides these additional features
         write-output "LocalRepo is at $localRepo"
         if(Test-Path "$localRepo\boxstarter.Helpers.*.nupkg") { $helperSrc = "$localRepo" }
         write-output "Checking for latest helper $(if($helperSrc){'locally'})"
-        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" update boxstarter.helpers $helperSrc
+        Chocolatey update boxstarter.helpers $helperSrc
         if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
         $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers*)
         if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
-        import-module $helperDir\boxstarter.helpers.psm1
+        if($helperDir) { import-module $helperDir\boxstarter.helpers.psm1 }
         del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force -ErrorAction Ignore
         if(test-path "$localRepo\$bootstrapPackage.*.nupkg"){
             $source = $localRepo
@@ -48,7 +48,7 @@ This essentially wraps Chocolatey Install and provides these additional features
             $source = "http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
         }
         write-output "Installing Boxstarter package from $source"
-        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install $bootstrapPackage -source "$source" -force
+        Chocolatey install $bootstrapPackage -source "$source" -force
     }
     finally{
         Cleanup

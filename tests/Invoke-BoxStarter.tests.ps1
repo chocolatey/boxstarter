@@ -2,7 +2,7 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter){Remove-Module boxstarter}
 ."$here\..\build.bat" Pack-Nuget
 
-Describe "Invoke-Boxstarter" {
+Describe "Invoke-Boxstarter via bootstrapper.bat (end to end)" {
     $testRoot = (Get-PSDrive TestDrive).Root
     mkdir "$testRoot\Repo" -ErrorAction ignore
     Copy-Item $here\..\BuildArtifacts\Boxstarter.Helpers.*.nupkg "$testRoot\Repo"
@@ -24,5 +24,31 @@ Describe "Invoke-Boxstarter" {
             $installLines = get-content "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" | ? { $_ -eq "______ test-package v1.0.0 ______" } 
             $installLines.Should.Have_Count_Of(1)
         }          
+    }
+}
+
+Resolve-Path $here\..\bootstrapper\*.ps1 | 
+    ? { -not ($_.ProviderPath.Contains("AdminProxy")) } |
+    % { . $_.ProviderPath }
+
+Describe "Invoke-Boxstarter" {
+    Mock Check-Chocolatey
+    Mock Chocolatey
+    Mock Stop-Service
+    Mock Start-Service
+    Mock Set-Service
+    $testRoot = (Get-PSDrive TestDrive).Root
+
+    Context "When Configuration Service is installed" {
+        Mock Get-Service {new-Object -TypeName PSObject -Property @{CanStop=$True}} -ParameterFilter {$include -eq "CCMEXEC"}
+
+        Invoke-Boxstarter test-package "$testRoot\Repo"
+
+        it "will stop ConfigurationService" {
+            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"}
+        }
+        it "will start ConfigurationService" {
+            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "CCMEXEC"}
+        }
     }
 }

@@ -1,15 +1,15 @@
 function cinst {
-    chocolatey Install
+    chocolatey Install @args
 }
 
 function cup {
-    chocolatey Update
+    chocolatey Update @args
 }
 
 function cinstm {
-    chocolatey InstallMissing
+    chocolatey InstallMissing @args
 }
 
 function chocolatey {
-
+    ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @args
 }
