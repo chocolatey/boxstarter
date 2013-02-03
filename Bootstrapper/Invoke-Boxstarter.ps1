@@ -1,3 +1,5 @@
+$Boxstarter = @{ProgramFiles86="$programFiles86";ChocolateyBin="$env:systemdrive\chocolatey\bin";Log="$env:temp\boxstarter.log";RebootOk=$false}
+
 function Invoke-BoxStarter{
 <#
 .SYNOPSIS
@@ -37,6 +39,7 @@ This essentially wraps Chocolatey Install and provides these additional features
             $Password=Read-Host -AsSecureString "Autologon Password:"
         }
         $script:BoxstarterPassword=$password
+        $Boxstarter.RebootOk=$RebootOk
         Check-Chocolatey
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction Ignore
         Stop-UpdateServices

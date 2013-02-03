@@ -90,16 +90,16 @@ Describe "Invoke-Boxstarter" {
   
       Context "When A reboot is invoked" {
         Mock Check-Chocolatey
-        Mock Chocolatey
+        Mock Call-Chocolatey
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
-        Invoke-Reboot
+        Mock Test-PendingReboot {return $true}
 
-        Invoke-Boxstarter test-package
+        Invoke-Boxstarter test-package -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
 
         it "will not delete startup file" {
             Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" | should Be $true
@@ -111,7 +111,7 @@ Describe "Invoke-Boxstarter" {
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
     }
 
-      Context "When no password is provided but reboot is ok" {
+    Context "When no password is provided but reboot is ok" {
         Mock Check-Chocolatey
         Mock Stop-Service
         Mock Start-Service
@@ -127,6 +127,57 @@ Describe "Invoke-Boxstarter" {
 
         it "will read host for the password" {
             Assert-MockCalled Set-SecureAutoLogon -ParameterFilter {$password -eq $pass}
+        }
+    }
+
+    Context "When a password is provided and reboot is ok" {
+        Mock Check-Chocolatey
+        Mock Stop-Service
+        Mock Start-Service
+        Mock Set-Service
+        Mock Set-SecureAutoLogon
+        Mock Restart
+        Mock Call-Chocolatey
+        Mock Read-Host
+
+        Invoke-Boxstarter test-package -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+
+        it "will not read host for the password" {
+            Assert-MockCalled Read-Host -times 0
+        }
+    }
+
+    Context "When reboot is not ok" {
+        Mock Check-Chocolatey
+        Mock Stop-Service
+        Mock Start-Service
+        Mock Set-Service
+        Mock Set-SecureAutoLogon
+        Mock Restart
+        Mock Call-Chocolatey
+        Mock Read-Host
+
+        Invoke-Boxstarter test-package
+
+        it "will not read host for the password" {
+            Assert-MockCalled Read-Host -times 0
+        }
+    }
+
+    Context "When reboot is not ok" {
+        Mock Check-Chocolatey
+        Mock Stop-Service
+        Mock Start-Service
+        Mock Set-Service
+        Mock Set-SecureAutoLogon
+        Mock Restart
+        Mock Call-Chocolatey
+        Mock Test-PendingReboot {return $true}
+
+        Invoke-Boxstarter test-package
+
+        it "will not reboot" {
+            Assert-MockCalled Restart -times 0
         }
     }
 }
