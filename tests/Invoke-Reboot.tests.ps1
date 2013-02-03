@@ -5,12 +5,11 @@ Resolve-Path $here\..\bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "Invoke-Reboot" {
-    Mock New-Item -ParameterFilter {$path -like "*Startup*"} -Verifiable
-    Mock Set-SecureAutoLogon
-    Mock Restart -Verifiable
-
     Context "When No Password is set" {
-
+        Mock New-Item -ParameterFilter {$path -like "*Startup*"} -Verifiable
+        Mock Set-SecureAutoLogon
+        Mock Restart -Verifiable
+        
         Invoke-Reboot
 
         it "will create Restart file and reboot" {
@@ -22,7 +21,11 @@ Describe "Invoke-Reboot" {
     }
 
     Context "When a Password is set" {
+        Mock New-Item -ParameterFilter {$path -like "*Startup*"} -Verifiable
+        Mock Set-SecureAutoLogon
+        Mock Restart -Verifiable
         $Password= ConvertTo-SecureString "mypassword" -asplaintext -force
+
         Invoke-Reboot
 
         it "will create Restart file and reboot" {

@@ -1,4 +1,4 @@
-function Cleanup {
+function Cleanup-Boxstarter {
   if(!$boxstarterRebooting) { 
     if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
         remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"

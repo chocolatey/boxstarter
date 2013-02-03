@@ -51,6 +51,6 @@ This essentially wraps Chocolatey Install and provides these additional features
         Chocolatey install $bootstrapPackage -source "$source" -force
     }
     finally{
-        Cleanup
+        Cleanup-Boxstarter
     }
 }
