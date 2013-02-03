@@ -44,7 +44,6 @@ This essentially wraps Chocolatey Install and provides these additional features
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction Ignore
         Stop-UpdateServices
         write-output "LocalRepo is at $localRepo"
-        New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $bootstrapPackage" | Out-Null
         if(Test-Path "$localRepo\boxstarter.Helpers.*.nupkg") { $helperSrc = "$localRepo" }
         write-output "Checking for latest helper $(if($helperSrc){'locally'})"
         ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" update boxstarter.helpers $helperSrc
@@ -62,11 +61,7 @@ This essentially wraps Chocolatey Install and provides these additional features
         ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" install $bootstrapPackage -source "$source" -force
     }
     finally{
-        if( !$Rebooting -and (Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat")) {
-            remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
-        }
-        rename-item function:\Write-Host function:\Write-BoxstarterHost -force
-        Start-UpdateServices
+        Cleanup
     }
 }
 
@@ -124,6 +119,19 @@ function Start-CCMEXEC {
     }
 }
 
+function Cleanup {
+  if(!$boxstarterRebooting) { 
+    if( Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat") {
+        remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
+    }
+    $winLogonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+    Remove-ItemProperty -Path $winLogonKey -Name "DefaultUserName" -ErrorAction Ignore
+    Remove-ItemProperty -Path $winLogonKey -Name "DefaultDomainName" -ErrorAction Ignore
+    Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction Ignore
+    Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction Ignore
+    Start-UpdateServices
+  } 
+}
 
-Export-ModuleMember Invoke-BoxStarter, Test-PendingReboot
+Export-ModuleMember Invoke-BoxStarter, Test-PendingReboot, Invoke-Reboot, cinst, cup, cinstm, chocolatey
 Export-ModuleMember -Variable Boxstarter

@@ -6,6 +6,7 @@
 *   http://creativecommons.org/publicdomain/zero/1.0/legalcode
 ***********************************************************************************
 #>
+function Set-SecureAutoLogon {
 [cmdletbinding()]
 param (
     [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]
@@ -268,7 +269,7 @@ process {
     }
 
 }
-
+}
 <#
     .SYNOPSIS
         Enables auto logon using the specified username and password.
