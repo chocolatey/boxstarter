@@ -51,4 +51,32 @@ Describe "Invoke-Boxstarter" {
             Assert-MockCalled Start-Service -ParameterFilter {$name -eq "CCMEXEC"}
         }
     }
+
+      Context "When Configuration Service is not installed" {
+        Mock Get-Service {$false} -ParameterFilter {$include -eq "CCMEXEC"}
+
+        Invoke-Boxstarter test-package "$testRoot\Repo"
+
+        it "will stop just WUA" {
+            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
+        }
+        it "will just start WUA" {
+            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "wuauserv"}
+        }
+    }
+
+      Context "When An exception occurs in the install" {
+        Mock Get-Service {new-Object -TypeName PSObject -Property @{CanStop=$True}} -ParameterFilter {$include -eq "CCMEXEC"}
+        Mock Chocolatey {throw "error"}
+
+        Invoke-Boxstarter test-package "$testRoot\Repo"
+
+        it "will stop WUA" {
+            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
+        }
+        it "will stop CCM" {
+            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"}
+        }
+    }
+  
 }
