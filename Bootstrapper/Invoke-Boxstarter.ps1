@@ -25,11 +25,18 @@ This essentially wraps Chocolatey Install and provides these additional features
  - The boxstarter feed on myget
 
 #>    
+    [CmdletBinding()]
     param(
       [string]$bootstrapPackage="default",
+      [System.Security.SecureString]$password,
+      [switch]$RebootOk,
       [string]$localRepo="$baseDir\BuildPackages"
     )
     try{
+        if($RebootOk -and !$Password) {
+            $Password=Read-Host -AsSecureString "Autologon Password:"
+        }
+        $script:BoxstarterPassword=$password
         Check-Chocolatey
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction Ignore
         Stop-UpdateServices

@@ -24,7 +24,7 @@ Describe "Invoke-Reboot" {
         Mock New-Item -ParameterFilter {$path -like "*Startup*"} -Verifiable
         Mock Set-SecureAutoLogon
         Mock Restart -Verifiable
-        $Password= ConvertTo-SecureString "mypassword" -asplaintext -force
+        $BoxstarterPassword= ConvertTo-SecureString "mypassword" -asplaintext -force
 
         Invoke-Reboot
 

@@ -13,7 +13,7 @@ Describe "Invoke-Boxstarter via bootstrapper.bat (end to end)" {
         remove-Item "$env:ChocolateyInstall\lib\boxstarter.helpers.*" -force -recurse
         Add-Content "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -Value "______ test-package v1.0.0 ______" -force
 
-        ."$here\..\boxstarter.bat" test-package "$testRoot\Repo"
+        ."$here\..\boxstarter.bat" test-package -LocalRepo "$testRoot\Repo"
 
         it "should save boxstarter package to chocolatey lib folder" {
             Test-Path "$env:ChocolateyInstall\lib\test-package.*" | Should Be $true
@@ -42,7 +42,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         Mock Get-Service {new-Object -TypeName PSObject -Property @{CanStop=$True}} -ParameterFilter {$include -eq "CCMEXEC"}
 
-        Invoke-Boxstarter test-package "$testRoot\Repo"
+        Invoke-Boxstarter test-package
 
         it "will stop ConfigurationService" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"}
@@ -60,7 +60,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         Mock Get-Service {$false} -ParameterFilter {$include -eq "CCMEXEC"}
 
-        Invoke-Boxstarter test-package "$testRoot\Repo"
+        Invoke-Boxstarter test-package
 
         it "will stop just WUA" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
@@ -78,7 +78,7 @@ Describe "Invoke-Boxstarter" {
         Mock Get-Service {new-Object -TypeName PSObject -Property @{CanStop=$True}} -ParameterFilter {$include -eq "CCMEXEC"}
         Mock Chocolatey {throw "error"}
 
-        try { Invoke-Boxstarter test-package "$testRoot\Repo" } catch {}
+        try { Invoke-Boxstarter test-package } catch {}
 
         it "will stop WUA" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
@@ -99,7 +99,7 @@ Describe "Invoke-Boxstarter" {
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
         Invoke-Reboot
 
-        Invoke-Boxstarter test-package "$testRoot\Repo"
+        Invoke-Boxstarter test-package
 
         it "will not delete startup file" {
             Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" | should Be $true
@@ -111,4 +111,22 @@ Describe "Invoke-Boxstarter" {
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
     }
 
+      Context "When no password is provided but reboot is ok" {
+        Mock Check-Chocolatey
+        Mock Stop-Service
+        Mock Start-Service
+        Mock Set-Service
+        Mock Set-SecureAutoLogon
+        Mock Restart
+        Mock Call-Chocolatey
+        $pass=ConvertTo-SecureString "mypassword" -asplaintext -force
+        Mock Read-Host {return $pass}
+        Mock Test-PendingReboot {return $true}
+
+        Invoke-Boxstarter test-package -RebootOk
+
+        it "will read host for the password" {
+            Assert-MockCalled Set-SecureAutoLogon -ParameterFilter {$password -eq $pass}
+        }
+    }
 }
