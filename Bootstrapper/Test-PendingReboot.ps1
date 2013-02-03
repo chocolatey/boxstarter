@@ -20,8 +20,8 @@ http://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb795
 Invoke-Reboot
 
 #>
-    $rebootPending = Get-PendingReeboot -ErrorLog $BoxStarter.ErrorLog
-    if($rebootPending.RebootPending) {return $true;}
+    $rebootPending = Get-PendingReboot -ErrorLog $BoxStarter.ErrorLog
+    if($rebootPending.RebootPending) {return $true}
     return IsCCMRebootPending
 }
 

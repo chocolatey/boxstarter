@@ -1,12 +1,13 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter){Remove-Module boxstarter}
-."$here\..\build.bat" Pack-Nuget
 
 Describe "Invoke-Boxstarter via bootstrapper.bat (end to end)" {
+    ."$here\..\build.bat" Pack-Nuget
     $testRoot = (Get-PSDrive TestDrive).Root
     mkdir "$testRoot\Repo" -ErrorAction ignore
     Copy-Item $here\..\BuildArtifacts\Boxstarter.Helpers.*.nupkg "$testRoot\Repo"
     Copy-Item $here\..\BuildArtifacts\test-package.*.nupkg "$testRoot\Repo"
+
     Context "When installing a local package" {
         remove-Item "$env:ChocolateyInstall\lib\test-package.*" -force -recurse
         remove-Item "$env:ChocolateyInstall\lib\boxstarter.helpers.*" -force -recurse
