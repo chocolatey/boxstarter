@@ -12,10 +12,12 @@ required.
 
 One may want to check this before installing software 
 or doing anything that may fail if there is a pending 
-reboot.
+reboot. If this command returns $true, one may want to
+call Invoke-Reboot to restart the local machine.
 
 .LINK
 http://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542 
+Invoke-Reboot
 
 #>
     $rebootPending = Get-PendingReeboot -ErrorLog $BoxStarter.ErrorLog
