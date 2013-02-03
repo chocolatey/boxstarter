@@ -3,7 +3,7 @@
 # Changeset: $sha$
 
 if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
-$Boxstarter = @{ProgramFiles86="$programFiles86";ChocolateyBin="$env:systemdrive\chocolatey\bin";Log="env:temp\boxstarter.log"}
+$Boxstarter = @{ProgramFiles86="$programFiles86";ChocolateyBin="$env:systemdrive\chocolatey\bin";Log="$env:temp\boxstarter.log"}
 [xml]$configXml = Get-Content "$PSScriptRoot\BoxStarter.config"
 $baseDir = (Split-Path -parent $PSScriptRoot)
 $config = $configXml.config
@@ -42,7 +42,7 @@ This essentially wraps Chocolatey Install and provides these additional features
     try{
         Check-Chocolatey
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction Ignore
-        Stop-Service -Name wuauserv
+        Stop-UpdateServices
         write-output "LocalRepo is at $localRepo"
         New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $bootstrapPackage" | Out-Null
         if(Test-Path "$localRepo\boxstarter.Helpers.*.nupkg") { $helperSrc = "$localRepo" }
@@ -66,7 +66,7 @@ This essentially wraps Chocolatey Install and provides these additional features
             remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
         }
         rename-item function:\Write-Host function:\Write-BoxstarterHost -force
-        Start-Service -Name wuauserv
+        Start-UpdateServices
     }
 }
 
@@ -89,5 +89,41 @@ function Check-Chocolatey{
     }
     Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
 }
+
+function Stop-UpdateServices {
+    Stop-Service -Name wuauserv
+    Stop-CCMEXEC
+}
+
+function Start-UpdateServices {
+    Start-Service -Name wuauserv
+    Start-CCMEXEC
+}
+
+function Stop-CCMEXEC {
+    $ccm = (get-service -include CCMEXEC)
+    if($ccm) {
+        set-service CCMEXEC -startuptype disabled
+        do {
+            if($ccm.CanStop) { 
+                Write-Output "Stopping Configuration Manager"
+                Stop-Service CCMEXEC
+                return
+            }
+            Write-Output "Waiting for Computer Configuration Manager to stop..."
+            sleep 10
+        } while (-not ($ccm.CanStop) -and ($i++ -lt 5))
+    }
+}
+
+function Start-CCMEXEC {
+    $ccm = get-service -include CCMEXEC
+    if($ccm) {
+        set-service CCMEXEC -startuptype automatic
+        Start-Service CCMEXEC
+    }
+}
+
+
 Export-ModuleMember Invoke-BoxStarter, Test-PendingReboot
-Export-ModuleMember -Variable $Boxstarter
+Export-ModuleMember -Variable Boxstarter
