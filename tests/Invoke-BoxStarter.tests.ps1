@@ -4,7 +4,7 @@ if(get-module Boxstarter){Remove-Module boxstarter}
 
 Describe "Invoke-Boxstarter" {
     $testRoot = (Get-PSDrive TestDrive).Root
-    mkdir "$testRoot\Repo"
+    mkdir "$testRoot\Repo" -ErrorAction ignore
     Copy-Item $here\..\BuildArtifacts\Boxstarter.Helpers.*.nupkg "$testRoot\Repo"
     Copy-Item $here\..\BuildArtifacts\test-package.*.nupkg "$testRoot\Repo"
     Context "When installing a local package" {
