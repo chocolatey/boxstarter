@@ -32,7 +32,7 @@ cinstm firefox
 cinstm windbg
 cinstm qttabbar
 cinstm testdriven.net
-cinstm adobereader
+#cinstm adobereader
 
 cinst IIS-WebServerRole -source windowsfeatures
 cinst IIS-HttpCompressionDynamic -source windowsfeatures
