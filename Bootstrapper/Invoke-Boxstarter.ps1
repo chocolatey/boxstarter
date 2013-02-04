@@ -38,7 +38,8 @@ This essentially wraps Chocolatey Install and provides these additional features
         $autoLogon=Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -ErrorAction Ignore
         if($autoLogon) {$autoLogon = $autoLogon.AutoAdminLogon} else {$autoLogon=0}
         if($RebootOk -and !$Password -and ($autoLogon -lt 1)) {
-            $Password=Read-Host -AsSecureString "Autologon Password"
+            write-host "Boxstarter may need to reboot your system. Please provide your password so that Boxstarter may automatically log you on. Your password will be securely stored and encrypted."
+            $Password=Read-AuthenticatedPassword
         }
         $script:BoxstarterPassword=$password
         $Boxstarter.RebootOk=$RebootOk
@@ -69,5 +70,23 @@ This essentially wraps Chocolatey Install and provides these additional features
     }
     finally{
         Cleanup-Boxstarter
+    }
+}
+
+function Read-AuthenticatedPassword {
+    Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+    $pctx = [System.DirectoryServices.AccountManagement.ContextType]::Domain
+    $pc = New-Object System.DirectoryServices.AccountManagement.PrincipalContext $pctx,$env:UserDomain
+    $attemptsLeft=3
+    while(--$attemptsLeft -ge 0 -and !$val) {
+        $Password=Read-Host -AsSecureString "Autologon Password"
+        $BSTR = [System.Runtime.InteropServices.marshal]::SecureStringToBSTR( $password);
+        $plainpassword = [ System.Runtime.InteropServices.marshal ]::PtrToStringAuto($BSTR);
+        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR );
+        $val = $pc.ValidateCredentials($env:username, $plainpassword, [System.DirectoryServices.AccountManagement.ContextOptions]::Negotiate)    
+    }
+    if($val){return $password} else {
+        write-host "Unable to authenticate your password. Proceeding with autologon disabled"
+        return $null
     }
 }
