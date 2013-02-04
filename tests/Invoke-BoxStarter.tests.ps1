@@ -89,7 +89,6 @@ Describe "Invoke-Boxstarter" {
     }
   
       Context "When A reboot is invoked" {
-        $testRoot = (Get-PSDrive TestDrive).Root
         Mock Check-Chocolatey
         Mock Call-Chocolatey
         Mock Stop-Service
@@ -100,7 +99,7 @@ Describe "Invoke-Boxstarter" {
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
         Mock Test-PendingReboot {return $true}
 
-        Invoke-Boxstarter test-package -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) -LocalRepo "$testRoot\Repo"
+        Invoke-Boxstarter test-package -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) -LocalRepo "c:\someRepo"
 
         it "will not delete startup file" {
             Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" | should Be $true
@@ -109,14 +108,14 @@ Describe "Invoke-Boxstarter" {
             (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon").AutoAdminLogon | should be 1
         }
         it "Restart file will have package name" {
-            get-content "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" | should Contain "test-package"
+            "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" | should Contain "test-package"
         }
         it "Restart file will have RebootOk" {
-            get-content "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" | should Contain "-RebootOk"
+            "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" | should Contain "-RebootOk"
         }
         it "Restart file will have LocalRepoPath" {
-            get-content "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" | should Contain "$testRoot\repo"
-        }        
+            "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" | should Contain "someRepo"
+        }  
         remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
     }
@@ -138,6 +137,7 @@ Describe "Invoke-Boxstarter" {
         it "will read host for the password" {
             Assert-MockCalled Set-SecureAutoLogon -ParameterFilter {$password -eq $pass}
         }
+        remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
     }
 
     Context "When no password is provided, reboot is ok and autologon is toggled" {
@@ -158,6 +158,7 @@ Describe "Invoke-Boxstarter" {
             Assert-MockCalled Read-Host -times 0
         }
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
+        remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
     }
 
     Context "When a password is provided and reboot is ok" {

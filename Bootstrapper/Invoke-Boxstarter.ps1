@@ -42,6 +42,11 @@ This essentially wraps Chocolatey Install and provides these additional features
         }
         $script:BoxstarterPassword=$password
         $Boxstarter.RebootOk=$RebootOk
+        $Boxstarter.Package=$bootstrapPackage
+        if($localRepo){
+            $localRepo = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($localRepo)
+            $Boxstarter.LocalRepo=$localRepo
+        }
         Check-Chocolatey
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction Ignore
         Stop-UpdateServices
