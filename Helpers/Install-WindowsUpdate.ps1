@@ -26,7 +26,7 @@ http://boxstarter.codeplex.com
         [switch]$getUpdatesFromMS, 
         [switch]$acceptEula, 
         [switch]$SuppressReboots,
-        [string]$criteria="BrowseOnly=0 and IsAssigned=1 and IsHidden=0 and IsInstalled=0 and Type='Software'"
+        [string]$criteria="IsAssigned=1 and IsHidden=0 and IsInstalled=0 and Type='Software'"
     )
     if($getUpdatesFromMS) {
         $auPath="HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"

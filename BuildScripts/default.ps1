@@ -17,7 +17,7 @@ Task Test {
     pushd "$baseDir"
     $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
     if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}
-    exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -DisableOldStyleAssertions}
+    exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -DisableLegacyExpectations}
     popd
 }
 
