@@ -82,6 +82,29 @@ Describe "Invoke-Reboot" {
         Write-Host $myPath
     }
 
+    Context "When UAC is Enabled and user has been auto loged on" {
+        if(!(get-module Boxstarter.Helpers)){
+            Import-Module $here\..\Helpers\Boxstarter.Helpers.psm1
+        }
+        $Boxstarter.AutologedOn=$true
+        Mock New-Item
+        Mock Set-SecureAutoLogon
+        Mock Restart
+        $Boxstarter.RebootOk=$true
+        Mock Get-UAC {return $true}
+        Mock Disable-UAC
+        
+        Invoke-Reboot
+
+        it "will Disable UAC" {
+            Assert-MockCalled Disable-UAC
+        }
+        it "will add ReEnableUac to restart command" {
+            Assert-MockCalled New-Item -ParameterFilter {$value -like "*-ReEnableUac"}
+        }
+        Write-Host $myPath
+    }
+
     Context "When UAC is enabled and password is not set" {
         if(!(get-module Boxstarter.Helpers)){
             Import-Module $here\..\Helpers\Boxstarter.Helpers.psm1

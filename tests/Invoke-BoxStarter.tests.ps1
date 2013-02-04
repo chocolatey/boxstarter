@@ -154,6 +154,7 @@ Describe "Invoke-Boxstarter" {
         Mock Call-Chocolatey
         Mock Read-AuthenticatedPassword
         Mock Test-PendingReboot {return $true}
+        Mock get-UAC
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
 
         Invoke-Boxstarter test-package -RebootOk

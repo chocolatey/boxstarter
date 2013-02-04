@@ -74,7 +74,8 @@ function Read-AuthenticatedPassword {
 function InitAutologon([switch]$RebootOk, [SecureString]$password){
     $autoLogon=Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -ErrorAction Ignore
     if($autoLogon) {$autoLogon = $autoLogon.AutoAdminLogon} else {$autoLogon=0}
-    if($RebootOk -and !$Password -and ($autoLogon -lt 1)) {
+    $Boxstarter.AutologedOn = ($autoLogon -gt 0)
+    if($RebootOk -and !$Password -and !$Boxstarter.AutologedOn) {
         write-host "Boxstarter may need to reboot your system. Please provide your password so that Boxstarter may automatically log you on. Your password will be securely stored and encrypted."
         $Password=Read-AuthenticatedPassword
     }

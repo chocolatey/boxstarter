@@ -23,11 +23,14 @@ Test-PendingReeboot
         return 
     }
     if($Boxstarter.LocalRepo){$commandArgs = "-LocalRepo `"$($Boxstarter.LocalRepo)`""}
-    if($BoxstarterPassword.Length -gt 0) {
+    if($BoxstarterPassword.Length -gt 0 -or $Boxstarter.AutologedOn) {
         if(Get-UAC){
+            Write-Output "UAC Enabled. Disabling..."
             Disable-UAC
             $commandArgs += " -ReEnableUAC"
         }
+    }
+    if($BoxstarterPassword.Length -gt 0) {
         Write-Output "Securely Storing $($env:userdomain)\$($env:username) credentials for automatic logon"
         Set-SecureAutoLogon $env:username $BoxstarterPassword $env:userdomain
     }
