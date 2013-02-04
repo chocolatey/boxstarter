@@ -1,5 +1,7 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter){Remove-Module boxstarter}
+if(get-module Boxstarter.Helpers){Remove-Module boxstarter.Helpers}
+Import-Module $here\..\Helpers\Boxstarter.Helpers.psm1
 
 Describe "Invoke-Boxstarter via bootstrapper.bat (end to end)" {
     ."$here\..\build.bat" Pack-Nuget
@@ -89,6 +91,7 @@ Describe "Invoke-Boxstarter" {
     }
   
       Context "When A reboot is invoked" {
+        Mock Get-UAC
         Mock Check-Chocolatey
         Mock Call-Chocolatey
         Mock Stop-Service
@@ -131,6 +134,7 @@ Describe "Invoke-Boxstarter" {
         $pass=ConvertTo-SecureString "mypassword" -asplaintext -force
         Mock Read-AuthenticatedPassword {return $pass}
         Mock Test-PendingReboot {return $true}
+        Mock Get-UAC
 
         Invoke-Boxstarter test-package -RebootOk
 
@@ -187,28 +191,51 @@ Describe "Invoke-Boxstarter" {
         Mock Restart
         Mock Call-Chocolatey
         Mock Read-AuthenticatedPassword
+        Mock Test-PendingReboot {return $true}
 
         Invoke-Boxstarter test-package
 
         it "will not read host for the password" {
             Assert-MockCalled Read-AuthenticatedPassword -times 0
         }
+        it "will not reboot" {
+            Assert-MockCalled Restart -times 0
+        }
     }
 
-    Context "When reboot is not ok" {
+    Context "When ReEnableUAC is Set" {
+        if(!(get-module Boxstarter.Helpers)){
+            Import-Module $here\..\Helpers\Boxstarter.Helpers.psm1
+        }
         Mock Check-Chocolatey
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
-        Mock Set-SecureAutoLogon
-        Mock Restart
-        Mock Call-Chocolatey
-        Mock Test-PendingReboot {return $true}
+        Mock Chocolatey
+        Mock Enable-UAC
+
+        Invoke-Boxstarter test-package -ReEnableUAC
+
+        it "will Enable UAC" {
+            Assert-MockCalled Enable-UAC
+        }
+    }
+
+    Context "When ReEnableUAC is not Set" {
+        if(!(get-module Boxstarter.Helpers)){
+            Import-Module $here\..\Helpers\Boxstarter.Helpers.psm1
+        }
+        Mock Check-Chocolatey
+        Mock Stop-Service
+        Mock Start-Service
+        Mock Set-Service
+        Mock Chocolatey
+        Mock Enable-UAC
 
         Invoke-Boxstarter test-package
 
-        it "will not reboot" {
-            Assert-MockCalled Restart -times 0
+        it "will Not Enable UAC" {
+            Assert-MockCalled Enable-UAC -times 0
         }
     }
 }

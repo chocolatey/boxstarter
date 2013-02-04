@@ -32,6 +32,7 @@ This essentially wraps Chocolatey Install and provides these additional features
       [string]$bootstrapPackage="default",
       [System.Security.SecureString]$password,
       [switch]$RebootOk,
+      [switch]$ReEnableUAC,
       [string]$localRepo="$baseDir\BuildPackages"
     )
     try{
@@ -59,6 +60,7 @@ This essentially wraps Chocolatey Install and provides these additional features
         $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers*)
         if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
         if($helperDir) { import-module $helperDir\boxstarter.helpers.psm1 }
+        if($ReEnableUAC) {Enable-UAC}
         del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force -ErrorAction Ignore
         if(test-path "$localRepo\$bootstrapPackage.*.nupkg"){
             $source = $localRepo

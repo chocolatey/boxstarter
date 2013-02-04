@@ -9,6 +9,8 @@ Resolve-Path $helpersPath\*.ps1 |
     % { . $_.ProviderPath }
 
 Export-ModuleMember Disable-UAC, `
+                    Enable-UAC, `
+                    Get-UAC, `
                     Disable-InternetExplorerESC, `
                     Get-ExplorerOptions, `
                     Set-TaskbarSmall, `
