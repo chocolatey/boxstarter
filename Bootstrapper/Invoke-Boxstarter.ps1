@@ -35,7 +35,9 @@ This essentially wraps Chocolatey Install and provides these additional features
       [string]$localRepo="$baseDir\BuildPackages"
     )
     try{
-        if($RebootOk -and !$Password) {
+        $autoLogon=Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -ErrorAction Ignore
+        if($autoLogon) {$autoLogon = $autoLogon.AutoAdminLogon} else {$autoLogon=0}
+        if($RebootOk -and !$Password -and ($autoLogon -lt 1)) {
             $Password=Read-Host -AsSecureString "Autologon Password"
         }
         $script:BoxstarterPassword=$password
