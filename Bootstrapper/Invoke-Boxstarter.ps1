@@ -36,7 +36,7 @@ This essentially wraps Chocolatey Install and provides these additional features
     )
     try{
         if($RebootOk -and !$Password) {
-            $Password=Read-Host -AsSecureString "Autologon Password:"
+            $Password=Read-Host -AsSecureString "Autologon Password"
         }
         $script:BoxstarterPassword=$password
         $Boxstarter.RebootOk=$RebootOk
