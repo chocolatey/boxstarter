@@ -30,45 +30,23 @@ This essentially wraps Chocolatey Install and provides these additional features
     [CmdletBinding()]
     param(
       [string]$bootstrapPackage="default",
-      [System.Security.SecureString]$password,
+      [SecureString]$password,
       [switch]$RebootOk,
       [switch]$ReEnableUAC,
       [string]$localRepo="$baseDir\BuildPackages"
     )
     try{
-        $autoLogon=Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -ErrorAction Ignore
-        if($autoLogon) {$autoLogon = $autoLogon.AutoAdminLogon} else {$autoLogon=0}
-        if($RebootOk -and !$Password -and ($autoLogon -lt 1)) {
-            write-host "Boxstarter may need to reboot your system. Please provide your password so that Boxstarter may automatically log you on. Your password will be securely stored and encrypted."
-            $Password=Read-AuthenticatedPassword
-        }
-        $script:BoxstarterPassword=$password
+        $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
         $Boxstarter.RebootOk=$RebootOk
         $Boxstarter.Package=$bootstrapPackage
-        if($localRepo){
-            $localRepo = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($localRepo)
-            $Boxstarter.LocalRepo=$localRepo
-        }
+        $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
         Check-Chocolatey
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction Ignore
+        del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction Ignore
         Stop-UpdateServices
-        write-output "LocalRepo is at $localRepo"
-        if(Test-Path "$localRepo\boxstarter.Helpers.*.nupkg") { $helperSrc = "$localRepo" }
-        write-output "Checking for latest helper $(if($helperSrc){'locally'})"
-        Chocolatey update boxstarter.helpers $helperSrc
-        if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
-        $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers*)
-        if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
-        if($helperDir) { import-module $helperDir\boxstarter.helpers.psm1 }
+        Get-HelperModule
         if($ReEnableUAC) {Enable-UAC}
-        del $env:systemdrive\chocolatey\lib\$bootstrapPackage.* -recurse -force -ErrorAction Ignore
-        if(test-path "$localRepo\$bootstrapPackage.*.nupkg"){
-            $source = $localRepo
-        } else {
-            $source = "http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
-        }
-        write-output "Installing Boxstarter package from $source"
-        Chocolatey install $bootstrapPackage -source "$source" -force
+        Download-Package $bootstrapPackage
     }
     finally{
         Cleanup-Boxstarter
@@ -91,4 +69,45 @@ function Read-AuthenticatedPassword {
         write-host "Unable to authenticate your password. Proceeding with autologon disabled"
         return $null
     }
+}
+
+function InitAutologon([switch]$RebootOk, [SecureString]$password){
+    $autoLogon=Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -ErrorAction Ignore
+    if($autoLogon) {$autoLogon = $autoLogon.AutoAdminLogon} else {$autoLogon=0}
+    if($RebootOk -and !$Password -and ($autoLogon -lt 1)) {
+        write-host "Boxstarter may need to reboot your system. Please provide your password so that Boxstarter may automatically log you on. Your password will be securely stored and encrypted."
+        $Password=Read-AuthenticatedPassword
+    }
+    return $password
+}
+
+function Resolve-LocalRepo([string]$localRepo) {
+    write-host "entering localRepo resolution"
+    if($localRepo){
+        $localRepo = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($localRepo)
+    }
+    write-host "LocalRepo is at $localRepo"
+    return $localRepo
+}
+
+function Get-HelperModule {
+    if(Test-Path (Join-Path $Boxstarter.LocalRepo "boxstarter.Helpers.*.nupkg")) { 
+        $helperSrc = $Boxstarter.LocalRepo
+    }
+    write-output "Checking for latest helper $(if($helperSrc){'locally'})"
+    Chocolatey update boxstarter.helpers $helperSrc
+    if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
+    $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers*)
+    if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
+    if($helperDir) { import-module $helperDir\boxstarter.helpers.psm1 }
+}
+
+function Download-Package([string]$bootstrapPackage) {
+    if(test-path (Join-Path $Boxstarter.LocalRepo "$bootstrapPackage.*.nupkg")){
+        $source = $Boxstarter.LocalRepo
+    } else {
+        $source = "http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
+    }
+    write-output "Installing Boxstarter package from $source"
+    Chocolatey install $bootstrapPackage -source "$source" -force
 }
