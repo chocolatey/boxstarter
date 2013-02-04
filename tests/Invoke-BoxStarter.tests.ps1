@@ -129,7 +129,7 @@ Describe "Invoke-Boxstarter" {
         Mock Restart
         Mock Call-Chocolatey
         $pass=ConvertTo-SecureString "mypassword" -asplaintext -force
-        Mock Read-Host {return $pass}
+        Mock Read-AuthenticatedPassword {return $pass}
         Mock Test-PendingReboot {return $true}
 
         Invoke-Boxstarter test-package -RebootOk
@@ -148,14 +148,14 @@ Describe "Invoke-Boxstarter" {
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock Call-Chocolatey
-        Mock Read-Host
+        Mock Read-AuthenticatedPassword
         Mock Test-PendingReboot {return $true}
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
 
         Invoke-Boxstarter test-package -RebootOk
 
         it "will not read host for the password" {
-            Assert-MockCalled Read-Host -times 0
+            Assert-MockCalled Read-AuthenticatedPassword -times 0
         }
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
         remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
@@ -169,12 +169,12 @@ Describe "Invoke-Boxstarter" {
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock Call-Chocolatey
-        Mock Read-Host
+        Mock Read-AuthenticatedPassword
 
         Invoke-Boxstarter test-package -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
 
         it "will not read host for the password" {
-            Assert-MockCalled Read-Host -times 0
+            Assert-MockCalled Read-AuthenticatedPassword -times 0
         }
     }
 
@@ -186,12 +186,12 @@ Describe "Invoke-Boxstarter" {
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock Call-Chocolatey
-        Mock Read-Host
+        Mock Read-AuthenticatedPassword
 
         Invoke-Boxstarter test-package
 
         it "will not read host for the password" {
-            Assert-MockCalled Read-Host -times 0
+            Assert-MockCalled Read-AuthenticatedPassword -times 0
         }
     }
 
