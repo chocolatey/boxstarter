@@ -95,11 +95,18 @@ function Get-HelperModule {
         $helperSrc = $Boxstarter.LocalRepo
     }
     write-output "Checking for latest helper $(if($helperSrc){'locally'})"
+    Try-LoadHelpers #Get old version if necessary to examine UAC
     Chocolatey update boxstarter.helpers $helperSrc
-    if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
+    Try-LoadHelpers #Get the update if there is one
+}
+
+function Try-LoadHelpers {
     $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers*)
     if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
-    if($helperDir) { import-module $helperDir\boxstarter.helpers.psm1 }
+    if($helperDir) { 
+        if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
+        import-module $helperDir\boxstarter.helpers.psm1 
+    }
 }
 
 function Download-Package([string]$bootstrapPackage) {

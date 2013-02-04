@@ -31,7 +31,9 @@ function chocolatey {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    if(Test-PendingReboot) {return Invoke-Reboot}
+    if(Get-Module boxstarter.helpers){ #if helpers have not been loaded the UAC check at reboot will fail
+        if(Test-PendingReboot) {return Invoke-Reboot}
+    }
     Call-Chocolatey @args
 }
 
