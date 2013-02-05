@@ -80,7 +80,7 @@ http://boxstarter.codeplex.com
                 } else {
                     $Rebooting=$true
                     Write-Output "Restart Required. Restarting now..."
-                    if(get-module Boxstarter) {
+                    if(test-path function:\Invoke-Reboot) {
                         return Invoke-Reboot
                     } else {
                         Restart-Computer -force
