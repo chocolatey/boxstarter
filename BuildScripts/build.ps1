@@ -20,4 +20,6 @@ if($Help){
   return
 }
 
-psake "$here/default.ps1" $Action
+$psakeDir = (dir $env:ChocolateyInstall\lib\Psake*)
+if($psakeDir.length -gt 0) {$psakerDir = $psakeDir[-1]}
+."$psakeDir\tools\psake.ps1" "$here/default.ps1" $Action -ScriptPath $psakeDir\tools
