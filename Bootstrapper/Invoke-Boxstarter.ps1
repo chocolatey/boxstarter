@@ -56,7 +56,11 @@ This essentially wraps Chocolatey Install and provides these additional features
 
 function Read-AuthenticatedPassword {
     Add-Type -AssemblyName System.DirectoryServices.AccountManagement
-    $pctx = [System.DirectoryServices.AccountManagement.ContextType]::Domain
+    if($env:computername -eq $env:UserDomain) {
+        $pctx = [System.DirectoryServices.AccountManagement.ContextType]::Machine
+    } else {
+        $pctx = [System.DirectoryServices.AccountManagement.ContextType]::Domain
+    }
     $pc = New-Object System.DirectoryServices.AccountManagement.PrincipalContext $pctx,$env:UserDomain
     $attemptsLeft=3
     while(--$attemptsLeft -ge 0 -and !$val) {
