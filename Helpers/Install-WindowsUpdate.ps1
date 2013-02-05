@@ -80,7 +80,11 @@ http://boxstarter.codeplex.com
                 } else {
                     $Rebooting=$true
                     Write-Output "Restart Required. Restarting now..."
-                    Restart-Computer -force
+                    if(get-module Boxstarter) {
+                        return Invoke-Reboot
+                    } else {
+                        Restart-Computer -force
+                    }
                 }
             }
             Write-Output "All updates installed"
