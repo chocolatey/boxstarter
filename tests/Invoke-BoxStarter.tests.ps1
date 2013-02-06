@@ -7,7 +7,7 @@ $BoxstarterUser="user"
 Describe "Invoke-Boxstarter via bootstrapper.bat (end to end)" {
     ."$here\..\build.bat" Pack-Nuget
     $testRoot = (Get-PSDrive TestDrive).Root
-    mkdir "$testRoot\Repo" -ErrorAction ignore
+    mkdir "$testRoot\Repo" -ErrorAction SilentlyContinue
     Copy-Item $here\..\BuildArtifacts\Boxstarter.Helpers.*.nupkg "$testRoot\Repo"
     Copy-Item $here\..\BuildArtifacts\test-package.*.nupkg "$testRoot\Repo"
 

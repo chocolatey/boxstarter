@@ -31,7 +31,7 @@ This essentially wraps Chocolatey Install and provides these additional features
     [CmdletBinding()]
     param(
       [string]$bootstrapPackage="default",
-      [SecureString]$password,
+      [System.Security.SecureString]$password,
       [switch]$RebootOk,
       [switch]$ReEnableUAC,
       [string]$localRepo="$baseDir\BuildPackages"
@@ -43,8 +43,8 @@ This essentially wraps Chocolatey Install and provides these additional features
         $Boxstarter.Package=$bootstrapPackage
         $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
         Check-Chocolatey
-        del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction Ignore
-        del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction Ignore
+        del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
+        del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
         Stop-UpdateServices
         Get-HelperModule
         if($ReEnableUAC) {Enable-UAC}
@@ -67,8 +67,8 @@ function Read-AuthenticatedPassword {
     while(--$attemptsLeft -ge 0 -and !$val) {
         $Password=Read-Host -AsSecureString "Autologon Password"
         $BSTR = [System.Runtime.InteropServices.marshal]::SecureStringToBSTR( $password);
-        $plainpassword = [ System.Runtime.InteropServices.marshal ]::PtrToStringAuto($BSTR);
-        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR );
+        $plainpassword = [System.Runtime.InteropServices.marshal]::PtrToStringAuto($BSTR);
+        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR);
         $val = $pc.ValidateCredentials($env:username, $plainpassword, [System.DirectoryServices.AccountManagement.ContextOptions]::Negotiate)    
     }
     if($val){return $password} else {
@@ -77,8 +77,8 @@ function Read-AuthenticatedPassword {
     }
 }
 
-function InitAutologon([switch]$RebootOk, [SecureString]$password){
-    $autoLogon=Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -ErrorAction Ignore
+function InitAutologon([switch]$RebootOk, [System.Security.SecureString]$password){
+    $autoLogon=Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -ErrorAction SilentlyContinue
     if($autoLogon) {$autoLogon = $autoLogon.AutoAdminLogon} else {$autoLogon=0}
     $Boxstarter.AutologedOn = ($autoLogon -gt 0)
     if($RebootOk -and !$Password -and !$Boxstarter.AutologedOn) {
@@ -123,5 +123,5 @@ function Download-Package([string]$bootstrapPackage) {
         $source = "http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
     }
     write-output "Installing Boxstarter package from $source"
-    Chocolatey install $bootstrapPackage -source "$source" -force
+    Chocolatey install $bootstrapPackage $source
 }

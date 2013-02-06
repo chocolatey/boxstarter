@@ -4,10 +4,10 @@ function Cleanup-Boxstarter {
         remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat"
     }
     $winLogonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
-    Remove-ItemProperty -Path $winLogonKey -Name "DefaultUserName" -ErrorAction Ignore
-    Remove-ItemProperty -Path $winLogonKey -Name "DefaultDomainName" -ErrorAction Ignore
-    Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction Ignore
-    Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction Ignore
+    Remove-ItemProperty -Path $winLogonKey -Name "DefaultUserName" -ErrorAction SilentlyContinue
+    Remove-ItemProperty -Path $winLogonKey -Name "DefaultDomainName" -ErrorAction SilentlyContinue
+    Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction SilentlyContinue
+    Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue
     Start-UpdateServices
   } 
 }
