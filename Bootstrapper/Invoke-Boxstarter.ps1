@@ -38,6 +38,7 @@ This essentially wraps Chocolatey Install and provides these additional features
     )
     try{
         $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
+        $script:BoxstarterUser=$env:username
         $Boxstarter.RebootOk=$RebootOk
         $Boxstarter.Package=$bootstrapPackage
         $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo

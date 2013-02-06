@@ -31,8 +31,8 @@ Test-PendingReeboot
         }
     }
     if($BoxstarterPassword.Length -gt 0) {
-        Write-Output "Securely Storing $($env:userdomain)\$($env:username) credentials for automatic logon"
-        Set-SecureAutoLogon $env:username $BoxstarterPassword $env:userdomain
+        Write-Output "Securely Storing $($env:userdomain)\$($BoxstarterUser) credentials for automatic logon"
+        Set-SecureAutoLogon $BoxstarterUser $BoxstarterPassword $env:userdomain
     }
     New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $($Boxstarter.package) -RebootOk $commandArgs" | Out-Null
     $script:boxstarterRebooting=$true

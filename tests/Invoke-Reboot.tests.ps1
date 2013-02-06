@@ -3,6 +3,7 @@ if(get-module Boxstarter){Remove-Module boxstarter}
 Resolve-Path $here\..\bootstrapper\*.ps1 | 
     ? { -not ($_.ProviderPath.Contains("AdminProxy")) } |
     % { . $_.ProviderPath }
+$BoxstarterUser="user"
 
 Describe "Invoke-Reboot" {
     Context "When No Password is set" {
