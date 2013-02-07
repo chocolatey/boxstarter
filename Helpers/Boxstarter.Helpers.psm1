@@ -3,7 +3,7 @@
 # Changeset: $sha$
 
 $helpersPath = (Split-Path -parent $MyInvocation.MyCommand.Definition);
-
+function Is64Bit {  [IntPtr]::Size -eq 8  }
 Resolve-Path $helpersPath\*.ps1 | 
     ? { -not ($_.ProviderPath.Contains(".Tests.")) } |
     % { . $_.ProviderPath }
@@ -18,4 +18,5 @@ Export-ModuleMember Disable-UAC, `
                     Move-LibraryDirectory, `
                     Enable-RemoteDesktop, `
                     Set-ExplorerOptions, `
-                    Get-LibraryNames
+                    Get-LibraryNames, `
+                    Update-ExecutionPolicy

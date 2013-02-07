@@ -1,12 +1,13 @@
-Disable-UAC
 Install-WindowsUpdate -AcceptEula
-
+Update-ExecutionPolicy Unrestricted
 Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
 Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
 Set-TaskbarSmall
 Enable-RemoteDesktop
 
 cinstm VisualStudio2012Ultimate
+if(Test-PendingReboot){Invoke-Reboot}
+Install-ChocolateyPackage 'vs update 2 ctp2' 'exe' 'http://download.microsoft.com/download/8/9/3/89372D24-6707-4587-A7F0-10A29EECA317/vsupdate_KB2707250.exe'
 cinstm fiddler
 cinstm mssqlserver2012express
 cinstm office2013ProPlusPreview
@@ -34,6 +35,7 @@ cinstm qttabbar
 cinstm testdriven.net
 #cinstm adobereader
 
+cinst Microsoft-Hyper-V-All -source windowsFeatures
 cinst IIS-WebServerRole -source windowsfeatures
 cinst IIS-HttpCompressionDynamic -source windowsfeatures
 cinst IIS-ManagementScriptingTools -source windowsfeatures
