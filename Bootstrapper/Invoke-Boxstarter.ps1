@@ -130,5 +130,5 @@ function Download-Package([string]$bootstrapPackage) {
         $source = "http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
     }
     write-output "Installing Boxstarter package from $source"
-    Chocolatey install $bootstrapPackage $source
+    Chocolatey install $bootstrapPackage -source $source -force
 }
