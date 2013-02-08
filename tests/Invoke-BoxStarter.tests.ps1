@@ -176,6 +176,7 @@ Describe "Invoke-Boxstarter" {
         Mock Restart
         Mock Call-Chocolatey
         Mock Read-AuthenticatedPassword
+        Mock Disable-UAC
 
         Invoke-Boxstarter test-package -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
 
