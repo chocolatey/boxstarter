@@ -59,7 +59,7 @@ http://boxstarter.codeplex.com
             If ($updatesToDownload.Count -gt 0) {
                 Write-Output "Beginning to download $($updatesToDownload.Count) updates"
                 $Downloader.Updates = $updatesToDownload
-                $Downloader.Download()
+                $Downloader.Download() | Out-Null
             }
             
             Write-Output "Downloading complete"
