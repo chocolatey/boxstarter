@@ -26,7 +26,7 @@ http://boxstarter.codeplex.com
         [switch]$getUpdatesFromMS, 
         [switch]$acceptEula, 
         [switch]$SuppressReboots,
-        [string]$criteria="IsAssigned=1 and IsHidden=0 and IsInstalled=0 and Type='Software'"
+        [string]$criteria="IsHidden=0 and IsInstalled=0 and Type='Software'"
     )
     if($getUpdatesFromMS) {
         $auPath="HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"
@@ -49,7 +49,7 @@ http://boxstarter.codeplex.com
         {
             Write-Output "$($Result.updates.count) Updates found"
             foreach($update in $result.updates) {
-                if ($update.isDownloaded -ne "true") {
+                if ($update.isDownloaded -ne "true" -and ($update.InstallationBehavior.CanRequestUserInput -eq $false )) {
                     Write-Output " * Adding $($update.title) to list of updates to download"
                     $updatesToDownload.add($update) | Out-Null
                 }
@@ -70,25 +70,24 @@ http://boxstarter.codeplex.com
                 $updatesToinstall.add($update) | Out-Null
             }
 
-            Write-Output "Beginning to install"
-            $Installer.updates = $UpdatesToInstall
-            $result = $Installer.Install()
+            Write-Output "Beginning to install. This may take several minutes..."
+                $Installer.updates = $UpdatesToInstall
+                $result = $Installer.Install()
 
-            if($result.rebootRequired) {
-                if($SuppressReboots) {
-                    Write-Output "A Restart is Required."
-                } else {
-                    $Rebooting=$true
-                    Write-Output "Restart Required. Restarting now..."
-                    if(test-path function:\Invoke-Reboot) {
-                        return Invoke-Reboot
+                if($result.rebootRequired) {
+                    if($SuppressReboots) {
+                        Write-Output "A Restart is Required."
                     } else {
-                        Restart-Computer -force
+                        $Rebooting=$true
+                        Write-Output "Restart Required. Restarting now..."
+                        if(test-path function:\Invoke-Reboot) {
+                            return Invoke-Reboot
+                        } else {
+                            Restart-Computer -force
+                        }
                     }
                 }
-            }
             Write-Output "All updates installed"
-            return $result
         }
         else{Write-Output "There is no update applicable to this machine"}    
     }
