@@ -60,8 +60,10 @@ function Intercept-Command ($commandName, $omitCommandParam) {
     Set-Item Function:\$commandName -value "$cmdLetBinding `r`n param ( $params )Process{ `r`n$Content}" -force
 }
 
-Intercept-Command cinst $true
-Intercept-Command cup $true
-Intercept-Command cinstm $true
-Intercept-Command chocolatey
-Intercept-Command call-chocolatey
+function Intrcept-Chocolatey {
+    Intercept-Command cinst $true
+    Intercept-Command cup $true
+    Intercept-Command cinstm $true
+    Intercept-Command chocolatey
+    Intercept-Command call-chocolatey
+}
