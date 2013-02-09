@@ -78,7 +78,7 @@ Describe "Invoke-Reboot" {
             Assert-MockCalled Disable-UAC
         }
         it "will add ReEnableUac to restart command" {
-            Assert-MockCalled New-Item -ParameterFilter {$value -like "*-ReEnableUac"}
+            Assert-MockCalled New-Item -ParameterFilter {$value -like "*-ReEnableUac*"}
         }
         Write-Host $myPath
     }
@@ -101,7 +101,7 @@ Describe "Invoke-Reboot" {
             Assert-MockCalled Disable-UAC
         }
         it "will add ReEnableUac to restart command" {
-            Assert-MockCalled New-Item -ParameterFilter {$value -like "*-ReEnableUac"}
+            Assert-MockCalled New-Item -ParameterFilter {$value -like "*-ReEnableUac*"}
         }
         Write-Host $myPath
     }

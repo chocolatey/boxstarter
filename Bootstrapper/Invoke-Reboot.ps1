@@ -34,11 +34,13 @@ Test-PendingReeboot
         Write-Output "Securely Storing $($env:userdomain)\$($BoxstarterUser) credentials for automatic logon"
         Set-SecureAutoLogon $BoxstarterUser $BoxstarterPassword $env:userdomain
     }
-    New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "$baseDir\BoxStarter.bat $($Boxstarter.package) -RebootOk $commandArgs" | Out-Null
+    Write-Output "writing restart file"
+    New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "`"$baseDir\BoxStarter.bat`" $($Boxstarter.package) -RebootOk $commandArgs `r`nPause" | Out-Null
     $script:boxstarterRebooting=$true
     Restart
 }
 
 function Restart {
+    Write-Output "Restarting..."
     Restart-Computer -force
 }
