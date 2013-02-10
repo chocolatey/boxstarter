@@ -5,12 +5,10 @@ Resolve-Path $here\..\bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "Getting Chocolatey" {
-    Context "When a reboot is pending" {
-        if(!(get-module Boxstarter.Helpers)){
-            Import-Module $here\..\Helpers\Boxstarter.Helpers.psm1
-        }
+    Context "When a reboot is pending and reboots are ok" {
         Mock Call-Chocolatey
-        Mock Test-PendingReboot {return $true}
+        Mock Test-PendingReboot {$true}
+        $boxstarter.RebootOk=$true
         Mock Invoke-Reboot
         
         Chocolatey Install pkg
@@ -23,12 +21,10 @@ Describe "Getting Chocolatey" {
         }        
     }
 
-    Context "When a reboot is not pending" {
-        if(!(get-module Boxstarter.Helpers)){
-            Import-Module $here\..\Helpers\Boxstarter.Helpers.psm1
-        }
+    Context "When a reboot is pending but reboots are not ok" {
         Mock Call-Chocolatey
-        Mock Test-PendingReboot {return $false}
+        Mock Test-PendingReboot {$true}
+        $boxstarter.RebootOk=$false
         Mock Invoke-Reboot
         
         Chocolatey Install pkg
@@ -41,18 +37,15 @@ Describe "Getting Chocolatey" {
         }        
     }
 
-    Context "When Helper module is not loaded" {
-        if(get-module Boxstarter.Helpers){
-            Remove-Module Boxstarter.Helpers
-        }
+    Context "When a reboot is not pending" {
         Mock Call-Chocolatey
-        Mock Test-PendingReboot
+        Mock Test-PendingReboot {return $false}
         Mock Invoke-Reboot
         
         Chocolatey Install pkg
 
-        it "will not Check for reboots" {
-            Assert-MockCalled Test-PendingReboot -times 0
+        it "will not Invoke-Reboot" {
+            Assert-MockCalled Invoke-Reboot -times 0
         }
         it "will get chocolatry" {
             Assert-MockCalled Call-Chocolatey -times 1

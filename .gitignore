@@ -4,3 +4,4 @@
 BuildPackages/*.nupkg
 *.nupkg
 Test.xml
+Bootstrapper/*-UAC.ps1

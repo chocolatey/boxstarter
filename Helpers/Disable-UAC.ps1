@@ -1,3 +1,4 @@
+<#A Build step copies this function to bootstrapper too#>
 function Disable-UAC {
 <#
 .SYNOPSIS
