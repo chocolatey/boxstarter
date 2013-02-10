@@ -35,7 +35,7 @@ Test-PendingReeboot
         Set-SecureAutoLogon $BoxstarterUser $BoxstarterPassword $env:userdomain
     }
     Write-Output "writing restart file"
-    New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "`"$baseDir\BoxStarter.bat`" $($Boxstarter.package) -RebootOk $commandArgs `r`nPause" | Out-Null
+    New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "Call `"$baseDir\BoxStarter.bat`" $($Boxstarter.package) -RebootOk $commandArgs `r`nPause" | Out-Null
     $script:boxstarterRebooting=$true
     Restart
 }
