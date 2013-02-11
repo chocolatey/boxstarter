@@ -7,7 +7,7 @@ function Check-Chocolatey{
         Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
         Enable-Net40
     }
-    Intrcept-Chocolatey
+    Intercept-Chocolatey
 }
 
 function Is64Bit {  [IntPtr]::Size -eq 8  }
