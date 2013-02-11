@@ -9,7 +9,7 @@ if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
 }
 
 cinstm psake
-cinstm pester
+cinstm pester -version 1.2.1
 
 if($Help){ 
   try {
