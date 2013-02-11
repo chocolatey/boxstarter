@@ -37,6 +37,7 @@ This essentially wraps Chocolatey Install and provides these additional features
       [string]$localRepo="$baseDir\BuildPackages"
     )
     try{
+        if($ReEnableUAC) {Enable-UAC}
         $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
         $script:BoxstarterUser=$env:username
         $Boxstarter.RebootOk=$RebootOk
@@ -47,7 +48,6 @@ This essentially wraps Chocolatey Install and provides these additional features
         del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
         Stop-UpdateServices
         Get-HelperModule
-        if($ReEnableUAC) {Enable-UAC}
         Download-Package $bootstrapPackage
     }
     finally{
