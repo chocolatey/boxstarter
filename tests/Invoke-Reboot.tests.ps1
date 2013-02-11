@@ -4,6 +4,7 @@ Resolve-Path $here\..\bootstrapper\*.ps1 |
     ? { -not ($_.ProviderPath.Contains("AdminProxy")) } |
     % { . $_.ProviderPath }
 $BoxstarterUser="user"
+$Boxstarter.SuppressLogging=$true
 
 Describe "Invoke-Reboot" {
     Context "When No Password is set" {

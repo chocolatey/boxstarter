@@ -5,3 +5,7 @@ BuildPackages/*.nupkg
 *.nupkg
 Test.xml
 Bootstrapper/*-UAC.ps1
+Bootstrapper/*-BoxstarterMessage.ps1
+Helpers/*-BoxstarterMessage.ps1
+Helpers/*-TimedSection.ps1
+Bootstrapper/*-TimedSection.ps1

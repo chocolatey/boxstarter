@@ -13,11 +13,13 @@ Task Build -depends Test, Package
 Task Deploy -depends Test, Package, Push-Nuget -description 'Versions, packages and pushes to Myget'
 Task Package -depends Version-Module, Pack-Nuget, Unversion-Module -description 'Versions the psm1 and packs the module and example package'
 
-Task Copy-UACFunctions {
+Task Copy-CommonFunctions {
     copy-item "$baseDir\helpers\*-UAC.ps1" "$baseDir\bootstrapper\" -Force
+    copy-item "$baseDir\common\*.ps1" "$baseDir\bootstrapper\" -Force
+    copy-item "$baseDir\common\*.ps1" "$baseDir\helpers\" -Force
 }
 
-Task Test -depends Copy-UACFunctions {
+Task Test -depends Copy-CommonFunctions {
     pushd "$baseDir"
     exec {."$env:ChocolateyInstall\lib\Pester.1.2.1\tools\bin\Pester.bat" $baseDir/Tests -DisableLegacyExpectations}
     popd
@@ -33,7 +35,7 @@ Task Unversion-Module -description 'Removes the versioning from the psm1' {
     (Get-Content "$baseDir\bootstrapper\boxstarter.psm1") | % {$_ -replace "$version", "`$version`$" } | % {$_ -replace "$changeset", "`$sha`$" } | Set-Content "$baseDir\bootstrapper\boxstarter.psm1"
 }
 
-Task Pack-Nuget -depends Copy-UACFunctions -description 'Packs the module and example package' {
+Task Pack-Nuget -depends Copy-CommonFunctions -description 'Packs the module and example package' {
     if (Test-Path "$baseDir\buildArtifacts") {
       Remove-Item "$baseDir\buildArtifacts" -Recurse -Force
     }

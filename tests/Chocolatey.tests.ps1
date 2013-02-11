@@ -4,6 +4,7 @@ Resolve-Path $here\..\bootstrapper\*.ps1 |
     ? { -not ($_.ProviderPath.Contains("AdminProxy")) } |
     % { . $_.ProviderPath }
 Intercept-Chocolatey
+$Boxstarter.SuppressLogging=$true
 
 Describe "Getting Chocolatey" {
     Context "When a reboot is pending and reboots are ok" {

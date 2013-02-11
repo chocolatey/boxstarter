@@ -1,4 +1,4 @@
-<#A Build step copies this function to bootstrapper too#>
+<#A Build step copies this function to bootstrapper Directory. Only edit script in Helpers#>
 function Disable-UAC {
 <#
 .SYNOPSIS

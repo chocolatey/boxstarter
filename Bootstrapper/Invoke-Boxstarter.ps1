@@ -1,5 +1,5 @@
 if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
-$Boxstarter = @{ProgramFiles86="$programFiles86";ChocolateyBin="$env:systemdrive\chocolatey\bin";Log="$env:temp\boxstarter.log";RebootOk=$false}
+$Boxstarter = @{ProgramFiles86="$programFiles86";ChocolateyBin="$env:systemdrive\chocolatey\bin";Log="$env:temp\boxstarter.log";RebootOk=$false;SuppressLogging=$false}
 
 function Invoke-BoxStarter{
 <#
@@ -36,6 +36,7 @@ This essentially wraps Chocolatey Install and provides these additional features
       [switch]$ReEnableUAC,
       [string]$localRepo="$baseDir\BuildPackages"
     )
+    $session=Start-TimedSection "Installation session of package $bootstrapPackage"
     try{
         if($ReEnableUAC) {Enable-UAC}
         $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
@@ -52,6 +53,7 @@ This essentially wraps Chocolatey Install and provides these additional features
     }
     finally{
         Cleanup-Boxstarter
+        Stop-TimedSection $session
     }
 }
 

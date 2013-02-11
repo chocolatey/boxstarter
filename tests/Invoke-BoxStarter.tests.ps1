@@ -33,6 +33,7 @@ Describe "Invoke-Boxstarter via bootstrapper.bat (end to end)" {
 Resolve-Path $here\..\bootstrapper\*.ps1 | 
     ? { -not ($_.ProviderPath.Contains("AdminProxy")) } |
     % { . $_.ProviderPath }
+$Boxstarter.SuppressLogging=$true
 
 Describe "Invoke-Boxstarter" {
     $testRoot = (Get-PSDrive TestDrive).Root
