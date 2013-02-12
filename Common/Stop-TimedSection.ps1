@@ -20,11 +20,11 @@ Stop-TimedSection $session
 
 This creates a block as follows:
 
-************ Boxstarter starting My First Section ************
++ Boxstarter starting My First Section
 
 Some stuff happens here.
 
-*** Boxstarter finished My First Section 00:00:00.2074282 ***
++ Boxstarter finished My First Section 00:00:00.2074282
 
 .EXAMPLE
 Timed Sections can be nested or staggered. You can have 
@@ -37,19 +37,21 @@ Stop-TimedSection $session
 
 This creates a block as follows:
 
-************ Boxstarter starting My First Section ************
++ Boxstarter starting My First Section
 
 Some stuff happens here.
 
-************ Boxstarter starting My Inner Section ************
+++ Boxstarter starting My Inner Section
 
 Some inner stuff happens here.
 
-*** Boxstarter finished My Inner Section 00:00:00.1074282 ***
+++ Boxstarter finished My Inner Section 00:00:00.1074282
 
 Some more stuff happens here.
 
-*** Boxstarter finished My First Section 00:00:00.2074282 ***
++ Boxstarter finished My First Section 00:00:00.2074282
+
+Note that the number of '+' chars indicate nesting level.
 
 .LINK
 http://boxstarter.codeplex.com
@@ -57,8 +59,9 @@ Start-TimedSection
 #>
     param([string]$SectionId)
     $timerEntry=$script:boxstarterTimers.$SectionId
+    $padCars="".PadLeft($boxstarterTimers.Count,"+")
     $script:boxstarterTimers.Remove($SectionId)
     $stopwatch = $timerEntry.stopwatch
-    Write-BoxstarterMessage "Boxstarter finished $($timerEntry.Title) $($stopwatch.Elapsed.ToString())" -NoLogo 
+    Write-BoxstarterMessage "$padCars Boxstarter finished $($timerEntry.Title) $($stopwatch.Elapsed.ToString())" -NoLogo 
     $stopwatch.Stop()
 }

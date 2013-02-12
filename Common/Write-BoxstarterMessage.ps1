@@ -5,8 +5,7 @@ function Write-BoxstarterMessage {
 Writes a message to the console and the log
 
 .DESCRIPTION
-Formats the message in green and surrounded by astriscs to fill 
-the width of the screen. This message is also logged to the 
+Formats the message in green. This message is also logged to the 
 Boxstarter log file with a timestamp.
 
 .PARAMETER Message
@@ -19,10 +18,10 @@ If ommited, the message will be preceeded with "Boxstarter: "
 Write-BoxstarterMessage "I am logging a message."
 
 This creates the following console output:
-************* Boxstarter: I am Logging a Message ************
+Boxstarter: I am Logging a Message
 
 This will appear in the log:
-[2013-02-11T00:59:44.9768457-08:00] ************* Boxstarter: I am Logging a Message ************
+[2013-02-11T00:59:44.9768457-08:00] Boxstarter: I am Logging a Message
 
 .LINK
 http://boxstarter.codeplex.com
