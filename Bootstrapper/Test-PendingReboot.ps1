@@ -21,8 +21,10 @@ Invoke-Reboot
 
 #>
     $rebootPending = Get-PendingReboot -ErrorLog $BoxStarter.ErrorLog | out-null
-    if($rebootPending.RebootPending) {return $true}
-    write-host "checking ccm"
+    if($rebootPending.RebootPending) {
+        Write-BoxstarterMessage "Detected Pending reboot"
+        return $true
+    }
     return IsCCMRebootPending
 }
 
@@ -32,6 +34,7 @@ function IsCCMRebootPending {
         try {
             $determination=$clientutils.DetermineIfRebootPending()
             $isPending=$determination.RebootPending
+            if($isPending){Write-BoxstarterMessage "Configuration manager is pending reboot"}
             return $isPending
             } catch {}
     }

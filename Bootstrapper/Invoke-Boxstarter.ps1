@@ -44,10 +44,10 @@ This essentially wraps Chocolatey Install and provides these additional features
         $Boxstarter.RebootOk=$RebootOk
         $Boxstarter.Package=$bootstrapPackage
         $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
+        Stop-UpdateServices
         Check-Chocolatey
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
         del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
-        Stop-UpdateServices
         Get-HelperModule
         Download-Package $bootstrapPackage
     }
@@ -72,9 +72,10 @@ function Read-AuthenticatedPassword {
         $plainpassword = [System.Runtime.InteropServices.marshal]::PtrToStringAuto($BSTR);
         [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR);
         $val = $pc.ValidateCredentials($env:username, $plainpassword, [System.DirectoryServices.AccountManagement.ContextOptions]::Negotiate)    
+        write-BoxstarterMessage "Succesfully authenticated password."
     }
     if($val){return $password} else {
-        write-host "Unable to authenticate your password. Proceeding with autologon disabled"
+        write-BoxstarterMessage "Unable to authenticate password. Proceeding with autologon disabled"
         return $null
     }
 }
@@ -98,11 +99,10 @@ function InitAutologon([switch]$RebootOk, [System.Security.SecureString]$passwor
 }
 
 function Resolve-LocalRepo([string]$localRepo) {
-    write-host "entering localRepo resolution"
     if($localRepo){
         $localRepo = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($localRepo)
     }
-    write-host "LocalRepo is at $localRepo"
+    write-BoxstarterMessage "LocalRepo is at $localRepo"
     return $localRepo
 }
 
@@ -110,10 +110,12 @@ function Get-HelperModule {
     if(Test-Path (Join-Path $Boxstarter.LocalRepo "boxstarter.Helpers.*.nupkg")) { 
         $helperSrc = $Boxstarter.LocalRepo
     }
-    write-output "Checking for latest helper $(if($helperSrc){'locally'})"
-    Try-LoadHelpers #Get old version if necessary to examine UAC
     Chocolatey update boxstarter.helpers $helperSrc
-    Try-LoadHelpers #Get the update if there is one
+    Try-LoadHelpers
+    if(Get-Module Boxstarter.Helpers){
+        $mod=Get-Module Boxstarter.Helpers
+        write-BoxstarterMessage "Loaded Boxstarter.Helpers version $($mod.Version.ToString())"
+    }
 }
 
 function Try-LoadHelpers {
@@ -131,6 +133,6 @@ function Download-Package([string]$bootstrapPackage) {
     } else {
         $source = "http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
     }
-    write-output "Installing Boxstarter package from $source"
+    write-BoxstarterMessage "Installing $bootstrapPackage package from $source"
     Chocolatey install $bootstrapPackage -source $source -force
 }

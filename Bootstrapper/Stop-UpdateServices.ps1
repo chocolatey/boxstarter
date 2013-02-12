@@ -1,4 +1,5 @@
 function Stop-UpdateServices {
+    write-boxstartermessage "Stopping Windows Update Services"
     Stop-Service -Name wuauserv
     Stop-CCMEXEC
 }
@@ -9,11 +10,11 @@ function Stop-CCMEXEC {
         set-service CCMEXEC -startuptype disabled
         do {
             if($ccm.CanStop) { 
-                Write-Output "Stopping Configuration Manager"
+                Write-boxstartermessage "Stopping Configuration Manager"
                 Stop-Service CCMEXEC
                 return
             }
-            Write-Output "Waiting for Computer Configuration Manager to stop..."
+            Write-boxstartermessage "Waiting for Computer Configuration Manager to stop..."
             sleep 10
         } while (-not ($ccm.CanStop) -and ($i++ -lt 5))
     }

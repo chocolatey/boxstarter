@@ -8,6 +8,7 @@ function Cleanup-Boxstarter {
     Remove-ItemProperty -Path $winLogonKey -Name "DefaultDomainName" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue
+    Write-BoxstarterMessage "Cleaned up logon registry and restart file"
     Start-UpdateServices
   } 
 }

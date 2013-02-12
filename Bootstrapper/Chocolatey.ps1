@@ -42,6 +42,7 @@ Intercepts Chocolatey call to check for reboots
         if ($global:error[$global:error.count-1] -match "code was '(\d+)'") {
             $errorCode=$matches[1]
             if($RebootCodes -contains $errorCode) {
+                Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code"
                 $pkgDir = (dir $env:ChocolateyInstall\lib\$packageName.*)
                 if($pkgDir.length -gt 0) {$pkgDir = $pkgDir[-1]}
                 remove-item $pkgDir -Recurse -Force
@@ -52,7 +53,9 @@ Intercepts Chocolatey call to check for reboots
 }
 
 function Call-Chocolatey {
+    $session=Start-TimedSection "Calling Chocolatey to install $packageName"
     ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
+    Stop-Timedsection $session
 }
 
 function Intercept-Command ($commandName, $omitCommandParam) {

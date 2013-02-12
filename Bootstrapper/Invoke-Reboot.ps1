@@ -19,28 +19,28 @@ Test-PendingReeboot
 
 #>
     if(!$Boxstarter.RebootOk) { 
-        Write-Output "A Reboot was requested but Reboots are surpressed. Either call Invoke-Boxstarter with -RebootOk or set `$Boxstarter.RebootOk to `$true"
+        Write-BoxstarterMessage "A Reboot was requested but Reboots are surpressed. Either call Invoke-Boxstarter with -RebootOk or set `$Boxstarter.RebootOk to `$true"
         return 
     }
     if($Boxstarter.LocalRepo){$commandArgs = "-LocalRepo `"$($Boxstarter.LocalRepo)`""}
     if($BoxstarterPassword.Length -gt 0 -or $Boxstarter.AutologedOn) {
         if(Get-UAC){
-            Write-Output "UAC Enabled. Disabling..."
+            Write-BoxstarterMessage "UAC Enabled. Disabling..."
             Disable-UAC
             $commandArgs += " -ReEnableUAC"
         }
     }
     if($BoxstarterPassword.Length -gt 0) {
-        Write-Output "Securely Storing $($env:userdomain)\$($BoxstarterUser) credentials for automatic logon"
+        Write-BoxstarterMessage "Securely Storing $($env:userdomain)\$($BoxstarterUser) credentials for automatic logon"
         Set-SecureAutoLogon $BoxstarterUser $BoxstarterPassword $env:userdomain
     }
-    Write-Output "writing restart file"
+    Write-BoxstarterMessage "writing restart file"
     New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "Call `"$baseDir\BoxStarter.bat`" $($Boxstarter.package) -RebootOk $commandArgs `r`nPause" | Out-Null
     $script:boxstarterRebooting=$true
     Restart
 }
 
 function Restart {
-    Write-Output "Restarting..."
+    Write-BoxstarterMessage "Restarting..."
     Restart-Computer -force
 }

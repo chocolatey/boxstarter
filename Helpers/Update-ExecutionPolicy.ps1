@@ -20,7 +20,7 @@ The execution policy to set
         [ValidateSet('Unrestricted','RemoteSigned','AllSigned','Restricted','Default','Bypass','Undefined')]
         [string]$policy
     )
-    write-output "Setting powershell execution context to $policy"
+    write-BoxstarterMessage "Setting powershell execution context to $policy"
     if(Is64Bit) {
         Start-Process "$env:SystemRoot\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" -verb runas -wait -argumentList "-noprofile -WindowStyle hidden -noninteractive -ExecutionPolicy unrestricted -Command `"Set-ExecutionPolicy $policy`""
     }

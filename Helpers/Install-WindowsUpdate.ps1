@@ -36,7 +36,7 @@ http://boxstarter.codeplex.com
         }
     }
     try{
-        Write-Output "Checking for updates..."
+        $searchSession=Start-TimedSection "Checking for updates..."
         $updateSession =new-object -comobject "Microsoft.Update.Session"
         $updatesToDownload =new-Object -com "Microsoft.Update.UpdateColl"
         $updatesToInstall =new-object -com "Microsoft.Update.UpdateColl"
@@ -44,6 +44,7 @@ http://boxstarter.codeplex.com
         $Installer =$updateSession.CreateUpdateInstaller()
         $Searcher =$updatesession.CreateUpdateSearcher()
         $Result = $Searcher.Search($criteria)
+        Stop-TimedSection $searchSession
 
         If ($Result.updates.count -ne 0)
         {
@@ -57,12 +58,12 @@ http://boxstarter.codeplex.com
             }
 
             If ($updatesToDownload.Count -gt 0) {
-                Write-Output "Beginning to download $($updatesToDownload.Count) updates"
+                $downloadSession=Start-TimedSection "Downloading $($updatesToDownload.Count) updates"
                 $Downloader.Updates = $updatesToDownload
                 $Downloader.Download() | Out-Null
+                Stop-TimedSection $downloadSession
             }
             
-            Write-Output "Downloading complete"
             foreach($update in $result.updates) {
                 if(!($update.EulaAccepted) -and $acceptEula){
                     $update.AcceptEula()
@@ -70,7 +71,8 @@ http://boxstarter.codeplex.com
                 $updatesToinstall.add($update) | Out-Null
             }
 
-            Write-Output "Beginning to install. This may take several minutes..."
+            $installSession=Start-TimedSection "Installing Updates"
+            Write-Output "This may take several minutes..."
                 $Installer.updates = $UpdatesToInstall
                 $result = $Installer.Install()
 
@@ -79,7 +81,8 @@ http://boxstarter.codeplex.com
                         Write-Output "A Restart is Required."
                     } else {
                         $Rebooting=$true
-                        Write-Output "Restart Required. Restarting now..."
+                        Write-BoxstarterMessage "Restart Required. Restarting now..."
+                        Stop-TimedSection $installSession
                         if(test-path function:\Invoke-Reboot) {
                             return Invoke-Reboot
                         } else {
@@ -87,9 +90,9 @@ http://boxstarter.codeplex.com
                         }
                     }
                 }
-            Write-Output "All updates installed"
+            Stop-TimedSection $installSession
         }
-        else{Write-Output "There is no update applicable to this machine"}    
+        else{Write-BoxstarterMessage "There is no update applicable to this machine"}    
     }
     finally {
         if($origAUVal){
