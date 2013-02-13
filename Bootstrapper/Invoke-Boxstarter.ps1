@@ -38,30 +38,33 @@ password which will be used for automatic logins in the event a
 restart is required.
 
 .Parameter ReEnableUAC
-This parameter is intended to be set by Boxstarter If boxstarter needs to
-disable UAC in order to suppress the security prompt after reboot when 
-relaunching boxstarter as admin, it will set this switch which will cause
-boxstarter to turn UAC back on aftr the reboot completes.
+This parameter is intended to be set by Boxstarter If boxstarter 
+needs to disable UAC in order to suppress the security prompt 
+after reboot when relaunching boxstarter as admin, it will set 
+this switch which will cause boxstarter to turn UAC back on aftr 
+the reboot completes.
 
 .Parameter Localrepo
 This is the path to the local boxstarter repository where boxstarter 
-should look for .nupkg files to install. By default this is located in the 
-BuildPackages directory just under the root Boxstarter directory.
+should look for .nupkg files to install. By default this is located 
+in the BuildPackages directory just under the root Boxstarter 
+directory.
 
 .EXAMPLE
 Invoke-Boxstarter example -RebootOk
 
-This invokes boxstarter an installs the example .nupkg. In pending reboots 
-are detected, boxstarter will restart the machine. Boxstarter will prompt 
-the user to enter a password which will be used for automatic logins in 
-the event a restart is required.
+This invokes boxstarter an installs the example .nupkg. In pending 
+reboots are detected, boxstarter will restart the machine. Boxstarter
+will prompt the user to enter a password which will be used for 
+automatic logins in the event a restart is required.
 
 .EXAMPLE
 Invoke-Boxstarter win8Install -rebootOk -LocalRepo \\server\share\boxstarter
 
-This installs the Win8Install .nupkg and specifies that it is ok to reboot 
-the macine if a pending reboot is needed. Boxstarter will look for the 
-Win8Install .nupkg file in the \\serer\share\boxstarter directory.
+This installs the Win8Install .nupkg and specifies that it is ok to 
+reboot the macine if a pending reboot is needed. Boxstarter will look 
+for the Win8Install .nupkg file in the \\serer\share\boxstarter 
+directory.
 
 .LINK
 http://boxstarter.codeplex.com
