@@ -56,9 +56,16 @@ Some more stuff happens here.
 
 Note that the number of '+' chars indicate nesting level.
 
+.NOTES
+If the SuppressLogging setting of the $Boxstarter variable is true, 
+logging mesages will be suppresed and not sent to the console or the 
+log.
+
 .LINK
 http://boxstarter.codeplex.com
 Stop-TimedSection
+About_Boxstarter_Variable
+
 #>
     param([string]$sectionName)
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()

@@ -20,13 +20,52 @@ This essentially wraps Chocolatey Install and provides these additional features
  - The chocolatey feed
  - The boxstarter feed on myget
 
- .PARAMETER bootstrapPackage
+ .PARAMETER BootstrapPackage
  The package to be installed.
  The .nupkg file for the provided package name is searched in the following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
  - The chocolatey feed
  - The boxstarter feed on myget
 
+.Parameter Password
+This password will be used to automatically log the user in if a 
+reboot is required and reboots are eabled.
+
+.Parameter RebootOk
+If set, a reboot will be performed if boxstarter determines that a 
+reboot is pending. Boxstarter will prompt the user to enter a 
+password which will be used for automatic logins in the event a 
+restart is required.
+
+.Parameter ReEnableUAC
+This parameter is intended to be set by Boxstarter If boxstarter needs to
+disable UAC in order to suppress the security prompt after reboot when 
+relaunching boxstarter as admin, it will set this switch which will cause
+boxstarter to turn UAC back on aftr the reboot completes.
+
+.Parameter Localrepo
+This is the path to the local boxstarter repository where boxstarter 
+should look for .nupkg files to install. By default this is located in the 
+BuildPackages directory just under the root Boxstarter directory.
+
+.EXAMPLE
+Invoke-Boxstarter example -RebootOk
+
+This invokes boxstarter an installs the example .nupkg. In pending reboots 
+are detected, boxstarter will restart the machine. Boxstarter will prompt 
+the user to enter a password which will be used for automatic logins in 
+the event a restart is required.
+
+.EXAMPLE
+Invoke-Boxstarter win8Install -rebootOk -LocalRepo \\server\share\boxstarter
+
+This installs the Win8Install .nupkg and specifies that it is ok to reboot 
+the macine if a pending reboot is needed. Boxstarter will look for the 
+Win8Install .nupkg file in the \\serer\share\boxstarter directory.
+
+.LINK
+http://boxstarter.codeplex.com
+About_Boxstarter_Variable
 #>    
     [CmdletBinding()]
     param(

@@ -1,0 +1,46 @@
+TOPIC
+	About_Boxstarter_Variable
+
+SYNOPSIS
+	A Hashtable for persisting Boxstarter settings throughout a Boxstarter 
+	installation session.
+
+DESCRIPTION	
+	The Boxstarter variable is a hashtable that is accesible from inside 
+	a Boxstarter chocolateyInstall file. Many of th settings available
+	from the Boxstarter variable can also be set from the Invoke-Boxstarter
+	Command.
+
+BOXSTARTER VARIABLE SETTINGS
+	ProgramFiles86
+		Unless the environment hass been specilly conficured, this points 
+		to the 'Program Files' folder in the system drive on x86 machines 
+		and the 'Program Files (x86)' folder in the system drive on 64 bit 
+		machines.
+
+	ChocolateyBin
+		This points to the path of the chocolatey bin directory which by 
+		default is c:\chocolatey\bin.
+
+	Log
+		This points to th path of the Boxstarter log file. By default this 
+		is $env:temp\boxstarter.log. You may edit this variable to change 
+		the location of the log.
+
+	RebootOk
+		A boolean value indicating if automatic reboots are permited. This 
+		is false by default but true if the -RebootOk switch is used when 
+		calling Invoke-Boxstarter. You may edit this value to suppress or 
+		enable reboots.
+
+	SuppressLogging
+		A boolean value that specifies if log messages should be suppressed. 
+		The default is false and can be changed at any time. If true, any 
+		message logged via Write-BoxstarterMessage or Star-TimedSection 
+		will not log to the console or to the file.
+
+SEE ALSO
+	http://boxstarter.codeplex.com
+	Invoke-Boxstarter
+	Write-BoxstarterMessage
+	Start-TimedSection

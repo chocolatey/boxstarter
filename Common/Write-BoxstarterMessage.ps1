@@ -23,8 +23,14 @@ Boxstarter: I am Logging a Message
 This will appear in the log:
 [2013-02-11T00:59:44.9768457-08:00] Boxstarter: I am Logging a Message
 
+.NOTES
+If the SuppressLogging setting of the $Boxstarter variable is true, 
+logging mesages will be suppresed and not sent to the console or the 
+log.
+
 .LINK
 http://boxstarter.codeplex.com
+About_Boxstarter_Variable
 
 #>
     param([String]$message, [switch]$nologo)

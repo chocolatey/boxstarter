@@ -9,14 +9,21 @@ password was provided.
 Use this command inside of a boxstarter package instead 
 of calling Restart-Computer
 
-This command eill often be used with the Test-PendingReboot
+This command will often be used with the Test-PendingReboot
 command. If Test-PendingReboot returns true, one may want 
 to call Invoke-Reboot to restart otherwise the remainder of 
 the package might fail.
 
-.LINK
-Test-PendingReeboot
+.NOTES
+Obe can use the $Boxstarter variable's RebootOk to enable/disable
+reboots. If this is set to $False (the default) then Invoke-Reboot
+will not do anything. If Boxstarter was invoked with the -Rebootok
+parameter $Boxstarter.RebootOk is set to True.
 
+.LINK
+http://boxstarter.codeplex.com
+Test-PendingReeboot
+Invoke-Boxstarter
 #>
     if(!$Boxstarter.RebootOk) { 
         Write-BoxstarterMessage "A Reboot was requested but Reboots are surpressed. Either call Invoke-Boxstarter with -RebootOk or set `$Boxstarter.RebootOk to `$true"
