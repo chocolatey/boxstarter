@@ -78,6 +78,9 @@ About_Boxstarter_Variable
       [switch]$ReEnableUAC,
       [string]$localRepo="$baseDir\BuildPackages"
     )
+    $boxMod=Get-Module Boxstarter
+    write-BoxstarterMessage "Boxstarter Version $($boxMod.Version)" -nologo
+    write-BoxstarterMessage "$($boxMod.Copyright)" -nologo
     $session=Start-TimedSection "Installation session of package $bootstrapPackage"
     try{
         if($ReEnableUAC) {Enable-UAC}

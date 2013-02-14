@@ -13,9 +13,7 @@
   <files>
     <file src="chocolateyinstall.ps1" target="tools"/>
     <file src="..\boxstarter.bat" target="tools"/>
-    <file src="..\bootstrapper\boxstarter.psm1" target="tools\bootstrapper"/>
-    <file src="..\bootstrapper\AdminProxy.ps1" target="tools\bootstrapper"/>
-    <file src="..\bootstrapper\boxstarter.config" target="tools\bootstrapper"/>
-    <file src="..\buildpackages\**\*.*" target="tools\buildpackages"/>
+    <file src="..\bootstrapper\**\*.*" target="tools\boxstarter"/>
+    <file src="..\buildpackages\**\*.*" target="tools\boxstarter\buildpackages"/>
   </files>
 </package>

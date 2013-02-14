@@ -1,6 +1,3 @@
-# Boxstarter
-# Version: $version$
-# Changeset: $sha$
 Resolve-Path $PSScriptRoot\*.ps1 | 
     ? { -not ($_.ProviderPath.Contains("AdminProxy.ps1")) } |
     % { . $_.ProviderPath }

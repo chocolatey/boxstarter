@@ -11,7 +11,7 @@ properties {
 Task default -depends Build
 Task Build -depends Test, Package
 Task Deploy -depends Test, Package, Push-Nuget -description 'Versions, packages and pushes to Myget'
-Task Package -depends Version-Module, Pack-Nuget, Unversion-Module -description 'Versions the psm1 and packs the module and example package'
+Task Package -depends Version-Module, Pack-Nuget, Unversion-Module -description 'Versions the psd1 and packs the module and example package'
 
 Task Copy-CommonFunctions {
     copy-item "$baseDir\helpers\*-UAC.ps1" "$baseDir\bootstrapper\" -Force
@@ -25,14 +25,13 @@ Task Test -depends Copy-CommonFunctions {
     popd
 }
 
-Task Version-Module -description 'Stamps the psm1 with the version and last changeset SHA' {
+Task Version-Module -description 'Stamps the psd1 with the version and last changeset SHA' {
     (Get-Content "$baseDir\Helpers\boxstarter.helpers.psm1") | % {$_ -replace "\`$version\`$", "$version" } | % {$_ -replace "\`$sha\`$", "$changeset" } | Set-Content "$baseDir\helpers\boxstarter.helpers.psm1"
-    (Get-Content "$baseDir\bootstrapper\boxstarter.psm1") | % {$_ -replace "\`$version\`$", "$version" } | % {$_ -replace "\`$sha\`$", "$changeset" } | Set-Content "$baseDir\bootstrapper\boxstarter.psm1"    
+    (Get-Content "$baseDir\bootstrapper\boxstarter.psd1") | % {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$version'" } | % {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } | Set-Content "$baseDir\bootstrapper\boxstarter.psd1"    
 }
 
 Task Unversion-Module -description 'Removes the versioning from the psm1' {
     (Get-Content "$baseDir\helpers\boxstarter.helpers.psm1") | % {$_ -replace "$version", "`$version`$" } | % {$_ -replace "$changeset", "`$sha`$" } | Set-Content "$baseDir\helpers\boxstarter.helpers.psm1"
-    (Get-Content "$baseDir\bootstrapper\boxstarter.psm1") | % {$_ -replace "$version", "`$version`$" } | % {$_ -replace "$changeset", "`$sha`$" } | Set-Content "$baseDir\bootstrapper\boxstarter.psm1"
 }
 
 Task Pack-Nuget -depends Copy-CommonFunctions -description 'Packs the module and example package' {
