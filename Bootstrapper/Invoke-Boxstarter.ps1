@@ -1,10 +1,9 @@
-if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
-$Boxstarter = @{ProgramFiles86="$programFiles86";ChocolateyBin="$env:systemdrive\chocolatey\bin";Log="$env:temp\boxstarter.log";RebootOk=$false;SuppressLogging=$false}
+$Boxstarter = @{Log="$env:temp\boxstarter.log";RebootOk=$false;SuppressLogging=$false;IsRebooting=$false}
 
 function Invoke-BoxStarter{
 <#
 .SYNOPSIS
-Invokes the installation of a Boxstarter package
+Invokes the Boxstarter bootstrapper
 
 .DESCRIPTION
 This essentially wraps Chocolatey Install and provides these additional features
@@ -72,11 +71,10 @@ About_Boxstarter_Variable
 #>    
     [CmdletBinding()]
     param(
-      [string]$bootstrapPackage="default",
+      [ScriptBlock]$ScriptToCall
       [System.Security.SecureString]$password,
       [switch]$RebootOk,
-      [switch]$ReEnableUAC,
-      [string]$localRepo="$baseDir\BuildPackages"
+      [switch]$ReEnableUAC
     )
     $boxMod=Get-Module Boxstarter
     write-BoxstarterMessage "Boxstarter Version $($boxMod.Version)" -nologo
@@ -87,14 +85,9 @@ About_Boxstarter_Variable
         $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
         $script:BoxstarterUser=$env:username
         $Boxstarter.RebootOk=$RebootOk
-        $Boxstarter.Package=$bootstrapPackage
-        $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
+        $Boxstarter.ScriptToCall = $ScriptToCall
         Stop-UpdateServices
-        Check-Chocolatey
-        del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
-        del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
-        Get-HelperModule
-        Download-Package $bootstrapPackage
+        &($ScriptToCall)
     }
     finally{
         Cleanup-Boxstarter
@@ -141,43 +134,4 @@ function InitAutologon([switch]$RebootOk, [System.Security.SecureString]$passwor
         $Password=Read-AuthenticatedPassword
     }
     return $password
-}
-
-function Resolve-LocalRepo([string]$localRepo) {
-    if($localRepo){
-        $localRepo = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($localRepo)
-    }
-    write-BoxstarterMessage "LocalRepo is at $localRepo"
-    return $localRepo
-}
-
-function Get-HelperModule {
-    if(Test-Path (Join-Path $Boxstarter.LocalRepo "boxstarter.Helpers.*.nupkg")) { 
-        $helperSrc = $Boxstarter.LocalRepo
-    }
-    Chocolatey update boxstarter.helpers $helperSrc
-    Try-LoadHelpers
-    if(Get-Module Boxstarter.Helpers){
-        $mod=Get-Module Boxstarter.Helpers
-        write-BoxstarterMessage "Loaded Boxstarter.Helpers version $($mod.Version.ToString())"
-    }
-}
-
-function Try-LoadHelpers {
-    $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers*)
-    if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
-    if($helperDir) { 
-        if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
-        import-module $helperDir\boxstarter.helpers.psm1 
-    }
-}
-
-function Download-Package([string]$bootstrapPackage) {
-    if(test-path (Join-Path $Boxstarter.LocalRepo "$bootstrapPackage.*.nupkg")){
-        $source = $Boxstarter.LocalRepo
-    } else {
-        $source = "http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
-    }
-    write-BoxstarterMessage "Installing $bootstrapPackage package from $source"
-    Chocolatey install $bootstrapPackage -source $source -force
 }

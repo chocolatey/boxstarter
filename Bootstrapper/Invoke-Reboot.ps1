@@ -29,7 +29,6 @@ Invoke-Boxstarter
         Write-BoxstarterMessage "A Reboot was requested but Reboots are surpressed. Either call Invoke-Boxstarter with -RebootOk or set `$Boxstarter.RebootOk to `$true"
         return 
     }
-    if($Boxstarter.LocalRepo){$commandArgs = "-LocalRepo `"$($Boxstarter.LocalRepo)`""}
     if($BoxstarterPassword.Length -gt 0 -or $Boxstarter.AutologedOn) {
         if(Get-UAC){
             Write-BoxstarterMessage "UAC Enabled. Disabling..."
@@ -42,8 +41,11 @@ Invoke-Boxstarter
         Set-SecureAutoLogon $BoxstarterUser $BoxstarterPassword $env:userdomain
     }
     Write-BoxstarterMessage "writing restart file"
-    New-Item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\bootstrap-post-restart.bat" -type file -force -value "Call `"$baseDir\BoxStarter.bat`" $($Boxstarter.package) -RebootOk $commandArgs `r`nPause" | Out-Null
-    $script:boxstarterRebooting=$true
+    $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
+    New-Item "$Startup\ScriptToCall.ps1" -type file -value $boxstarter.ScriptToCall
+    $restartScript="Call powershell -NoProfile -ExecutionPolicy bypass -command `"'$BaseDir\Bootstrapper\AdminProxy.ps1' -ScriptToCall ([scriptblock]::Create(get-Content '$Startup\ScriptToCall.ps1')) -RebootOk $commandArgs`" `r`nPause"
+    New-Item "startup\boxstarter-post-restart.bat" -type file -force -value $restartScript | Out-Null
+    Boxstarter.IsRebooting=$true
     Restart
 }
 

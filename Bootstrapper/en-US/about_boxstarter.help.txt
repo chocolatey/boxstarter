@@ -1,0 +1,8 @@
+TOPIC
+	About_Boxstarter
+
+SYNOPSIS
+	Describes how to use Boxstarter to setup a new environment.
+
+DESCRIPTION
+	B
