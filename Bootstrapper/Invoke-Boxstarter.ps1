@@ -1,4 +1,8 @@
-$Boxstarter = @{Log="$env:temp\boxstarter.log";RebootOk=$false;SuppressLogging=$false;IsRebooting=$false}
+if(!$Boxstarter) {$Boxstarter = @{}}
+$Boxstarter.Log="$env:temp\boxstarter.log"
+$Boxstarter.RebootOk=$false
+$Boxstarter.SuppressLogging=$false
+$Boxstarter.IsRebooting=$false
 
 function Invoke-BoxStarter{
 <#
@@ -36,13 +40,6 @@ reboot is pending. Boxstarter will prompt the user to enter a
 password which will be used for automatic logins in the event a 
 restart is required.
 
-.Parameter ReEnableUAC
-This parameter is intended to be set by Boxstarter If boxstarter 
-needs to disable UAC in order to suppress the security prompt 
-after reboot when relaunching boxstarter as admin, it will set 
-this switch which will cause boxstarter to turn UAC back on aftr 
-the reboot completes.
-
 .Parameter Localrepo
 This is the path to the local boxstarter repository where boxstarter 
 should look for .nupkg files to install. By default this is located 
@@ -71,23 +68,29 @@ About_Boxstarter_Variable
 #>    
     [CmdletBinding()]
     param(
-      [ScriptBlock]$ScriptToCall
+      [ScriptBlock]$ScriptToCall,
       [System.Security.SecureString]$password,
-      [switch]$RebootOk,
-      [switch]$ReEnableUAC
+      [switch]$RebootOk
     )
+    $scriptFile = "$env:temp\boxstarter.script"
+    if(!(Test-Admin)) {
+        New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force
+        Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate."
+        $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($Boxstarter.Basedir)\Bootstrapper\BoxStarter.psd1`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'})"
+        Start-Process powershell -verb runas -argumentlist $command
+    }
     $boxMod=Get-Module Boxstarter
     write-BoxstarterMessage "Boxstarter Version $($boxMod.Version)" -nologo
     write-BoxstarterMessage "$($boxMod.Copyright)" -nologo
     $session=Start-TimedSection "Installation session of package $bootstrapPackage"
     try{
-        if($ReEnableUAC) {Enable-UAC}
+        if(Test-ReEnableUAC) {Enable-UAC}
         $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
         $script:BoxstarterUser=$env:username
         $Boxstarter.RebootOk=$RebootOk
-        $Boxstarter.ScriptToCall = $ScriptToCall
+        $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
-        &($ScriptToCall)
+        &([ScriptBlock]::Create($Boxstarter.ScriptToCall)) 2>&1 | Tee-BoxstarterLog
     }
     finally{
         Cleanup-Boxstarter
@@ -134,4 +137,27 @@ function InitAutologon([switch]$RebootOk, [System.Security.SecureString]$passwor
         $Password=Read-AuthenticatedPassword
     }
     return $password
+}
+
+function Test-Admin {
+    $identity  = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = New-Object System.Security.Principal.WindowsPrincipal( $identity )
+    return $principal.IsInRole( [System.Security.Principal.WindowsBuiltInRole]::Administrator )
+}
+
+function Resolve-Script([ScriptBlock]$script, [string]$scriptFile){
+    if($script) {return $script}
+    if(Test-Path $scriptFile) {
+        $script=(Get-Content $scriptFile)
+        if($script.length -gt 0) {
+            return [ScriptBlock]::Create($script)
+        }
+    }
+    throw "No Script was specified to call."
+}
+
+function Test-ReEnableUAC {
+    $test=Test-Path "$env:temp\BoxstarterReEnableUAC"
+    if($test){del "$env:temp\BoxstarterReEnableUAC"}
+    return $test
 }

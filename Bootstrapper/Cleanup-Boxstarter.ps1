@@ -3,7 +3,7 @@ function Cleanup-Boxstarter {
     $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
     if( Test-Path "$Startup\boxstarter-post-restart.bat") {
         remove-item "$Startup\boxstarter-post-restart.bat"
-        remove-item "$Startup\ScriptToCall.ps1S"
+        remove-item "$env:temp\Boxstarter.Script"
     }
     $winLogonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
     Remove-ItemProperty -Path $winLogonKey -Name "DefaultUserName" -ErrorAction SilentlyContinue
