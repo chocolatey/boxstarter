@@ -8,6 +8,7 @@ Describe "Invoke-Boxstarter" {
     $testRoot = (Get-PSDrive TestDrive).Root
 
     Context "When Configuration Service is installed" {
+        Mock Test-Admin {return $true}
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
@@ -24,6 +25,7 @@ Describe "Invoke-Boxstarter" {
     }
 
       Context "When Configuration Service is not installed" {
+        Mock Test-Admin {return $true}
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
@@ -40,6 +42,7 @@ Describe "Invoke-Boxstarter" {
     }
 
       Context "When An exception occurs in the install" {
+        Mock Test-Admin {return $true}
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
@@ -57,6 +60,7 @@ Describe "Invoke-Boxstarter" {
   
       Context "When A reboot is invoked" {
         Mock Get-UAC
+        Mock Test-Admin {return $true}
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
@@ -83,6 +87,7 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When no password is provided but reboot is ok" {
+        Mock Test-Admin {return $true}
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
@@ -101,6 +106,7 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When no password is provided, reboot is ok and autologon is toggled" {
+        Mock Test-Admin {return $true}
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
@@ -120,6 +126,7 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When a password is provided and reboot is ok" {
+        Mock Test-Admin {return $true}
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
@@ -136,6 +143,7 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When reboot is not ok" {
+        Mock Test-Admin {return $true}
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
@@ -154,6 +162,7 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When ReEnableUAC File Exists" {
+        Mock Test-Admin {return $true}
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
@@ -171,6 +180,7 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When ReEnableUAC file does not exist" {
+        Mock Test-Admin {return $true}
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
@@ -180,6 +190,24 @@ Describe "Invoke-Boxstarter" {
 
         it "will Not Enable UAC" {
             Assert-MockCalled Enable-UAC -times 0
+        }
+    }
+
+    Context "When Not Running As Admin" {
+        Mock Test-Admin {return $false}
+        Mock Start-Process
+        Mock Stop-UpdateServices
+
+        Invoke-Boxstarter {return}
+
+        it "will Write Script File" {
+            "$env:temp\boxstarter.script" | should Contain "return"
+        }
+        it "will invoke-boxstarter via elevated console"{
+            Assert-MockCalled Start-Process -ParameterFilter {$filepath -eq "powershell" -and $verb -eq "runas" -and $argumentlist -like "*Invoke-BoxStarter*"}
+        }
+        it "will not stop update services" {
+            Assert-MockCalled Stop-UpdateServices -times 0
         }
     }
 }

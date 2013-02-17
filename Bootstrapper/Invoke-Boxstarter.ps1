@@ -68,10 +68,11 @@ About_Boxstarter_Variable
     )
     $scriptFile = "$env:temp\boxstarter.script"
     if(!(Test-Admin)) {
-        New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force
+        New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | out-null
         Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate."
         $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($Boxstarter.Basedir)\Bootstrapper\BoxStarter.psd1`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'})"
         Start-Process powershell -verb runas -argumentlist $command
+        return
     }
     $boxMod=Get-Module Boxstarter
     write-BoxstarterMessage "Boxstarter Version $($boxMod.Version)" -nologo
