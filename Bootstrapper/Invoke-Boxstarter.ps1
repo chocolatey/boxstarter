@@ -40,12 +40,6 @@ reboot is pending. Boxstarter will prompt the user to enter a
 password which will be used for automatic logins in the event a 
 restart is required.
 
-.Parameter Localrepo
-This is the path to the local boxstarter repository where boxstarter 
-should look for .nupkg files to install. By default this is located 
-in the BuildPackages directory just under the root Boxstarter 
-directory.
-
 .EXAMPLE
 Invoke-Boxstarter example -RebootOk
 

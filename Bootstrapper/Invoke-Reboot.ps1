@@ -33,7 +33,7 @@ Invoke-Boxstarter
         if(Get-UAC){
             Write-BoxstarterMessage "UAC Enabled. Disabling..."
             Disable-UAC
-            New-Item "$env:temp\BoxstarterReEnableUAC" -type file
+            New-Item "$env:temp\BoxstarterReEnableUAC" -type file | Out-Null
         }
     }
     if($BoxstarterPassword.Length -gt 0) {
@@ -41,11 +41,11 @@ Invoke-Boxstarter
         Set-SecureAutoLogon $BoxstarterUser $BoxstarterPassword $env:userdomain
     }
     Write-BoxstarterMessage "writing restart file"
-    New-Item "$env:temp\Boxstarter.script" -type file -value $boxstarter.ScriptToCall
+    New-Item "$env:temp\Boxstarter.script" -type file -value $boxstarter.ScriptToCall -force | Out-Null
     $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
     $restartScript="Call powershell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$BoxstarterBaseDir\Bootstrapper\boxstarter.psd1';Invoke-Boxstarter -RebootOk`" `r`nPause"
-    New-Item "startup\boxstarter-post-restart.bat" -type file -force -value $restartScript | Out-Null
-    Boxstarter.IsRebooting=$true
+    New-Item "$startup\boxstarter-post-restart.bat" -type file -force -value $restartScript | Out-Null
+    $Boxstarter.IsRebooting=$true
     Restart
 }
 
