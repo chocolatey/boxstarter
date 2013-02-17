@@ -1,7 +1,6 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter){Remove-Module boxstarter}
 Resolve-Path $here\..\bootstrapper\*.ps1 | 
-    ? { -not ($_.ProviderPath.Contains("AdminProxy")) } |
     % { . $_.ProviderPath }
 $BoxstarterUser="user"
 $Boxstarter.SuppressLogging=$true
@@ -9,6 +8,7 @@ $Boxstarter.SuppressLogging=$true
 Describe "Invoke-Reboot" {
     Context "When No Password is set" {
         Mock New-Item -ParameterFilter {$path -like "*Startup*"} -Verifiable
+        Mock New-Item -ParameterFilter {$path -like "*.script"} -Verifiable
         Mock Set-SecureAutoLogon
         Mock Restart -Verifiable
         $Boxstarter.RebootOk=$true
@@ -26,6 +26,7 @@ Describe "Invoke-Reboot" {
     Context "When a Password is set" {
         Mock Get-UAC
         Mock New-Item -ParameterFilter {$path -like "*Startup*"} -Verifiable
+        Mock New-Item -ParameterFilter {$path -like "*.script"} -Verifiable
         Mock Set-SecureAutoLogon
         Mock Restart -Verifiable
         $BoxstarterPassword= ConvertTo-SecureString "mypassword" -asplaintext -force
@@ -42,7 +43,7 @@ Describe "Invoke-Reboot" {
     }
 
     Context "When reboots are suppressed" {
-        Mock New-Item -ParameterFilter {$path -like "*Startup*"}
+        Mock New-Item
         Mock Set-SecureAutoLogon
         Mock Restart
         $BoxstarterPassword= ConvertTo-SecureString "mypassword" -asplaintext -force
@@ -62,9 +63,6 @@ Describe "Invoke-Reboot" {
     }
 
     Context "When UAC is Enabled and password is set" {
-        if(!(get-module Boxstarter.Helpers)){
-            Import-Module $here\..\Helpers\Boxstarter.Helpers.psm1
-        }
         $BoxstarterPassword= ConvertTo-SecureString "mypassword" -asplaintext -force
         Mock New-Item
         Mock Set-SecureAutoLogon
@@ -78,16 +76,12 @@ Describe "Invoke-Reboot" {
         it "will Disable UAC" {
             Assert-MockCalled Disable-UAC
         }
-        it "will add ReEnableUac to restart command" {
-            Assert-MockCalled New-Item -ParameterFilter {$value -like "*-ReEnableUac*"}
+        it "will add ReEnableUac file" {
+            Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"}
         }
-        Write-Host $myPath
     }
 
     Context "When UAC is Enabled and user has been auto loged on" {
-        if(!(get-module Boxstarter.Helpers)){
-            Import-Module $here\..\Helpers\Boxstarter.Helpers.psm1
-        }
         $Boxstarter.AutologedOn=$true
         Mock New-Item
         Mock Set-SecureAutoLogon
@@ -101,16 +95,12 @@ Describe "Invoke-Reboot" {
         it "will Disable UAC" {
             Assert-MockCalled Disable-UAC
         }
-        it "will add ReEnableUac to restart command" {
-            Assert-MockCalled New-Item -ParameterFilter {$value -like "*-ReEnableUac*"}
+        it "will add ReEnableUac file" {
+            Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"}
         }
-        Write-Host $myPath
     }
 
     Context "When UAC is enabled and password is not set" {
-        if(!(get-module Boxstarter.Helpers)){
-            Import-Module $here\..\Helpers\Boxstarter.Helpers.psm1
-        }
         Mock New-Item
         Mock Set-SecureAutoLogon
         Mock Restart
@@ -123,15 +113,12 @@ Describe "Invoke-Reboot" {
         it "will not Disable UAC" {
             Assert-MockCalled Disable-UAC -times 0
         }
-        it "will not add ReEnableUac to restart command" {
-            Assert-MockCalled New-Item -ParameterFilter {$path -like "*-ReEnableUac*"} -times 0
+        it "will not add ReEnableUac file" {
+            Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"} -times 0
         }
     }
 
     Context "When UAC is disabled" {
-        if(!(get-module Boxstarter.Helpers)){
-            Import-Module $here\..\Helpers\Boxstarter.Helpers.psm1
-        }
         Mock New-Item
         Mock Set-SecureAutoLogon
         Mock Restart
@@ -144,8 +131,8 @@ Describe "Invoke-Reboot" {
         it "will not Disable UAC" {
             Assert-MockCalled Disable-UAC -times 0
         }
-        it "will not add ReEnableUac to restart command" {
-            Assert-MockCalled New-Item -ParameterFilter {$path -like "*-ReEnableUac*"} -times 0
+        it "will not add ReEnableUac file" {
+            Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"} -times 0
         }
     }
 }
