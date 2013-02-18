@@ -72,16 +72,24 @@ About_Boxstarter_Variable
       [string]$bootstrapPackage="default",
       [string]$localRepo="$baseDir\BuildPackages"
     )
-        if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
-        $Boxstarter.ProgramFiles86="$programFiles86"
-        $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
-        $Boxstarter.Package=$bootstrapPackage
-        $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
-        Check-Chocolatey
-        del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
-        del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
-        Get-HelperModule
-        Download-Package $bootstrapPackage
+    if(!$script:CalledByBoxstarter){
+        $Script:CalledByBoxstarter=$true
+        $script=@"
+Import-Module "$PSScriptRoot\Boxstarter.Chocolatey.psd1"
+Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage -Localrepo $localRepo
+"@
+        Invoke-Boxstarter ([ScriptBlock]::Create($script))
+        return
+    }
+    if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
+    $Boxstarter.ProgramFiles86="$programFiles86"
+    $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
+    $Boxstarter.Package=$bootstrapPackage
+    $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
+    Check-Chocolatey
+    del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
+    del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
+    Download-Package $bootstrapPackage
 }
 
 function Resolve-LocalRepo([string]$localRepo) {
@@ -90,27 +98,6 @@ function Resolve-LocalRepo([string]$localRepo) {
     }
     write-BoxstarterMessage "LocalRepo is at $localRepo"
     return $localRepo
-}
-
-function Get-HelperModule {
-    if(Test-Path (Join-Path $Boxstarter.LocalRepo "boxstarter.Helpers.*.nupkg")) { 
-        $helperSrc = $Boxstarter.LocalRepo
-    }
-    Chocolatey update boxstarter.helpers $helperSrc
-    Try-LoadHelpers
-    if(Get-Module Boxstarter.Helpers){
-        $mod=Get-Module Boxstarter.Helpers
-        write-BoxstarterMessage "Loaded Boxstarter.Helpers version $($mod.Version.ToString())"
-    }
-}
-
-function Try-LoadHelpers {
-    $helperDir = (Get-ChildItem $env:ChocolateyInstall\lib\boxstarter.helpers*)
-    if($helperDir.Count -gt 1){$helperDir = $helperDir[-1]}
-    if($helperDir) { 
-        if(Get-Module boxstarter.helpers){Remove-Module boxstarter.helpers}
-        import-module $helperDir\boxstarter.helpers.psm1 
-    }
 }
 
 function Download-Package([string]$bootstrapPackage) {

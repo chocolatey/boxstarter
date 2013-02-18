@@ -13,7 +13,6 @@ cinstm pester -version 1.2.1
 
 if($Help){ 
   try {
-    Get-Help "$($MyInvocation.MyCommand.Definition)" -full | Out-Host -paging
     Write-Host "Available build tasks:"
     psake -nologo -docs | Out-Host -paging
   } catch {}

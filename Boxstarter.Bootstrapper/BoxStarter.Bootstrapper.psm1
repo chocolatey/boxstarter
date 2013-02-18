@@ -3,7 +3,7 @@ Resolve-Path $PSScriptRoot\*.ps1 |
 
 [xml]$configXml = Get-Content "$PSScriptRoot\BoxStarter.config"
 $Boxstarter = @{BaseDir=(Split-Path -parent $PSScriptRoot)}
-$config = $configXml.config
+$Boxstarter.Config = $configXml.config
 
 Export-ModuleMember Invoke-BoxStarter, Test-PendingReboot, Invoke-Reboot, Write-BoxstarterMessage, Start-TimedSection, Stop-TimedSection
 Export-ModuleMember -Variable Boxstarter

@@ -1,7 +1,10 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-if(get-module Boxstarter){Remove-Module boxstarter}
-Resolve-Path $here\..\bootstrapper\*.ps1 | 
-    ? { -not ($_.ProviderPath.Contains("AdminProxy")) } |
+if(get-module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
+Resolve-Path $here\..\Boxstarter.Common\*.ps1 | 
+    % { . $_.ProviderPath }
+Resolve-Path $here\..\Boxstarter.Bootstrapper\*.ps1 | 
+    % { . $_.ProviderPath }
+Resolve-Path $here\..\Boxstarter.Chocolatey\*.ps1 | 
     % { . $_.ProviderPath }
 Intercept-Chocolatey
 $Boxstarter.SuppressLogging=$true

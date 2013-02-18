@@ -11,30 +11,22 @@ properties {
 Task default -depends Build
 Task Build -depends Test, Package
 Task Deploy -depends Test, Package, Push-Nuget -description 'Versions, packages and pushes to Myget'
-Task Package -depends Version-Module, Pack-Nuget, Unversion-Module -description 'Versions the psd1 and packs the module and example package'
+Task Package -depends Version-Module, Pack-Nuget -description 'Versions the psd1 and packs the module and example package'
 
-Task Copy-CommonFunctions {
-    copy-item "$baseDir\helpers\*-UAC.ps1" "$baseDir\bootstrapper\" -Force
-    copy-item "$baseDir\common\*.ps1" "$baseDir\bootstrapper\" -Force
-    copy-item "$baseDir\common\*.ps1" "$baseDir\helpers\" -Force
-}
-
-Task Test -depends Copy-CommonFunctions {
+Task Test {
     pushd "$baseDir"
     exec {."$env:ChocolateyInstall\lib\Pester.1.2.1\tools\bin\Pester.bat" $baseDir/Tests -DisableLegacyExpectations}
     popd
 }
 
 Task Version-Module -description 'Stamps the psd1 with the version and last changeset SHA' {
-    (Get-Content "$baseDir\Helpers\boxstarter.helpers.psm1") | % {$_ -replace "\`$version\`$", "$version" } | % {$_ -replace "\`$sha\`$", "$changeset" } | Set-Content "$baseDir\helpers\boxstarter.helpers.psm1"
-    (Get-Content "$baseDir\bootstrapper\boxstarter.psd1") | % {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$version'" } | % {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } | Set-Content "$baseDir\bootstrapper\boxstarter.psd1"    
+    Set-Version "$baseDir\boxstarter.Common\boxstarter.Common.psd1"
+    Set-Version "$baseDir\boxstarter.WinConfig\boxstarter.WinConfig.psd1"
+    Set-Version "$baseDir\boxstarter.bootstrapper\boxstarter.bootstrapper.psd1"
+    Set-Version "$baseDir\boxstarter.Chocolatey\boxstarter.Chocolatey.psd1"
 }
 
-Task Unversion-Module -description 'Removes the versioning from the psm1' {
-    (Get-Content "$baseDir\helpers\boxstarter.helpers.psm1") | % {$_ -replace "$version", "`$version`$" } | % {$_ -replace "$changeset", "`$sha`$" } | Set-Content "$baseDir\helpers\boxstarter.helpers.psm1"
-}
-
-Task Pack-Nuget -depends Copy-CommonFunctions -description 'Packs the module and example package' {
+Task Pack-Nuget -description 'Packs the modules and example packages' {
     if (Test-Path "$baseDir\buildArtifacts") {
       Remove-Item "$baseDir\buildArtifacts" -Recurse -Force
     }
@@ -45,8 +37,8 @@ Task Pack-Nuget -depends Copy-CommonFunctions -description 'Packs the module and
     exec { .$nugetExe pack "$baseDir\BuildPackages\example\example.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }
     exec { .$nugetExe pack "$baseDir\BuildPackages\example-light\example-light.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }    
     exec { .$nugetExe pack "$baseDir\BuildPackages\test-package\test-package.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis }    
-    exec { .$nugetExe pack "$baseDir\helpers\boxstarter.helpers.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
-    exec { .$nugetExe pack "$baseDir\nuget\boxstarter.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
+    #exec { .$nugetExe pack "$baseDir\helpers\boxstarter.helpers.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
+    #exec { .$nugetExe pack "$baseDir\nuget\boxstarter.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
 }
 
 Task Push-Nuget -description 'Pushes the module to Myget feed' {
@@ -65,4 +57,8 @@ Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
     exec { cpush $pkg.FullName }
     $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.helpers.*.*.*.nupkg   
     exec { cpush $pkg.FullName }
+}
+
+function Set-Version($path){
+    (Get-Content $path) | % {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$version'" } | % {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } | Set-Content $path   
 }
