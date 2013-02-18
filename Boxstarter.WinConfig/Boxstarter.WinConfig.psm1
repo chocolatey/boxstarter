@@ -1,11 +1,4 @@
-# Boxstarter.Helpers
-# Version: $version$
-# Changeset: $sha$
-
-$helpersPath = (Split-Path -parent $MyInvocation.MyCommand.Definition);
-function Is64Bit {  [IntPtr]::Size -eq 8  }
-Resolve-Path $helpersPath\*.ps1 | 
-    ? { -not ($_.ProviderPath.Contains(".Tests.")) } |
+Resolve-Path $PSScriptRoot\*.ps1 | 
     % { . $_.ProviderPath }
 
 Export-ModuleMember Disable-UAC, `

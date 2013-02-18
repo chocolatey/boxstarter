@@ -26,3 +26,5 @@ The execution policy to set
     }
     Start-Process "powershell.exe" -verb runas -wait -argumentList "-noprofile -noninteractive -ExecutionPolicy unrestricted -WindowStyle hidden -Command `"Set-ExecutionPolicy $policy`""
 }
+
+function Is64Bit {  [IntPtr]::Size -eq 8  }

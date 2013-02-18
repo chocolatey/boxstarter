@@ -43,7 +43,7 @@ Invoke-Boxstarter
     Write-BoxstarterMessage "writing restart file"
     New-Item "$env:temp\Boxstarter.script" -type file -value $boxstarter.ScriptToCall -force | Out-Null
     $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
-    $restartScript="Call powershell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$BoxstarterBaseDir\Bootstrapper\boxstarter.psd1';Invoke-Boxstarter -RebootOk`" `r`nPause"
+    $restartScript="Call powershell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$BoxstarterBaseDir\Boxstarter.Bootstrapper\boxstarter.bootstraper.psd1';Invoke-Boxstarter -RebootOk`" `r`nPause"
     New-Item "$startup\boxstarter-post-restart.bat" -type file -force -value $restartScript | Out-Null
     $Boxstarter.IsRebooting=$true
     Restart

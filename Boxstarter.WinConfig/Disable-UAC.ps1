@@ -8,5 +8,6 @@ Turns off Windows User Access Control
 http://boxstarter.codeplex.com
 
 #>
+    Write-BoxstarterMessage "Enabling UAC"
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA  -Value 0
 }

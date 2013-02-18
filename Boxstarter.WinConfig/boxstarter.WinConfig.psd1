@@ -1,13 +1,13 @@
 @{
-Description = 'Manages packages that define machine setup'
+Description = 'Provides Functions for customizing and configuring core windows settings'
 # Script module or binary module file associated with this manifest.
-RootModule = './boxstarter.psm1'
+RootModule = './boxstarter.WinConfig.psm1'
 
 # Version number of this module.
 ModuleVersion = '0.1.88'
 
 # ID used to uniquely identify this module
-GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e50'
+GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e52'
 
 # Author of this module
 Author = 'Matt Wrock'
@@ -22,7 +22,7 @@ PowerShellVersion = '2.0'
 DotNetFrameworkVersion = '2.0'
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-# NestedModules = @()
+NestedModules = @('..\Boxstarter.Common\Boxstarter.Common.psd1')
 
 # Functions to export from this module
 FunctionsToExport = '*'
