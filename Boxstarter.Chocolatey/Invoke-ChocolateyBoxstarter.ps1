@@ -8,7 +8,7 @@ This essentially wraps Chocolatey Install and provides these additional features
  - Installs chocolatey if it is not already installed
  - Installs the .net 4.0 framework if it is not installed which is a chocolatey requirement
  - Turns off the windows update service during installation to prevent installation conflicts and minimize the need for reboots
- - Imports the Boxstarter.Helpers module that provides functions for customizing windows
+ - Imports the Boxstarter.WinConfig module that provides functions for customizing windows
  - Provides Reboot Resiliency by ensuring the package installation is immediately restarted up on reboot if there is a reboot during the installation.
  - Ensures everything runs under admin
 
@@ -24,22 +24,11 @@ This essentially wraps Chocolatey Install and provides these additional features
  - The chocolatey feed
  - The boxstarter feed on myget
 
-.Parameter Password
-This password will be used to automatically log the user in if a 
-reboot is required and reboots are eabled.
-
 .Parameter RebootOk
 If set, a reboot will be performed if boxstarter determines that a 
 reboot is pending. Boxstarter will prompt the user to enter a 
 password which will be used for automatic logins in the event a 
 restart is required.
-
-.Parameter ReEnableUAC
-This parameter is intended to be set by Boxstarter If boxstarter 
-needs to disable UAC in order to suppress the security prompt 
-after reboot when relaunching boxstarter as admin, it will set 
-this switch which will cause boxstarter to turn UAC back on aftr 
-the reboot completes.
 
 .Parameter Localrepo
 This is the path to the local boxstarter repository where boxstarter 
@@ -48,15 +37,15 @@ in the BuildPackages directory just under the root Boxstarter
 directory.
 
 .EXAMPLE
-Invoke-Boxstarter example -RebootOk
+Invoke-ChocolateyBoxstarter example -RebootOk
 
-This invokes boxstarter an installs the example .nupkg. In pending 
+This invokes boxstarter and installs the example .nupkg. In pending 
 reboots are detected, boxstarter will restart the machine. Boxstarter
 will prompt the user to enter a password which will be used for 
 automatic logins in the event a restart is required.
 
 .EXAMPLE
-Invoke-Boxstarter win8Install -rebootOk -LocalRepo \\server\share\boxstarter
+Invoke-ChocolateyBoxstarter win8Install -rebootOk -LocalRepo \\server\share\boxstarter
 
 This installs the Win8Install .nupkg and specifies that it is ok to 
 reboot the macine if a pending reboot is needed. Boxstarter will look 
@@ -70,13 +59,14 @@ About_Boxstarter_Variable
     [CmdletBinding()]
     param(
       [string]$bootstrapPackage="default",
-      [string]$localRepo="$baseDir\BuildPackages"
+      [string]$localRepo="$baseDir\BuildPackages",
+      [switch]$RebootOk
     )
     if(!$script:CalledByBoxstarter){
         $Script:CalledByBoxstarter=$true
         $script=@"
 Import-Module "$PSScriptRoot\Boxstarter.Chocolatey.psd1"
-Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage -Localrepo $localRepo
+Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage -Localrepo $localRepo $(if($rebootOk){"-RebootOk"})
 "@
         Invoke-Boxstarter ([ScriptBlock]::Create($script))
         return
