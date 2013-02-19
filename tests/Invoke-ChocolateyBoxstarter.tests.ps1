@@ -23,3 +23,47 @@ Describe "Invoke-ChocolateyBoxstarter via bootstrapper.bat (end to end)" {
         }          
     }
 }
+
+Resolve-Path $here\..\boxstarter.common\*.ps1 | 
+    % { . $_.ProviderPath }
+Resolve-Path $here\..\boxstarter.winconfig\*.ps1 | 
+    % { . $_.ProviderPath }
+Resolve-Path $here\..\boxstarter.bootstrapper\*.ps1 | 
+    % { . $_.ProviderPath }
+Resolve-Path $here\..\boxstarter.chocolatey\*.ps1 | 
+    % { . $_.ProviderPath }    
+$Boxstarter.SuppressLogging=$true
+
+Describe "Invoke-ChocolateyBoxstarter" {
+    Context "When not invoked via boxstarter" {
+        $script:CalledByBoxstarter=$false
+        Mock Invoke-Boxstarter
+        Mock Chocolatey
+        Mock Check-Chocolatey
+
+        Invoke-ChocolateyBoxstarter package
+
+        it "should Call Boxstarter" {
+            Assert-MockCalled Invoke-Boxstarter
+        }
+        it "should not call chocolatey" {
+            Assert-MockCalled chocolatey -times 0
+        }          
+    }
+
+    Context "When invoked via boxstarter" {
+        $script:CalledByBoxstarter=$true
+        Mock Invoke-Boxstarter
+        Mock Chocolatey
+        Mock Check-Chocolatey
+
+        Invoke-ChocolateyBoxstarter package
+
+        it "should not Call Boxstarter" {
+            Assert-MockCalled Invoke-Boxstarter -times 0
+        }
+        it "should call chocolatey" {
+            Assert-MockCalled chocolatey
+        }          
+    }
+}
