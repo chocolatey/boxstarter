@@ -9,7 +9,6 @@ Describe "Invoke-ChocolateyBoxstarter via bootstrapper.bat (end to end)" {
 
     Context "When installing a local package" {
         remove-Item "$env:ChocolateyInstall\lib\test-package.*" -force -recurse
-        remove-Item "$env:ChocolateyInstall\lib\boxstarter.helpers.*" -force -recurse
         Add-Content "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -Value "______ test-package v1.0.0 ______" -force
 
         ."$here\..\boxstarter.bat" test-package -LocalRepo "$testRoot\Repo"
@@ -33,10 +32,11 @@ Resolve-Path $here\..\boxstarter.bootstrapper\*.ps1 |
 Resolve-Path $here\..\boxstarter.chocolatey\*.ps1 | 
     % { . $_.ProviderPath }    
 $Boxstarter.SuppressLogging=$true
+$Boxstarter.BaseDir= (split-path -parent $here)
 
 Describe "Invoke-ChocolateyBoxstarter" {
     Context "When not invoked via boxstarter" {
-        $script:CalledByBoxstarter=$false
+        $global:BoxstarterStarted=$false
         Mock Invoke-Boxstarter
         Mock Chocolatey
         Mock Check-Chocolatey
@@ -52,7 +52,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
     }
 
     Context "When invoked via boxstarter" {
-        $script:CalledByBoxstarter=$true
+        $global:BoxstarterStarted=$true
         Mock Invoke-Boxstarter
         Mock Chocolatey
         Mock Check-Chocolatey

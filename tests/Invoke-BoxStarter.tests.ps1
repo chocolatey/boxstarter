@@ -7,6 +7,7 @@ Resolve-Path $here\..\boxstarter.winconfig\*.ps1 |
 Resolve-Path $here\..\boxstarter.bootstrapper\*.ps1 | 
     % { . $_.ProviderPath }
 $Boxstarter.SuppressLogging=$true
+$Boxstarter.BaseDir= (split-path -parent $here)
 
 Describe "Invoke-Boxstarter" {
     $testRoot = (Get-PSDrive TestDrive).Root
