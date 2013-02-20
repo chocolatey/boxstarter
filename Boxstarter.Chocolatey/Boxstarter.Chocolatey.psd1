@@ -1,7 +1,7 @@
 @{
 Description = 'Provides a robust environment capable of automatic reboots and several windows customization functions ideal for installing chocolatey packages on a new machine'
 # Script module or binary module file associated with this manifest.
-RootModule = './boxstarter.chocolatey.psm1'
+ModuleToProcess = './boxstarter.chocolatey.psm1'
 
 # Version number of this module.
 ModuleVersion = '0.1.88'
@@ -44,9 +44,6 @@ AliasesToExport = '*'
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 PrivateData = 'eae406a6ee2c0b324083051f911882ec8015f847'
-
-# HelpInfo URI of this module
-HelpInfoURI = 'http://boxstarter.codeplex.com'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

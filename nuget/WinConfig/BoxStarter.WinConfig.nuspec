@@ -5,10 +5,10 @@
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
     <projectUrl>https://BoxStarter.codeplex.com</projectUrl>
-    <id>BoxStarter.Helpers</id>
-    <title>BoxStarter Helper Functions</title>
+    <id>BoxStarter.WinConfig</id>
+    <title>BoxStarter WinConfig Module</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Helper functions that Boxstarter uses to customize the windows environment.</description>
+    <description>Functions that Boxstarter uses to customize the windows environment.</description>
     <tags>devops chocolatey bootstraper setup windows customizations</tags>
   </metadata>
 </package>

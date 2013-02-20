@@ -59,20 +59,25 @@ About_Boxstarter_Variable
         Start-Process powershell -verb runas -argumentlist $command
         return
     }
-    $boxMod=Get-Module Boxstarter
-    write-BoxstarterMessage "Boxstarter Version $($boxMod.Version)" -nologo
-    write-BoxstarterMessage "$($boxMod.Copyright)" -nologo
-    $session=Start-TimedSection "Installation session of package $bootstrapPackage"
+    $session=$null
     try{
+        if(!$BoxstarterStarted){
+            $boxMod=(IEX (Get-Content (join-path $Boxstarter.Basedir Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1) | Out-String))
+            write-BoxstarterMessage "Boxstarter Version $($boxMod.ModuleVersion)" -nologo
+            write-BoxstarterMessage "$($boxMod.Copyright)" -nologo
+            $session=Start-TimedSection "Installation session $(if($RebootOk){'Ok to Reboot'})"
+            $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
+            $script:BoxstarterUser=$env:username
+            $Boxstarter.RebootOk=$RebootOk
+            $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
+            Stop-UpdateServices
+        }
+        $Global:BoxstarterStarted=$true
         if(Test-ReEnableUAC) {Enable-UAC}
-        $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
-        $script:BoxstarterUser=$env:username
-        $Boxstarter.RebootOk=$RebootOk
-        $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
-        Stop-UpdateServices
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall)) 2>&1 | Tee-BoxstarterLog
     }
     finally{
+        $Global:BoxstarterStarted=$false
         Cleanup-Boxstarter
         Stop-TimedSection $session
     }
@@ -128,9 +133,9 @@ function Test-Admin {
 function Resolve-Script([ScriptBlock]$script, [string]$scriptFile){
     if($script) {return $script}
     if(Test-Path $scriptFile) {
-        $script=(Get-Content $scriptFile)
-        if($script.length -gt 0) {
-            return [ScriptBlock]::Create($script)
+        $scriptFile=(Get-Content $scriptFile)
+        if($scriptFile.length -gt 0) {
+            return [ScriptBlock]::Create($scriptFile)
         }
     }
     throw "No Script was specified to call."

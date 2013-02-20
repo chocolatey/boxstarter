@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <version>$version$</version>
+    <authors>Matt Wrock</authors>
+    <owners>Matt Wrock</owners>
+    <projectUrl>https://BoxStarter.codeplex.com</projectUrl>
+    <id>BoxStarter.Common</id>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <title>BoxStarter Common Module</title>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Provides common functions used by multiple Boxstarter Modules.</description>
+  </metadata>
+  <files>
+    <file src="chocolateyinstall.ps1" target="tools"/>
+    <file src="..\Boxstarter.Common\**\*.*" target="tools\Boxstarter.Common"/>
+  </files>
+</package>

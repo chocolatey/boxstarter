@@ -59,6 +59,7 @@ Start-TimedSection
 #>
     param([string]$SectionId)
     $timerEntry=$script:boxstarterTimers.$SectionId
+    if(!$timerEntry){return}
     $padCars="".PadLeft($boxstarterTimers.Count,"+")
     $script:boxstarterTimers.Remove($SectionId)
     $stopwatch = $timerEntry.stopwatch

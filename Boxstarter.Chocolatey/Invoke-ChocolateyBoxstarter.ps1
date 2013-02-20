@@ -59,16 +59,15 @@ About_Boxstarter_Variable
     [CmdletBinding()]
     param(
       [string]$bootstrapPackage="default",
-      [string]$localRepo="$baseDir\BuildPackages",
+      [string]$localRepo=(Join-Path $Boxstarter.baseDir BuildPackages),
       [switch]$RebootOk
     )
-    if(!$script:CalledByBoxstarter){
-        $Script:CalledByBoxstarter=$true
+    if(!$BoxstarterStarted){
         $script=@"
-Import-Module "$PSScriptRoot\Boxstarter.Chocolatey.psd1"
+Import-Module (Join-Path $PSScriptRoot Boxstarter.Chocolatey.psd1);
 Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage -Localrepo $localRepo $(if($rebootOk){"-RebootOk"})
 "@
-        Invoke-Boxstarter ([ScriptBlock]::Create($script))
+        Invoke-Boxstarter ([ScriptBlock]::Create($script)) -rebootok:$rebootok
         return
     }
     if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }

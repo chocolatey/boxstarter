@@ -2,9 +2,9 @@ function Check-Chocolatey{
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
         Write-BoxstarterMessage "Chocolatey not instaled. Boxstarter will download and install."
         $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
-        New-Item $env:ChocolateyInstall -Force -type directory
+        New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
         $url=$Boxstarter.config.ChocolateyPackage
-        iex ((new-object net.webclient).DownloadString($config.ChocolateyRepo))
+        iex ((new-object net.webclient).DownloadString($Boxstarter.config.ChocolateyRepo))
         Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
         Enable-Net40
     }
