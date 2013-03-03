@@ -71,6 +71,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
+        Mock RestartNow
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
 
         Invoke-Boxstarter {Invoke-Reboot} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
@@ -98,6 +99,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
+        Mock RestartNow
         $pass=ConvertTo-SecureString "mypassword" -asplaintext -force
         Mock Read-AuthenticatedPassword {return $pass}
         Mock Get-UAC
@@ -117,6 +119,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
+        Mock RestartNow
         Mock Read-AuthenticatedPassword
         Mock get-UAC
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
@@ -137,6 +140,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
+        Mock RestartNow
         Mock Read-AuthenticatedPassword
         Mock Disable-UAC
 
@@ -154,6 +158,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
+        Mock RestartNow
         Mock Read-AuthenticatedPassword
 
         Invoke-Boxstarter {Invoke-Reboot}

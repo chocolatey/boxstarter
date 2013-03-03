@@ -1,6 +1,6 @@
 function Start-UpdateServices {
     Write-BoxstarterMessage "Starting Windows Update Service"
-    Start-Service -Name wuauserv
+    Enter-BoxstarterLogable { Start-Service -Name wuauserv }
     Start-CCMEXEC
 }
 
@@ -9,6 +9,6 @@ function Start-CCMEXEC {
     if($ccm) {
         Write-BoxstarterMessage "Starting Configuration Manager Service"
         set-service CCMEXEC -startuptype automatic
-        Start-Service CCMEXEC
+        Enter-BoxstarterLogable { Start-Service CCMEXEC }
     }
 }

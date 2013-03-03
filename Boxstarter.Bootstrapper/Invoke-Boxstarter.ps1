@@ -74,6 +74,10 @@ About_Boxstarter_Variable
         if(Test-ReEnableUAC) {Enable-UAC}
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
     }
+    catch {
+       Log-BoxStarterMessage $_
+       throw 
+    }
     finally{
         Cleanup-Boxstarter
         Stop-TimedSection $session

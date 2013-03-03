@@ -4,9 +4,11 @@ function Check-Chocolatey{
         $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
         New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
         $url=$Boxstarter.config.ChocolateyPackage
-        iex ((new-object net.webclient).DownloadString($Boxstarter.config.ChocolateyRepo))
-        Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
-        Enable-Net40
+        Enter-BoxstarterLogable {
+            iex ((new-object net.webclient).DownloadString($Boxstarter.config.ChocolateyRepo))
+            Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
+            Enable-Net40
+        }
     }
     Write-BoxstarterMessage "Chocoltey installed, seting up interception of Chocolatey methods."
     Intercept-Chocolatey

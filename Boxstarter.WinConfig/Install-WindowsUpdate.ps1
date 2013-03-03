@@ -48,13 +48,13 @@ http://boxstarter.codeplex.com
 
         If ($Result.updates.count -ne 0)
         {
-            Write-Output "$($Result.updates.count) Updates found"
+            Out-BoxstarterLog "$($Result.updates.count) Updates found"
             foreach($update in $result.updates) {
                 if ($update.isDownloaded -ne "true" -and ($update.InstallationBehavior.CanRequestUserInput -eq $false )) {
-                    Write-Output " * Adding $($update.title) to list of updates to download"
+                    Out-BoxstarterLog " * Adding $($update.title) to list of updates to download"
                     $updatesToDownload.add($update) | Out-Null
                 }
-                else {Write-Output " * $($update.title) already downloaded"}
+                else {Out-BoxstarterLog " * $($update.title) already downloaded"}
             }
 
             If ($updatesToDownload.Count -gt 0) {
@@ -72,13 +72,13 @@ http://boxstarter.codeplex.com
             }
 
             $installSession=Start-TimedSection "Installing Updates"
-            Write-Output "This may take several minutes..."
+            Out-BoxstarterLog "This may take several minutes..."
                 $Installer.updates = $UpdatesToInstall
                 $result = $Installer.Install()
 
                 if($result.rebootRequired) {
                     if($SuppressReboots) {
-                        Write-Output "A Restart is Required."
+                        Out-BoxstarterLog "A Restart is Required."
                     } else {
                         $Rebooting=$true
                         Write-BoxstarterMessage "Restart Required. Restarting now..."
