@@ -64,7 +64,7 @@ About_Boxstarter_Variable
     try{
         $boxMod=(IEX (Get-Content (join-path $Boxstarter.Basedir Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1) | Out-String))
         write-BoxstarterMessage "Boxstarter Version $($boxMod.ModuleVersion)" -nologo
-        write-BoxstarterMessage "$($boxMod.Copyright)" -nologo
+        write-BoxstarterMessage "$($boxMod.Copyright) http://boxstarter.codeplex.com" -nologo
         $session=Start-TimedSection "Installation session."
         Stop-UpdateServices
         $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
