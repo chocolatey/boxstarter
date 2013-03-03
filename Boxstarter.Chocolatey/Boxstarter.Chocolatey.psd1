@@ -22,7 +22,7 @@ PowerShellVersion = '2.0'
 DotNetFrameworkVersion = '2.0'
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('..\Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1')
+NestedModules = @()
 
 # Functions to export from this module
 FunctionsToExport = '*'

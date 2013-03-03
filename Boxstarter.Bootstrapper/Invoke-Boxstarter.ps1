@@ -1,4 +1,4 @@
-if(!$Boxstarter) {$Boxstarter = @{}}
+if(!$Global:Boxstarter) { $Global:Boxstarter = @{} }
 $Boxstarter.Log="$env:temp\boxstarter.log"
 $Boxstarter.RebootOk=$false
 $Boxstarter.SuppressLogging=$false
@@ -54,33 +54,36 @@ About_Boxstarter_Variable
     $scriptFile = "$env:temp\boxstarter.script"
     if(!(Test-Admin)) {
         New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | out-null
-        Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate."
-        $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($Boxstarter.Basedir)\Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psd1`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'})"
+        Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate..."
+        $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psd1")
+        $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($unNormalized.FullName)`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'})"
         Start-Process powershell -verb runas -argumentlist $command
         return
     }
     $session=$null
     try{
-        if(!$BoxstarterStarted){
-            $boxMod=(IEX (Get-Content (join-path $Boxstarter.Basedir Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1) | Out-String))
-            write-BoxstarterMessage "Boxstarter Version $($boxMod.ModuleVersion)" -nologo
-            write-BoxstarterMessage "$($boxMod.Copyright)" -nologo
-            $session=Start-TimedSection "Installation session $(if($RebootOk){'Ok to Reboot'})"
-            $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
-            $script:BoxstarterUser=$env:username
-            $Boxstarter.RebootOk=$RebootOk
-            $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
-            Stop-UpdateServices
-        }
-        $Global:BoxstarterStarted=$true
+        $boxMod=(IEX (Get-Content (join-path $Boxstarter.Basedir Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1) | Out-String))
+        write-BoxstarterMessage "Boxstarter Version $($boxMod.ModuleVersion)" -nologo
+        write-BoxstarterMessage "$($boxMod.Copyright)" -nologo
+        $session=Start-TimedSection "Installation session."
+        Stop-UpdateServices
+        $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
+        $script:BoxstarterUser=$env:username
+        $Boxstarter.RebootOk=$RebootOk
+        $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         if(Test-ReEnableUAC) {Enable-UAC}
-        &([ScriptBlock]::Create($Boxstarter.ScriptToCall)) 2>&1 | Tee-BoxstarterLog
+        &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
     }
     finally{
-        $Global:BoxstarterStarted=$false
         Cleanup-Boxstarter
         Stop-TimedSection $session
+        if($BoxStarter.IsRebooting) {RestartNow}
     }
+}
+
+function RestartNow {
+    Write-BoxstarterMessage "Restarting..."
+    Restart-Computer -force
 }
 
 function Read-AuthenticatedPassword {

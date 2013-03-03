@@ -13,7 +13,7 @@ GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e50'
 Author = 'Matt Wrock'
 
 # Copyright statement for this module
-Copyright = '(c) 2013 Matt Wrock. All rights reserved.'
+Copyright = '(c) 2013 Matt Wrock'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '2.0'
@@ -22,7 +22,7 @@ PowerShellVersion = '2.0'
 DotNetFrameworkVersion = '2.0'
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('..\Boxstarter.Common\Boxstarter.Common.psd1','..\Boxstarter.WinConfig\Boxstarter.WinConfig.psd1')
+NestedModules = @('..\Boxstarter.Common\Boxstarter.Common.psd1')
 
 # Functions to export from this module
 FunctionsToExport = '*'

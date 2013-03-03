@@ -62,9 +62,9 @@ About_Boxstarter_Variable
       [string]$localRepo=(Join-Path $Boxstarter.baseDir BuildPackages),
       [switch]$RebootOk
     )
-    if(!$BoxstarterStarted){
+    if(!$Boxstarter.ScriptToCall){
         $script=@"
-Import-Module (Join-Path $PSScriptRoot Boxstarter.Chocolatey.psd1);
+Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global;
 Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage -Localrepo $localRepo $(if($rebootOk){"-RebootOk"})
 "@
         Invoke-Boxstarter ([ScriptBlock]::Create($script)) -rebootok:$rebootok
