@@ -75,7 +75,7 @@ About_Boxstarter_Variable
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
     }
     catch {
-       Log-BoxStarterMessage $_
+       out-BoxStarterLog $_
        throw 
     }
     finally{
@@ -94,26 +94,19 @@ function RestartNow {
 }
 
 function Read-AuthenticatedPassword {
-    Add-Type -AssemblyName System.DirectoryServices.AccountManagement
-    if($env:computername -eq $env:UserDomain) {
-        $pctx = [System.DirectoryServices.AccountManagement.ContextType]::Machine
-    } else {
-        $pctx = [System.DirectoryServices.AccountManagement.ContextType]::Domain
-    }
-    $pc = New-Object System.DirectoryServices.AccountManagement.PrincipalContext $pctx,$env:UserDomain
     $attemptsLeft=3
     while(--$attemptsLeft -ge 0 -and !$val) {
-        $Password=Read-Host -AsSecureString "Autologon Password"
-        $BSTR = [System.Runtime.InteropServices.marshal]::SecureStringToBSTR( $password);
-        $plainpassword = [System.Runtime.InteropServices.marshal]::PtrToStringAuto($BSTR);
-        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR);
-        $val = $pc.ValidateCredentials($env:username, $plainpassword, [System.DirectoryServices.AccountManagement.ContextOptions]::Negotiate)    
-        write-BoxstarterMessage "Succesfully authenticated password."
+        try{
+            $Password=Read-Host -AsSecureString "Autologon Password"
+            $creds = New-Object System.Management.Automation.PsCredential("$env:UserDomain\$env:username", $password)
+            Start-Process "Cmd.exe" -argumentlist "/c","echo" -Credential $creds
+            write-BoxstarterMessage "Succesfully authenticated password."
+            return $password
+        }
+        catch { }
     }
-    if($val){return $password} else {
-        write-BoxstarterMessage "Unable to authenticate password. Proceeding with autologon disabled"
-        return $null
-    }
+    write-BoxstarterMessage "Unable to authenticate password. Proceeding with autologon disabled"
+    return $null
 }
 
 function InitAutologon([switch]$RebootOk, [System.Security.SecureString]$password){
