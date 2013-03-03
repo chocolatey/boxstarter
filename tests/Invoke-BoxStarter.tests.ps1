@@ -220,4 +220,125 @@ Describe "Invoke-Boxstarter" {
             Assert-MockCalled Stop-UpdateServices -times 0
         }
     }
+
+    Context "When rebooting and No Password is set" {
+        Mock Test-Admin {return $true}
+        Mock Set-SecureAutoLogon
+        Mock Stop-UpdateServices
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        $Boxstarter.IsRebooting=$true
+        
+        Invoke-Boxstarter {return} -RebootOk
+
+        it "will Not Set AutoLogin" {
+            Assert-MockCalled Set-SecureAutoLogon -times 0
+        }
+    }
+
+    Context "When rebooting and a Password is set" {
+        Mock Test-Admin {return $true}
+        Mock Set-SecureAutoLogon
+        Mock Stop-UpdateServices
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        $Boxstarter.IsRebooting=$true
+        Mock Set-SecureAutoLogon
+
+        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+
+        it "will Set AutoLogin" {
+            Assert-MockCalled Set-SecureAutoLogon
+        }
+    }
+
+    Context "When rebooting and UAC is Enabled and password is set" {
+        Mock Test-Admin {return $true}
+        Mock Set-SecureAutoLogon
+        Mock Stop-UpdateServices
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        $Boxstarter.IsRebooting=$true
+        Mock Get-UAC {return $true}
+        Mock Disable-UAC
+        Mock Set-SecureAutoLogon
+        Mock New-Item
+
+        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+
+        it "will Disable UAC" {
+            Assert-MockCalled Disable-UAC
+        }
+        it "will add ReEnableUac file" {
+            Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"}
+        }
+    }
+
+    Context "When rebooting and UAC is Enabled and user has been auto loged on" {
+        Mock Test-Admin {return $true}
+        Mock Set-SecureAutoLogon
+        Mock Stop-UpdateServices
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        $Boxstarter.IsRebooting=$true
+        Mock Get-UAC {return $true}
+        Mock Disable-UAC
+        Mock Set-SecureAutoLogon
+        Mock New-Item
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
+
+        Invoke-Boxstarter {return} -RebootOk
+
+        it "will Disable UAC" {
+            Assert-MockCalled Disable-UAC
+        }
+        it "will add ReEnableUac file" {
+            Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"}
+        }
+        Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
+    }
+
+    Context "When rebooting UAC is enabled and password is not set" {
+        Mock Test-Admin {return $true}
+        Mock Set-SecureAutoLogon
+        Mock Stop-UpdateServices
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        $Boxstarter.IsRebooting=$true
+        Mock Get-UAC {return $true}
+        Mock Disable-UAC
+        Mock Set-SecureAutoLogon
+        Mock New-Item
+        
+        Invoke-Boxstarter {return} -RebootOk
+
+        it "will not Disable UAC" {
+            Assert-MockCalled Disable-UAC -times 0
+        }
+        it "will not add ReEnableUac file" {
+            Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"} -times 0
+        }
+    }
+
+    Context "When rebooting and UAC is disabled" {
+        Mock Test-Admin {return $true}
+        Mock Set-SecureAutoLogon
+        Mock Stop-UpdateServices
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        $Boxstarter.IsRebooting=$true
+        Mock Get-UAC
+        Mock Disable-UAC
+        Mock Set-SecureAutoLogon
+        Mock New-Item
+
+        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+
+        it "will not Disable UAC" {
+            Assert-MockCalled Disable-UAC -times 0
+        }
+        it "will not add ReEnableUac file" {
+            Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"} -times 0
+        }
+    }
 }

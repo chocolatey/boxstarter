@@ -36,7 +36,7 @@ $Boxstarter.BaseDir= (split-path -parent $here)
 
 Describe "Invoke-ChocolateyBoxstarter" {
     Context "When not invoked via boxstarter" {
-        $global:BoxstarterStarted=$false
+        $Boxstarter.ScriptToCall=$null
         Mock Invoke-Boxstarter
         Mock Chocolatey
         Mock Check-Chocolatey
@@ -52,7 +52,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
     }
 
     Context "When invoked via boxstarter" {
-        $global:BoxstarterStarted=$true
+        $Boxstarter.ScriptToCall="return"
         Mock Invoke-Boxstarter
         Mock Chocolatey
         Mock Check-Chocolatey

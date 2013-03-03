@@ -81,7 +81,10 @@ About_Boxstarter_Variable
     finally{
         Cleanup-Boxstarter
         Stop-TimedSection $session
-        if($BoxStarter.IsRebooting) {RestartNow}
+        if($BoxStarter.IsRebooting) {
+            $BoxStarter.IsRebooting = $false #reset
+            RestartNow
+        }
     }
 }
 
