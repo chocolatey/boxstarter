@@ -15,6 +15,7 @@
     </dependencies>
   </metadata>
   <files>
+    <file src="..\..\LICENSE" target="tools"/>
     <file src="..\chocolateyinstall.ps1" target="tools"/>
     <file src="..\..\Boxstarter.WinConfig\**\*.*" target="tools\Boxstarter.WinConfig"/>
   </files>

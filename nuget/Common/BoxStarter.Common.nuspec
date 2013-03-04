@@ -12,6 +12,7 @@
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
   </metadata>
   <files>
+    <file src="..\..\LICENSE" target="tools"/>
     <file src="..\chocolateyinstall.ps1" target="tools"/>
     <file src="..\..\Boxstarter.Common\**\*.*" target="tools\Boxstarter.Common"/>
   </files>
