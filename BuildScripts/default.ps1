@@ -44,26 +44,27 @@ Task Pack-Nuget -description 'Packs the modules and example packages' {
 }
 
 Task Push-Nuget -description 'Pushes the module to Myget feed' {
-    $pkg = Get-Item -path $baseDir\buildPackages\example.*.*.*.nupkg
-    exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
-    $pkg = Get-Item -path $baseDir\buildPackages\example-light.*.*.*.nupkg   
-    exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
-    $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.*.*.*.nupkg   
-    exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
-    $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.helpers.*.*.*.nupkg   
-    exec { cpush $pkg.FullName -source "http://www.myget.org/F/boxstarter/api/v2/package" }
+    PushDirectory $baseDir\buildPackages
+    PushDirectory $baseDir\buildArtifacts
 }
 
 Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
-    $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.0.*.*.nupkg   
-    exec { cpush $pkg.FullName }
-    $pkg = Get-Item -path $baseDir\buildArtifacts\boxstarter.helpers.*.*.*.nupkg   
-    exec { cpush $pkg.FullName }
+    exec { 
+        Get-ChildItem "$baseDir\buildPackages\*.nupkg" | 
+            % { cpush $_  }
+    }
 }
 
 function PackDirectory($path){
     exec { 
         Get-ChildItem "$path\**\*.nuspec" | 
             % { .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $version }
+    }
+}
+
+function PushDirectory($path){
+    exec { 
+        Get-ChildItem "$path\*.nupkg" | 
+            % { cpush $_ -source "http://www.myget.org/F/boxstarter/api/v2/package" }
     }
 }
