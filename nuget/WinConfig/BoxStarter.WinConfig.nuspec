@@ -10,5 +10,12 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Functions that Boxstarter uses to customize the windows environment.</description>
     <tags>devops chocolatey bootstraper setup windows customizations</tags>
+    <dependencies>
+      <dependency id="Boxstarter.Common" />
+    </dependencies>
   </metadata>
+  <files>
+    <file src="..\chocolateyinstall.ps1" target="tools"/>
+    <file src="..\..\Boxstarter.WinConfig\**\*.*" target="tools\Boxstarter.WinConfig"/>
+  </files>
 </package>

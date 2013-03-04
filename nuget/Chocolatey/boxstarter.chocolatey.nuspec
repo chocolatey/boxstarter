@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>boxstarter.chocolatey</id>
+    <version>$version$</version>
+    <authors>Matt Wrock</authors>
+    <owners>Matt Wrock</owners>
+    <title>BoxStarter Chocolatey Module</title>
+    <projectUrl>https://BoxStarter.codeplex.com</projectUrl>    
+    <summary>Creates a fresh developer (or non developer) environment from a bare OS utilizing powershell and chocolatey. Installs chocolatey, cutomizes windows settings, installs windows updates, handles reboots, installs windows features and your favorite applications.</summary>
+    <tags>boxstarter chocolatey environment setup</tags>
+    <dependencies>
+      <dependency id="Boxstarter.Common" />
+      <dependency id="Boxstarter.WinConfig" />  
+      <dependency id="Boxstarter.Bootstrapper" />  
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\chocolateyinstall.ps1" target="tools"/>
+    <file src="..\Boxstarter\boxstarter.bat" target="tools"/>
+    <file src="..\..\Boxstarter.Chocolatey\**\*.*" target="tools\Boxstarter.Chocolatey"/>
+  </files>
+</package>
