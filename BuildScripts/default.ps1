@@ -20,10 +20,13 @@ Task Test {
 }
 
 Task Version-Module -description 'Stamps the psd1 with the version and last changeset SHA' {
-    Set-Version "$baseDir\boxstarter.Common\boxstarter.Common.psd1"
-    Set-Version "$baseDir\boxstarter.WinConfig\boxstarter.WinConfig.psd1"
-    Set-Version "$baseDir\boxstarter.bootstrapper\boxstarter.bootstrapper.psd1"
-    Set-Version "$baseDir\boxstarter.Chocolatey\boxstarter.Chocolatey.psd1"
+    Get-ChildItem "$baseDir\**\*.psd1" | % {
+       $path = $_
+        (Get-Content $path) |
+            % {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$version'" } | 
+                % {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } | 
+                    Set-Content $path
+    }
 }
 
 Task Pack-Nuget -description 'Packs the modules and example packages' {
@@ -34,11 +37,10 @@ Task Pack-Nuget -description 'Packs the modules and example packages' {
       Remove-Item "$baseDir\buildPackages\*.nupkg" -Force
     }
     mkdir "$baseDir\buildArtifacts"
-    exec { .$nugetExe pack "$baseDir\BuildPackages\example\example.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }
-    exec { .$nugetExe pack "$baseDir\BuildPackages\example-light\example-light.nuspec" -OutputDirectory "$baseDir\BuildPackages" -NoPackageAnalysis -version $version }    
-    exec { .$nugetExe pack "$baseDir\BuildPackages\test-package\test-package.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis }    
-    #exec { .$nugetExe pack "$baseDir\helpers\boxstarter.helpers.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
-    #exec { .$nugetExe pack "$baseDir\nuget\boxstarter.nuspec" -OutputDirectory "$baseDir\buildArtifacts" -NoPackageAnalysis -version $version }
+
+    PackDirectory "$baseDir\BuildPackages"
+    PackDirectory "$baseDir\nuget"
+    Move-Item "$baseDir\nuget\*.nupkg" "$basedir\buildArtifacts"
 }
 
 Task Push-Nuget -description 'Pushes the module to Myget feed' {
@@ -59,6 +61,9 @@ Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
     exec { cpush $pkg.FullName }
 }
 
-function Set-Version($path){
-    (Get-Content $path) | % {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$version'" } | % {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } | Set-Content $path   
+function PackDirectory($path){
+    exec { 
+        Get-ChildItem "$path\**\*.nuspec" | 
+            % { .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $version }
+    }
 }
