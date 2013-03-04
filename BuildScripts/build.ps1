@@ -9,6 +9,7 @@ if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
 }
 
 cinstm psake
+cinstm 7zip.CommandLine
 
 if(!(Test-Path "$env:ChocolateyInstall\lib\Pester.1.2.1")){
     cinst pester -version 1.2.1

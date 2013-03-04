@@ -41,6 +41,9 @@ Task Pack-Nuget -description 'Packs the modules and example packages' {
     PackDirectory "$baseDir\BuildPackages"
     PackDirectory "$baseDir\nuget"
     Move-Item "$baseDir\nuget\*.nupkg" "$basedir\buildArtifacts"
+
+    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.zip" "$basedir\boxstarter.*" }
+    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.zip" "$basedir\license" }
 }
 
 Task Push-Nuget -description 'Pushes the module to Myget feed' {
