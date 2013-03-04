@@ -76,7 +76,7 @@ About_Boxstarter_Variable
     }
     catch {
        out-BoxStarterLog $_
-       throw 
+       $_ | write-host -ForeGroundColor red
     }
     finally{
         Cleanup-Boxstarter
