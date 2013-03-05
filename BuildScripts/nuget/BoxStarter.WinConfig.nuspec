@@ -5,6 +5,7 @@
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
     <projectUrl>https://BoxStarter.codeplex.com</projectUrl>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <id>BoxStarter.WinConfig</id>
     <title>BoxStarter WinConfig Module</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -15,7 +16,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\..\LICENSE" target="tools"/>
+    <file src="..\..\LICENSE.txt" target="tools"/>
     <file src="chocolateyinstall.ps1" target="tools"/>
     <file src="..\..\Boxstarter.WinConfig\**\*.*" target="tools\Boxstarter.WinConfig"/>
   </files>

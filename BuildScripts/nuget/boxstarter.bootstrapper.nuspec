@@ -6,7 +6,8 @@
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
     <title>BoxStarter Bootstrapper Module</title>
-    <projectUrl>https://BoxStarter.codeplex.com</projectUrl>    
+    <projectUrl>https://BoxStarter.codeplex.com</projectUrl>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <description>Boxstarter's Bootstrapper module provides a powershell wrapper that supports reboots and automatic logons and exposes commands that can detect pending reboots, perform logging and messaging, and several commands that can configure various windows settings.</description>
     <tags>boxstarter bootstrapper environment setup</tags>
     <dependencies>
@@ -15,7 +16,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\..\LICENSE" target="tools"/>
+    <file src="..\..\LICENSE.txt" target="tools"/>
     <file src="chocolateyinstall.ps1" target="tools"/>
     <file src="..\..\Boxstarter.Bootstrapper\**\*.*" target="tools\Boxstarter.Bootstrapper"/>
   </files>

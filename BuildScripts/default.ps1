@@ -43,7 +43,7 @@ Task Pack-Nuget -description 'Packs the modules and example packages' {
     Move-Item "$baseDir\BuildScripts\nuget\*.nupkg" "$basedir\buildArtifacts"
 
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.zip" "$basedir\boxstarter.*" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.zip" "$basedir\license" }
+    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.zip" "$basedir\license.txt" }
 }
 
 Task Push-Nuget -description 'Pushes the module to Myget feed' {
@@ -60,7 +60,7 @@ Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
 
 function PackDirectory($path){
     exec { 
-        Get-ChildItem "$path\**\*.nuspec" | 
+        Get-ChildItem $path -Recurse -include *.nuspec | 
             % { .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $version }
     }
 }
