@@ -14,6 +14,7 @@
   <files>
     <file src="..\..\LICENSE.txt" target="tools"/>
     <file src="chocolateyinstall.ps1" target="tools"/>
+    <file src="..\Setup.ps1" target="tools"/>    
     <file src="..\..\Boxstarter.Common\**\*.*" target="tools\Boxstarter.Common"/>
   </files>
 </package>

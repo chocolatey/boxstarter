@@ -18,6 +18,7 @@
   <files>
     <file src="..\..\LICENSE.txt" target="tools"/>
     <file src="chocolateyinstall.ps1" target="tools"/>
+    <file src="..\Setup.ps1" target="tools"/>    
     <file src="..\..\Boxstarter.Bootstrapper\**\*.*" target="tools\Boxstarter.Bootstrapper"/>
   </files>
 </package>
