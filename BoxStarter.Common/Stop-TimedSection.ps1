@@ -1,4 +1,3 @@
-<#A Build step copies this function to bootstrapper and Helpers Directory. Only edit script in Common#>
 function Stop-TimedSection {
 <#
 .SYNOPSIS

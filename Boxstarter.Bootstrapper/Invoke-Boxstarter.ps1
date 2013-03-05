@@ -15,6 +15,10 @@ This wraps any powershell script block and executes it in an environment tailore
  - Imports the Boxstarter.WinConfig module that provides functions for customizing windows
  - Provides Reboot Resiliency by ensuring the package installation is immediately restarted up on reboot if there is a reboot during the installation.
  - Ensures everything runs under admin
+If the password argument is not included and RebootOk is passed, 
+the user will be prompted for a password immediately after 
+invoking the command and that password will be used for any 
+subsequent reboot during the boxstarter run.
 
 .Parameter ScriptToCall
 The script that boxstarter wraps. After Boxstarter Shuts down 
@@ -29,9 +33,10 @@ reboot is required and reboots are eabled.
 
 .Parameter RebootOk
 If set, a reboot will be performed if boxstarter determines that a 
-reboot is pending. Boxstarter will prompt the user to enter a 
-password which will be used for automatic logins in the event a 
-restart is required.
+reboot is pending. If no password is supplied t othe Password 
+parameterBoxstarter will prompt the user to enter a password which 
+will be used for automatic logins in the event a restart is 
+required.
 
 .EXAMPLE
 Invoke-Boxstarter {Import-Modler myinstaller;Invoke-MyInstall} -RebootOk
