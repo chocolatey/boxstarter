@@ -39,8 +39,8 @@ Task Pack-Nuget -description 'Packs the modules and example packages' {
     mkdir "$baseDir\buildArtifacts"
 
     PackDirectory "$baseDir\BuildPackages"
-    PackDirectory "$baseDir\nuget"
-    Move-Item "$baseDir\nuget\*.nupkg" "$basedir\buildArtifacts"
+    PackDirectory "$baseDir\BuildScripts\nuget"
+    Move-Item "$baseDir\BuildScripts\nuget\*.nupkg" "$basedir\buildArtifacts"
 
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.zip" "$basedir\boxstarter.*" }
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.zip" "$basedir\license" }
