@@ -3,6 +3,10 @@ function Install-Boxstarter($here) {
     if(!(test-Path $boxstarterPath)){
         mkdir $boxstarterPath
     }
+    $packagePath=Join-Path $boxstarterPath BuildPackages
+    if(!(test-Path $packagePath)){
+        mkdir $packagePath
+    }    
     foreach($ModulePath in (Get-ChildItem $here | ?{ $_.PSIsContainer })){
         $target=Join-Path $boxstarterPath $modulePath.BaseName
         if(test-Path $target){
