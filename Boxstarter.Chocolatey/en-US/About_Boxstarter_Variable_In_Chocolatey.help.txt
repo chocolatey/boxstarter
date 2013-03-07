@@ -1,0 +1,35 @@
+TOPIC
+	About_Boxstarter_Variable_In_Chocolatey
+
+SYNOPSIS
+	A Hashtable for persisting Boxstarter settings.
+
+DESCRIPTION	
+	The Boxstarter variable is a hashtable that is globaly accesible. 
+	Different Boxstarter modules may store different settings.
+	Some of the Chocolatey module settings available from the 
+	Boxstarter variable can also be set from the 
+	Invoke-ChocolateyBoxstarter Command.
+
+BOXSTARTER VARIABLE SETTINGS
+	ProgramFiles86
+		Unless the environment has been specilly conficured, this 
+		points to the 'Program Files' folder in the system drive on 
+		x86 machines and the 'Program Files (x86)' folder in the 
+		system drive on 64 bit machines.
+
+	ChocolateyBin
+		This points to the path of the chocolatey bin directory which 
+		by default is c:\chocolatey\bin.
+
+	Package
+		The name of the bootstrapper package running in Boxstarter.
+
+	LocalRepo
+		Path to the local directory containing packages that 
+		boxstarter will scan when looking for a package.
+
+SEE ALSO
+	http://boxstarter.codeplex.com
+	About_Boxstarter_Variable_In_Bootstrapper
+	Invoke-ChocolateyBoxstarter
