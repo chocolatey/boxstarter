@@ -53,7 +53,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         Mock Get-Service {new-Object -TypeName PSObject -Property @{CanStop=$True}} -ParameterFilter {$include -eq "CCMEXEC"}
 
-        try { Invoke-Boxstarter {throw "error"} } catch {}
+        try { Invoke-Boxstarter {throw "error"} } catch {} 
 
         it "will stop WUA" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
@@ -152,6 +152,7 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When reboot is not ok" {
+        $Boxstarter.RebootOk=$false
         Mock Test-Admin {return $true}
         Mock Stop-Service
         Mock Start-Service
@@ -169,6 +170,25 @@ Describe "Invoke-Boxstarter" {
         it "will not reboot" {
             Assert-MockCalled Restart -times 0
         }
+    }
+
+    Context "When boxstarter.rebootok is set but not passed to command" {
+        Mock Test-Admin {return $true}
+        Mock Stop-Service
+        Mock Start-Service
+        Mock Set-Service
+        Mock Set-SecureAutoLogon
+        Mock Restart
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        $Boxstarter.RebootOk=$true
+
+        Invoke-Boxstarter {Invoke-Reboot}
+
+        it "will reboot" {
+            Assert-MockCalled Restart
+        }
+        $Boxstarter.RebootOk=$False
     }
 
     Context "When ReEnableUAC File Exists" {

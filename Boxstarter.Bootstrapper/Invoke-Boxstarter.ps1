@@ -74,13 +74,13 @@ About_Boxstarter_Variable
         Stop-UpdateServices
         $script:BoxstarterPassword=InitAutologon -RebootOk:$RebootOk $password
         $script:BoxstarterUser=$env:username
-        $Boxstarter.RebootOk=$RebootOk
+        if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         if(Test-ReEnableUAC) {Enable-UAC}
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
     }
     catch {
-       out-BoxStarterLog $_
+       Log-BoxStarterMessage $_
        $_ | write-host -ForeGroundColor red
     }
     finally{

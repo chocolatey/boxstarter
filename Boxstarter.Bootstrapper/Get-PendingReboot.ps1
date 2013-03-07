@@ -1,4 +1,12 @@
-﻿Function Get-PendingReboot
+﻿<#
+***********************************************************************************
+*   This function was written by Brian Wilhite
+*   Published at http://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542
+*   Distributed according to Technet Terms of Use
+*   http://technet.microsoft.com/cc300389.aspx
+***********************************************************************************
+#>
+Function Get-PendingReboot
 {
 <#
 .SYNOPSIS

@@ -1,0 +1,34 @@
+TOPIC
+	About_Boxstarter_Bootstrapper
+
+SYNOPSIS
+	Describes how to use Boxstarter to wrap powershell scripts.
+
+DESCRIPTION
+	The Boxstarter.Bootstrapper module provides an execution environment for running scripts that may require one or more reboots throughout its exeution process. This can be any powershell script and is ideally suited for scripts that involve the installation of software and system configuration.
+
+ENABLING REBOOTS
+	By default, Boxstarter will not reboot a machine even when Invoke-Reboot is called. In order to enable reboots, either the -RebootOk switch parameter bust be set on Invoke-Boxstarter or the RebootOk $Boxstarter property should be true.
+
+	If Reoots are enabled, calling INVOKE-REBOOT will prepare the Boxstarter environment for reboot and force a restart of the local machine. DO NOT CALL RESTART-COMPUTER. This will not allow Boxstarter to propperly prepare for reboot and will disable automatic logon and not allow the Boxstarter script to continue upon reboot.
+
+DETERMINING IF A REBOOT IS NEEDED
+	While a boxstarter script may have its own rules determining when a reboot is needed, Boxstarter provides a Test-PendingReboot functions which checks several machine settings to determine if a reboot is needed. Credit for this script goes to Brian Wilhite's original contribution at http://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542.
+
+	Test-PendingReboot Checks several known registry keys, the windows update service, component based servicing, and configuration manager. If there is any indication that a reboot is pending, Test-PendingReboot returns $True. Boxstarter scripts may then want to call Invoke-Reboot. Many Software Installers will fail if there is a reboot pending.
+
+AUTOMATIC LOGON
+	If reboots are enabled, Boxstarter will prompt the user for a password when initially calling Invoke-Boxstarter. The password is given to boxstarter as a SecureString. Boxstarter uses the domain and username of the current user. Boxstarter will attempt to authenticate the password up to three times. If the password cannot be authenticated, Boxstarter will continue to run the script but the user will need to manually sign on at logon. If the user succesfully authenticates, Boxstarter stores the pasword in an encrypted area intended for auto logon passwords.
+
+	When the boxstarter script completes, all logon information is removed from the registry and subsequent logons will prompt for credentials.
+
+WRITING BOXSTARTER SCRIPTS FOR REBOOTS
+	When Boxstarter reboots, it simply reruns the script as it was provided. Currently Boxstarter has no checkpointing mechanism to start your script from a specific location. Of coarse, the script author can include such logic. Therefore, it is best to write scripts that can be run in a repeatable manner. For example, the script may want to do its own checks to determine if long running routines like a lengthy software install needs to be run. Is the software already installed? Boxstarter scripts should anticipate that any portion of the script may have been previously executed.
+
+RUNNING AS ADMIN
+UAC
+UPDATE SERVICES
+
+LOGING
+
+WINDOWS CONFIGURATION UTILITIES
