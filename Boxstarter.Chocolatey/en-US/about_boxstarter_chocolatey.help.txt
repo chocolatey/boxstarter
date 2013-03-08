@@ -1,8 +1,18 @@
 TOPIC
-	About_Boxstarter_Bootstrapper
+	About_Boxstarter_Chocolatey
 
 SYNOPSIS
-	Describes how to use Boxstarter to setup a new environment.
+	Describes how to use Boxstarter's Chocolatey module to setup a new environment with your favorite Chocolatey packages.
 
 DESCRIPTION
-	B
+	Boxstarter's Chocolatey module compliments the Boxstarter Bootstrap module by augmenting its unnatended script execution environment with Chocolatey goodness making it easy to setup a new box with Chocolatey packages.
+
+Installing Chocolatey
+	Boxstarter will check to ensure if Chocolatey is installed. If chocolatey is not installed it will install it before running any Chocolatey commands. Boxstarter will also check t see if the .net 4.0 framework is installed before installing Chocolatey since the .net 4 runtime is a prerequisite.
+
+Package Sources
+	When calling Invoke-ChocolateyBoxstarter or just Boxstarter, a BootstrapperPackage must be passed to the command. This is a special Chocolatey package that boxstarter asks Chocolatey to install
+	
+	Logging
+
+	Reboot detection

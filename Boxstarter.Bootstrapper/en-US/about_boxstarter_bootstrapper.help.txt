@@ -26,9 +26,13 @@ WRITING BOXSTARTER SCRIPTS FOR REBOOTS
 	When Boxstarter reboots, it simply reruns the script as it was provided. Currently Boxstarter has no checkpointing mechanism to start your script from a specific location. Of coarse, the script author can include such logic. Therefore, it is best to write scripts that can be run in a repeatable manner. For example, the script may want to do its own checks to determine if long running routines like a lengthy software install needs to be run. Is the software already installed? Boxstarter scripts should anticipate that any portion of the script may have been previously executed.
 
 RUNNING AS ADMIN
-UAC
-UPDATE SERVICES
+	Boxstarter ensures that scripts run as administrator. If you call Invoke-Boxstarter from a non elevated shell, Boxstarter will launch an elevated shell and run the remainder of the session from tha tshell. If Boxstarter is asked to reboot via Invoke-Reboot and UAC is enabled on the machine, it will disable UAC and then reenable it after the machine is rebooted and the script restarts. This is necessary for an unattended execution experience, otherwise Boxstarter would need to have you accept the UAC prompt after reboot in order to continue the Boxstarter session.
 
-LOGING
+UPDATE SERVICES
+	In order to provide as little interruption as possible during a Boxstarter script execution, Windos Update Service and, if installed, the System Configuration Client are stopped. When Boxstarter completes, these services are restarted. Boxstarter exposes functionality to install Windows Updates (see below) and stopping these services will not impact that functionality.
+
+LOGGING
+	Boxstarter provides several Logging functions. These include the ability to log both to the screen and the Boxstarter Log as well as the ability to log to both simultaneously. Boxstarter also enables you t ocapture the standard output and error streams of standard command line executables and utilities and not just the powershell pipeline. See About_Boxstarter_Logging for more details.
 
 WINDOWS CONFIGURATION UTILITIES
+	Boxstarter exposes several functions aimed at customizing several Windows settings. All of these are located in the Boxstarter.WinConfig module. These include customizing Windows Explorer, the Windows Task Bar, enabling Remote desktop and much more. See Get-Command -Module Boxstarter.WinConfig for the functions available.
