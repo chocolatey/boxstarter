@@ -10,9 +10,16 @@ DESCRIPTION
 Installing Chocolatey
 	Boxstarter will check to ensure if Chocolatey is installed. If chocolatey is not installed it will install it before running any Chocolatey commands. Boxstarter will also check t see if the .net 4.0 framework is installed before installing Chocolatey since the .net 4 runtime is a prerequisite.
 
+Boxstarter Bootstrapper Packages
+	When calling Invoke-ChocolateyBoxstarter or just Boxstarter, a BootstrapperPackage name must be passed to the command. This is a special Chocolatey package provided by te user that boxstarter asks Chocolatey to install and it contains the script that is intended to install all the applications and settings the user wants setup on the local machine.
+
+	This package script has access to all of the chocolatey helper functions as well as all Boxstarter logging, WinConfig and Bootstrapper commands. See About_Boxstarter_Bootstrapper and About_Boxstarter_Loging for information regarding those comands.
+
 Package Sources
-	When calling Invoke-ChocolateyBoxstarter or just Boxstarter, a BootstrapperPackage must be passed to the command. This is a special Chocolatey package that boxstarter asks Chocolatey to install
-	
+	Invoke-ChocolateyBoxstarter (or Boxstarter) expects just the name of the bootstrapping package - just like CINST or Nuget. Boxstarter will search the following locations in this order:
+
+	$Boxstarter.LocalRepo: This is the local repository that by default
 	Logging
 
 	Reboot detection
+	Package Authoring Considerations

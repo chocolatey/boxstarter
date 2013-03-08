@@ -29,10 +29,10 @@ Resolve-Path $here\..\boxstarter.winconfig\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\boxstarter.bootstrapper\*.ps1 | 
     % { . $_.ProviderPath }
+$Boxstarter.BaseDir=(split-path -parent $here)
+$Boxstarter.SuppressLogging=$true
 Resolve-Path $here\..\boxstarter.chocolatey\*.ps1 | 
     % { . $_.ProviderPath }    
-$Boxstarter.SuppressLogging=$true
-$Boxstarter.BaseDir= (split-path -parent $here)
 
 Describe "Invoke-ChocolateyBoxstarter" {
     Context "When not invoked via boxstarter" {
@@ -65,5 +65,33 @@ Describe "Invoke-ChocolateyBoxstarter" {
         it "should call chocolatey" {
             Assert-MockCalled chocolatey
         }          
+    }
+
+    Context "When Setting a LocalRepo on $Boxstarter and not the commandLine" {
+        $Boxstarter.ScriptToCall="return"
+        $Boxstarter.LocalRepo="myrepo"
+        Mock Invoke-Boxstarter
+        Mock Chocolatey
+        Mock Check-Chocolatey
+
+        Invoke-ChocolateyBoxstarter package
+
+        it "should use Boxstarter.Localrepo value" {
+            $Boxstarter.LocalRepo | should be "myrepo"
+        }
+    }
+
+    Context "When Setting a LocalRepo on the commandLine" {
+        $Boxstarter.ScriptToCall="return"
+        $Boxstarter.LocalRepo="myrepo"
+        Mock Invoke-Boxstarter
+        Mock Chocolatey
+        Mock Check-Chocolatey
+
+        Invoke-ChocolateyBoxstarter package -Localrepo "c:\anotherRepo"
+
+        it "should use command line value" {
+            $Boxstarter.LocalRepo | should be "c:\anotherRepo"
+        }
     }
 }
