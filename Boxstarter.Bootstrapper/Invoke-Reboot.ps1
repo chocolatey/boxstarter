@@ -24,6 +24,8 @@ parameter $Boxstarter.RebootOk is set to True.
 http://boxstarter.codeplex.com
 Test-PendingReeboot
 Invoke-Boxstarter
+about_boxstarter_bootstrapper
+about_boxstarter_variable_in_bootstrapper
 #>
     if(!$Boxstarter.RebootOk) { 
         Write-BoxstarterMessage "A Reboot was requested but Reboots are surpressed. Either call Invoke-Boxstarter with -RebootOk or set `$Boxstarter.RebootOk to `$true"

@@ -55,6 +55,8 @@ Note that the number of '+' chars indicate nesting level.
 .LINK
 http://boxstarter.codeplex.com
 Start-TimedSection
+about_boxstarter_logging
+
 #>
     param([string]$SectionId)
     $timerEntry=$script:boxstarterTimers.$SectionId

@@ -28,6 +28,7 @@ as well as th boxstarter log.
 
 .LINK
 http://boxstarter.codeplex.com
+about_boxstarter_logging
 
 #>
     & ($script) 2>&1 | Out-BoxstarterLog
@@ -59,6 +60,7 @@ Out-BoxstarterLog "This can be seen on the screen and in the log file"
 
 .LINK
 http://boxstarter.codeplex.com
+about_boxstarter_logging
 
 #>    
     process {

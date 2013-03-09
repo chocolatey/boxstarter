@@ -36,3 +36,11 @@ LOGGING
 
 WINDOWS CONFIGURATION UTILITIES
 	Boxstarter exposes several functions aimed at customizing several Windows settings. All of these are located in the Boxstarter.WinConfig module. These include customizing Windows Explorer, the Windows Task Bar, enabling Remote desktop and much more. See Get-Command -Module Boxstarter.WinConfig for the functions available.
+
+SEE ALSO
+
+	http://boxstarter.codeplex.com
+	about_boxstarter_logging
+	Invoke-Boxstarter
+	Invoke-Reboot
+	about_boxstarter_variable_in_bootstrapper

@@ -36,3 +36,14 @@ Package Authoring Considerations
 	- Boxstarter Chocolatey packages should be repeatable. This is especially true if you anticipate the need to reboot. When Boxstarter reboots, it starts running the package from the beginning. So ensure that there is nothing that would cause the package to break if run twice .
 
 	- If you have several chocolatey packages that you want to install during the Boxstarter session, it is preferable to call CINST directly from inside your ChocolateyInstall instead of declaring them as dependencies. This is because Boxstarter cannot intercept chocolatey dependencies so those packages will not have any reboot protections.
+
+SEE ALSO
+
+	http://boxstarter.codeplex.com
+	Invoke-ChocolateyBoxstarter
+	about_boxstarter_logging
+	Invoke-Boxstarter
+	Invoke-Reboot
+	about_boxstarter_variable_in_bootstrapper
+	about_boxstarter_logging
+	about_boxstarter_variable_in_chocolatey

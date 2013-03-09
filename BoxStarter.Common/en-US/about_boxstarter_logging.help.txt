@@ -10,9 +10,6 @@ DESCRIPTION
 	Write-BoxstarterMessage
 		Writes a message to both the Boxstarter log file and to the screen. These messages are output in Green to make them stand out from other messages.
 
-	Log-BoxstarterMessage
-		This writes a message to the Boxstarter log file. It does not write to the screen.
-
 	Out-BoxtarterLog
 		This is identical to Write-BoxstarterMessage but the text written to the screen is not in green. It is formatted normally.
 
@@ -21,3 +18,12 @@ DESCRIPTION
 
 	Start-TimedSection and Stop-TimedSection
 		These functions surround all script in between the start and end functions with a header and footer message and time the script execution. The footer message includes the total elapsed time. These sections can be nested.
+
+SEE ALSO
+
+	http://boxstarter.codeplex.com
+	Write-BoxstarterMessage
+	Out-BoxtarterLog
+	Enter-BoxstarterLogable
+	Start-TimedSection
+	Stop-TimedSection

@@ -29,7 +29,7 @@ log.
 
 .LINK
 http://boxstarter.codeplex.com
-About_Boxstarter_Variable
+about_boxstarter_logging
 
 #>
     param([String]$message, [switch]$nologo)

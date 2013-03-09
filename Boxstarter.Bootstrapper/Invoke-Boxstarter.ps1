@@ -48,7 +48,9 @@ automatic logins in the event a restart is required.
 
 .LINK
 http://boxstarter.codeplex.com
-About_Boxstarter_Variable
+about_boxstarter_variable_in_bootstrapper
+about_boxstarter_bootstrapper
+Invoke-Reboot
 #>    
     [CmdletBinding()]
     param(

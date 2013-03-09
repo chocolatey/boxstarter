@@ -46,7 +46,11 @@ BOXSTARTER VARIABLE SETTINGS
 		file.
 
 SEE ALSO
+
 	http://boxstarter.codeplex.com
 	Invoke-Boxstarter
 	Write-BoxstarterMessage
 	Start-TimedSection
+	about_boxstarter_logging
+	Invoke-Reboot
+	about_boxstarter_bootstrapper	

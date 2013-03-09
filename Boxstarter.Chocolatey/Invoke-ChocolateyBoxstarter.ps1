@@ -55,7 +55,8 @@ directory.
 
 .LINK
 http://boxstarter.codeplex.com
-About_Boxstarter_Variable
+about_boxstarter_chocolatey
+about_boxstarter_variable_in_chocolatey
 #>    
     [CmdletBinding()]
     param(

@@ -63,8 +63,7 @@ log.
 .LINK
 http://boxstarter.codeplex.com
 Stop-TimedSection
-About_Boxstarter_Variable
-
+about_boxstarter_logging
 #>
     param([string]$sectionName)
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
