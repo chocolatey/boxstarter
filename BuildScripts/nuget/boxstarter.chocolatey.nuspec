@@ -5,6 +5,7 @@
     <version>$version$</version>
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
+    <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=boxstarter&amp;DownloadId=635599&amp;Build=20006</iconUrl>
     <title>BoxStarter Chocolatey Module</title>
     <projectUrl>https://BoxStarter.codeplex.com</projectUrl>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>

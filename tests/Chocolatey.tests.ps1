@@ -4,10 +4,12 @@ Resolve-Path $here\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\Boxstarter.Bootstrapper\*.ps1 | 
     % { . $_.ProviderPath }
+
+$Boxstarter.BaseDir=(split-path -parent $here)
+$Boxstarter.SuppressLogging=$true
 Resolve-Path $here\..\Boxstarter.Chocolatey\*.ps1 | 
     % { . $_.ProviderPath }
 Intercept-Chocolatey
-$Boxstarter.SuppressLogging=$true
 
 Describe "Getting Chocolatey" {
     Context "When a reboot is pending and reboots are ok" {

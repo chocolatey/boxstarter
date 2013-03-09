@@ -8,6 +8,7 @@
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <id>BoxStarter.WinConfig</id>
     <title>BoxStarter WinConfig Module</title>
+    <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=boxstarter&amp;DownloadId=635599&amp;Build=20006</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Functions that Boxstarter uses to customize the windows environment.</description>
     <tags>devops chocolatey bootstraper setup windows customizations</tags>

@@ -4,7 +4,7 @@ Description = 'Provides Functions for customizing and configuring core windows s
 ModuleToProcess = './boxstarter.WinConfig.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1.113'
+ModuleVersion = '0.1.124'
 
 # ID used to uniquely identify this module
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e52'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = '9cbc71474ef97b8a12d54690600c723b185a6c00'
+PrivateData = '6dca2b906ff267a153340ead79c2824bcf286cff'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

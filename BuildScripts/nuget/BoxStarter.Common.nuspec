@@ -7,6 +7,7 @@
     <projectUrl>https://BoxStarter.codeplex.com</projectUrl>
     <id>BoxStarter.Common</id>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=boxstarter&amp;DownloadId=635599&amp;Build=20006</iconUrl>
     <title>BoxStarter Common Module</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
