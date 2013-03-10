@@ -35,7 +35,7 @@ Invoke-BoxstarterBuild
         [string]$path
     )
     if(!$boxstarter -or !$boxstarter.LocalRepo){
-        throw "No Local Repository has been set in $Boxstarter.LocalRepo."
+        throw "No Local Repository has been set in `$Boxstarter.LocalRepo."
     }
     Check-Chocolatey
     $nugetExe = "$env:ChocolateyInstall\ChocolateyInstall\nuget.exe"
@@ -63,7 +63,7 @@ Invoke-BoxstarterBuild
         $nodesNamesToDelete = @("licenseUrl","projectUrl","iconUrl","requireLicenseAcceptance","releaseNotes", "copyright","dependencies")
         $metadata.ChildNodes | ? { $nodesNamesToDelete -contains $_.Name } | % { $nodesToDelete += $_ }
         $nodesToDelete | %{ $metadata.RemoveChild($_) } | out-null
-        $metadata.Description=$Description
+        if($description){$metadata.Description=$Description}
         $metadata.tags="Boxstarter"
         $xml.Save($pkgFile)
     }
