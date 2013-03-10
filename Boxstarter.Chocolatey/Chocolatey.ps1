@@ -86,9 +86,11 @@ function Intercept-Command ($commandName, $omitCommandParam) {
 }
 
 function Intercept-Chocolatey {
+    if($Script:BoxstarterIntrercepting){return}
     Intercept-Command cinst $true
     Intercept-Command cup $true
     Intercept-Command cinstm $true
     Intercept-Command chocolatey
     Intercept-Command call-chocolatey
+    $Script:BoxstarterIntrercepting=$true
 }
