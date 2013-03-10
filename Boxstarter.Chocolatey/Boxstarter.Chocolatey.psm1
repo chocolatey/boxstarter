@@ -2,4 +2,4 @@ $unNormalized=(Get-Item "$PSScriptRoot\..\Boxstarter.Bootstrapper\Boxstarter.Boo
 Import-Module $unNormalized.FullName -global -DisableNameChecking
 Resolve-Path $PSScriptRoot\*.ps1 | 
     % { . $_.ProviderPath }
-Export-ModuleMember Invoke-ChocolateyBoxstarter, cinst, cup, cinstm, chocolatey
+Export-ModuleMember Invoke-ChocolateyBoxstarter, cinst, cup, cinstm, chocolatey, New-BoxstarterPackage
