@@ -1,4 +1,4 @@
-$Boxstarter.localRepo=(Join-Path $Boxstarter.baseDir BuildPackages)
+if($Boxstarter.baseDir){$Boxstarter.localRepo=(Join-Path $Boxstarter.baseDir BuildPackages)}
 function Invoke-ChocolateyBoxstarter{
 <#
 .SYNOPSIS

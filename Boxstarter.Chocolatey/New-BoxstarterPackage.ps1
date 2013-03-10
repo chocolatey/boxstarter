@@ -16,6 +16,9 @@ repository directory to a Chocolatey nupkg.
 .PARAMETER Name
 The name of the package to create
 
+.PARAMETER Description
+Description of the package to be written to the nuspec
+
 .PARAMETER Path
 Optional path whose contents will be copied to the repository
 
@@ -25,8 +28,36 @@ about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey
 Invoke-BoxstarterBuild
 #>
+    [CmdletBinding()]
     param(
         [string]$Name,
+        [string]$description,
         [string]$path
     )
+    $pkgDir = Join-Path $Boxstarter.LocalRepo $Name
+    MkDir $pkgDir | out-null
+    Pushd $pkgDir
+    ."$env:ChocolateyInstall\ChocolateyInstall\nuget" spec $Name -NonInteractive
+    $pkgFile = Join-Path $pkgDir "$name.nuspec"
+    [xml]$xml = Get-Content $pkgFile
+    $metadata = $xml.package.metadata
+    $nodesToDelete = @()
+    $nodesNamesToDelete = @("licenseUrl","projectUrl","iconUrl","requireLicenseAcceptance","releaseNotes", "copyright","dependencies")
+    $metadata.ChildNodes | ? { $nodesNamesToDelete -contains $_.Name } | % { $nodesToDelete += $_ }
+    $nodesToDelete | %{ $metadata.RemoveChild($_) } | out-null
+    $metadata.Description=$Description
+    $metadata.tags="Boxstarter"
+    $xml.Save($pkgFile)
+    Mkdir "Tools" | out-null
+    $installScript=@"
+try {
+
+    Write-ChocolateySuccess '$name'
+} catch {
+  Write-ChocolateyFailure '$name' `$(`$_.Exception.Message)
+  throw
+}
+"@
+    new-Item "tools\ChocolateyInstall.ps1" -type file -value $installScript| out-null
+    Popd
 }
