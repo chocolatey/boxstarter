@@ -37,18 +37,25 @@ Invoke-BoxstarterBuild
     $pkgDir = Join-Path $Boxstarter.LocalRepo $Name
     MkDir $pkgDir | out-null
     Pushd $pkgDir
-    ."$env:ChocolateyInstall\ChocolateyInstall\nuget" spec $Name -NonInteractive
+    if($path){
+        Copy-Item "$path\*" . -recurse
+    }
     $pkgFile = Join-Path $pkgDir "$name.nuspec"
-    [xml]$xml = Get-Content $pkgFile
-    $metadata = $xml.package.metadata
-    $nodesToDelete = @()
-    $nodesNamesToDelete = @("licenseUrl","projectUrl","iconUrl","requireLicenseAcceptance","releaseNotes", "copyright","dependencies")
-    $metadata.ChildNodes | ? { $nodesNamesToDelete -contains $_.Name } | % { $nodesToDelete += $_ }
-    $nodesToDelete | %{ $metadata.RemoveChild($_) } | out-null
-    $metadata.Description=$Description
-    $metadata.tags="Boxstarter"
-    $xml.Save($pkgFile)
-    Mkdir "Tools" | out-null
+    if(!(test-path $pkgFile)){
+        ."$env:ChocolateyInstall\ChocolateyInstall\nuget" spec $Name -NonInteractive
+        [xml]$xml = Get-Content $pkgFile
+        $metadata = $xml.package.metadata
+        $nodesToDelete = @()
+        $nodesNamesToDelete = @("licenseUrl","projectUrl","iconUrl","requireLicenseAcceptance","releaseNotes", "copyright","dependencies")
+        $metadata.ChildNodes | ? { $nodesNamesToDelete -contains $_.Name } | % { $nodesToDelete += $_ }
+        $nodesToDelete | %{ $metadata.RemoveChild($_) } | out-null
+        $metadata.Description=$Description
+        $metadata.tags="Boxstarter"
+        $xml.Save($pkgFile)
+    }
+    if(!(test-path "tools")){
+        Mkdir "tools" | out-null
+    }
     $installScript=@"
 try {
 
@@ -58,6 +65,8 @@ try {
   throw
 }
 "@
-    new-Item "tools\ChocolateyInstall.ps1" -type file -value $installScript| out-null
+    if(!(test-path "tools\ChocolateyInstall.ps1")){
+        new-Item "tools\ChocolateyInstall.ps1" -type file -value $installScript| out-null
+    }
     Popd
 }
