@@ -34,15 +34,29 @@ Invoke-BoxstarterBuild
         [string]$description,
         [string]$path
     )
+    if(!$boxstarter -or !$boxstarter.LocalRepo){
+        throw "No Local Repository has been set in $Boxstarter.LocalRepo."
+    }
+    Check-Chocolatey
+    $nugetExe = "$env:ChocolateyInstall\ChocolateyInstall\nuget.exe"
+    [System.Reflection.Assembly]::LoadFile($nugetExe) | out-null
+    [NuGet.PackageIdValidator]::ValidatePackageId($name)
     $pkgDir = Join-Path $Boxstarter.LocalRepo $Name
+    if(test-path $pkgDir) {
+        throw "A local Repo already exists at $($boxstarter.LocalRepo)\$packageName. Delete the directory before caling New-BoxstarterPackage"
+    }
     MkDir $pkgDir | out-null
     Pushd $pkgDir
     if($path){
+        if(!(test-path $Path)){
+            popd
+            throw "$path could not be found"
+        }
         Copy-Item "$path\*" . -recurse
     }
     $pkgFile = Join-Path $pkgDir "$name.nuspec"
     if(!(test-path $pkgFile)){
-        ."$env:ChocolateyInstall\ChocolateyInstall\nuget" spec $Name -NonInteractive
+        .$nugetExe spec $Name -NonInteractive
         [xml]$xml = Get-Content $pkgFile
         $metadata = $xml.package.metadata
         $nodesToDelete = @()
