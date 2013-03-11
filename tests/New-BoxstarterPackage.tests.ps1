@@ -116,10 +116,10 @@ Describe "New-BoxstarterPackage" {
 
     Context "When a package name is not valid" {
         Mock Check-Chocolatey
-        try {New-BoxstarterPackage "my: invalid name" $Description} catch [System.ArgumentException]{ $exception=$_ }
+        try {New-BoxstarterPackage "my: invalid name" $Description} catch { $exception=$_ }
 
-        It "Will throw ArgumentException" {
-            $exception | Should not be $null
+        It "Will throw Invalid Package ID" {
+            $exception | Should match "Invalid Package ID"
         }
     } 
 

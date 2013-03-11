@@ -43,11 +43,12 @@ Get-PackageRoot
     }
     Check-Chocolatey
     $nugetExe = "$env:ChocolateyInstall\ChocolateyInstall\nuget.exe"
-    [System.Reflection.Assembly]::LoadFile($nugetExe) | out-null
-    [NuGet.PackageIdValidator]::ValidatePackageId($name)
+    if(!($name -match "^\w+(?:[_.-]\w+)*$") -or ($name.length -gt 100)){
+        throw "Invalid Package ID"
+    }
     $pkgDir = Join-Path $Boxstarter.LocalRepo $Name
     if(test-path $pkgDir) {
-        throw "A local Repo already exists at $($boxstarter.LocalRepo)\$packageName. Delete the directory before caling New-BoxstarterPackage"
+        throw "A local Repo already exists at $($boxstarter.LocalRepo)\$name. Delete the directory before caling New-BoxstarterPackage"
     }
     MkDir $pkgDir | out-null
     Pushd $pkgDir
