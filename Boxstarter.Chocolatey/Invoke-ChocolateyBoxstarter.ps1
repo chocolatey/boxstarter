@@ -24,7 +24,7 @@ This essentially wraps Chocolatey Install and provides these additional features
  - .\BuildPackages relative to the parent directory of the module file
  - The chocolatey feed
  - The boxstarter feed on myget
- This can be configured by editing $Boxstarter.BaseDir\Boxstarter.Config
+ This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
 
  .PARAMETER BootstrapPackage
  The package to be installed.

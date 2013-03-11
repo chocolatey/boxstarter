@@ -16,7 +16,7 @@ Chocolatey Boxstarter Packages
 	This package script has access to all of the chocolatey helper functions as well as all Boxstarter logging, WinConfig and Bootstrapper commands. See About_Boxstarter_Bootstrapper and About_Boxstarter_Logging for information regarding those comands.
 
 Creating Packages
-	Boxstarter provides some functions to make creation and deployment of packages easy. Use New-BoxstarterPackage to either create a skeleton package with a minimal nuspec and ChocolateyInstall.ps1 or to import an existing package into boxstarter. This will put the package source files in $Boxstarter.LocalRepo\<package name>. To pack these source files use Invoke-BoxstarterBuild <package name>. You may also pack all package in your repo with Invoke-BoxstarterBuild -all. If you would like to make your local repo a network share, use Set-BoxstarterShare. 
+	Boxstarter provides some functions to make creation and deployment of packages easy. Use New-BoxstarterPackage to either create a skeleton package with a minimal nuspec and ChocolateyInstall.ps1 or to import an existing package into boxstarter. This will put the package source files in $($Boxstarter.LocalRepo)\<package name>. To pack these source files use Invoke-BoxstarterBuild <package name>. You may also pack all package in your repo with Invoke-BoxstarterBuild -all. If you would like to make your local repo a network share, use Set-BoxstarterShare. 
 
 Consuming Boxstarter Packages
 	The primary gateway to kicking off a Boxstarter.Chocolatey installation session is Invoke-ChocolateyBoxstarter. While you may use this powershell function, you can also call Boxstarter.Bat which takes the exact same parameters as Invoke-CocolateyBoxstarter. If you instaled Boxstarter.Chocolatey via Chocolatey of the setup.bat installer, boxstarter.bat is placed in your path. Boxstarter.bat will import the Boxstarter.Chocolatey module and create a powershell session bypassing ExecutionPolicy. Boxstarter.bat is ideal for calling Boxstarter remotely. Simply share the Boxstarter base directory and you can access it via \\serverName\Boxstarter\Boxstarter.bat.
@@ -24,13 +24,13 @@ Consuming Boxstarter Packages
 Package Sources
 	Invoke-ChocolateyBoxstarter (or Boxstarter) expects just the name of the bootstrapping package - just like CINST or Nuget. Boxstarter will search the following locations in this order:
 
-	- $Boxstarter.LocalRepo: This is the local repository that by default is in the BuildPackages directory in the Boxstarter Base Boxstarter Module directory ($Boxstarter.BaseDir). You can change the default by adding a LocalRepo setting to $Boxstarter.BaseDir\Boxstarter.Config.
+	- $Boxstarter.LocalRepo: This is the local repository that by default is in the BuildPackages directory in the Boxstarter Base Boxstarter Module directory ($Boxstarter.BaseDir). You can change the default by adding a LocalRepo setting to $($Boxstarter.BaseDir)\Boxstarter.Config.
 
 	- Chocolatey.Org: The public chocolatey feed at http://chocolatey.org/api/v2
 
 	- Myget: The Boxstarter Community Feed at http://www.myget.org/F/boxstarter/api/v2
 
-	The last two remote sorces can be configured by editing $Boxstarter.BaseDir\Boxstarter.Config.
+	The last two remote sorces can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config.
 
 Reboot detection
 	Perhaps the most compelling feature of Boxstarter is its way to handle rebboots during an involved environment setup package. Especially when you are running patches, installing services and downloading complex applications. Boxstarter intercepts all calls to chocolatey install commands and checks for pending reboots prior to calling Chocolatey. If a pending reboot exists, Boxstarter reboots the machine and automtically logs on with the credentials you provided providing an unattended installation session. After the chocolatey package completes, if the package fails and returns the common MSI reboot needed exit code of 3010, Boxstarter will reboot which will likely cause the package to succeed on the next run. See about_boxstarter_bootstrapper for more details about the rebooting logic and how you can disable or manually invoke them.

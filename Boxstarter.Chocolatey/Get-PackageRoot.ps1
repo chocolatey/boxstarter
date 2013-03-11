@@ -17,6 +17,8 @@ This is $MyInvocation instance accesible from ChocolateyInstall.ps1
 .EXAMPLE
 Copy-Item "$env:programfiles\Sublime Text 2\Data\*" Package\Sublime -recurse
 New_BoxstarterPackage MyPackage .\Package
+#Edit install script
+Notepad $($Boxstarter.LocalRepo)\MyPackage\Tools\chocolateyInstall.ps1
 Invoke-BoxstarterBuild MyPackage
 Invoke-ChocolateyBoxstarter MyPackage
 
