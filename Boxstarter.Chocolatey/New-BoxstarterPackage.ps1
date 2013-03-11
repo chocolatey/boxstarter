@@ -11,7 +11,10 @@ ChocolateyInstall.ps1 file. If a path is provided, Boxstarter will
 copy the contents of the path to the new package directory. If the
 path does not include a nuspec or ChocolateyInstall.ps1, Boxstarter
 will create one. You can use Invoke-BoxstarterBuild to pack the 
-repository directory to a Chocolatey nupkg.
+repository directory to a Chocolatey nupkg. If your path includes 
+subdirectories, you can use Get-PackageRoot inside 
+ChocolateyInstall.ps1 to reference the parent directory of the copied
+content.
 
 .PARAMETER Name
 The name of the package to create
@@ -27,6 +30,7 @@ http://boxstarter.codeplex.com
 about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey
 Invoke-BoxstarterBuild
+Get-PackageRoot
 #>
     [CmdletBinding()]
     param(
