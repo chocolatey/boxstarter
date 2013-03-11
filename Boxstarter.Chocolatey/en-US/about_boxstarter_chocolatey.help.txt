@@ -10,13 +10,16 @@ DESCRIPTION
 Installing Chocolatey
 	Boxstarter will check to ensure if Chocolatey is installed. If chocolatey is not installed it will install it before running any Chocolatey commands. Boxstarter will also check t see if the .net 4.0 framework is installed before installing Chocolatey since the .net 4 runtime is a prerequisite.
 
-Calling Boxstarter.Chocolatey
-	The primary gateway to kicking off a Boxstarter.Chocolatey installation session is Invoke-ChocolateyBoxstarter. While you may use this powershell function, you can also call Boxstarter.Bat which takes the exact same parameters as Invoke-CocolateyBoxstarter. If you instaled Boxstarter.Chocolatey via Chocolatey of the setup.bat installer, boxstarter.bat is placed in your path. Boxstarter.bat will import the Boxstarter.Chocolatey module and create a powershell session bypassing ExecutionPolicy. Boxstarter.bat is ideal for calling Boxstarter remotely. Simply share the Boxstarter base directory and you can access it via \\serverName\Boxstarter\Boxstarter.bat.
-
-Boxstarter Bootstrapper Packages
+Chocolatey Boxstarter Packages
 	When calling Invoke-ChocolateyBoxstarter or just Boxstarter, a BootstrapperPackage name must be passed to the command. This is a special Chocolatey package provided by te user that boxstarter asks Chocolatey to install and it contains the script that is intended to install all the applications and settings the user wants setup on the local machine.
 
 	This package script has access to all of the chocolatey helper functions as well as all Boxstarter logging, WinConfig and Bootstrapper commands. See About_Boxstarter_Bootstrapper and About_Boxstarter_Logging for information regarding those comands.
+
+Creating Packages
+	Boxstarter provides some functions to make creation and deployment of packages easy. Use New-BoxstarterPackage to either create a skeleton package with a minimal nuspec and ChocolateyInstall.ps1 or to import an existing package into boxstarter. This will put the package source files in $Boxstarter.LocalRepo\<package name>. To pack these source files use Invoke-BoxstarterBuild <package name>. You may also pack all package in your repo with Invoke-BoxstarterBuild -all. If you would like to make your local repo a network share, use Set-BoxstarterShare. 
+
+Consuming Boxstarter Packages
+	The primary gateway to kicking off a Boxstarter.Chocolatey installation session is Invoke-ChocolateyBoxstarter. While you may use this powershell function, you can also call Boxstarter.Bat which takes the exact same parameters as Invoke-CocolateyBoxstarter. If you instaled Boxstarter.Chocolatey via Chocolatey of the setup.bat installer, boxstarter.bat is placed in your path. Boxstarter.bat will import the Boxstarter.Chocolatey module and create a powershell session bypassing ExecutionPolicy. Boxstarter.bat is ideal for calling Boxstarter remotely. Simply share the Boxstarter base directory and you can access it via \\serverName\Boxstarter\Boxstarter.bat.
 
 Package Sources
 	Invoke-ChocolateyBoxstarter (or Boxstarter) expects just the name of the bootstrapping package - just like CINST or Nuget. Boxstarter will search the following locations in this order:
@@ -46,6 +49,9 @@ SEE ALSO
 	about_boxstarter_logging
 	Invoke-Boxstarter
 	Invoke-Reboot
+	New-BoxstarterPackage
+	Invoke-BoxstarterBuild
+	Set-BoxstarterShare
 	about_boxstarter_variable_in_bootstrapper
 	about_boxstarter_logging
 	about_boxstarter_variable_in_chocolatey
