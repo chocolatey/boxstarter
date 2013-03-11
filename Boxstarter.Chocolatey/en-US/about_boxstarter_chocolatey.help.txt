@@ -21,11 +21,13 @@ Boxstarter Bootstrapper Packages
 Package Sources
 	Invoke-ChocolateyBoxstarter (or Boxstarter) expects just the name of the bootstrapping package - just like CINST or Nuget. Boxstarter will search the following locations in this order:
 
-	- $Boxstarter.LocalRepo: This is the local repository that by default is in the BuildPackages directory in the Boxstarter Base Boxstarter Module directory ($Boxstarter.BaseDir).
+	- $Boxstarter.LocalRepo: This is the local repository that by default is in the BuildPackages directory in the Boxstarter Base Boxstarter Module directory ($Boxstarter.BaseDir). You can change the default by adding a LocalRepo setting to $Boxstarter.BaseDir\Boxstarter.Config.
 
 	- Chocolatey.Org: The public chocolatey feed at http://chocolatey.org/api/v2
 
 	- Myget: The Boxstarter Community Feed at http://www.myget.org/F/boxstarter/api/v2
+
+	The last two remote sorces can be configured by editing $Boxstarter.BaseDir\Boxstarter.Config.
 
 Reboot detection
 	Perhaps the most compelling feature of Boxstarter is its way to handle rebboots during an involved environment setup package. Especially when you are running patches, installing services and downloading complex applications. Boxstarter intercepts all calls to chocolatey install commands and checks for pending reboots prior to calling Chocolatey. If a pending reboot exists, Boxstarter reboots the machine and automtically logs on with the credentials you provided providing an unattended installation session. After the chocolatey package completes, if the package fails and returns the common MSI reboot needed exit code of 3010, Boxstarter will reboot which will likely cause the package to succeed on the next run. See about_boxstarter_bootstrapper for more details about the rebooting logic and how you can disable or manually invoke them.

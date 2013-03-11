@@ -1,4 +1,11 @@
-if($Boxstarter.baseDir){$Boxstarter.localRepo=(Join-Path $Boxstarter.baseDir BuildPackages)}
+if($Boxstarter.Config.LocalRepo -ne $null){
+    $BoxStarter.LocalRepo=$Boxstarter.Config.LocalRepo
+} else {
+    if($Boxstarter.baseDir){
+        $Boxstarter.localRepo=(Join-Path $Boxstarter.baseDir BuildPackages)
+    }
+}
+$Boxstarter.NugetSources=$Boxstarter.Config.NugetSources
 function Invoke-ChocolateyBoxstarter{
 <#
 .SYNOPSIS
@@ -17,6 +24,7 @@ This essentially wraps Chocolatey Install and provides these additional features
  - .\BuildPackages relative to the parent directory of the module file
  - The chocolatey feed
  - The boxstarter feed on myget
+ This can be configured by editing $Boxstarter.BaseDir\Boxstarter.Config
 
  .PARAMETER BootstrapPackage
  The package to be installed.
@@ -95,7 +103,7 @@ function Download-Package([string]$bootstrapPackage) {
     if(test-path (Join-Path $Boxstarter.LocalRepo "$bootstrapPackage.*.nupkg")){
         $source = $Boxstarter.LocalRepo
     } else {
-        $source = "http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
+        $source = $Boxstarter.Config.NugetSources
     }
     write-BoxstarterMessage "Installing $bootstrapPackage package from $source"
     Chocolatey install $bootstrapPackage -source $source -force

@@ -27,7 +27,17 @@ BOXSTARTER VARIABLE SETTINGS
 
 	LocalRepo
 		Path to the local directory containing packages that 
-		boxstarter will scan when looking for a package.
+		boxstarter will scan when looking for a package. By default 
+		this is the BuildPackeged directory under the base Boxstarter 
+		directory usually in the user's AppData directory. The 
+		default can be changed by adding a LocalRepo setting to 
+		$Boxstarter.BaseDir\Boxstarter.Config.
+
+	NugetSources
+		The Nuget feeds that Boxstarter checks for the Boxstarter 
+		Bootstrap package. By default this is the chocolatey and 
+		Myget Boxstarter community feed. This can be changed by 
+		editing $Boxstarter.BaseDir\Boxstarter.Config.
 
 SEE ALSO
 	http://boxstarter.codeplex.com
