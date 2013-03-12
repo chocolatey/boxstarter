@@ -44,6 +44,13 @@ Invoke-BoxstarterBuild
         [string]$shareName="Boxstarter",
         [string[]]$accounts=@("Everyone")
     )
+    if(!(Test-Admin)) {
+        $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Chocolatey\BoxStarter.Chocolatey.psd1")
+        $command = "-ExecutionPolicy bypass -command Import-Module `"$($unNormalized.FullName)`";Set-BoxstarterShare @PSBoundParameters"
+        Start-Process powershell -verb runas -argumentlist $command
+        return
+    }
+
     foreach($account in $accounts){
         $acctOption += "/GRANT:'$account,READ' "
     }

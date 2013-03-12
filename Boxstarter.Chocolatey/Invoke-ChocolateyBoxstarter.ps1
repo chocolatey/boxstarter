@@ -75,7 +75,7 @@ about_boxstarter_variable_in_chocolatey
     if(!$Boxstarter.ScriptToCall){
         $script=@"
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
-Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage -Localrepo $localRepo $(if($rebootOk){"-RebootOk"})
+Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage $(if($LocalRepo){"-Localrepo $localRepo"}) $(if($rebootOk){"-RebootOk"})
 "@
         Invoke-Boxstarter ([ScriptBlock]::Create($script)) -rebootok:$rebootok
         return

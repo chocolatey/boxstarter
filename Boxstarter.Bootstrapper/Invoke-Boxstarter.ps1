@@ -134,12 +134,6 @@ function InitAutologon([switch]$RebootOk, [System.Security.SecureString]$passwor
     return $password
 }
 
-function Test-Admin {
-    $identity  = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-    $principal = New-Object System.Security.Principal.WindowsPrincipal( $identity )
-    return $principal.IsInRole( [System.Security.Principal.WindowsBuiltInRole]::Administrator )
-}
-
 function Resolve-Script([ScriptBlock]$script, [string]$scriptFile){
     if($script) {return $script}
     if(Test-Path $scriptFile) {
