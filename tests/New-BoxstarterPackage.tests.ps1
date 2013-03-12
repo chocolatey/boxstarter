@@ -14,7 +14,7 @@ Describe "New-BoxstarterPackage" {
     $packageName="pkg"
     $Description="My Description"
     Context "When No Path is provided" {
-        Mock Check-Chocolatey
+        Mock Intercept-Chocolatey
 
         New-BoxstarterPackage $packageName $Description
 
@@ -39,7 +39,10 @@ Describe "New-BoxstarterPackage" {
         }
         It "Will Create ChocolateyInstall file" {
             join-path (Join-Path $Boxstarter.LocalRepo "$packageName\tools") "ChocolateyInstall.ps1" | Should Exist
-        }        
+        }
+        It "Should not intercept chocolatey" {
+            Assert-MockCalled Intercept-Chocolatey -Times 0
+        }
     }
 
     Context "When a Path is provided that has no nuspec or chocolateyInstall" {

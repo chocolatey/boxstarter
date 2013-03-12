@@ -1,4 +1,4 @@
-function Check-Chocolatey{
+function Check-Chocolatey ([switch]$ShouldIntercept){
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
         Write-BoxstarterMessage "Chocolatey not instaled. Boxstarter will download and install."
         $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
@@ -11,7 +11,7 @@ function Check-Chocolatey{
         }
     }
     Write-BoxstarterMessage "Chocoltey installed, seting up interception of Chocolatey methods."
-    Intercept-Chocolatey
+    if($ShouldIntercept){Intercept-Chocolatey}
 }
 
 function Is64Bit {  [IntPtr]::Size -eq 8  }

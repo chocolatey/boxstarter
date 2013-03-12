@@ -85,7 +85,7 @@ Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage -Localrepo $loca
     $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
     $Boxstarter.Package=$bootstrapPackage
     $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
-    Check-Chocolatey
+    Check-Chocolatey -ShouldIntercept
     del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
     del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
     Download-Package $bootstrapPackage

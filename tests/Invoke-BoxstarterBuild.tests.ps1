@@ -13,7 +13,7 @@ Describe "Invoke-BoxstarterBuild" {
     $Boxstarter.SuppressLogging=$true
     $packageName="pkg"
     Context "When Building a single package" {
-        Mock Check-Chocolatey
+        Mock Intercept-Chocolatey
         New-BoxstarterPackage $packageName
 
         Invoke-BoxstarterBuild $packageName
@@ -21,6 +21,10 @@ Describe "Invoke-BoxstarterBuild" {
         It "Will Create the nupkg" {
             Join-Path $Boxstarter.LocalRepo "$packageName.1.0.0.nupkg" | Should Exist
         }
+        It "Should not intercept chocolatey" {
+            Assert-MockCalled Intercept-Chocolatey -Times 0
+        }
+
     }
 
     Context "When Building all packages" {
