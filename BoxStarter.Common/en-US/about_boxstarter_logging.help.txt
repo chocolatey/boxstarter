@@ -10,6 +10,9 @@ DESCRIPTION
 	Write-BoxstarterMessage
 		Writes a message to both the Boxstarter log file and to the screen. These messages are output in Green to make them stand out from other messages.
 
+	Log-BoxstarterMessage
+		Only writes a message to the Boxstarter log file. The message is not logged to the console.
+
 	Out-BoxtarterLog
 		This is identical to Write-BoxstarterMessage but the text written to the screen is not in green. It is formatted normally.
 
