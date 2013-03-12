@@ -6,6 +6,7 @@ if($Boxstarter.Config.LocalRepo -ne $null){
     }
 }
 $Boxstarter.NugetSources=$Boxstarter.Config.NugetSources
+$Boxstarter.RebootOk=$true
 function Invoke-ChocolateyBoxstarter{
 <#
 .SYNOPSIS
@@ -33,12 +34,6 @@ This essentially wraps Chocolatey Install and provides these additional features
  - The chocolatey feed
  - The boxstarter feed on myget
 
-.Parameter RebootOk
-If set, a reboot will be performed if boxstarter determines that a 
-reboot is pending. Boxstarter will prompt the user to enter a 
-password which will be used for automatic logins in the event a 
-restart is required.
-
 .Parameter Localrepo
 This is the path to the local boxstarter repository where boxstarter 
 should look for .nupkg files to install. By default this is located 
@@ -46,7 +41,7 @@ in the BuildPackages directory just under the root Boxstarter
 directory.
 
 .EXAMPLE
-Invoke-ChocolateyBoxstarter example -RebootOk
+Invoke-ChocolateyBoxstarter example
 
 This invokes boxstarter and installs the example .nupkg. In pending 
 reboots are detected, boxstarter will restart the machine. Boxstarter
@@ -54,7 +49,7 @@ will prompt the user to enter a password which will be used for
 automatic logins in the event a restart is required.
 
 .EXAMPLE
-Invoke-ChocolateyBoxstarter win8Install -rebootOk -LocalRepo \\server\share\boxstarter
+Invoke-ChocolateyBoxstarter win8Install -LocalRepo \\server\share\boxstarter
 
 This installs the Win8Install .nupkg and specifies that it is ok to 
 reboot the macine if a pending reboot is needed. Boxstarter will look 
@@ -69,15 +64,14 @@ about_boxstarter_variable_in_chocolatey
     [CmdletBinding()]
     param(
       [string]$bootstrapPackage="default",
-      [string]$localRepo,
-      [switch]$RebootOk
+      [string]$localRepo
     )
     if(!$Boxstarter.ScriptToCall){
         $script=@"
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
-Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage $(if($LocalRepo){"-Localrepo $localRepo"}) $(if($rebootOk){"-RebootOk"})
+Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage $(if($LocalRepo){"-Localrepo $localRepo"})
 "@
-        Invoke-Boxstarter ([ScriptBlock]::Create($script)) -rebootok:$rebootok
+        Invoke-Boxstarter ([ScriptBlock]::Create($script))
         return
     }
     if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
