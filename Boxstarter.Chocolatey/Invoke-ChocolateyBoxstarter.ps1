@@ -40,6 +40,9 @@ should look for .nupkg files to install. By default this is located
 in the BuildPackages directory just under the root Boxstarter 
 directory.
 
+.PARAMETER DisableReboots
+If set, reboots are subbressed.
+
 .EXAMPLE
 Invoke-ChocolateyBoxstarter example
 
@@ -64,14 +67,16 @@ about_boxstarter_variable_in_chocolatey
     [CmdletBinding()]
     param(
       [string]$bootstrapPackage="default",
-      [string]$localRepo
+      [string]$localRepo,
+      [switch]$DisableReboots
     )
+    if($DisableReboots){$Boxstarter.RebootOk=$false}
     if(!$Boxstarter.ScriptToCall){
         $script=@"
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
 Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage $(if($LocalRepo){"-Localrepo $localRepo"})
 "@
-        Invoke-Boxstarter ([ScriptBlock]::Create($script))
+        Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk
         return
     }
     if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }

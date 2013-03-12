@@ -11,7 +11,7 @@ Describe "Invoke-ChocolateyBoxstarter via bootstrapper.bat (end to end)" {
         remove-Item "$env:ChocolateyInstall\lib\test-package.*" -force -recurse
         Add-Content "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -Value "______ test-package v1.0.0 ______" -force
 
-        ."$here\..\boxstarter.bat" test-package -LocalRepo "$testRoot\Repo"
+        ."$here\..\boxstarter.bat" test-package -LocalRepo "$testRoot\Repo" -DisableReboots
 
         it "should save boxstarter package to chocolatey lib folder" {
             Test-Path "$env:ChocolateyInstall\lib\test-package.*" | Should Be $true
