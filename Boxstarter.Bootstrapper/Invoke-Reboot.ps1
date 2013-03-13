@@ -15,7 +15,7 @@ to call Invoke-Reboot to restart otherwise the remainder of
 the package might fail.
 
 .NOTES
-Obe can use the $Boxstarter variable's RebootOk to enable/disable
+One can use the $Boxstarter variable's RebootOk to enable/disable
 reboots. If this is set to $False (the default) then Invoke-Reboot
 will not do anything. If Boxstarter was invoked with the -Rebootok
 parameter $Boxstarter.RebootOk is set to True.

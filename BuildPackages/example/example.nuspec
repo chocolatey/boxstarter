@@ -8,7 +8,4 @@
     <description>An example boxstarter package</description>
     <tags>boxstarter</tags>
   </metadata>
-  <files>
-    <file src="tools\**\*.*" target="tools"/>
-  </files>
 </package>

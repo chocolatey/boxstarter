@@ -46,10 +46,11 @@ Invoke-ChocolateyBoxstarter
 Invoke-BoxstarterBuild
 #>
     param(
+        [Parameter(Mandatory=$true)]
         [System.Management.Automation.InvocationInfo]$invocation
     )
     if($invocation.MyCommand.Definition -eq $null -or !($invocation.MyCommand.Definition.ToLower().EndsWith("tools\chocolateyinstall.ps1"))){
-        throw "Get-PackageRoot can only be used inside of chocolateyinstall.ps1"
+        throw "Get-PackageRoot can only be used inside of chocolateyinstall.ps1. You Tried to call it from $($invocation.MyCommand.Definition)"
     }
     return (Split-Path -parent(Split-Path -parent $invocation.MyCommand.Definition))
 }

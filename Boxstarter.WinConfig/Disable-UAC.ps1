@@ -6,6 +6,7 @@ Turns off Windows User Access Control
 
 .LINK
 http://boxstarter.codeplex.com
+Enable-UAC
 
 #>
     Write-BoxstarterMessage "Enabling UAC"

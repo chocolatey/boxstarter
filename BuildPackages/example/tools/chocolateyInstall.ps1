@@ -45,9 +45,9 @@ try {
     Install-ChocolateyFileAssociation ".dll" "$($Boxstarter.ChocolateyBin)\dotPeek.bat"
 
     mkdir "$sublimeDir\data"
-    copy-item (Join-Path Get-PackageRoot 'sublime\*') -Force -Recurse "$sublimeDir\data"
+    copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'sublime\*') -Force -Recurse "$sublimeDir\data"
     move-item "$sublimeDir\data\Pristine Packages\*" -Force "$sublimeDir\Pristine Packages"
-    copy-item (Join-Path Get-PackageRoot 'console.xml') -Force $env:appdata\console\console.xml
+    copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'console.xml') -Force $env:appdata\console\console.xml
 
     Install-ChocolateyVsixPackage xunit http://visualstudiogallery.msdn.microsoft.com/463c5987-f82b-46c8-a97e-b1cde42b9099/file/66837/1/xunit.runner.visualstudio.vsix
     Install-ChocolateyVsixPackage autowrocktestable http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix
@@ -55,6 +55,6 @@ try {
     Install-WindowsUpdate -AcceptEula
     Write-ChocolateySuccess 'example'
 } catch {
-  Write-ChocolateyFailure 'example' `$(`$_.Exception.Message)
+  Write-ChocolateyFailure 'example' $($_.Exception.Message)
   throw
 }

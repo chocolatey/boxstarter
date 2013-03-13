@@ -55,7 +55,7 @@ Task Push-Nuget -description 'Pushes the module to Myget feed' {
 
 Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
     exec { 
-        Get-ChildItem "$baseDir\buildPackages\*.nupkg" | 
+        Get-ChildItem "$baseDir\buildArtifacts\*.nupkg" | 
             % { cpush $_  }
     }
 }
