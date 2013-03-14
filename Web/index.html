@@ -1,0 +1,133 @@
+﻿
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Boxstarter</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <div><img height="270" src="images/boxlogo.png" width="270"> </div>
+        <p>Creates a fresh Windows environment from a bare OS utilizing powershell and chocolatey.</p>
+
+        <p class="view"><a href="https://boxstarter.codeplex.com/">View the Project on Codeplex<small>http://boxstarter.codeplex.com</small></a></p>
+
+
+        <ul>
+          <li><a href="downloads/boxstarter.1.0.5.zip">Download <strong>ZIP File</strong></a></li>
+          <li><a href="http://chocolatey.org/packages/boxstarter.chocolatey">CINST from<strong>Chocolatey</strong></a></li>
+          <li><a href="https://boxstarter.codeplex.com/Documentation">Docs on<strong>Codeplex</strong></a></li>
+        </ul>
+      </header>
+      <section>
+      	<h1>Boxstarter</h1>
+        <h2>Your personal Windows Install made easy!</h2>
+
+<ul>
+<li>100% Unattended Install with pending reboot detection and automatic logon.</li>
+<li>Lots of Windows configuration utilities including installing critical updates, changing windows explorer options, and more.</li>
+<li>Easily installs to a Thumb drive or Set-BoxstarterShare to share it on your network.</li>
+</ul><h2>Build your Uber Geek Environment</h2>
+
+<div class="highlight"><pre><span class="c">#After extracting Boxstarter.1.0.0.zip on MYCOMPUTER</span>
+<span class="p">.\</span><span class="n">setup</span><span class="p">.</span><span class="n">bat</span>
+<span class="nb">Import-Module</span> <span class="nv">$env:appdata</span><span class="p">\</span><span class="n">boxstarter</span><span class="p">\</span><span class="n">Boxstarter</span><span class="p">.</span><span class="n">Chocolatey</span><span class="p">\</span><span class="n">Boxstarter</span><span class="p">.</span><span class="n">Chocolatey</span><span class="p">.</span><span class="n">psd1</span>
+<span class="c">#Create minimal nuspec and chocolateyInstall</span>
+<span class="nb">New-BoxstarterPackage</span> <span class="n">MyPackage</span>
+<span class="c">#Edit Install script to customize your environment</span>
+<span class="n">Notepad</span> <span class="nb">Join-Path</span> <span class="nv">$Boxstarter</span><span class="p">.</span><span class="n">LocalRepo</span> <span class="s2">"tools\ChocolateyInstall.ps1"</span>
+<span class="c">#Pack nupkg</span>
+<span class="nb">Invoke-BoxstarterBuild</span> <span class="n">MyPackage</span>
+
+<span class="c">#share Repo</span>
+<span class="nb">Set-BoxstarterShare</span>
+<span class="c">#Or Copy to thumb drive G</span>
+<span class="nb">Copy-Item</span> <span class="nv">$Boxstarter</span><span class="p">.</span><span class="n">BaseDir</span> <span class="n">G</span><span class="err">:</span><span class="p">\</span> <span class="n">-Recurse</span>
+
+<span class="c">#Logon to your bare Windows install</span>
+<span class="p">\\</span><span class="n">MYCOMPUTER</span><span class="p">\</span><span class="n">Boxstarter</span><span class="p">\</span><span class="n">Boxstarter</span> <span class="n">Mypackage</span>
+
+<span class="c">#Enter password when prompted and come back later to find all your apps installed</span>
+</pre></div>
+
+<h2>Here is an example developer chocolateyInstall.ps1:</h2>
+
+<div class="highlight"><pre><span class="n">Install-WindowsUpdate</span> <span class="n">-AcceptEula</span>
+<span class="nb">Update-ExecutionPolicy</span> <span class="n">Unrestricted</span>
+<span class="nb">Move-LibraryDirectory</span> <span class="s2">"Personal"</span> <span class="s2">"$env:UserProfile\skydrive\documents"</span>
+<span class="nb">Set-ExplorerOptions</span> <span class="n">-showHidenFilesFoldersDrives</span> <span class="n">-showProtectedOSFiles</span> <span class="n">-showFileExtensions</span>
+<span class="nb">Set-TaskbarSmall</span>
+<span class="nb">Enable-RemoteDesktop</span>
+
+<span class="n">cinstm</span> <span class="n">VisualStudio2012Ultimate</span>
+<span class="k">if</span><span class="p">((</span><span class="nb">Get-Item</span> <span class="s2">"</span><span class="si">$(</span><span class="err">$</span><span class="si">Boxstarter.programFiles86)</span><span class="s2">\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"</span><span class="p">).</span><span class="n">VersionInfo</span><span class="p">.</span><span class="n">ProductVersion</span> <span class="o">-lt</span> <span class="s2">"11.0.60115.1"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">Test-PendingReboot</span><span class="p">){</span><span class="nb">Invoke-Reboot</span><span class="p">}</span>
+    <span class="n">Install-ChocolateyPackage</span> <span class="s1">'vs update 2 ctp2'</span> <span class="s1">'exe'</span> <span class="s1">'/passive /norestart'</span> <span class="s1">'http://download.microsoft.com/download/8/9/3/89372D24-6707-4587-A7F0-10A29EECA317/vsupdate_KB2707250.exe'</span>
+<span class="p">}</span>
+<span class="n">cinstm</span> <span class="n">fiddler</span>
+<span class="n">cinstm</span> <span class="n">mssqlserver2012express</span>
+<span class="n">cinstm</span> <span class="n">git-credential-winstore</span>
+<span class="n">cinstm</span> <span class="n">console-devel</span>
+<span class="n">cinstm</span> <span class="n">sublimetext2</span>
+<span class="n">cinstm</span> <span class="n">skydrive</span>
+<span class="n">cinstm</span> <span class="n">poshgit</span>
+<span class="n">cinstm</span> <span class="n">resharper</span>
+<span class="n">cinstm</span> <span class="n">windbg</span>
+
+<span class="n">cinst</span> <span class="n">Microsoft-Hyper-V-All</span> <span class="n">-source</span> <span class="n">windowsFeatures</span>
+<span class="n">cinst</span> <span class="n">IIS-WebServerRole</span> <span class="n">-source</span> <span class="n">windowsfeatures</span>
+<span class="n">cinst</span> <span class="n">IIS-HttpCompressionDynamic</span> <span class="n">-source</span> <span class="n">windowsfeatures</span>
+<span class="n">cinst</span> <span class="n">IIS-ManagementScriptingTools</span> <span class="n">-source</span> <span class="n">windowsfeatures</span>
+<span class="n">cinst</span> <span class="n">IIS-WindowsAuthentication</span> <span class="n">-source</span> <span class="n">windowsfeatures</span>
+<span class="n">cinst</span> <span class="n">TelnetClient</span> <span class="n">-source</span> <span class="n">windowsFeatures</span>
+
+<span class="n">Install-ChocolateyPinnedTaskBarItem</span> <span class="s2">"$env:windir\system32\mstsc.exe"</span>
+<span class="n">Install-ChocolateyPinnedTaskBarItem</span> <span class="s2">"$env:programfiles\console\console.exe"</span>
+<span class="n">Install-ChocolateyPinnedTaskBarItem</span> <span class="s2">"$sublimeDir\sublime_text.exe"</span>
+
+<span class="n">Install-ChocolateyFileAssociation</span> <span class="s2">".txt"</span> <span class="s2">"$env:programfiles\Sublime Text 2\sublime_text.exe"</span>
+
+<span class="nb">copy-item</span> <span class="p">(</span><span class="nb">Join-Path</span> <span class="p">(</span><span class="nb">Get-PackageRoot</span><span class="p">(</span><span class="nv">$MyInvocation</span><span class="p">))</span> <span class="s1">'console.xml'</span><span class="p">)</span> <span class="n">-Force</span> <span class="nv">$env:appdata</span><span class="p">\</span><span class="n">console</span><span class="p">\</span><span class="n">console</span><span class="p">.</span><span class="n">xml</span>
+
+<span class="n">Install-ChocolateyVsixPackage</span> <span class="n">xunit</span> <span class="n">http</span><span class="err">:</span><span class="p">//</span><span class="n">visualstudiogallery</span><span class="p">.</span><span class="n">msdn</span><span class="p">.</span><span class="n">microsoft</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">463c5987-f82b</span><span class="p">-</span><span class="n">46c8-a97e-b1cde42b9099</span><span class="p">/</span><span class="n">file</span><span class="p">/</span><span class="n">66837</span><span class="p">/</span><span class="n">1</span><span class="p">/</span><span class="n">xunit</span><span class="p">.</span><span class="n">runner</span><span class="p">.</span><span class="n">visualstudio</span><span class="p">.</span><span class="n">vsix</span>
+<span class="n">Install-ChocolateyVsixPackage</span> <span class="n">autowrocktestable</span> <span class="n">http</span><span class="err">:</span><span class="p">//</span><span class="n">visualstudiogallery</span><span class="p">.</span><span class="n">msdn</span><span class="p">.</span><span class="n">microsoft</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">ea3a37c9</span><span class="p">-</span><span class="n">1c76</span><span class="p">-</span><span class="n">4628</span><span class="p">-</span><span class="n">803e-b10a109e7943</span><span class="p">/</span><span class="n">file</span><span class="p">/</span><span class="n">73131</span><span class="p">/</span><span class="n">1</span><span class="p">/</span><span class="n">AutoWrockTestable</span><span class="p">.</span><span class="n">vsix</span>
+</pre></div>
+
+<h2>Get-Help</h2>
+
+<p><a href="https://boxstarter.codeplex.com/Documentation">See the Documentation</a></p>
+
+<div class="highlight"><pre><span class="nb">Import-Module</span> <span class="n">Boxstarter</span><span class="p">.</span><span class="n">Chocolatey</span>
+<span class="nb">Get-Help</span> <span class="n">Boxstarter</span>
+</pre></div>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="http://www.mattwrock.com">Matt Wrock</a></p>
+        <p><a href="https://twitter.com/mwrockx" class="twitter-follow-button" data-show-count="false">Follow @mwrockx</a></p>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+        <p><small>Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-39271380-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>

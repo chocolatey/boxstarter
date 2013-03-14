@@ -2,25 +2,39 @@ TOPIC
 	About_Boxstarter_Logging
 
 SYNOPSIS
-	Describes how to the different Boxstarter Logging functions to log to the console, log file or both.
+	Describes how to the different Boxstarter Logging functions to log to 
+	the console, log file or both.
 
 DESCRIPTION
-	Boxstarter provides several logging logging functions to make it easy to deliver messages to script consumers and provide detailed debugging information to log files. Here is a description of each of these functions:
+	Boxstarter provides several logging logging functions to make it easy 
+	to deliver messages to script consumers and provide detailed debugging
+	information to log files. Here is a description of each of these 
+	functions:
 
 	Write-BoxstarterMessage
-		Writes a message to both the Boxstarter log file and to the screen. These messages are output in Green to make them stand out from other messages.
+		Writes a message to both the Boxstarter log file and to the screen. 
+		These messages are output in Green to make them stand out from 
+		other messages.
 
 	Log-BoxstarterMessage
-		Only writes a message to the Boxstarter log file. The message is not logged to the console.
+		Only writes a message to the Boxstarter log file. The message is 
+		not logged to the console.
 
 	Out-BoxtarterLog
-		This is identical to Write-BoxstarterMessage but the text written to the screen is not in green. It is formatted normally.
+		This is identical to Write-BoxstarterMessage but the text written 
+		to the screen is not in green. It is formatted normally.
 
 	Enter-BoxstarterLogable
-		This executes a script block and redirects the standard output stream and standard error stream to both the console and the Boxstarter log file. This is similar to Out-Boxstarterlog but it includes the output from standard command line utilities.
+		This executes a script block and redirects the standard output 
+		stream and standard error stream to both the console and the 
+		Boxstarter log file. This is similar to Out-Boxstarterlog but it 
+		includes the output from standard command line utilities.
 
 	Start-TimedSection and Stop-TimedSection
-		These functions surround all script in between the start and end functions with a header and footer message and time the script execution. The footer message includes the total elapsed time. These sections can be nested.
+		These functions surround all script in between the start and end 
+		functions with a header and footer message and time the script 
+		execution. The footer message includes the total elapsed time. 
+		These sections can be nested.
 
 SEE ALSO
 

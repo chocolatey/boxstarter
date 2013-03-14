@@ -1,5 +1,4 @@
 function Enter-BoxstarterLogable{
-    param([ScriptBlock] $script)
 <#
 .SYNOPSIS
 Logs the output and error streams of the script to the 
@@ -31,14 +30,12 @@ http://boxstarter.codeplex.com
 about_boxstarter_logging
 
 #>
+    param([ScriptBlock] $script)
+
     & ($script) 2>&1 | Out-BoxstarterLog
 }
 
 function Out-BoxstarterLog {
-    param(
-        [Parameter(position=0,Mandatory=$True,ValueFromPipeline=$True)]
-        [object]$object
-    )
 <#
 .SYNOPSIS
 Logs provided text or objects to the console and 
@@ -63,6 +60,11 @@ http://boxstarter.codeplex.com
 about_boxstarter_logging
 
 #>    
+    param(
+        [Parameter(position=0,Mandatory=$True,ValueFromPipeline=$True)]
+        [object]$object
+    )
+
     process {
         write-host $object
         if($Boxstarter -and $BoxStarter.Log){
