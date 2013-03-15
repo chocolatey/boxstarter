@@ -68,19 +68,13 @@
 <span class="nb">Set-TaskbarSmall</span>
 <span class="nb">Enable-RemoteDesktop</span>
 
-<span class="n">cinstm</span> <span class="n">VisualStudio2012Ultimate</span>
-<span class="k">if</span><span class="p">((</span><span class="nb">Get-Item</span> <span class="s2">"</span><span class="si">$(</span><span class="err">$</span><span class="si">Boxstarter.programFiles86)</span><span class="s2">\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"</span><span class="p">).</span><span class="n">VersionInfo</span><span class="p">.</span><span class="n">ProductVersion</span> <span class="o">-lt</span> <span class="s2">"11.0.60115.1"</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span><span class="p">(</span><span class="nb">Test-PendingReboot</span><span class="p">){</span><span class="nb">Invoke-Reboot</span><span class="p">}</span>
-    <span class="n">Install-ChocolateyPackage</span> <span class="s1">'vs update 2 ctp2'</span> <span class="s1">'exe'</span> <span class="s1">'/passive /norestart'</span> <span class="s1">'http://download.microsoft.com/download/8/9/3/89372D24-6707-4587-A7F0-10A29EECA317/vsupdate_KB2707250.exe'</span>
-<span class="p">}</span>
+<span class="n">cinstm</span> <span class="n">VisualStudioExpress2012Web</span>
 <span class="n">cinstm</span> <span class="n">fiddler</span>
 <span class="n">cinstm</span> <span class="n">mssqlserver2012express</span>
 <span class="n">cinstm</span> <span class="n">git-credential-winstore</span>
 <span class="n">cinstm</span> <span class="n">console-devel</span>
-<span class="n">cinstm</span> <span class="n">sublimetext2</span>
 <span class="n">cinstm</span> <span class="n">skydrive</span>
 <span class="n">cinstm</span> <span class="n">poshgit</span>
-<span class="n">cinstm</span> <span class="n">resharper</span>
 <span class="n">cinstm</span> <span class="n">windbg</span>
 
 <span class="n">cinst</span> <span class="n">Microsoft-Hyper-V-All</span> <span class="n">-source</span> <span class="n">windowsFeatures</span>
@@ -92,9 +86,6 @@
 
 <span class="n">Install-ChocolateyPinnedTaskBarItem</span> <span class="s2">"$env:windir\system32\mstsc.exe"</span>
 <span class="n">Install-ChocolateyPinnedTaskBarItem</span> <span class="s2">"$env:programfiles\console\console.exe"</span>
-<span class="n">Install-ChocolateyPinnedTaskBarItem</span> <span class="s2">"$sublimeDir\sublime_text.exe"</span>
-
-<span class="n">Install-ChocolateyFileAssociation</span> <span class="s2">".txt"</span> <span class="s2">"$env:programfiles\Sublime Text 2\sublime_text.exe"</span>
 
 <span class="nb">copy-item</span> <span class="p">(</span><span class="nb">Join-Path</span> <span class="p">(</span><span class="nb">Get-PackageRoot</span><span class="p">(</span><span class="nv">$MyInvocation</span><span class="p">))</span> <span class="s1">'console.xml'</span><span class="p">)</span> <span class="n">-Force</span> <span class="nv">$env:appdata</span><span class="p">\</span><span class="n">console</span><span class="p">\</span><span class="n">console</span><span class="p">.</span><span class="n">xml</span>
 
