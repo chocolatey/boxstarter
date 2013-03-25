@@ -16,7 +16,7 @@ If any update requires a eula acceptance, setting this switch will accept the eu
 Setting this switch will suppress a reboot in the event that any update requires one.
 
 .PARAMETER Criteria
-The criteria used for searching updates. The default criteria is "BrowseOnly=0 and IsAssigned=1 and IsHidden=0 and IsInstalled=0 and Type='Software'" which is effectively just critical updates.
+The criteria used for searching updates. The default criteria is "IsHidden=0 and IsInstalled=0 and Type='Software'" which is effectively just critical updates.
 
 .LINK
 http://boxstarter.codeplex.com
