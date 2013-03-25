@@ -24,11 +24,11 @@ A Boxstarter Module has been added to your Module path.
 You will need to open a new console for the path to be visible.
 Use 'Get-Module Boxstarter.* -ListAvailable' to list all Boxstarter Modules.
 To list all available Boxstarter Commands, use:
-PS:>Import-Module Boxstarter.*
+PS:>Get-Module Boxstarter.* | % { Import-Module $_ }
 PS:>Get-Command -Module Boxstarter.*
 
 To find more info visit http://Boxstarter.Codeplex.com or use:
-PS:>Import-Module Boxstarter.*
+PS:>Get-Module Boxstarter.* | % { Import-Module $_ }
 PS:>Get-Help Boxstarter
 "@
     Write-BoxstarterMessage $successMsg
