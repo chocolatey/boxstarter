@@ -1,4 +1,4 @@
-function Install-Boxstarter($here) {
+function Install-Boxstarter($here, $ModuleName) {
     $boxstarterPath=Join-Path $env:AppData Boxstarter
     if(!(test-Path $boxstarterPath)){
         mkdir $boxstarterPath
@@ -24,11 +24,11 @@ A Boxstarter Module has been added to your Module path.
 You will need to open a new console for the path to be visible.
 Use 'Get-Module Boxstarter.* -ListAvailable' to list all Boxstarter Modules.
 To list all available Boxstarter Commands, use:
-PS:>Get-Module Boxstarter.* | % { Import-Module $_ }
+PS:>Import-Module $ModuleName
 PS:>Get-Command -Module Boxstarter.*
 
 To find more info visit http://Boxstarter.Codeplex.com or use:
-PS:>Get-Module Boxstarter.* | % { Import-Module $_ }
+PS:>Import-Module $ModuleName
 PS:>Get-Help Boxstarter
 "@
     Write-BoxstarterMessage $successMsg
