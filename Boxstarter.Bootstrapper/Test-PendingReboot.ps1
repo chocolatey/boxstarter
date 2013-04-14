@@ -22,7 +22,7 @@ Invoke-Reboot
 about_boxstarter_bootstrapper
 
 #>
-    $rebootPending = Get-PendingReboot -ErrorLog $BoxStarter.ErrorLog | out-null
+    $rebootPending = Get-PendingReboot -ErrorLog $BoxStarter.Log
     if($rebootPending.RebootPending) {
         Write-BoxstarterMessage "Detected Pending reboot"
         return $true
