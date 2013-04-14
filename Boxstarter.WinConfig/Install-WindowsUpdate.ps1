@@ -74,7 +74,16 @@ http://boxstarter.codeplex.com
             $installSession=Start-TimedSection "Installing Updates"
             Out-BoxstarterLog "This may take several minutes..."
                 $Installer.updates = $UpdatesToInstall
-                $result = $Installer.Install()
+                try { $result = $Installer.Install() } catch {
+                    # Check for WU_E_INSTALL_NOT_ALLOWED  
+                    if($_.Exception.HResult -eq -2146233087) {
+                        Out-BoxstarterLog "You either do not have rights or there is a pending reboot blocking the install."
+                        Out-BoxstarterLog "If you are using the Bootstrapper or Chocolatey module, try using:"
+                        Out-BoxstarterLog "if(Test-PendingReboot){Invoke-Reboot}"
+                        Out-BoxstarterLog "This will perform a reboot if reboots are pending."
+                    }
+                    throw
+                }
 
                 if($result.rebootRequired) {
                     if($SuppressReboots) {
