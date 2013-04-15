@@ -1,3 +1,3 @@
 function Restart-Explorer {
-    Stop-Process -processname explorer -Force | Out-Null
+    try{Stop-Process -processname explorer -Force -ErrorAction Stop | Out-Null} catch {}
 }

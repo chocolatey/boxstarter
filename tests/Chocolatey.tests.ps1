@@ -11,6 +11,8 @@ Resolve-Path $here\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 Intercept-Chocolatey
 
+function DISM { return; }
+
 Describe "Getting Chocolatey" {
     Context "When a reboot is pending and reboots are ok" {
         Mock Call-Chocolatey
@@ -89,4 +91,29 @@ Describe "Getting Chocolatey" {
             Assert-MockCalled Invoke-Reboot -times 0
         }
     }
+
+    Context "When WindowsFeature is already installed" {
+        Mock Test-PendingReboot {return $false}
+        Mock Invoke-Reboot
+        Mock Call-Chocolatey
+        Mock DISM {"State : Enabled"}
+        
+        Chocolatey Install "somefeature" -source "WindowsFeatures"
+
+        it "will not Call Chocolatey" {
+            Assert-MockCalled Call-Chocolatey -times 0
+        }
+    }   
+
+        Context "When WindowsFeature is not already installed" {
+        Mock Test-PendingReboot {return $false}
+        Mock Invoke-Reboot
+        Mock Call-Chocolatey
+        
+        Chocolatey Install "somefeature" -source "WindowsFeatures"
+
+        it "will Call Chocolatey" {
+            Assert-MockCalled Call-Chocolatey
+        }
+    }     
 }

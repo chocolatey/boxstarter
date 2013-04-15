@@ -35,6 +35,14 @@ Intercepts Chocolatey call to check for reboots
 
 #>  
     param($RebootCodes=@(3010))
+    if($source -eq "WindowsFeatures"){
+        $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
+        if($dismInfo -contains "State : Enabled" -or $dismInfo -contains "State : Enable Pending") {
+            Write-BoxstarterMessage "$packageName is already installed"
+            return
+        }
+    }
+
     if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
     $global:error.Clear()
     Call-Chocolatey @PSBoundParameters
