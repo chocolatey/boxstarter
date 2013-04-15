@@ -73,12 +73,12 @@ Invoke-Reboot
         write-BoxstarterMessage "Boxstarter Version $($boxMod.ModuleVersion)" -nologo
         write-BoxstarterMessage "$($boxMod.Copyright) http://boxstarter.codeplex.com" -nologo
         $session=Start-TimedSection "Installation session."
-        Stop-UpdateServices
         if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
         $script:BoxstarterPassword=InitAutologon $password
         $script:BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         if(Test-ReEnableUAC) {Enable-UAC}
+        Stop-UpdateServices
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
     }
     catch {
