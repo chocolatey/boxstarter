@@ -25,6 +25,7 @@ about_boxstarter_bootstrapper
     $rebootPending = Get-PendingReboot -ErrorLog $BoxStarter.Log
     if($rebootPending.RebootPending) {
         Write-BoxstarterMessage "Detected Pending reboot"
+        Log-BoxstarterMessage "$rebootPending"
         return $true
     }
     return IsCCMRebootPending
