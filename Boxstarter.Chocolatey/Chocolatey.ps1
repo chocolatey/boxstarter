@@ -106,7 +106,7 @@ function Intercept-Chocolatey {
 
 function Add-DefaultRebootCodes($codes) {
     if($codes -eq $null){$codes=@()}
-    $codes += 3010
-    $codes += -2067919934
+    $codes += 3010 #common MSI reboot needed code
+    $codes += -2067919934 #returned by sql server when it needs a reboot
     return $codes
 }
