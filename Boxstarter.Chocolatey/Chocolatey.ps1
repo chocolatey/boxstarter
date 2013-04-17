@@ -4,7 +4,7 @@ function cinst {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param($RebootCodes=@(3010))
+    param($RebootCodes=@(3010, -2067919934))
     chocolatey Install @PSBoundParameters
 }
 
@@ -14,7 +14,7 @@ function cup {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param($RebootCodes=@(3010))
+    param($RebootCodes=@(3010, -2067919934))
     chocolatey Update @PSBoundParameters
 }
 
@@ -24,7 +24,7 @@ function cinstm {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param($RebootCodes=@(3010))
+    param($RebootCodes=@(3010, -2067919934))
     chocolatey InstallMissing @PSBoundParameters
 }
 
@@ -34,7 +34,7 @@ function chocolatey {
 Intercepts Chocolatey call to check for reboots
 
 #>  
-    param($RebootCodes=@(3010))
+    param($RebootCodes=@(3010, -2067919934))
     if($source -eq "WindowsFeatures"){
         $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
         if($dismInfo -contains "State : Enabled" -or $dismInfo -contains "State : Enable Pending") {
