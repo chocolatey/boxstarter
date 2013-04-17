@@ -6,7 +6,8 @@ param (
 $here = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 if($ChocoPath){
     $ChocoPath=$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($ChocoPath)
-    [Environment]::SetEnvironmentVariable($ChocolateyInstall, $ChocoPath, [System.EnvironmentVariableTarget]::User)
+    Write-Output "Setting ChocolateyInstall to $ChocoPath"
+    [Environment]::SetEnvironmentVariable("ChocolateyInstall", $ChocoPath, [System.EnvironmentVariableTarget]::User)
     $env:ChocolateyInstall=$ChocoPath
 }
 if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
