@@ -5,7 +5,9 @@ param (
 )
 $here = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 if($ChocoPath){
-    $env:ChocolateyInstall=$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($ChocoPath)
+    $ChocoPath=$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($ChocoPath)
+    [Environment]::SetEnvironmentVariable($ChocolateyInstall, $ChocoPath, [System.EnvironmentVariableTarget]::User)
+    $env:ChocolateyInstall=$ChocoPath
 }
 if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
     iex ((new-object net.webclient).DownloadString("http://bit.ly/psChocInstall"))
