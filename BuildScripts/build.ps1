@@ -1,9 +1,12 @@
 param (
     [string]$Action="default",
+    [string]$ChocoPath,
     [switch]$Help
 )
 $here = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-
+if($ChocoPath){
+    $env:ChocolateyInstall=$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($ChocoPath)
+}
 if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
     iex ((new-object net.webclient).DownloadString("http://bit.ly/psChocInstall"))
 }

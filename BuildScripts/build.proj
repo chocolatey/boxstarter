@@ -8,6 +8,6 @@
   </PropertyGroup>
 
   <Target Name="Go">
-    <Exec Command="cmd /c $(baseDir)..\Build.Bat" />
+    <Exec Command="cmd /c $(baseDir)..\Build.Bat -ChocoPath Chocolatey" />
   </Target>
 </Project>
