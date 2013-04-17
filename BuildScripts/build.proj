@@ -1,0 +1,14 @@
+<Project ToolsVersion="4.0"
+         DefaultTargets="Go"
+         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration>Release</Configuration>
+    <Platform>Any CPU</Platform>
+    <BuildDirectory>BuildArtifacts</BuildDirectory>
+    <BuildPath>$(MSBuildProjectDirectory)\$(BuildDirectory)</BuildPath>
+  </PropertyGroup>
+
+  <Target Name="Go">
+    <Exec Command="cmd /c $(baseDir)Build.Bat" />
+  </Target>
+</Project>
