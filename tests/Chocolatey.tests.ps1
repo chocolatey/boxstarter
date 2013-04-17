@@ -79,6 +79,24 @@ Describe "Getting Chocolatey" {
         }
     }
 
+    Context "When chocolatey writes a negative reboot error and reboots are ok" {
+        Mock Test-PendingReboot {return $false}
+        $boxstarter.RebootOk=$true
+        Mock Remove-Item
+        Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
+        Mock Invoke-Reboot
+        Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '-654'." 2>&1 | out-null}
+        
+        Chocolatey Install pkg -RebootCodes @(56,3010,-654)
+
+        it "will Invoke-Reboot" {
+            Assert-MockCalled Invoke-Reboot -times 1
+        }
+        it "will delete package folder" {
+            Assert-MockCalled Remove-Item -parameterFilter {$path -eq "dir2"}
+        }
+    }
+
     Context "When chocolatey writes a error that is not a reboot error" {
         Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true

@@ -47,7 +47,7 @@ Intercepts Chocolatey call to check for reboots
     $global:error.Clear()
     Call-Chocolatey @PSBoundParameters
     if($Boxstarter.rebootOk -and $global:error.count -gt 0) {
-        if ($global:error[$global:error.count-1] -match "code was '(\d+)'") {
+        if ($global:error[$global:error.count-1] -match "code was '(-?\d+)'") {
             $errorCode=$matches[1]
             if($RebootCodes -contains $errorCode) {
                 Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code"
