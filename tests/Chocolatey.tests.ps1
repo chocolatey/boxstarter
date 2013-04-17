@@ -97,6 +97,24 @@ Describe "Getting Chocolatey" {
         }
     }
 
+    Context "When user specifies a reboot code" {
+        Mock Test-PendingReboot {return $false}
+        $boxstarter.RebootOk=$true
+        Mock Remove-Item
+        Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
+        Mock Invoke-Reboot
+        Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '3010'." 2>&1 | out-null}
+        
+        Chocolatey Install pkg -RebootCodes @(56,-654)
+
+        it "will Invoke-Reboot when a default code is called too" {
+            Assert-MockCalled Invoke-Reboot -times 1
+        }
+        it "will delete package folder when a default code is called too" {
+            Assert-MockCalled Remove-Item -parameterFilter {$path -eq "dir2"}
+        }
+    }
+
     Context "When chocolatey writes a error that is not a reboot error" {
         Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true

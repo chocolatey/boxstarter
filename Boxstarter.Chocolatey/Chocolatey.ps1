@@ -4,7 +4,7 @@ function cinst {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param($RebootCodes=@(3010, -2067919934))
+    param([int[]]$RebootCodes)
     chocolatey Install @PSBoundParameters
 }
 
@@ -14,7 +14,7 @@ function cup {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param($RebootCodes=@(3010, -2067919934))
+    param([int[]]$RebootCodes)
     chocolatey Update @PSBoundParameters
 }
 
@@ -24,7 +24,7 @@ function cinstm {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param($RebootCodes=@(3010, -2067919934))
+    param([int[]]$RebootCodes)
     chocolatey InstallMissing @PSBoundParameters
 }
 
@@ -34,7 +34,8 @@ function chocolatey {
 Intercepts Chocolatey call to check for reboots
 
 #>  
-    param($RebootCodes=@(3010, -2067919934))
+    param([int[]]$RebootCodes)
+    $RebootCodes=Add-DefaultRebootCodes $RebootCodes
     if($source -eq "WindowsFeatures"){
         $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
         if($dismInfo -contains "State : Enabled" -or $dismInfo -contains "State : Enable Pending") {
@@ -101,4 +102,11 @@ function Intercept-Chocolatey {
     Intercept-Command chocolatey
     Intercept-Command call-chocolatey
     $Script:BoxstarterIntrercepting=$true
+}
+
+function Add-DefaultRebootCodes($codes) {
+    if($codes -eq $null){$codes=@()}
+    $codes += 3010
+    $codes += -2067919934
+    return $codes
 }
