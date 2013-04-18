@@ -4,7 +4,7 @@ function cinst {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param([int[]]$RebootCodes)
+    param([int[]]$RebootCodes=@())
     chocolatey Install @PSBoundParameters
 }
 
@@ -14,7 +14,7 @@ function cup {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param([int[]]$RebootCodes)
+    param([int[]]$RebootCodes=@())
     chocolatey Update @PSBoundParameters
 }
 
@@ -24,7 +24,7 @@ function cinstm {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param([int[]]$RebootCodes)
+    param([int[]]$RebootCodes=@())
     chocolatey InstallMissing @PSBoundParameters
 }
 
@@ -34,7 +34,7 @@ function chocolatey {
 Intercepts Chocolatey call to check for reboots
 
 #>  
-    param([int[]]$RebootCodes)
+    param([int[]]$RebootCodes=@())
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
     if($source -eq "WindowsFeatures"){
         $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
@@ -45,7 +45,6 @@ Intercepts Chocolatey call to check for reboots
     }
 
     if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
-    $global:error.Clear()
     try {Call-Chocolatey @PSBoundParameters}catch { $ex=$_}
     if($Boxstarter.rebootOk -and $global:error.count -gt 0) {
         if ($ex -ne $null -and ($ex -match "code was '(-?\d+)'")) {

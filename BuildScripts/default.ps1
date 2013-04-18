@@ -20,7 +20,9 @@ Task Package -depends Version-Module, Pack-Nuget -description 'Versions the psd1
 
 Task Test {
     pushd "$baseDir"
-    exec {."$env:ChocolateyInstall\lib\Pester.1.2.1\tools\bin\Pester.bat" $baseDir/Tests -DisableLegacyExpectations}
+    $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
+    if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}
+    exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests }
     popd
 }
 

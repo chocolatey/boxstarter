@@ -46,10 +46,10 @@ Describe "Invoke-BoxstarterBuild" {
         New-BoxstarterPackage $packageName
         $boxstarter.LocalRepo = $null
 
-        try {Invoke-BoxstarterBuild $packageName} catch { $exception=$_ }
+        try {Invoke-BoxstarterBuild $packageName} catch { $ex=$_ }
 
         It "Will throw LocalRepo is null" {
-            $exception | Should match "No Local Repository has been set*"
+            $ex | Should match "No Local Repository has been set*"
         }
         $Boxstarter.LocalRepo=Join-Path $boxstarter.BaseDir "repo"
     }
@@ -58,10 +58,10 @@ Describe "Invoke-BoxstarterBuild" {
         Mock Check-Chocolatey
         Mkdir $Boxstarter.LocalRepo | Out-Null
 
-        try {Invoke-BoxstarterBuild $packageName} catch { $exception=$_ }
+        try {Invoke-BoxstarterBuild $packageName} catch { $ex=$_ }
 
         It "Will throw No Nuspec" {
-            $exception | Should be "Cannot find nuspec for $packageName"
+            $ex | Should be "Cannot find nuspec for $packageName"
         }
     }
 
@@ -70,10 +70,10 @@ Describe "Invoke-BoxstarterBuild" {
         Mkdir (Join-Path $Boxstarter.LocalRepo "pkg1") | Out-Null
         Mkdir (Join-Path $Boxstarter.LocalRepo "pkg2") | Out-Null
 
-        try {Invoke-BoxstarterBuild -all} catch { $exception=$_ }
+        try {Invoke-BoxstarterBuild -all} catch { $ex=$_ }
 
         It "Will throw No Nuspec" {
-            $exception | Should be "Cannot find nuspec for pkg1"
+            $ex | Should be "Cannot find nuspec for pkg1"
         }
     }
 }

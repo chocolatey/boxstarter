@@ -33,6 +33,7 @@ $Boxstarter.BaseDir=(split-path -parent $here)
 $Boxstarter.SuppressLogging=$true
 Resolve-Path $here\..\boxstarter.chocolatey\*.ps1 | 
     % { . $_.ProviderPath }    
+Intercept-Chocolatey
 
 Describe "Invoke-ChocolateyBoxstarter" {
     Context "When not invoked via boxstarter" {

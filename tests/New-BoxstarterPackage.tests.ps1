@@ -109,20 +109,20 @@ Describe "New-BoxstarterPackage" {
         Mock Check-Chocolatey
         $boxstarter.LocalRepo = $null
 
-        try {New-BoxstarterPackage $packageName $Description} catch { $exception=$_ }
+        try {New-BoxstarterPackage $packageName $Description} catch { $ex=$_ }
 
         It "Will throw LocalRepo is null" {
-            $exception | Should match "No Local Repository has been set*"
+            $ex | Should match "No Local Repository has been set*"
         }
         $Boxstarter.LocalRepo=Join-Path $boxstarter.BaseDir "repo"
     }
 
     Context "When a package name is not valid" {
         Mock Check-Chocolatey
-        try {New-BoxstarterPackage "my: invalid name" $Description} catch { $exception=$_ }
+        try {New-BoxstarterPackage "my: invalid name" $Description} catch { $ex=$_ }
 
         It "Will throw Invalid Package ID" {
-            $exception | Should match "Invalid Package ID"
+            $ex | Should match "Invalid Package ID"
         }
     } 
 
@@ -130,20 +130,20 @@ Describe "New-BoxstarterPackage" {
         Mock Check-Chocolatey
         mkdir (Join-Path $boxstarter.LocalRepo $packageName) |out-null
 
-        try {New-BoxstarterPackage $packageName $Description} catch { $exception=$_ }
+        try {New-BoxstarterPackage $packageName $Description} catch { $ex=$_ }
 
         It "Will throw Repo dir exists" {
-            $exception | Should match "A local Repo already exists*"
+            $ex | Should match "A local Repo already exists*"
         }
     }    
 
     Context "When a path is provided that does not exist" {
         Mock Check-Chocolatey
 
-        try {New-BoxstarterPackage $packageName $Description (Join-Path $boxstarter.BaseDir "mypkg") } catch { $exception=$_ }
+        try {New-BoxstarterPackage $packageName $Description (Join-Path $boxstarter.BaseDir "mypkg") } catch { $ex=$_ }
 
         It "Will throw path does not exist" {
-            $exception.exception.Message.EndsWith("could not be found") | Should be $true
+            $ex.exception.Message.EndsWith("could not be found") | Should be $true
         }
     }    
 }

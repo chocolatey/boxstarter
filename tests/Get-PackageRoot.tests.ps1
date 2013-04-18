@@ -21,10 +21,10 @@ Describe "Get-PackageRoot" {
         $install = Join-Path $testRoot "Install.ps1"
         New-Item $install -type file -value "return Get-PackageRoot `$MyInvocation" | Out-Null
 
-        try {& $install} catch { $exception=$_ }
+        try {& $install -ErrorAction Stop} catch { $ex=$_ }
 
         It "Should throw"{
-            $exception | should not be $null
+            $ex | should not be $null
         }
     }
 }

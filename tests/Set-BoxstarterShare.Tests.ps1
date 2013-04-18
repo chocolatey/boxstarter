@@ -55,10 +55,10 @@ Describe "Set-BoxstarterShare" {
         $Boxstarter.BaseDir="$testRoot\Boxstarter"
         Net share Boxstarter="$($Boxstarter.BaseDir)"
         
-        try {Set-BoxstarterShare} catch{$exception=$_}
+        try {Set-BoxstarterShare} catch{$ex=$_}
 
         It "Should throw exception"{
-            $exception | should not be $null
+            $ex | should not be $null
         }
         net share Boxstarter /delete
     }
