@@ -67,7 +67,7 @@ Describe "Getting Chocolatey" {
         Mock Remove-Item
         Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
         Mock Invoke-Reboot
-        Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '3010'." 2>&1 | out-null}
+        Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'."}
         
         Chocolatey Install pkg -RebootCodes @(56,3010,654)
 
@@ -85,7 +85,7 @@ Describe "Getting Chocolatey" {
         Mock Remove-Item
         Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
         Mock Invoke-Reboot
-        Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '-654'." 2>&1 | out-null}
+        Mock Call-Chocolatey {throw "[ERROR] Exit code was '-654'."}
         
         Chocolatey Install pkg -RebootCodes @(56,3010,-654)
 
@@ -103,7 +103,7 @@ Describe "Getting Chocolatey" {
         Mock Remove-Item
         Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
         Mock Invoke-Reboot
-        Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '3010'." 2>&1 | out-null}
+        Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'." }
         
         Chocolatey Install pkg -RebootCodes @(56,-654)
 
