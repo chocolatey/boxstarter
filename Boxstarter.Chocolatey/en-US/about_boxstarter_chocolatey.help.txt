@@ -7,26 +7,26 @@ SYNOPSIS
 
 DESCRIPTION
 	Boxstarter's Chocolatey module compliments the Boxstarter Bootstrap 
-	module by augmenting its unnatended script execution environment 
+	module by augmenting its unattended script execution environment 
 	with Chocolatey goodness making it easy to setup a new box with 
 	Chocolatey packages.
 
 Installing Chocolatey
 	Boxstarter will check to ensure if Chocolatey is installed. If 
-	chocolatey is not installed it will install it before running any 
-	Chocolatey commands. Boxstarter will also check t see if the .net 
-	4.0 framework is installed before installing Chocolatey since the 
-	.net 4 runtime is a prerequisite.
+	Chocolatey is not installed it will install it before running any 
+	Chocolatey commands. Boxstarter will also check to see if the .Net 
+	4.0 Framework is installed before installing Chocolatey since the 
+	.Net 4 runtime is a prerequisite.
 
 Chocolatey Boxstarter Packages
 	When calling Invoke-ChocolateyBoxstarter or just Boxstarter, a 
 	BootstrapperPackage name must be passed to the command. This is a 
-	special Chocolatey package provided by te user that boxstarter asks 
+	special Chocolatey package provided by the user that boxstarter asks 
 	Chocolatey to install and it contains the script that is intended to 
 	install all the applications and settings the user wants setup on the 
 	local machine.
 
-	This package script has access to all of the chocolatey helper 
+	This package script has access to all of the Chocolatey helper 
 	functions as well as all Boxstarter logging, WinConfig and 
 	Bootstrapper commands. See About_Boxstarter_Bootstrapper and 
 	About_Boxstarter_Logging for information regarding those comands.
@@ -44,9 +44,9 @@ Creating Packages
 Consuming Boxstarter Packages
 	The primary gateway to kicking off a Boxstarter.Chocolatey installation 
 	session is Invoke-ChocolateyBoxstarter. While you may use this 
-	powershell function, you can also call Boxstarter.Bat which takes the 
-	exact same parameters as Invoke-CocolateyBoxstarter. If you instaled 
-	Boxstarter.Chocolatey via Chocolatey of the setup.bat installer, 
+	powershell function, you can also call Boxstarter.bat which takes the 
+	exact same parameters as Invoke-CocolateyBoxstarter. If you installed 
+	Boxstarter.Chocolatey via Chocolatey or the setup.bat installer, 
 	boxstarter.bat is placed in your path. Boxstarter.bat will import the 
 	Boxstarter.Chocolatey module and create a powershell session bypassing 
 	ExecutionPolicy. Boxstarter.bat is ideal for calling Boxstarter 
@@ -63,22 +63,22 @@ Package Sources
 	directory ($Boxstarter.BaseDir). You can change the default by adding a 
 	LocalRepo setting to $($Boxstarter.BaseDir)\Boxstarter.Config.
 
-	- Chocolatey.Org: The public chocolatey feed at http://chocolatey.org/api/v2
+	- Chocolatey.org: The public chocolatey feed at http://chocolatey.org/api/v2
 
 	- Myget: The Boxstarter Community Feed at http://www.myget.org/F/boxstarter/api/v2
 
-	The last two remote sorces can be configured by editing 
+	The last two remote sources can be configured by editing 
 	$($Boxstarter.BaseDir)\Boxstarter.Config.
 
 Reboot detection
 	Perhaps the most compelling feature of Boxstarter is its way to handle 
 	reboots during an involved environment setup package. Especially when 
 	you are running patches, installing services and downloading complex 
-	applications. Boxstarter intercepts all calls to chocolatey install 
+	applications. Boxstarter intercepts all calls to Chocolatey install 
 	commands and checks for pending reboots prior to calling Chocolatey. If 
-	a pending reboot exists, Boxstarter reboots the machine and automtically
+	a pending reboot exists, Boxstarter reboots the machine and automatically
 	logs on with the credentials you provided providing an unattended 
-	installation session. After the chocolatey package completes, if the 
+	installation session. After the Chocolatey package completes, if the 
 	package fails and returns the common MSI reboot needed exit code of 
 	3010, Boxstarter will reboot which will likely cause the package to 
 	succeed on the next run. See about_boxstarter_bootstrapper for more 
@@ -86,9 +86,9 @@ Reboot detection
 	invoke them.
 
 Package Authoring Considerations
-	Boxstarter can run any chocolatey package and any valid powershell 
-	inside that package. However there are a few things to consider 
-	that may make a Boxstarter chocolatey package a better installation 
+	Boxstarter can run any Chocolatey package and any valid powershell 
+	inside that package. However, there are a few things to consider 
+	that may make a Boxstarter Chocolatey package a better installation 
 	experience.
 
 	- Boxstarter Chocolatey packages should be repeatable. This is 
@@ -97,11 +97,11 @@ Package Authoring Considerations
 	that there is nothing that would cause the package to break if run 
 	twice.
 
-	- If you have several chocolatey packages that you want to install 
+	- If you have several Chocolatey packages that you want to install 
 	during the Boxstarter session, it is preferable to call CINST 
 	directly from inside your ChocolateyInstall instead of declaring 
 	them as dependencies. This is because Boxstarter cannot intercept 
-	chocolatey dependencies so those packages will not have any reboot 
+	Chocolatey dependencies so those packages will not have any reboot 
 	protections.
 
 SEE ALSO
