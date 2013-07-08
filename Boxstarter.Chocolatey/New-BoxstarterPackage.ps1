@@ -88,4 +88,7 @@ try {
         new-Item "tools\ChocolateyInstall.ps1" -type file -value $installScript| out-null
     }
     Popd
+
+    Write-Host "A new Chocolatey package has been created at $pkgDir."
+    Write-Host "You may now edit the files in this package and build the final .nupkg using Invoke-BoxstarterBuild."
 }
