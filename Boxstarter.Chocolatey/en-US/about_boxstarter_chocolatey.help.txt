@@ -60,8 +60,8 @@ Package Sources
 
 	- $Boxstarter.LocalRepo: This is the local repository that by default is
 	in the BuildPackages directory in the Boxstarter Base Boxstarter Module 
-	directory ($Boxstarter.BaseDir). You can change the default by adding a 
-	LocalRepo setting to $($Boxstarter.BaseDir)\Boxstarter.Config.
+	directory ($Boxstarter.BaseDir). You can change the default by using the
+	Set-BoxstarterConfig function with the -LocalRepo argument.
 
 	- Chocolatey.Org: The public chocolatey feed at http://chocolatey.org/api/v2
 
@@ -117,3 +117,4 @@ SEE ALSO
 	about_boxstarter_variable_in_bootstrapper
 	about_boxstarter_logging
 	about_boxstarter_variable_in_chocolatey
+	Set-BoxstarterConfig

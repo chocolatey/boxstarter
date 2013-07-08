@@ -34,7 +34,7 @@ This essentially wraps Chocolatey Install and provides these additional features
 This is the path to the local boxstarter repository where boxstarter 
 should look for .nupkg files to install. By default this is located 
 in the BuildPackages directory just under the root Boxstarter 
-directory.
+directory but can be changed with Set-BoxstarterConfig.
 
 .PARAMETER DisableReboots
 If set, reboots are subbressed.
@@ -59,6 +59,7 @@ directory.
 http://boxstarter.codeplex.com
 about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey
+Set-BoxstarterConfig
 #>    
     [CmdletBinding()]
     param(
