@@ -1,12 +1,8 @@
-if($Boxstarter.Config.LocalRepo -ne $null){
-    $BoxStarter.LocalRepo=$Boxstarter.Config.LocalRepo
-} else {
-    if($Boxstarter.baseDir){
-        $Boxstarter.localRepo=(Join-Path $Boxstarter.baseDir BuildPackages)
-    }
-}
-$Boxstarter.NugetSources=$Boxstarter.Config.NugetSources
+$config = Get-BoxstarterConfig
+$BoxStarter.LocalRepo=$config.LocalRepo
+$Boxstarter.NugetSources=$config.NugetSources
 $Boxstarter.RebootOk=$true
+
 function Invoke-ChocolateyBoxstarter{
 <#
 .SYNOPSIS
@@ -102,7 +98,7 @@ function Download-Package([string]$bootstrapPackage) {
     if(test-path (Join-Path $Boxstarter.LocalRepo "$bootstrapPackage.*.nupkg")){
         $source = $Boxstarter.LocalRepo
     } else {
-        $source = $Boxstarter.Config.NugetSources
+        $source = (Get-BoxstarterConfig).NugetSources
     }
     write-BoxstarterMessage "Installing $bootstrapPackage package from $source"
     Chocolatey install $bootstrapPackage -source $source -force
