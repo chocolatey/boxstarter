@@ -37,7 +37,8 @@ BOXSTARTER VARIABLE SETTINGS
 		The Nuget feeds that Boxstarter checks for the Boxstarter 
 		Bootstrap package. By default this is the chocolatey and 
 		Myget Boxstarter community feed. This can be changed by 
-		editing $($Boxstarter.BaseDir)\Boxstarter.Config.
+		using the Set-BoxstarterConfig function with the -NugetSources 
+		argument.
 
 SEE ALSO
 	http://boxstarter.codeplex.com
