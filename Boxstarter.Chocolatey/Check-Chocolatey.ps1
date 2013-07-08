@@ -23,7 +23,7 @@ function Enable-Net40 {
         $session=Start-TimedSection "Download and install .NET 4.0 Framework"
         $env:chocolateyPackageFolder="$env:temp\chocolatey\webcmd"
         Install-ChocolateyZipPackage 'webcmd' 'http://www.iis.net/community/files/webpi/webpicmdline_anycpu.zip' $env:temp
-        .$env:temp\WebpiCmdLine.exe /products: NetFramework4 /accepteula
+        .$env:temp\WebpiCmdLine.exe /products: NetFramework4 /SuppressReboot /accepteula
         Stop-TimedSection $session
     }
 }
