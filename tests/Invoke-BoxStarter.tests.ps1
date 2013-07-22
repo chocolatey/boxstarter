@@ -241,6 +241,19 @@ Describe "Invoke-Boxstarter" {
         }
     }
 
+    Context "When Not Running As Admin and passing a password arg" {
+        Mock Test-Admin {return $false}
+        Mock Start-Process
+        Mock Stop-UpdateServices
+        $securePassword = (ConvertTo-SecureString "mypassword" -asplaintext -force)
+
+        Invoke-Boxstarter {return} -password $securePassword
+
+        it "will pass password to elevated console encryptedPassword arg"{
+            Assert-MockCalled Start-Process -ParameterFilter {$argumentlist -like "*-encryptedPassword *"}
+        }
+    }
+
     Context "When rebooting and No Password is set" {
         Mock Test-Admin {return $true}
         Mock Set-SecureAutoLogon

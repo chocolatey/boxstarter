@@ -56,14 +56,19 @@ Invoke-Reboot
     param(
       [ScriptBlock]$ScriptToCall,
       [System.Security.SecureString]$password,
-      [switch]$RebootOk
+      [switch]$RebootOk,
+      [string]$encryptedPassword=$null
     )
     $scriptFile = "$env:temp\boxstarter.script"
     if(!(Test-Admin)) {
         New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | out-null
         Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate..."
         $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psd1")
-        $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($unNormalized.FullName)`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'})"
+        if($password){ 
+            $encryptedPass = convertfrom-securestring -securestring $password
+            $passwordArg = "-encryptedPassword $encryptedPass"
+        }
+        $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($unNormalized.FullName)`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'}) $passwordArg"
         Start-Process powershell -verb runas -argumentlist $command
         return
     }
@@ -74,6 +79,7 @@ Invoke-Reboot
         write-BoxstarterMessage "$($boxMod.Copyright) http://boxstarter.codeplex.com" -nologo
         $session=Start-TimedSection "Installation session."
         if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
+        if($encryptedPassword){$password = ConvertTo-SecureString -string $encryptedPassword}
         $script:BoxstarterPassword=InitAutologon $password
         $script:BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
