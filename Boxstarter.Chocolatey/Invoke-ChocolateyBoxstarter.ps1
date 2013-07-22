@@ -65,7 +65,8 @@ Set-BoxstarterConfig
     param(
       [string]$bootstrapPackage="default",
       [string]$localRepo,
-      [switch]$DisableReboots
+      [switch]$DisableReboots,
+      [System.Security.SecureString]$password
     )
     if($DisableReboots){$Boxstarter.RebootOk=$false}
     if(!$Boxstarter.ScriptToCall){
@@ -73,7 +74,7 @@ Set-BoxstarterConfig
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
 Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage $(if($LocalRepo){"-Localrepo $localRepo"})
 "@
-        Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk
+        Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password
         return
     }
     if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }

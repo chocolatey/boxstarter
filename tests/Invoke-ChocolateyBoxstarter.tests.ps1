@@ -52,6 +52,20 @@ Describe "Invoke-ChocolateyBoxstarter" {
         }          
     }
 
+    Context "When not invoked via boxstarter and given a password" {
+        $Boxstarter.ScriptToCall=$null
+        Mock Invoke-Boxstarter
+        Mock Chocolatey
+        Mock Check-Chocolatey
+        $securePassword = (ConvertTo-SecureString "mypassword" -asplaintext -force)
+
+        Invoke-ChocolateyBoxstarter package -password $securePassword
+
+        it "should Call Boxstarter with the password" {
+            Assert-MockCalled Invoke-Boxstarter -ParameterFilter {$password -eq $securePassword}
+        }
+    }
+
     Context "When invoked via boxstarter" {
         $Boxstarter.ScriptToCall="return"
         Mock Invoke-Boxstarter
