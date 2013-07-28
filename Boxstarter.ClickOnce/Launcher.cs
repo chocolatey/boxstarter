@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Security.Principal;
 using System.Web;
 
-namespace Boxstarter.ClickOnce
+namespace Boxstarter.WebLaunch
 {
     public class Launcher
     {

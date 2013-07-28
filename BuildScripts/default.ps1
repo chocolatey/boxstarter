@@ -14,9 +14,15 @@ properties {
 }
 
 Task default -depends Build
-Task Build -depends Test, Package
+Task Build -depends Build-Clickonce, Test, Package
 Task Deploy -depends Test, Package, Push-Nuget -description 'Versions, packages and pushes to Myget'
 Task Package -depends Version-Module, Pack-Nuget -description 'Versions the psd1 and packs the module and example package'
+
+task Build-ClickOnce {
+    Update-AssemblyInfoFiles $version $changeset
+    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:quiet }
+    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:quiet /p:AssemblyVersion=$version /p:AssemblyFileVersion=$version }
+}
 
 Task Test {
     pushd "$baseDir"
@@ -78,5 +84,31 @@ function PushDirectory($path){
     exec { 
         Get-ChildItem "$path\*.nupkg" | 
             % { cpush $_ -source "http://www.myget.org/F/boxstarter/api/v2/package" }
+    }
+}
+
+# Borrowed from Luis Rocha's Blog (http://www.luisrocha.net/2009/11/setting-assembly-version-with-windows.html)
+function Update-AssemblyInfoFiles ([string] $version, [string] $commit) {
+    $assemblyVersionPattern = 'AssemblyVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
+    $fileVersionPattern = 'AssemblyFileVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
+    $fileCommitPattern = 'AssemblyTrademark\("([a-f0-9]{40})?"\)'
+    $assemblyVersion = 'AssemblyVersion("' + $version + '")';
+    $fileVersion = 'AssemblyFileVersion("' + $version + '")';
+    $commitVersion = 'AssemblyTrademark("' + $commit + '")';
+
+    Get-ChildItem -path $baseDir -r -filter AssemblyInfo.cs | ForEach-Object {
+        $filename = $_.Directory.ToString() + '\' + $_.Name
+        $filename + ' -> ' + $version
+        
+        # If you are using a source control that requires to check-out files before 
+        # modifying them, make sure to check-out the file here.
+        # For example, TFS will require the following command:
+        # tf checkout $filename
+    
+        (Get-Content $filename) | ForEach-Object {
+            % {$_ -replace $assemblyVersionPattern, $assemblyVersion } |
+            % {$_ -replace $fileVersionPattern, $fileVersion } |
+            % {$_ -replace $fileCommitPattern, $commitVersion }
+        } | Set-Content $filename
     }
 }
