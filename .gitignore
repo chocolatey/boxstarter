@@ -10,3 +10,7 @@ Helpers/*-BoxstarterMessage.ps1
 Helpers/*-TimedSection.ps1
 Bootstrapper/*-TimedSection.ps1
 BuildArtifacts
+obj
+bin
+*.user
+*.suo

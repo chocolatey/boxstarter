@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7339091F-13A0-4353-8DED-589BDFC8FE0F}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Boxstarter.ClickOnce</RootNamespace>
+    <AssemblyName>Boxstarter.ClickOnce</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <PublishUrl>http://localhost/ClickOnce/</PublishUrl>
+    <Install>false</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <TrustUrlParameters>true</TrustUrlParameters>
+    <ApplicationRevision>21</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>D2D258DDFD35972F5D593F6E28B0E672C5540A42</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>Boxstarter.ClickOnce_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Launcher.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\BoxStarter.bat">
+      <Link>BoxStarter.bat</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\Boxstarter.bootstrapper.psd1">
+      <Link>Boxstarter.Bootstrapper\Boxstarter.bootstrapper.psd1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psm1">
+      <Link>Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psm1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\Cleanup-Boxstarter.ps1">
+      <Link>Boxstarter.Bootstrapper\Cleanup-Boxstarter.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\Get-PendingReboot.ps1">
+      <Link>Boxstarter.Bootstrapper\Get-PendingReboot.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\Invoke-Boxstarter.ps1">
+      <Link>Boxstarter.Bootstrapper\Invoke-Boxstarter.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\Invoke-Reboot.ps1">
+      <Link>Boxstarter.Bootstrapper\Invoke-Reboot.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\Set-SecureAutoLogon.ps1">
+      <Link>Boxstarter.Bootstrapper\Set-SecureAutoLogon.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\Start-UpdateServices.ps1">
+      <Link>Boxstarter.Bootstrapper\Start-UpdateServices.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\Stop-UpdateServices.ps1">
+      <Link>Boxstarter.Bootstrapper\Stop-UpdateServices.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\Test-PendingReboot.ps1">
+      <Link>Boxstarter.Bootstrapper\Test-PendingReboot.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1">
+      <Link>Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psm1">
+      <Link>Boxstarter.Chocolatey\Boxstarter.Chocolatey.psm1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Chocolatey\Check-Chocolatey.ps1">
+      <Link>Boxstarter.Chocolatey\Check-Chocolatey.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Chocolatey\Chocolatey.ps1">
+      <Link>Boxstarter.Chocolatey\Chocolatey.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Chocolatey\Get-BoxstarterConfig.ps1">
+      <Link>Boxstarter.Chocolatey\Get-BoxstarterConfig.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Chocolatey\Get-PackageRoot.ps1">
+      <Link>Boxstarter.Chocolatey\Get-PackageRoot.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Chocolatey\Invoke-BoxstarterBuild.ps1">
+      <Link>Boxstarter.Chocolatey\Invoke-BoxstarterBuild.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Chocolatey\Invoke-ChocolateyBoxstarter.ps1">
+      <Link>Boxstarter.Chocolatey\Invoke-ChocolateyBoxstarter.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Chocolatey\New-BoxstarterPackage.ps1">
+      <Link>Boxstarter.Chocolatey\New-BoxstarterPackage.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Chocolatey\Set-BoxstarterConfig.ps1">
+      <Link>Boxstarter.Chocolatey\Set-BoxstarterConfig.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.Chocolatey\Set-BoxstarterShare.ps1">
+      <Link>Boxstarter.Chocolatey\Set-BoxstarterShare.ps1</Link>
+    </Content>
+    <Content Include="..\BoxStarter.Common\boxstarter.common.psd1">
+      <Link>Boxstarter.Common\boxstarter.common.psd1</Link>
+    </Content>
+    <Content Include="..\BoxStarter.Common\Boxstarter.Common.psm1">
+      <Link>Boxstarter.Common\Boxstarter.Common.psm1</Link>
+    </Content>
+    <Content Include="..\BoxStarter.Common\Format-BoxStarterMessage.ps1">
+      <Link>Boxstarter.Common\Format-BoxStarterMessage.ps1</Link>
+    </Content>
+    <Content Include="..\BoxStarter.Common\Log-BoxStarterMessage.ps1">
+      <Link>Boxstarter.Common\Log-BoxStarterMessage.ps1</Link>
+    </Content>
+    <Content Include="..\BoxStarter.Common\Out-BoxstarterLog.ps1">
+      <Link>Boxstarter.Common\Out-BoxstarterLog.ps1</Link>
+    </Content>
+    <Content Include="..\BoxStarter.Common\Start-TimedSection.ps1">
+      <Link>Boxstarter.Common\Start-TimedSection.ps1</Link>
+    </Content>
+    <Content Include="..\BoxStarter.Common\Stop-TimedSection.ps1">
+      <Link>Boxstarter.Common\Stop-TimedSection.ps1</Link>
+    </Content>
+    <Content Include="..\BoxStarter.Common\Test-Admin.ps1">
+      <Link>Boxstarter.Common\Test-Admin.ps1</Link>
+    </Content>
+    <Content Include="..\BoxStarter.Common\Write-BoxstarterMessage.ps1">
+      <Link>Boxstarter.Common\Write-BoxstarterMessage.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\boxstarter.WinConfig.psd1">
+      <Link>Boxstarter.WinConfig\boxstarter.WinConfig.psd1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Boxstarter.WinConfig.psm1">
+      <Link>Boxstarter.WinConfig\Boxstarter.WinConfig.psm1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Disable-InternetExplorerESC.ps1">
+      <Link>Boxstarter.WinConfig\Disable-InternetExplorerESC.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Disable-UAC.ps1">
+      <Link>Boxstarter.WinConfig\Disable-UAC.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Enable-RemoteDesktop.ps1">
+      <Link>Boxstarter.WinConfig\Enable-RemoteDesktop.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Enable-UAC.ps1">
+      <Link>Boxstarter.WinConfig\Enable-UAC.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Get-LibraryNames.ps1">
+      <Link>Boxstarter.WinConfig\Get-LibraryNames.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Get-UAC.ps1">
+      <Link>Boxstarter.WinConfig\Get-UAC.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Install-WindowsUpdate.ps1">
+      <Link>Boxstarter.WinConfig\Install-WindowsUpdate.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Move-LibraryDirectory.ps1">
+      <Link>Boxstarter.WinConfig\Move-LibraryDirectory.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Restart-Explorer.ps1">
+      <Link>Boxstarter.WinConfig\Restart-Explorer.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Set-ExplorerOptions.ps1">
+      <Link>Boxstarter.WinConfig\Set-ExplorerOptions.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Set-TaskbarSmall.ps1">
+      <Link>Boxstarter.WinConfig\Set-TaskbarSmall.ps1</Link>
+    </Content>
+    <Content Include="..\Boxstarter.WinConfig\Update-ExecutionPolicy.ps1">
+      <Link>Boxstarter.WinConfig\Update-ExecutionPolicy.ps1</Link>
+    </Content>
+    <Content Include="..\boxstarter.config">
+      <Link>boxstarter.config</Link>
+    </Content>
+    <None Include="App.config" />
+    <None Include="Boxstarter.ClickOnce_TemporaryKey.pfx" />
+    <None Include="Properties\app.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\LICENSE.txt">
+      <Link>LICENSE.txt</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
