@@ -1,0 +1,5 @@
+<config>
+	<ChocolateyPackage>http://chocolatey.org/api/v2/package/chocolatey/</ChocolateyPackage>
+	<ChocolateyRepo>http://chocolatey.org/install.ps1</ChocolateyRepo>
+	<NugetSources>http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2</NugetSources>
+</config>

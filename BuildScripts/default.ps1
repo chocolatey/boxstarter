@@ -15,13 +15,21 @@ properties {
 
 Task default -depends Build
 Task Build -depends Build-Clickonce, Test, Package
-Task Deploy -depends Test, Package, Push-Nuget -description 'Versions, packages and pushes to Myget'
-Task Package -depends Version-Module, Pack-Nuget -description 'Versions the psd1 and packs the module and example package'
+Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce #, Push-Nuget -description 'Versions, packages and pushes to Myget'
+Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 
 task Build-ClickOnce {
     Update-AssemblyInfoFiles $version $changeset
     exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:quiet }
-    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:quiet /p:AssemblyVersion=$version /p:AssemblyFileVersion=$version }
+    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:quiet }
+}
+
+task Publish-ClickOnce {
+    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:quiet /p:ApplicationVersion="$version.0" }
+    Remove-Item "$basedir\public\Launch" -Recurse -Force -ErrorAction SilentlyContinue
+    MkDir "$basedir\public\Launch"
+    Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\Application Files" "$basedir\public\Launch" -Recurse -Force
+    Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\Boxstarter.WebLaunch.Application" "$basedir\public\Launch"
 }
 
 Task Test {
@@ -42,23 +50,39 @@ Task Version-Module -description 'Stamps the psd1 with the version and last chan
     }
 }
 
-Task Pack-Nuget -description 'Packs the modules and example packages' {
+Task Clean-Artifacts {
     if (Test-Path "$baseDir\buildArtifacts") {
       Remove-Item "$baseDir\buildArtifacts" -Recurse -Force
     }
+}
+
+Task Create-ArtifactsDir {
+    if(!(Test-Path "$baseDir\buildArtifacts")){
+        mkdir "$baseDir\buildArtifacts"
+    }
+}
+
+Task Pack-Nuget -depends Create-ArtifactsDir -description 'Packs the modules and example packages' {
     if (Test-Path "$baseDir\buildPackages\*.nupkg") {
       Remove-Item "$baseDir\buildPackages\*.nupkg" -Force
     }
-    mkdir "$baseDir\buildArtifacts"
 
     PackDirectory "$baseDir\BuildPackages"
     PackDirectory "$baseDir\BuildScripts\nuget"
     Move-Item "$baseDir\BuildScripts\nuget\*.nupkg" "$basedir\buildArtifacts"
+}
 
+Task Package-DownloadZip -depends Create-ArtifactsDir {
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.*" }
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\license.txt" }
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\BuildScripts\Setup.ps1" }
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\Setup.bat" }
+}
+
+Task Deploy-DownloadZip -depends Package-DownloadZip {
+    Remove-Item "$basedir\public\downloads" -Recurse -Force -ErrorAction SilentlyContinue
+    mkdir "$basedir\public\downloads"
+    Copy-Item "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\public\downloads"
 }
 
 Task Push-Nuget -description 'Pushes the module to Myget feed' {
