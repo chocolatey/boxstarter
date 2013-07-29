@@ -4,7 +4,7 @@ Description = 'Provides an unattended installation evironment supporting automai
 ModuleToProcess = './boxstarter.bootstrapper.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.52'
+ModuleVersion = '1.0.55'
 
 # ID used to uniquely identify this module
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e50'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = '5e991f5c79cf9c4650ebebb48ff89fce0a2372de'
+PrivateData = 'e8efe5badaa90382c6aa8949d0cdfafe50e60828'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

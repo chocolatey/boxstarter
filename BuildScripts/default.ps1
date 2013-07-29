@@ -29,6 +29,7 @@ task Publish-ClickOnce {
     Remove-Item "$basedir\public\Launch" -Recurse -Force -ErrorAction SilentlyContinue
     MkDir "$basedir\public\Launch"
     Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\public\Launch" -Recurse -Force
+    Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\Boxstarter.WebLaunch.Application" "$basedir\public\Launch\Application Files\Boxstarter.WebLaunch_$($version.Replace('.','_'))_0"
 }
 
 Task Test {
