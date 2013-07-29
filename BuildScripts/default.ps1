@@ -28,8 +28,7 @@ task Publish-ClickOnce {
     exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:quiet /p:ApplicationVersion="$version.0" }
     Remove-Item "$basedir\public\Launch" -Recurse -Force -ErrorAction SilentlyContinue
     MkDir "$basedir\public\Launch"
-    Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\Application Files" "$basedir\public\Launch" -Recurse -Force
-    Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\Boxstarter.WebLaunch.Application" "$basedir\public\Launch"
+    Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\public\Launch" -Recurse -Force
 }
 
 Task Test {

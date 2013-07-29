@@ -11,7 +11,7 @@
     <AssemblyName>Boxstarter.WebLaunch</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>http://localhost/launch/</PublishUrl>
+    <PublishUrl>ftp://waws-prod-bay-001.ftp.azurewebsites.windows.net/site/wwwroot/Public/launch/</PublishUrl>
     <Install>false</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -21,6 +21,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
+    <InstallUrl>http://boxstarter.org/launch/</InstallUrl>
     <SupportUrl>http://boxstarter.org</SupportUrl>
     <ProductName>Boxstarter.WebLaunch</ProductName>
     <PublisherName>Boxstarter.org</PublisherName>
