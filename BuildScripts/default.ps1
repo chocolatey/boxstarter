@@ -15,7 +15,7 @@ properties {
 
 Task default -depends Build
 Task Build -depends Build-Clickonce, Test, Package
-Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce #, Push-Nuget -description 'Versions, packages and pushes to Myget'
+Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage, Push-Nuget -description 'Versions, packages and pushes to Myget'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 
 task Build-ClickOnce {
@@ -142,4 +142,12 @@ function Update-AssemblyInfoFiles ([string] $version, [string] $commit) {
             % {$_ -replace $fileCommitPattern, $commitVersion }
         } | Set-Content $filename
     }
+}
+
+task Update-Homepage {
+     $downloadUrl="Boxstarter.$version.zip"
+     $downloadButtonUrlPatern="Boxstarter\.[0-9]+(\.([0-9]+|\*)){1,3}\.zip"
+     $downloadLinkTextPattern="V[0-9]+(\.([0-9]+|\*)){1,3}"
+     $filename = "$baseDir\public\index.html"
+     (Get-Content $filename) | % {$_ -replace $downloadButtonUrlPatern, $downloadUrl } | % {$_ -replace $downloadLinkTextPattern, ("v"+$version) } | Set-Content $filename
 }
