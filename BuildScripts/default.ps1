@@ -15,7 +15,7 @@ properties {
 
 Task default -depends Build
 Task Build -depends Build-Clickonce, Test, Package
-Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage, Push-Nuget -description 'Versions, packages and pushes to Myget'
+Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to Myget'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 
 task Build-ClickOnce {
