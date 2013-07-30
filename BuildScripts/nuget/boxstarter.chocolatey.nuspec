@@ -16,6 +16,14 @@
       <dependency id="Boxstarter.WinConfig" />  
       <dependency id="Boxstarter.Bootstrapper" />  
     </dependencies>
+    <releaseNotes>
+      - Bunch of bug fixes to make Boxstarter more stable
+      - Protect against reboots during .net4 install
+      - Provide helper cmdlets for reading and editing config settings
+      - Allow SecureString Password to be aded as a commnd line argument
+      - Documentation typo fixes
+      - Clarify some messaging
+    </releaseNotes>
   </metadata>
   <files>
     <file src="chocolateyinstall.ps1" target="tools"/>
