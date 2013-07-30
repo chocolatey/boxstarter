@@ -79,24 +79,29 @@ Set-BoxstarterConfig
       [switch]$DisableReboots,
       [System.Security.SecureString]$password
     )
-    if($DisableReboots){$Boxstarter.RebootOk=$false}
-    if(!$Boxstarter.ScriptToCall){
-        $script=@"
+    try{
+        if($DisableReboots){$Boxstarter.RebootOk=$false}
+        if(!$Boxstarter.ScriptToCall){
+            $script=@"
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
 Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage $(if($LocalRepo){"-Localrepo $localRepo"})
 "@
-        Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password
-        return
+            Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password
+            return
+        }
+        if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
+        $Boxstarter.ProgramFiles86="$programFiles86"
+        $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
+        $Boxstarter.Package=$bootstrapPackage
+        $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
+        Check-Chocolatey -ShouldIntercept
+        del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
+        del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
+        Download-Package $bootstrapPackage
     }
-    if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
-    $Boxstarter.ProgramFiles86="$programFiles86"
-    $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
-    $Boxstarter.Package=$bootstrapPackage
-    $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
-    Check-Chocolatey -ShouldIntercept
-    del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
-    del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
-    Download-Package $bootstrapPackage
+    finally {
+        $Boxstarter.ScriptToCall = $null
+    }
 }
 
 function Resolve-LocalRepo([string]$localRepo) {
