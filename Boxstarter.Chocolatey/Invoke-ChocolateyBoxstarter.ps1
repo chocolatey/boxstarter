@@ -39,6 +39,11 @@ directory but can be changed with Set-BoxstarterConfig.
 .PARAMETER DisableReboots
 If set, reboots are suppressed.
 
+.PARAMETER Password
+User's password as a Secure string to be used for reboot autologons.
+This will suppress the password prompt at the beginning of the 
+Boxstarter installer.
+
 .EXAMPLE
 Invoke-ChocolateyBoxstarter example
 
@@ -54,6 +59,12 @@ This installs the Win8Install .nupkg and specifies that it is ok to
 reboot the macine if a pending reboot is needed. Boxstarter will look 
 for the Win8Install .nupkg file in the \\serer\share\boxstarter 
 directory.
+
+.EXAMPLE
+Invoke-ChocolateyBoxstarter example -Password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+
+This installs the example package and uses "mypassword" for any reboot 
+autologins. The user is now not prompted for a password.
 
 .LINK
 http://boxstarter.codeplex.com
