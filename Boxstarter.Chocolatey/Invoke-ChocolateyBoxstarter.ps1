@@ -37,7 +37,7 @@ in the BuildPackages directory just under the root Boxstarter
 directory but can be changed with Set-BoxstarterConfig.
 
 .PARAMETER DisableReboots
-If set, reboots are subbressed.
+If set, reboots are suppressed.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter example
