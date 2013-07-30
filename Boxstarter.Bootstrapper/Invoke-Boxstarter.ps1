@@ -133,8 +133,8 @@ function InitAutologon([System.Security.SecureString]$password){
         }
     } else {$autoLogon=0}
     $Boxstarter.AutologedOn = ($autoLogon -gt 0)
-
     if($Boxstarter.RebootOk -and !$Password -and !$Boxstarter.AutologedOn) {
+        Write-BoxstarterMessage "Please type CTRL+C or close this window to exit Boxstarter if you do not want to risk a reboot during this Boxstarter install."
         write-host "Boxstarter may need to reboot your system. Please provide your password so that Boxstarter may automatically log you on. Your password will be securely stored and encrypted."
         $Password=Read-AuthenticatedPassword
     }
