@@ -74,17 +74,23 @@ Set-BoxstarterConfig
 #>    
     [CmdletBinding()]
     param(
-      [string]$bootstrapPackage="default",
-      [string]$localRepo,
+      [string]$BootstrapPackage=$null,
+      [string]$LocalRepo,
       [switch]$DisableReboots,
-      [System.Security.SecureString]$password
+      [System.Security.SecureString]$Password
     )
     try{
         if($DisableReboots){$Boxstarter.RebootOk=$false}
-        if(!$Boxstarter.ScriptToCall){
+        if($Boxstarter.ScriptToCall -eq $null){
+            if($bootstrapPackage -ne $null){
+                write-BoxstarterMessage "Installing package '$bootstrapPackage'"
+            }
+            else{
+                write-BoxstarterMessage "Installing Chocolatey"
+            }
             $script=@"
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
-Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage $(if($LocalRepo){"-Localrepo $localRepo"})
+Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstrapPackage"}) $(if($LocalRepo){"-Localrepo $localRepo"})
 "@
             Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password
             return
@@ -92,12 +98,12 @@ Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage $(if($LocalRepo)
         if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
         $Boxstarter.ProgramFiles86="$programFiles86"
         $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
-        $Boxstarter.Package=$bootstrapPackage
         $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
         Check-Chocolatey -ShouldIntercept
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
-        del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
-        Download-Package $bootstrapPackage
+        if($bootstrapPackage -ne $null){
+            Download-Package $bootstrapPackage
+        }
     }
     finally {
         $Boxstarter.ScriptToCall = $null
@@ -113,6 +119,8 @@ function Resolve-LocalRepo([string]$localRepo) {
 }
 
 function Download-Package([string]$bootstrapPackage) {
+    $Boxstarter.Package=$bootstrapPackage
+    del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
     if(test-path (Join-Path $Boxstarter.LocalRepo "$bootstrapPackage.*.nupkg")){
         $source = $Boxstarter.LocalRepo
     } else {
