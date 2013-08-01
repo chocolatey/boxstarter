@@ -56,7 +56,7 @@ Invoke-BoxstarterBuild
     }
     IEX "net share $shareName='$($Boxstarter.BaseDir)' $acctOption"
     if($LastExitCode -ne 0) {
-        Throw "Share was not succesfull. Use NET SHARE $ShareName to see if share already exists. To Delete the share use NET SHARE $ShareName /DELETE."
+        Throw "Sharing $shareName on $($Boxstarter.BaseDir) to $acctOption was not succesfull. Use NET SHARE $ShareName to see if share already exists. To Delete the share use NET SHARE $ShareName /DELETE."
     }
 }
 
