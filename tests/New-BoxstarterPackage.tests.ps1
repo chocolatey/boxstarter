@@ -16,7 +16,7 @@ Describe "New-BoxstarterPackage" {
     Context "When No Path is provided" {
         Mock Intercept-Chocolatey
 
-        New-BoxstarterPackage $packageName $Description
+        New-BoxstarterPackage $packageName $Description | out-null
 
         It "Will Create the nuspec" {
             join-path (Join-Path $Boxstarter.LocalRepo $packageName) "$packageName.nuspec" | Should Exist
@@ -51,7 +51,7 @@ Describe "New-BoxstarterPackage" {
         New-Item (Join-Path $boxstarter.BaseDir "mypkg\test.txt") -type file | out-null
         New-Item (Join-Path $boxstarter.BaseDir "mypkg\dir1\test1.txt") -type file | out-null
 
-        New-BoxstarterPackage $packageName $Description (Join-Path $boxstarter.BaseDir "mypkg")
+        New-BoxstarterPackage $packageName $Description (Join-Path $boxstarter.BaseDir "mypkg") | out-null
 
         It "Will Create the nuspec" {
             join-path (Join-Path $Boxstarter.LocalRepo $packageName) "$packageName.nuspec" | Should Exist
@@ -86,7 +86,7 @@ Describe "New-BoxstarterPackage" {
         mkdir (Join-Path $boxstarter.BaseDir "mypkg\dir1") |out-null
         New-Item (Join-Path $boxstarter.BaseDir "mypkg\pkg.nuspec") -type file -value "my nuspec" | out-null
 
-        New-BoxstarterPackage $packageName $Description (Join-Path $boxstarter.BaseDir "mypkg")
+        New-BoxstarterPackage $packageName $Description (Join-Path $boxstarter.BaseDir "mypkg") | out-null
 
         It "Will not Create the nuspec" {
             get-content (join-path (Join-Path $Boxstarter.LocalRepo $packageName) "$packageName.nuspec") | Should be "my nuspec"
@@ -98,7 +98,7 @@ Describe "New-BoxstarterPackage" {
         mkdir (Join-Path $boxstarter.BaseDir "mypkg\tools") |out-null
         New-Item (Join-Path $boxstarter.BaseDir "mypkg\tools\chocolateyInstall.ps1") -type file -value "my install" | out-null
 
-        New-BoxstarterPackage $packageName $Description (Join-Path $boxstarter.BaseDir "mypkg")
+        New-BoxstarterPackage $packageName $Description (Join-Path $boxstarter.BaseDir "mypkg") | out-null
 
         It "Will not Create the chocolateyInstall" {
             get-content (join-path (Join-Path $Boxstarter.LocalRepo $packageName) "tools\chocolateyInstall.ps1") | Should be "my install"

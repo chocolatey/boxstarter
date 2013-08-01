@@ -89,6 +89,6 @@ try {
     }
     Popd
 
-    Write-Host "A new Chocolatey package has been created at $pkgDir."
-    Write-Host "You may now edit the files in this package and build the final .nupkg using Invoke-BoxstarterBuild."
+    Write-BoxstarterMessage "A new Chocolatey package has been created at $pkgDir." -nologo
+    Write-BoxstarterMessage "You may now edit the files in this package and build the final .nupkg using Invoke-BoxstarterBuild." -nologo
 }

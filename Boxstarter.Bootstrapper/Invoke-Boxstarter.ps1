@@ -1,9 +1,3 @@
-if(!$Global:Boxstarter) { $Global:Boxstarter = @{} }
-$Boxstarter.Log="$env:temp\boxstarter.log"
-$Boxstarter.RebootOk=$false
-$Boxstarter.SuppressLogging=$false
-$Boxstarter.IsRebooting=$false
-
 function Invoke-BoxStarter{
 <#
 .SYNOPSIS
@@ -83,7 +77,6 @@ Invoke-Reboot
         $script:BoxstarterPassword=InitAutologon $password
         $script:BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
-        if(Test-ReEnableUAC) {Enable-UAC}
         Stop-UpdateServices
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
     }
@@ -134,8 +127,13 @@ function InitAutologon([System.Security.SecureString]$password){
     } else {$autoLogon=0}
     $Boxstarter.AutologedOn = ($autoLogon -gt 0)
     if($Boxstarter.RebootOk -and !$Password -and !$Boxstarter.AutologedOn) {
-        Write-BoxstarterMessage "Please type CTRL+C or close this window to exit Boxstarter if you do not want to risk a reboot during this Boxstarter install."
-        write-host "Boxstarter may need to reboot your system. Please provide your password so that Boxstarter may automatically log you on. Your password will be securely stored and encrypted."
+        write-BoxstarterMessage @"
+Boxstarter may need to reboot your system. 
+Please provide your password so that Boxstarter may automatically log you on. 
+Your password will be securely stored and encrypted.
+"@ -nologo
+        Write-BoxstarterMessage "Please type CTRL+C or close this window to exit Boxstarter if you do not want to risk a reboot during this Boxstarter install." -nologo
+
         $Password=Read-AuthenticatedPassword
     }
     return $password
@@ -150,10 +148,4 @@ function Resolve-Script([ScriptBlock]$script, [string]$scriptFile){
         }
     }
     throw "No Script was specified to call."
-}
-
-function Test-ReEnableUAC {
-    $test=Test-Path "$env:temp\BoxstarterReEnableUAC"
-    if($test){del "$env:temp\BoxstarterReEnableUAC"}
-    return $test
 }

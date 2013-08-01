@@ -39,7 +39,7 @@ New-BoxstarterPackage
                 throw "Cannot find nuspec for $name"
             }
             .$choco Pack (join-path $name "$name.nuspec")
-            Write-Host "Your package has been built. Using Boxstarter.bat $name or Invoke-ChocolateyBoxstarter $name will run this package."
+            Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $name or Invoke-ChocolateyBoxstarter $name will run this package." -nologo
         } else {
              if($all){
                 Get-ChildItem . | ? { $_.PSIsContainer } | % {
@@ -47,7 +47,7 @@ New-BoxstarterPackage
                         throw "Cannot find nuspec for $_"
                     }
                     .$choco Pack (join-path . "$($_.Name)\$($_.Name).nuspec")
-                    Write-Host "Your package has been built. Using Boxstarter.bat $($_.Name) or Invoke-ChocolateyBoxstarter $($_.Name) will run this package."
+                    Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Invoke-ChocolateyBoxstarter $($_.Name) will run this package." -nologo
                 }                
             }
         }

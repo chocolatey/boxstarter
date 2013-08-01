@@ -34,6 +34,7 @@ Describe "Invoke-Boxstarter" {
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
+        Mock Get-Service {new-Object -TypeName PSObject -Property @{Status="Stopped"}} -ParameterFilter {$name -eq "wuauserv"}
         Mock Get-Service {$false} -ParameterFilter {$include -eq "CCMEXEC"}
 
         Invoke-Boxstarter {return}
@@ -104,7 +105,7 @@ Describe "Invoke-Boxstarter" {
         Mock Read-AuthenticatedPassword {return $pass}
         Mock Get-UAC
 
-        Invoke-Boxstarter {Invoke-Reboot} -RebootOk
+        Invoke-Boxstarter {Invoke-Reboot} -RebootOk | Out-Null
 
         it "will read host for the password" {
             Assert-MockCalled Set-SecureAutoLogon -ParameterFilter {$password -eq $pass}
@@ -183,7 +184,7 @@ Describe "Invoke-Boxstarter" {
         Mock Read-AuthenticatedPassword
         $Boxstarter.RebootOk=$true
 
-        Invoke-Boxstarter {Invoke-Reboot}
+        Invoke-Boxstarter {Invoke-Reboot} | Out-Null
 
         it "will reboot" {
             Assert-MockCalled Restart
@@ -262,7 +263,7 @@ Describe "Invoke-Boxstarter" {
         Mock Read-AuthenticatedPassword
         $Boxstarter.IsRebooting=$true
         
-        Invoke-Boxstarter {return} -RebootOk
+        Invoke-Boxstarter {return} -RebootOk | Out-Null
 
         it "will Not Set AutoLogin" {
             Assert-MockCalled Set-SecureAutoLogon -times 0
@@ -297,7 +298,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-SecureAutoLogon
         Mock New-Item
 
-        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
 
         it "will Disable UAC" {
             Assert-MockCalled Disable-UAC
@@ -343,7 +344,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-SecureAutoLogon
         Mock New-Item
         
-        Invoke-Boxstarter {return} -RebootOk
+        Invoke-Boxstarter {return} -RebootOk | Out-Null
 
         it "will not Disable UAC" {
             Assert-MockCalled Disable-UAC -times 0
