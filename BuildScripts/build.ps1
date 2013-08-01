@@ -14,9 +14,9 @@ if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
     iex ((new-object net.webclient).DownloadString("http://bit.ly/psChocInstall"))
 }
 
-cinstm psake
-cinstm 7zip.CommandLine
-cinstm pester
+if(!(Test-Path $env:ChocolateyInstall\lib\Psake*)) { cinst psake }
+if(!(Test-Path $env:ChocolateyInstall\lib\7zip.CommandLine*)) { cinst 7zip.CommandLine }
+if(!(Test-Path $env:ChocolateyInstall\lib\pester*)) { cinst pester }
 
 if($Help){ 
   try {
