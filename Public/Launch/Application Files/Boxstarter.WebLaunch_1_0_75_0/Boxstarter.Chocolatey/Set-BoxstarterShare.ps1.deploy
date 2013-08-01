@@ -1,10 +1,10 @@
 ﻿function Set-BoxstarterShare {
 <#
 .SYNOPSIS
-Shares the Boxstarter rot directory - $Boxstarter.BaseDir
+Shares the Boxstarter root directory - $Boxstarter.BaseDir
 
 .DESCRIPTION
-Shares the Boxstarter rot directory - $Boxstarter.BaseDir - so that 
+Shares the Boxstarter root directory - $Boxstarter.BaseDir - so that 
 it can be accessed remotely. This allows remote machines to Invoke 
 ChocolateyBoxstarter via \\server\shareName\Boxstarter.bat. Unless 
 specified otherwise, the share name is Boxstarter and Everyone is 
@@ -56,7 +56,7 @@ Invoke-BoxstarterBuild
     }
     IEX "net share $shareName='$($Boxstarter.BaseDir)' $acctOption"
     if($LastExitCode -ne 0) {
-        Throw "Share was not succesfull. Use NET SHARE $ShareName to see if share already exists. To Delete the share use NET SHARE $ShareName /DELETE."
+        Throw "Sharing $shareName on $($Boxstarter.BaseDir) to $acctOption was not succesfull. Use NET SHARE $ShareName to see if share already exists. To Delete the share use NET SHARE $ShareName /DELETE."
     }
 }
 

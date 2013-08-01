@@ -1,4 +1,8 @@
 function Cleanup-Boxstarter {
+    if(Test-Path "$env:temp\BoxstarterReEnableUAC") {
+        del "$env:temp\BoxstarterReEnableUAC"
+        Enable-UAC
+    }
     if(!$Boxstarter.IsRebooting) { 
         $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
         if( Test-Path "$Startup\boxstarter-post-restart.bat") {

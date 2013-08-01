@@ -10,15 +10,27 @@ namespace Boxstarter.WebLaunch
     {
         public static void Main(string[] args)
         {
-            var package = string.Empty;
+            var psArgs = string.Empty;
             if (args.Length > 0)
             {
-                package = args[0];
+                psArgs = args[0];
+                if (args.Length > 1)
+                {
+                    psArgs += " -DisableReboots";
+                }
             }
             else if (ApplicationDeployment.IsNetworkDeployed && ApplicationDeployment.CurrentDeployment.ActivationUri != null)
             {
                 var queryString = ApplicationDeployment.CurrentDeployment.ActivationUri.Query;
-                package = HttpUtility.ParseQueryString(queryString)["package"];
+                if(queryString != null)
+                {
+                    psArgs = HttpUtility.ParseQueryString(queryString)["package"];
+                    if(HttpUtility.ParseQueryString(queryString)["noreboot"] != null)
+                    {
+                        psArgs += " -DisableReboots";
+                    }
+                }
+
             }
 
             var fileToRun = "boxstarter.bat";
@@ -30,7 +42,7 @@ namespace Boxstarter.WebLaunch
             var processInfo = new ProcessStartInfo(fileToRun)
             {
                 Verb = "runas",
-                Arguments = package
+                Arguments = psArgs
             };
             Process.Start(processInfo);
         }

@@ -218,6 +218,9 @@
     <Content Include="..\boxstarter.config">
       <Link>boxstarter.config</Link>
     </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\Init-Settings.ps1">
+      <Link>Boxstarter.Bootstrapper\Init-Settings.ps1</Link>
+    </Content>
     <None Include="App.config" />
     <None Include="Boxstarter.ClickOnce_TemporaryKey.pfx" />
     <None Include="Properties\app.manifest" />

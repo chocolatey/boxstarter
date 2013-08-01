@@ -37,7 +37,12 @@ in the BuildPackages directory just under the root Boxstarter
 directory but can be changed with Set-BoxstarterConfig.
 
 .PARAMETER DisableReboots
-If set, reboots are subbressed.
+If set, reboots are suppressed.
+
+.PARAMETER Password
+User's password as a Secure string to be used for reboot autologons.
+This will suppress the password prompt at the beginning of the 
+Boxstarter installer.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter example
@@ -55,6 +60,12 @@ reboot the macine if a pending reboot is needed. Boxstarter will look
 for the Win8Install .nupkg file in the \\serer\share\boxstarter 
 directory.
 
+.EXAMPLE
+Invoke-ChocolateyBoxstarter example -Password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+
+This installs the example package and uses "mypassword" for any reboot 
+autologins. The user is now not prompted for a password.
+
 .LINK
 http://boxstarter.codeplex.com
 about_boxstarter_chocolatey
@@ -63,29 +74,40 @@ Set-BoxstarterConfig
 #>    
     [CmdletBinding()]
     param(
-      [string]$bootstrapPackage="default",
-      [string]$localRepo,
+      [string]$BootstrapPackage=$null,
+      [string]$LocalRepo,
       [switch]$DisableReboots,
-      [System.Security.SecureString]$password
+      [System.Security.SecureString]$Password
     )
-    if($DisableReboots){$Boxstarter.RebootOk=$false}
-    if(!$Boxstarter.ScriptToCall){
-        $script=@"
+    try{
+        if($DisableReboots){$Boxstarter.RebootOk=$false}
+        if($Boxstarter.ScriptToCall -eq $null){
+            if($bootstrapPackage -ne $null){
+                write-BoxstarterMessage "Installing package '$bootstrapPackage'"
+            }
+            else{
+                write-BoxstarterMessage "Installing Chocolatey"
+            }
+            $script=@"
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
-Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage $(if($LocalRepo){"-Localrepo $localRepo"})
+Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstrapPackage"}) $(if($LocalRepo){"-Localrepo $localRepo"})
 "@
-        Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password
-        return
+            Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password
+            return
+        }
+        if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
+        $Boxstarter.ProgramFiles86="$programFiles86"
+        $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
+        $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
+        Check-Chocolatey -ShouldIntercept
+        del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
+        if($bootstrapPackage -ne $null){
+            Download-Package $bootstrapPackage
+        }
     }
-    if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
-    $Boxstarter.ProgramFiles86="$programFiles86"
-    $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
-    $Boxstarter.Package=$bootstrapPackage
-    $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
-    Check-Chocolatey -ShouldIntercept
-    del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
-    del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
-    Download-Package $bootstrapPackage
+    finally {
+        $Boxstarter.ScriptToCall = $null
+    }
 }
 
 function Resolve-LocalRepo([string]$localRepo) {
@@ -97,6 +119,8 @@ function Resolve-LocalRepo([string]$localRepo) {
 }
 
 function Download-Package([string]$bootstrapPackage) {
+    $Boxstarter.Package=$bootstrapPackage
+    del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
     if(test-path (Join-Path $Boxstarter.LocalRepo "$bootstrapPackage.*.nupkg")){
         $source = $Boxstarter.LocalRepo
     } else {

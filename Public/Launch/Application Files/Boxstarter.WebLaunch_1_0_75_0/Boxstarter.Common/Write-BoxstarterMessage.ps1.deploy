@@ -32,7 +32,10 @@ http://boxstarter.codeplex.com
 about_boxstarter_logging
 
 #>
-    param([String]$message, [switch]$nologo)
+    param(
+        [String]$message, 
+        [switch]$nologo
+    )
     if($Boxstarter.SuppressLogging){return}
     if(!$nologo){$message = "Boxstarter: $message"}
     $fmtTitle = Format-BoxStarterMessage $message
