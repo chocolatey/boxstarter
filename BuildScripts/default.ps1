@@ -54,15 +54,10 @@ Task Clean-Artifacts {
     if (Test-Path "$baseDir\buildArtifacts") {
       Remove-Item "$baseDir\buildArtifacts" -Recurse -Force
     }
+    mkdir "$baseDir\buildArtifacts"
 }
 
-Task Create-ArtifactsDir {
-    if(!(Test-Path "$baseDir\buildArtifacts")){
-        mkdir "$baseDir\buildArtifacts"
-    }
-}
-
-Task Pack-Nuget -depends Create-ArtifactsDir -description 'Packs the modules and example packages' {
+Task Pack-Nuget -depends Clean-Artifacts -description 'Packs the modules and example packages' {
     if (Test-Path "$baseDir\buildPackages\*.nupkg") {
       Remove-Item "$baseDir\buildPackages\*.nupkg" -Force
     }
@@ -72,7 +67,7 @@ Task Pack-Nuget -depends Create-ArtifactsDir -description 'Packs the modules and
     Move-Item "$baseDir\BuildScripts\nuget\*.nupkg" "$basedir\buildArtifacts"
 }
 
-Task Package-DownloadZip -depends Create-ArtifactsDir {
+Task Package-DownloadZip -depends Clean-Artifacts {
     if (Test-Path "$basedir\BuildArtifacts\Boxstarter.*.zip") {
       Remove-Item "$basedir\BuildArtifacts\Boxstarter.*.zip" -Force
     }
