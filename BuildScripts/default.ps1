@@ -99,6 +99,34 @@ Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
     }
 }
 
+task Update-Homepage {
+     $downloadUrl="Boxstarter.$version.zip"
+     $downloadButtonUrlPatern="Boxstarter\.[0-9]+(\.([0-9]+|\*)){1,3}\.zip"
+     $downloadLinkTextPattern="V[0-9]+(\.([0-9]+|\*)){1,3}"
+     $filename = "$baseDir\public\index.html"
+     (Get-Content $filename) | % {$_ -replace $downloadButtonUrlPatern, $downloadUrl } | % {$_ -replace $downloadLinkTextPattern, ("v"+$version) } | Set-Content $filename
+}
+
+task Test-VM {
+    $vm = Get-VM $VmName
+    Restore-VMSnapshot $vm -Name $vm.ParentSnapshotName -Confirm:$false
+    Start-VM $VmName
+    $creds = Get-Credential -Message "$vmName credentials" -UserName "$env:UserDomain\$env:username"
+    $me=$env:computername
+    $remoteDir = $baseDir.replace(':','$')
+    $encryptedPass = convertfrom-securestring -securestring $creds.password
+    $modPath="\\$me\$remoteDir\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1"
+    $script = {
+        Import-Module $args[0]
+        Invoke-ChocolateyBoxstarter $args[1] -Password $args[2]
+    }
+    Write-Host "Waiting for $vmName to start..."
+    do {Start-Sleep -milliseconds 100} 
+    until ((Get-VMIntegrationService $vm | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
+    Write-Host "Importing Module at $modPath"
+    Invoke-Command -ComputerName $vmName -Credential $creds -Authentication Credssp -ScriptBlock $script -Argumentlist $modPath,$package,$creds.Password
+}
+
 function PackDirectory($path){
     exec { 
         Get-ChildItem $path -Recurse -include *.nuspec | 
@@ -137,12 +165,4 @@ function Update-AssemblyInfoFiles ([string] $version, [string] $commit) {
             % {$_ -replace $fileCommitPattern, $commitVersion }
         } | Set-Content $filename
     }
-}
-
-task Update-Homepage {
-     $downloadUrl="Boxstarter.$version.zip"
-     $downloadButtonUrlPatern="Boxstarter\.[0-9]+(\.([0-9]+|\*)){1,3}\.zip"
-     $downloadLinkTextPattern="V[0-9]+(\.([0-9]+|\*)){1,3}"
-     $filename = "$baseDir\public\index.html"
-     (Get-Content $filename) | % {$_ -replace $downloadButtonUrlPatern, $downloadUrl } | % {$_ -replace $downloadLinkTextPattern, ("v"+$version) } | Set-Content $filename
 }

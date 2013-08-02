@@ -1,7 +1,9 @@
 param (
     [string]$Action="default",
     [string]$ChocoPath,
-    [switch]$Help
+    [switch]$Help,
+    [string]$VmName,
+    [string]$package
 )
 $here = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 if($ChocoPath){
@@ -28,4 +30,4 @@ if($Help){
 
 $psakeDir = (dir $env:ChocolateyInstall\lib\Psake*)
 if($psakeDir.length -gt 0) {$psakerDir = $psakeDir[-1]}
-."$psakeDir\tools\psake.ps1" "$here/default.ps1" $Action -ScriptPath $psakeDir\tools
+."$psakeDir\tools\psake.ps1" "$here/default.ps1" $Action -ScriptPath $psakeDir\tools -parameters $PSBoundParameters
