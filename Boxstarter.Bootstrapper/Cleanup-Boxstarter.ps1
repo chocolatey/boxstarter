@@ -1,4 +1,5 @@
 function Cleanup-Boxstarter {
+    param([switch]$KeepWindowOpen)
     if(Test-Path "$env:temp\BoxstarterReEnableUAC") {
         del "$env:temp\BoxstarterReEnableUAC"
         Enable-UAC
@@ -8,6 +9,7 @@ function Cleanup-Boxstarter {
         if( Test-Path "$Startup\boxstarter-post-restart.bat") {
             remove-item "$Startup\boxstarter-post-restart.bat"
             remove-item "$env:temp\Boxstarter.Script"
+            $promptToExit=$true
         }
         $winLogonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
         Remove-ItemProperty -Path $winLogonKey -Name "DefaultUserName" -ErrorAction SilentlyContinue
@@ -16,6 +18,7 @@ function Cleanup-Boxstarter {
         Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue
         Write-Debug "Cleaned up logon registry and restart file"
         Start-UpdateServices
+        if($promptToExit -or $KeepWindowOpen){Read-Host 'Type ENTER to exit'}
         return
     } 
 

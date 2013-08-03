@@ -34,7 +34,7 @@ about_boxstarter_variable_in_bootstrapper
     Write-BoxstarterMessage "writing restart file"
     New-Item "$env:temp\Boxstarter.script" -type file -value $boxstarter.ScriptToCall -force | Out-Null
     $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
-    $restartScript="Call powershell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$($Boxstarter.BaseDir)\Boxstarter.Bootstrapper\boxstarter.bootstrapper.psd1';Invoke-Boxstarter -RebootOk; Read-Host 'Type ENTER to continue'`""
+    $restartScript="Call powershell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$($Boxstarter.BaseDir)\Boxstarter.Bootstrapper\boxstarter.bootstrapper.psd1';Invoke-Boxstarter -RebootOk`""
     New-Item "$startup\boxstarter-post-restart.bat" -type file -force -value $restartScript | Out-Null
     $Boxstarter.IsRebooting=$true
     Restart

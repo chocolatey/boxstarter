@@ -42,7 +42,7 @@ namespace Boxstarter.WebLaunch
             var processInfo = new ProcessStartInfo(fileToRun)
             {
                 Verb = "runas",
-                Arguments = psArgs
+                Arguments = psArgs + " -KeepWindowOpen"
             };
             Process.Start(processInfo);
         }

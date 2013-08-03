@@ -48,10 +48,16 @@ Invoke-Reboot
 #>    
     [CmdletBinding()]
     param(
+      [Parameter(Position=0,Mandatory=1)]
       [ScriptBlock]$ScriptToCall,
+      [Parameter(Position=1,Mandatory=0)]
       [System.Security.SecureString]$password,
+      [Parameter(Position=2,Mandatory=0)]
       [switch]$RebootOk,
-      [string]$encryptedPassword=$null
+      [Parameter(Position=3,Mandatory=0)]
+      [string]$encryptedPassword=$null,
+      [Parameter(Position=4,Mandatory=0)]
+      [switch]$KeepWindowOpen      
     )
     $scriptFile = "$env:temp\boxstarter.script"
     if(!(Test-Admin)) {
@@ -85,7 +91,7 @@ Invoke-Reboot
        $_ | write-host -ForeGroundColor red
     }
     finally{
-        Cleanup-Boxstarter
+        Cleanup-Boxstarter $KeepWindowOpen
         Stop-TimedSection $session
         if($BoxStarter.IsRebooting) {
             $BoxStarter.IsRebooting = $false #reset
