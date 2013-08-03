@@ -82,11 +82,11 @@ Set-BoxstarterConfig
     try{
         if($DisableReboots){$Boxstarter.RebootOk=$false}
         if($Boxstarter.ScriptToCall -eq $null){
-            if($bootstrapPackage -ne $null){
-                write-BoxstarterMessage "Installing package '$bootstrapPackage'"
+            if($bootstrapPackage -ne $null -and $bootstrapPackage.length -gt 0){
+                write-BoxstarterMessage "Installing package '$bootstrapPackage'" -Color Cyan
             }
             else{
-                write-BoxstarterMessage "Installing Chocolatey"
+                write-BoxstarterMessage "Installing Chocolatey" -Color Cyan
             }
             $script=@"
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;

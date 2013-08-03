@@ -34,11 +34,12 @@ about_boxstarter_logging
 #>
     param(
         [String]$message, 
-        [switch]$nologo
+        [switch]$nologo,
+        [ConsoleColor]$color=[ConsoleColor]::green
     )
     if($Boxstarter.SuppressLogging){return}
     if(!$nologo){$message = "Boxstarter: $message"}
     $fmtTitle = Format-BoxStarterMessage $message
-    Write-Host $fmtTitle -ForeGroundColor green
+    Write-Host $fmtTitle -ForeGroundColor $color
     Log-BoxStarterMessage $fmtTitle
 }

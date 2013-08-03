@@ -69,8 +69,8 @@ Invoke-Reboot
     $session=$null
     try{
         $boxMod=(IEX (Get-Content (join-path $Boxstarter.Basedir Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1) | Out-String))
-        write-BoxstarterMessage "Boxstarter Version $($boxMod.ModuleVersion)" -nologo
-        write-BoxstarterMessage "$($boxMod.Copyright) http://boxstarter.codeplex.com" -nologo
+        write-BoxstarterMessage "Boxstarter Version $($boxMod.ModuleVersion)" -nologo -Color White
+        write-BoxstarterMessage "$($boxMod.Copyright) http://boxstarter.codeplex.com`r`n" -nologo -Color White
         $session=Start-TimedSection "Installation session."
         if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
         if($encryptedPassword){$password = ConvertTo-SecureString -string $encryptedPassword}
@@ -127,12 +127,12 @@ function InitAutologon([System.Security.SecureString]$password){
     } else {$autoLogon=0}
     $Boxstarter.AutologedOn = ($autoLogon -gt 0)
     if($Boxstarter.RebootOk -and !$Password -and !$Boxstarter.AutologedOn) {
+        Write-BoxstarterMessage "Please type CTRL+C or close this window to exit Boxstarter if you do not want to risk a reboot during this Boxstarter install.`r`n" -nologo -Color Yellow
         write-BoxstarterMessage @"
 Boxstarter may need to reboot your system. 
 Please provide your password so that Boxstarter may automatically log you on. 
 Your password will be securely stored and encrypted.
 "@ -nologo
-        Write-BoxstarterMessage "Please type CTRL+C or close this window to exit Boxstarter if you do not want to risk a reboot during this Boxstarter install." -nologo
 
         $Password=Read-AuthenticatedPassword
     }
