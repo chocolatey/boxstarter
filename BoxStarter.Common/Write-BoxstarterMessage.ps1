@@ -13,6 +13,10 @@ The string to be logged
 .PARAMETER NoLogo
 If ommited, the message will be preceeded with "Boxstarter: "
 
+.PARAMETER Color
+Specifies a foreground color to use for the message. Green is the 
+default.
+
 .EXAMPLE
 Write-BoxstarterMessage "I am logging a message."
 
