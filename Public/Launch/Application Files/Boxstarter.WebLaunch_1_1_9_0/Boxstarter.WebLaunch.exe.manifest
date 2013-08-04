@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="Boxstarter.WebLaunch.exe" version="1.1.0.0" publicKeyToken="e206c7817b124a53" language="neutral" processorArchitecture="msil" type="win32" />
+  <asmv1:assemblyIdentity name="Boxstarter.WebLaunch.exe" version="1.1.9.0" publicKeyToken="e206c7817b124a53" language="neutral" processorArchitecture="msil" type="win32" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="Boxstarter.WebLaunch" version="1.1.0.0" language="neutral" processorArchitecture="msil" />
+    <assemblyIdentity name="Boxstarter.WebLaunch" version="1.1.9.0" language="neutral" processorArchitecture="msil" />
     <commandLine file="Boxstarter.WebLaunch.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -31,13 +31,13 @@
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Boxstarter.WebLaunch.exe" size="5120">
-      <assemblyIdentity name="Boxstarter.WebLaunch" version="1.1.0.0" language="neutral" processorArchitecture="msil" />
+      <assemblyIdentity name="Boxstarter.WebLaunch" version="1.1.9.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>R1VUnusX0YzD/dpv9InUxVtaxoI=</dsig:DigestValue>
+        <dsig:DigestValue>YcknlQKHsAbZIXdXb0W6ATmsqrk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -50,13 +50,13 @@
       <dsig:DigestValue>dcT48n6yLTSvLVEHW/lXCBiehBI=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.Bootstrapper\Boxstarter.bootstrapper.psd1" size="1556">
+  <file name="Boxstarter.Bootstrapper\Boxstarter.bootstrapper.psd1" size="1596">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>SivySoHF98fAr6aK9lJ9ePHNxEg=</dsig:DigestValue>
+      <dsig:DigestValue>ZnSOgDg8Nha9fNu/yo5qmDbvsNw=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psm1" size="414">
@@ -68,13 +68,13 @@
       <dsig:DigestValue>XDnzdhPGJ6iRvK6kYLzA2a0FHzg=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.Bootstrapper\Cleanup-Boxstarter.ps1" size="1668">
+  <file name="Boxstarter.Bootstrapper\Cleanup-Boxstarter.ps1" size="1816">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>a+LaUbjMoMF/Ezt9q/IQk7qMVG8=</dsig:DigestValue>
+      <dsig:DigestValue>qmWr6HxSxodaCBaoxfMZZljV40c=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.Bootstrapper\Get-PendingReboot.ps1" size="6370">
@@ -95,22 +95,22 @@
       <dsig:DigestValue>c/7fBAKX/GbSkLAETgoKc4bqT00=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.Bootstrapper\Invoke-Boxstarter.ps1" size="6564">
+  <file name="Boxstarter.Bootstrapper\Invoke-Boxstarter.ps1" size="6897">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>TPI+5r//n6BxrXCtrE0Lmxq8jO8=</dsig:DigestValue>
+      <dsig:DigestValue>m0P/2BHm0tYeJdf9M+FkgtYEnWc=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.Bootstrapper\Invoke-Reboot.ps1" size="1808">
+  <file name="Boxstarter.Bootstrapper\Invoke-Reboot.ps1" size="1772">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>ews0D5IDfZ6syyBSGt+w0ibN/zU=</dsig:DigestValue>
+      <dsig:DigestValue>EMtiAX6LxkbXov1NOc8TmaO1rRw=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.Bootstrapper\Set-SecureAutoLogon.ps1" size="13153">
@@ -149,13 +149,13 @@
       <dsig:DigestValue>5GRDUToanE0UXq175M7WzgkyVWU=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1" size="1598">
+  <file name="Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1" size="1638">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>fURUWSQMcK+fUaE5RrukD/zjuWA=</dsig:DigestValue>
+      <dsig:DigestValue>rCuGs/UCls1LQWDVVzjRt46CIkk=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.Chocolatey\Boxstarter.Chocolatey.psm1" size="537">
@@ -212,13 +212,13 @@
       <dsig:DigestValue>NXMHJCP5/RO1Cv3RaQC4ogoqXmc=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.Chocolatey\Invoke-ChocolateyBoxstarter.ps1" size="5557">
+  <file name="Boxstarter.Chocolatey\Invoke-ChocolateyBoxstarter.ps1" size="5681">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>QyTFGzPHamJyif+eZkEH3B8AdWs=</dsig:DigestValue>
+      <dsig:DigestValue>lNLVHk3fdLobD29w737z+NHkM3A=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.Chocolatey\New-BoxstarterPackage.ps1" size="3408">
@@ -248,13 +248,13 @@
       <dsig:DigestValue>39Cs+CSuG9PNQhhIsCflFfr3C2w=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.Common\boxstarter.common.psd1" size="1456">
+  <file name="Boxstarter.Common\boxstarter.common.psd1" size="1496">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>xgUEx9TC3J1AG1JqJsWj3/SWKo0=</dsig:DigestValue>
+      <dsig:DigestValue>Vq2bC8wg2NlteKuzgKiwuXTeh9s=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.Common\Boxstarter.Common.psm1" size="231">
@@ -320,13 +320,13 @@
       <dsig:DigestValue>XSG9i9wWI54UNwn5bIg2Fc1Womc=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.Common\Write-BoxstarterMessage.ps1" size="1136">
+  <file name="Boxstarter.Common\Write-BoxstarterMessage.ps1" size="1288">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>f4uMjhxolV5jNpplwCU4TPChcfU=</dsig:DigestValue>
+      <dsig:DigestValue>XM6/fQnkIXU9K39ACrA7yCj910U=</dsig:DigestValue>
     </hash>
   </file>
   <file name="boxstarter.config" size="279">
@@ -347,13 +347,13 @@
       <dsig:DigestValue>2IsMvbWsC/GEpIzyD6FhbYMI6xI=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.WinConfig\boxstarter.WinConfig.psd1" size="1509">
+  <file name="Boxstarter.WinConfig\boxstarter.WinConfig.psd1" size="1549">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>kb+LLVIarVwgyXTO0+KEOeFE18Y=</dsig:DigestValue>
+      <dsig:DigestValue>9U5xNHlCqFygfTy9UJdG1MItBvQ=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.WinConfig\Boxstarter.WinConfig.psm1" size="574">
@@ -494,4 +494,4 @@
       <!--<supportedOS Id="{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}"></supportedOS>-->
     </application>
   </compatibility>
-<publisherIdentity name="CN=ULTRAWROCK\Matt" issuerKeyHash="31d28f5489c382bcd6dc391afe495a6521357c99" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>9yKfrOi4OuAjfEdPdhSi23yUBSM=</DigestValue></Reference></SignedInfo><SignatureValue>CvXAaFAhePP1Qlcwr6MFTtzPiLDoDJPasZAcGHmLr/vf0HX5UDGpVp2C018HLUjgCxsIDW1BUG3RbKTzdDylzK29D4m6WHjnmBTTjuwF0jMIMbrsKRnSKzoJXZODUOGr05zbCKgp4KWrC58TQXRGsyYZYgGJs1VUPa+ShUsA2l0=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>tfW6LM3WwZX/ZK8sLO7arWkoonUbcXBEErh3uem9E1sRbsB9kqMbGGcOTtCAfGHFIrSjyTS4S79QxX74o6SXLyakdeNZ6UTIPm4nhypm40mAWxFQP5ryF17mn7crBQSud3Gsk1GH4o5cK/uxhXx04zt3kH54ia8fJRGaewVYnnk=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="2305947cdba214764f477c23e03ab8e8ac9f22f7" Description="" Url=""><as:assemblyIdentity name="Boxstarter.WebLaunch.exe" version="1.1.0.0" publicKeyToken="e206c7817b124a53" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=ULTRAWROCK\Matt</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>5Aixjyq4GivCrLFz2T3bTkWFL6k=</DigestValue></Reference></SignedInfo><SignatureValue>RdCFPvSXkc4/i/7rWI/uE2iojZSkOvfFw6GXO4ASkTH5OADV4syW1KcUK7oZ22GBCkTSw2Fl7WIfQcn0Qjg4V9Bietoee6A9wjKY00bzVsqrJZQ+cuSf7frlSCOf9S91psR/8Rmar8YlLD7HjYwoJu/BrWSgaAXLJ+MHU5m5BNI=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>tfW6LM3WwZX/ZK8sLO7arWkoonUbcXBEErh3uem9E1sRbsB9kqMbGGcOTtCAfGHFIrSjyTS4S79QxX74o6SXLyakdeNZ6UTIPm4nhypm40mAWxFQP5ryF17mn7crBQSud3Gsk1GH4o5cK/uxhXx04zt3kH54ia8fJRGaewVYnnk=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB1TCCAT6gAwIBAgIQb5wdCo+uBb5A7eSsAyYxnjANBgkqhkiG9w0BAQUFADApMScwJQYDVQQDHh4AVQBMAFQAUgBBAFcAUgBPAEMASwBcAE0AYQB0AHQwHhcNMTMwNzI4MDQyOTIyWhcNMTQwNzI4MTAyOTIyWjApMScwJQYDVQQDHh4AVQBMAFQAUgBBAFcAUgBPAEMASwBcAE0AYQB0AHQwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALX1uizN1sGV/2SvLCzu2q1pKKJ1G3FwRBK4d7npvRNbEW7AfZKjGxhnDk7QgHxhxSK0o8k0uEu/UMV++KOkly8mpHXjWelEyD5uJ4cqZuNJgFsRUD+a8hde5p+3KwUErndxrJNRh+KOXCv7sYV8dOM7d5B+eImvHyURmnsFWJ55AgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAQSx8Evy32EfYb+4tziuDVNoUS13c5vmOBlGfYYeKSXk1Q0LeSyxX5lvGL/LddjaYQ7MN/4GKOf2bfu3x5OfMqBkHIq43yVWaKF58h8P1ArvznlQhnMrYCuxTCwmwTzcSyt/ix4MwJxWwWtl3k7aoRS23/E7EGVZWkzSrnyle0cc=</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>
+<publisherIdentity name="CN=ULTRAWROCK\Matt" issuerKeyHash="31d28f5489c382bcd6dc391afe495a6521357c99" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>qt1TRNPqDVPxQC+oJdD/elT1P2E=</DigestValue></Reference></SignedInfo><SignatureValue>b/6sSAhWseGcsY4b7MpobePFvFbTe5U1JnjqOvDU/nq82ptl2M8x4EhozCA5/0KwCtDdSNk+TV68OVMCmTrCc3aqf4/6ZLxpDI9gKHOyMEIL7zTby7Q++AtXcOgdVOiFrbRNw+vgKQbWuVVPemrPHRLGY7k8CiDgkJaiEb/46c8=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>tfW6LM3WwZX/ZK8sLO7arWkoonUbcXBEErh3uem9E1sRbsB9kqMbGGcOTtCAfGHFIrSjyTS4S79QxX74o6SXLyakdeNZ6UTIPm4nhypm40mAWxFQP5ryF17mn7crBQSud3Gsk1GH4o5cK/uxhXx04zt3kH54ia8fJRGaewVYnnk=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="613ff5547affd025a82f40f1530dead34453ddaa" Description="" Url=""><as:assemblyIdentity name="Boxstarter.WebLaunch.exe" version="1.1.9.0" publicKeyToken="e206c7817b124a53" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=ULTRAWROCK\Matt</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>TMX+CA7m7CVpMEduO0qX7UBZhKw=</DigestValue></Reference></SignedInfo><SignatureValue>BLHTouFP1vH8PR9LNod/SwijS4tRbN3w1nR9DWyAmtcV/z+yL69WQ2TcSMqU4hU2WmPUb3CNcBLZRC+r3s0WSDvftjl66uD1tzGULoufPgdt/DNMUQQEGT3xN3KPNKc5FJevHSkucR9AiDWNsrae+1Z2PKHEVeUkD8U4XLvolPM=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>tfW6LM3WwZX/ZK8sLO7arWkoonUbcXBEErh3uem9E1sRbsB9kqMbGGcOTtCAfGHFIrSjyTS4S79QxX74o6SXLyakdeNZ6UTIPm4nhypm40mAWxFQP5ryF17mn7crBQSud3Gsk1GH4o5cK/uxhXx04zt3kH54ia8fJRGaewVYnnk=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB1TCCAT6gAwIBAgIQb5wdCo+uBb5A7eSsAyYxnjANBgkqhkiG9w0BAQUFADApMScwJQYDVQQDHh4AVQBMAFQAUgBBAFcAUgBPAEMASwBcAE0AYQB0AHQwHhcNMTMwNzI4MDQyOTIyWhcNMTQwNzI4MTAyOTIyWjApMScwJQYDVQQDHh4AVQBMAFQAUgBBAFcAUgBPAEMASwBcAE0AYQB0AHQwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALX1uizN1sGV/2SvLCzu2q1pKKJ1G3FwRBK4d7npvRNbEW7AfZKjGxhnDk7QgHxhxSK0o8k0uEu/UMV++KOkly8mpHXjWelEyD5uJ4cqZuNJgFsRUD+a8hde5p+3KwUErndxrJNRh+KOXCv7sYV8dOM7d5B+eImvHyURmnsFWJ55AgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAQSx8Evy32EfYb+4tziuDVNoUS13c5vmOBlGfYYeKSXk1Q0LeSyxX5lvGL/LddjaYQ7MN/4GKOf2bfu3x5OfMqBkHIq43yVWaKF58h8P1ArvznlQhnMrYCuxTCwmwTzcSyt/ix4MwJxWwWtl3k7aoRS23/E7EGVZWkzSrnyle0cc=</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>
