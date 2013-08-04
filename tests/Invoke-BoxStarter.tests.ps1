@@ -11,6 +11,7 @@ $Boxstarter.BaseDir= (split-path -parent $here)
 
 Describe "Invoke-Boxstarter" {
     $testRoot = (Get-PSDrive TestDrive).Root
+    Mock New-Item -ParameterFilter {$path -like "$env:appdata\*"}
 
     Context "When Configuration Service is installed" {
         Mock Test-Admin {return $true}
@@ -78,18 +79,17 @@ Describe "Invoke-Boxstarter" {
         Invoke-Boxstarter {Invoke-Reboot} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
 
         it "will save startup file" {
-            Test-Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat" | should Be $true
+            Assert-MockCalled New-Item -ParameterFilter {$Path -eq "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat"}
         }
         it "will not remove autologin registry" {
             (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon").AutoAdminLogon | should be 1
         }
         it "Will Save Script File" {
-            "$env:temp\boxstarter.script" | should Contain "Invoke-Reboot"
+            Assert-MockCalled New-Item -ParameterFilter {$Path -eq "$env:temp\boxstarter.script" -and ($Value -like "*Invoke-Reboot*")}
         }
         it "Restart file will have RebootOk" {
-            "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat" | should Contain "-RebootOk"
+            Assert-MockCalled New-Item -ParameterFilter {$Path -eq "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat" -and ($Value -like "*-RebootOk*")}
         }
-        remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat"
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
     }
 
@@ -110,7 +110,6 @@ Describe "Invoke-Boxstarter" {
         it "will read host for the password" {
             Assert-MockCalled Set-SecureAutoLogon -ParameterFilter {$password -eq $pass}
         }
-        remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat"
     }
 
     Context "When no password is provided, reboot is ok and autologon is toggled" {
@@ -131,7 +130,6 @@ Describe "Invoke-Boxstarter" {
             Assert-MockCalled Read-AuthenticatedPassword -times 0
         }
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
-        remove-item "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat"
     }
 
     Context "When a password is provided and reboot is ok" {
