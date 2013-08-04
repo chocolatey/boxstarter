@@ -44,6 +44,11 @@ User's password as a Secure string to be used for reboot autologons.
 This will suppress the password prompt at the beginning of the 
 Boxstarter installer.
 
+.PARAMETER NoNewWindow
+Enabling this switch will prevent the command window from closing and 
+prompt the user to pres the Enter key before the window closes. This 
+is ideal when not invoking boxstarter from a console.
+
 .EXAMPLE
 Invoke-ChocolateyBoxstarter example
 

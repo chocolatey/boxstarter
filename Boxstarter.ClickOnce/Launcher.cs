@@ -38,11 +38,15 @@ namespace Boxstarter.WebLaunch
             {
                 fileToRun = Assembly.GetExecutingAssembly().CodeBase;
             }
+            else
+            {
+                psArgs += " -KeepWindowOpen";
+            }
 
             var processInfo = new ProcessStartInfo(fileToRun)
             {
                 Verb = "runas",
-                Arguments = psArgs + " -KeepWindowOpen"
+                Arguments = psArgs
             };
             Process.Start(processInfo);
         }
