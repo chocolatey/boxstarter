@@ -91,7 +91,7 @@ Invoke-Reboot
        $_ | write-host -ForeGroundColor red
     }
     finally{
-        Cleanup-Boxstarter $KeepWindowOpen
+        Cleanup-Boxstarter -KeepWindowOpen:$KeepWindowOpen
         Stop-TimedSection $session
         if($BoxStarter.IsRebooting) {
             $BoxStarter.IsRebooting = $false #reset
