@@ -12,6 +12,8 @@ $Boxstarter.BaseDir= (split-path -parent $here)
 Describe "Invoke-Boxstarter" {
     $testRoot = (Get-PSDrive TestDrive).Root
     Mock New-Item -ParameterFilter {$path -like "$env:appdata\*"}
+    Mock Enable-UAC
+    Mock Disable-UAC
 
     Context "When Configuration Service is installed" {
         Mock Test-Admin {return $true}
@@ -141,7 +143,6 @@ Describe "Invoke-Boxstarter" {
         Mock Restart
         Mock RestartNow
         Mock Read-AuthenticatedPassword
-        Mock Disable-UAC
 
         Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
 
@@ -195,7 +196,6 @@ Describe "Invoke-Boxstarter" {
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
-        Mock Enable-UAC
         New-Item "$env:temp\BoxstarterReEnableUAC" -type file | Out-Null
 
         Invoke-Boxstarter {return}
@@ -213,7 +213,6 @@ Describe "Invoke-Boxstarter" {
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
-        Mock Enable-UAC
 
         Invoke-Boxstarter {return}
 
@@ -292,7 +291,6 @@ Describe "Invoke-Boxstarter" {
         Mock Read-AuthenticatedPassword
         $Boxstarter.IsRebooting=$true
         Mock Get-UAC {return $true}
-        Mock Disable-UAC
         Mock Set-SecureAutoLogon
         Mock New-Item
 
@@ -314,7 +312,6 @@ Describe "Invoke-Boxstarter" {
         Mock Read-AuthenticatedPassword
         $Boxstarter.IsRebooting=$true
         Mock Get-UAC {return $true}
-        Mock Disable-UAC
         Mock Set-SecureAutoLogon
         Mock New-Item
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
@@ -338,7 +335,6 @@ Describe "Invoke-Boxstarter" {
         Mock Read-AuthenticatedPassword
         $Boxstarter.IsRebooting=$true
         Mock Get-UAC {return $true}
-        Mock Disable-UAC
         Mock Set-SecureAutoLogon
         Mock New-Item
         
@@ -360,7 +356,6 @@ Describe "Invoke-Boxstarter" {
         Mock Read-AuthenticatedPassword
         $Boxstarter.IsRebooting=$true
         Mock Get-UAC
-        Mock Disable-UAC
         Mock Set-SecureAutoLogon
         Mock New-Item
 
