@@ -3,7 +3,8 @@ param (
     [string]$ChocoPath,
     [switch]$Help,
     [string]$VmName,
-    [string]$package
+    [string]$package,
+    [string]$testName
 )
 $here = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 if($ChocoPath){
