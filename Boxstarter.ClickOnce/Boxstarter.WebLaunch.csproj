@@ -65,10 +65,21 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>D2D258DDFD35972F5D593F6E28B0E672C5540A42</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>EC806986340C77C357FA30F902B5EC10255D5AC5</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>Boxstarter.ClickOnce_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>boxLogo_sm.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -221,8 +232,8 @@
     <Content Include="..\Boxstarter.Bootstrapper\Init-Settings.ps1">
       <Link>Boxstarter.Bootstrapper\Init-Settings.ps1</Link>
     </Content>
+    <Content Include="boxLogo_sm.ico" />
     <None Include="App.config" />
-    <None Include="Boxstarter.ClickOnce_TemporaryKey.pfx" />
     <None Include="Properties\app.manifest" />
   </ItemGroup>
   <ItemGroup>
@@ -243,6 +254,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"$(WindowsSDK80Path)bin\x64\signtool.exe" sign /n "Open Source Developer, Boxstarter.org" "$(ProjectDir)obj\debug\Boxstarter.WebLaunch.exe"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
