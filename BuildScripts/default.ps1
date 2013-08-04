@@ -36,7 +36,12 @@ Task Test {
     pushd "$baseDir"
     $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
     if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}
-    exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests }
+    if($testName){
+        exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -testName $testName}
+    }
+    else{
+        exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests }
+    }
     popd
 }
 
@@ -107,7 +112,7 @@ task Update-Homepage {
      (Get-Content $filename) | % {$_ -replace $downloadButtonUrlPatern, $downloadUrl } | % {$_ -replace $downloadLinkTextPattern, ("v"+$version) } | Set-Content $filename
 }
 
-task Test-VM {
+task Test-VM -requiredVariables "VmName","package"{
     $vm = Get-VM $VmName
     Restore-VMSnapshot $vm -Name $vm.ParentSnapshotName -Confirm:$false
     Start-VM $VmName
