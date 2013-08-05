@@ -33,11 +33,27 @@
         <h2>Your personal Windows Install made easy!</h2>
 
 <ul>
-<li>100% Unattended Install with pending reboot detection and automatic logon.</li>
+<li>100% Unattended Install with <b>pending reboot detection and automatic logon</b>.</li>
 <li>Lots of Windows configuration utilities including installing critical updates, changing windows explorer options, and more.</li>
-<li>Easily installs to a Thumb drive or Set-BoxstarterShare to share it on your network.</li>
-</ul><h2>Build your Uber Geek Environment</h2>
+<li>Launch via a simple URL, install on a Thumb drive or share it on your network.</li>
+</ul>
+<h2>Build your Environment with one easy command</h2>
+Boxstarter can run any <a href="http://chocolatey.org">Chocolatey</a> standard Nuget package to create an environment customized to your needs and tastes. There is no need to have Chocolatey installed. <b>Any base install of Windows 7, 8, Server 2008 R2 or 2012 is fully compatible</b>. Launch the Boxstarter Web Lancher targeting any public Chocolatey or Myget.Org Boxstarter feed:
 
+<img src="images/Launch.png"/>
+
+Accept all the prompts and the privilege elevation request. <b>Boxstarter needs to run as admin</b>.
+
+<img src="images/elevate.png"/>
+
+Enter your password so Boxstarter can automatically log you in after each reboot.
+
+<img src="images/console.png"/>
+
+See <a href="https://boxstarter.codeplex.com/wikipage?title=Boxstarter%20from%20web%20via%20ClickOnce">this wiki</a> for more details on installing Boxstarter packages from the web.
+<p/>
+<h2>Host your own portable repo</h2>
+If you prefer not to use the ClickOnce web installer or host/use a private feed not on Chocolatey or the Myget.org community feed. Install the Boxstarter Powershell modules:
 <div class="highlight"><pre><span class="c">#After extracting Boxstarter.1.1.14.zip on MYCOMPUTER</span>
 <span class="p">.\</span><span class="n">setup</span><span class="p">.</span><span class="n">bat</span>
 <span class="nb">Import-Module</span> <span class="nv">$env:appdata</span><span class="p">\</span><span class="n">boxstarter</span><span class="p">\</span><span class="n">Boxstarter</span><span class="p">.</span><span class="n">Chocolatey</span><span class="p">\</span><span class="n">Boxstarter</span><span class="p">.</span><span class="n">Chocolatey</span><span class="p">.</span><span class="n">psd1</span>
