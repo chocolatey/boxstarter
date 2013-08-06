@@ -53,7 +53,7 @@ Invoke-Reboot
 #>    
     [CmdletBinding()]
     param(
-      [Parameter(Position=0,Mandatory=1)]
+      [Parameter(Position=0,Mandatory=0)]
       [ScriptBlock]$ScriptToCall,
       [Parameter(Position=1,Mandatory=0)]
       [System.Security.SecureString]$password,

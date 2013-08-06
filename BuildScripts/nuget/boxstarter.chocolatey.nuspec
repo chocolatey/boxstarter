@@ -17,6 +17,7 @@
       <dependency id="Boxstarter.Bootstrapper" />  
     </dependencies>
     <releaseNotes>
+      - Fix bug preventing script to continue after reboot
       - Bunch of bug fixes to make Boxstarter more stable
       - Protect against reboots during .net4 install
       - Provide helper cmdlets for reading and editing config settings

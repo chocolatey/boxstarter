@@ -1,13 +1,13 @@
 @{
-Description = 'Provides Functions for customizing and configuring core windows settings'
+Description = 'Provides a robust environment capable of automatic reboots and several windows customization functions ideal for installing chocolatey packages on a new machine'
 # Script module or binary module file associated with this manifest.
-ModuleToProcess = './boxstarter.WinConfig.psm1'
+ModuleToProcess = './boxstarter.chocolatey.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.1.14'
+ModuleVersion = '1.1.17'
 
 # ID used to uniquely identify this module
-GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e52'
+GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e51'
 
 # Author of this module
 Author = 'Matt Wrock'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = '12d9fbb4f3e98da998b857c64e402e940074bee4'
+PrivateData = 'dd414737bbe2d281bbda0cfca618d9cc9140d11c'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

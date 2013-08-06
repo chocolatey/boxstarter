@@ -134,6 +134,27 @@ Describe "Invoke-Boxstarter" {
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
     }
 
+    Context "When no script is passed on command line but script file exists" {
+        Mock Test-Admin {return $true}
+        Mock Stop-Service
+        Mock Start-Service
+        Mock Set-Service
+        Mock Set-SecureAutoLogon
+        Mock Restart
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        Mock get-UAC
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
+        New-Item "$env:temp\Boxstarter.script" -type file -value ([ScriptBlock]::Create("`$env:testkey='val'")) -force | Out-Null
+
+        Invoke-Boxstarter -RebootOk
+
+        it "will call script" {
+            $env:testkey | should be "val"
+        }
+        Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -ErrorAction SilentlyContinue
+    }
+
     Context "When a password is provided and reboot is ok" {
         Mock Test-Admin {return $true}
         Mock Stop-Service
