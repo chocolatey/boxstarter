@@ -1,0 +1,14 @@
+ - Try to use ICS First
+ - See If ICS is enabled
+ - No, Try to enable
+ - Look for an existing Private V switch
+ - Yes, Is it shared with an active connection, use it
+ - No, Are there any adapters engaged in ICS
+ - No, Create new Private Switch and share with existing connection
+ - ICS is not enabled or an adapter is already being shared
+ - Yes, Is there a public switch 
+ - Yes, is it connected
+ - Yes, use it
+ - It is not connected or no public switches, are there any connected adapters
+ - Yes, create a new public switch and bind to it
+ - Still no connection, complain
