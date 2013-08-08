@@ -64,7 +64,7 @@ Invoke-Reboot
       [Parameter(Position=4,Mandatory=0)]
       [switch]$KeepWindowOpen      
     )
-    $scriptFile = "$env:temp\boxstarter.script"
+    $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
     if(!(Test-Admin)) {
         New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | out-null
         Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate..."

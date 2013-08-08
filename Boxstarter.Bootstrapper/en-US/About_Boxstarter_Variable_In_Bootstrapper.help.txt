@@ -26,8 +26,8 @@ BOXSTARTER VARIABLE SETTINGS
 
 	Log
 		This points to the path of the Boxstarter log file. By default 
-		this is $env:temp\boxstarter.log. You may edit this variable 
-		to change the location of the log.
+		this is $env:LocalAppData\Boxstarter\boxstarter.log. You may 
+		edit this variable to change the location of the log.
 
 	RebootOk
 		A boolean value indicating if automatic reboots are permited. 
