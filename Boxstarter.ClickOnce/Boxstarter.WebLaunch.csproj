@@ -124,6 +124,9 @@
     <Content Include="..\Boxstarter.Bootstrapper\Test-PendingReboot.ps1">
       <Link>Boxstarter.Bootstrapper\Test-PendingReboot.ps1</Link>
     </Content>
+    <Content Include="..\Boxstarter.Bootstrapper\Get-BoxstarterTempDir.ps1">
+      <Link>Boxstarter.Bootstrapper\Get-BoxstarterTempDir.ps1</Link>
+    </Content>    
     <Content Include="..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1">
       <Link>Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1</Link>
     </Content>
