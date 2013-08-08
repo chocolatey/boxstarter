@@ -87,7 +87,7 @@ Describe "Invoke-Boxstarter" {
             (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon").AutoAdminLogon | should be 1
         }
         it "Will Save Script File" {
-            Assert-MockCalled New-Item -ParameterFilter {$Path -eq "$env:temp\boxstarter.script" -and ($Value -like "*Invoke-Reboot*")}
+            Assert-MockCalled New-Item -ParameterFilter {$Path -eq "$(Get-BoxstarterTempDir)\boxstarter.script" -and ($Value -like "*Invoke-Reboot*")}
         }
         it "Restart file will have RebootOk" {
             Assert-MockCalled New-Item -ParameterFilter {$Path -eq "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat" -and ($Value -like "*-RebootOk*")}
@@ -145,7 +145,7 @@ Describe "Invoke-Boxstarter" {
         Mock Read-AuthenticatedPassword
         Mock get-UAC
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
-        New-Item "$env:temp\Boxstarter.script" -type file -value ([ScriptBlock]::Create("`$env:testkey='val'")) -force | Out-Null
+        New-Item "$(Get-BoxstarterTempDir)\Boxstarter.script" -type file -value ([ScriptBlock]::Create("`$env:testkey='val'")) -force | Out-Null
 
         Invoke-Boxstarter -RebootOk
 
@@ -217,7 +217,7 @@ Describe "Invoke-Boxstarter" {
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
-        New-Item "$env:temp\BoxstarterReEnableUAC" -type file | Out-Null
+        New-Item "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" -type file | Out-Null
 
         Invoke-Boxstarter {return}
 
@@ -225,7 +225,7 @@ Describe "Invoke-Boxstarter" {
             Assert-MockCalled Enable-UAC
         }
         it "will Remove ReEnableUAC File" {
-            "$env:temp\BoxstarterReEnableUAC" | Should Not Exist
+            "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" | Should Not Exist
         }
     }
 
@@ -250,7 +250,7 @@ Describe "Invoke-Boxstarter" {
         Invoke-Boxstarter {return}
 
         it "will Write Script File" {
-            "$env:temp\boxstarter.script" | should Contain "return"
+            "$(Get-BoxstarterTempDir)\boxstarter.script" | should Contain "return"
         }
         it "will invoke-boxstarter via elevated console"{
             Assert-MockCalled Start-Process -ParameterFilter {$filepath -eq "powershell" -and $verb -eq "runas" -and $argumentlist -like "*Invoke-BoxStarter*"}

@@ -1,5 +1,5 @@
 if(!$Global:Boxstarter) { $Global:Boxstarter = @{} }
-$Boxstarter.Log="$env:temp\boxstarter.log"
+$Boxstarter.Log="$(Get-BoxstarterTempDir)\boxstarter.log"
 $Boxstarter.RebootOk=$false
 $Boxstarter.SuppressLogging=$false
 $Boxstarter.IsRebooting=$false
