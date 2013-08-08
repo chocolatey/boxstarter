@@ -1,4 +1,4 @@
 function Get-BoxstarterTempDir {
-    if(!(test-path "$env:LocalApData\Boxstarter")){mkdir "$env:LocalApData\Boxstarter"}
-    return "$env:LocalApData\Boxstarter"
+    if(!(test-path "$env:LocalAppData\Boxstarter")){mkdir "$env:LocalAppData\Boxstarter" | out-null}
+    return "$env:LocalAppData\Boxstarter"
 }
