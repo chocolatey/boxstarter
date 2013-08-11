@@ -36,7 +36,8 @@ function Enable-Net40 {
         Write-Output "Download and install .NET 4.0 Framework"
         $env:chocolateyPackageFolder="$env:temp\chocolatey\webcmd"
         Install-ChocolateyZipPackage 'webcmd' 'http://www.iis.net/community/files/webpi/webpicmdline_anycpu.zip' $env:temp
-        .$env:temp\WebpiCmdLine.exe /products: NetFramework4 /SuppressReboot /accepteula
+        $p = Start-Process $env:temp\WebpiCmdLine.exe -verb runas -ArgumentList "/products: NetFramework4 /SuppressReboot /accepteula" -passthru
+        $p.WaitForExit()
     }
 }
 
