@@ -2,10 +2,12 @@ function Get-Boxstarter {
     if(Check-Chocolatey ){    
         Write-Output "Chocoltey installed, Installing Boxstarter Modules."
         cinst Boxstarter.Chocolatey
+        $Message = "Boxstarter installed"
     }
     else {
-        Write-Output "Did not detect Chocolatey and unable to install. Installation of Boxstarter is aborted."
+        $Message = "Did not detect Chocolatey and unable to install. Installation of Boxstarter is aborted."
     }
+    Read-Host $Message
 }
 
 function Check-Chocolatey {
