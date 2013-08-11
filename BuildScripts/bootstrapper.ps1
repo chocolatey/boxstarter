@@ -36,8 +36,14 @@ function Enable-Net40 {
         Write-Output "Download and install .NET 4.0 Framework"
         $env:chocolateyPackageFolder="$env:temp\chocolatey\webcmd"
         Install-ChocolateyZipPackage 'webcmd' 'http://www.iis.net/community/files/webpi/webpicmdline_anycpu.zip' $env:temp
-        $p = Start-Process $env:temp\WebpiCmdLine.exe -verb runas -ArgumentList "/products: NetFramework4 /SuppressReboot /accepteula" -passthru
-        $p.WaitForExit()
+        if(Test-Admin){
+            $env:temp\WebpiCmdLine.exe /products: NetFramework4 /SuppressReboot /accepteula
+        }
+        else{
+            Write-Output "Installing .NET 4 in a separate window. Boxstarter instalation will complete when it finishes..."
+            $p = Start-Process $env:temp\WebpiCmdLine.exe -verb runas -ArgumentList "/products: NetFramework4 /SuppressReboot /accepteula" -passthru
+            $p.WaitForExit()            
+        }
     }
 }
 
@@ -54,3 +60,10 @@ function Confirm-Install {
         1 {return $false; break}
     }    
 }
+
+function Test-Admin {
+    $identity  = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = New-Object System.Security.Principal.WindowsPrincipal( $identity )
+    return $principal.IsInRole( [System.Security.Principal.WindowsBuiltInRole]::Administrator )
+}
+
