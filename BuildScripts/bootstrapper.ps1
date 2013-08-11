@@ -1,11 +1,12 @@
 function Get-Boxstarter {
+    Write-Output "Welcome to the Boxstarter Module installer!"
     if(Check-Chocolatey ){    
         Write-Output "Chocoltey installed, Installing Boxstarter Modules."
         cinst Boxstarter.Chocolatey
-        $Message = "Boxstarter installed"
+        $Message = "Boxstarter Module Installer completed"
     }
     else {
-        $Message = "Did not detect Chocolatey and unable to install. Installation of Boxstarter is aborted."
+        $Message = "Did not detect Chocolatey and unable to install. Installation of Boxstarter has been aborted."
     }
     Read-Host $Message
 }
@@ -36,12 +37,14 @@ function Enable-Net40 {
         Write-Output "Download and install .NET 4.0 Framework"
         $env:chocolateyPackageFolder="$env:temp\chocolatey\webcmd"
         Install-ChocolateyZipPackage 'webcmd' 'http://www.iis.net/community/files/webpi/webpicmdline_anycpu.zip' $env:temp
+        Write-Host "The .Net 4 framework is about to be installed. This may take several minutes."
+        Remove-Module chocolateyInstaller
         if(Test-Admin){
-            $env:temp\WebpiCmdLine.exe /products: NetFramework4 /SuppressReboot /accepteula
+            ."$env:temp\WebpiCmdLine.exe" /products: NetFramework4 /SuppressReboot /accepteula
         }
         else{
-            Write-Output "Installing .NET 4 in a separate window. Boxstarter instalation will complete when it finishes..."
-            $p = Start-Process $env:temp\WebpiCmdLine.exe -verb runas -ArgumentList "/products: NetFramework4 /SuppressReboot /accepteula" -passthru
+            Write-host "Installing .NET 4 in a separate window. Boxstarter instalation will complete when it finishes..."
+            $p = Start-Process "$env:temp\WebpiCmdLine.exe" -verb runas -ArgumentList "/products: NetFramework4 /SuppressReboot /accepteula" -passthru
             $p.WaitForExit()            
         }
     }
@@ -49,7 +52,7 @@ function Enable-Net40 {
 
 function Confirm-Install {
     $caption = "Installing Chocoltey"
-    $message = "Chocolatey is going to be downloaded and installed on your machine. Do you want to proceed?"
+    $message = "Chocolatey is going to be downloaded and installed on your machine. If you do not have the .NET Framework Version 4, that will aldo be downloaded and installed. Do you want to proceed?"
     $yes = new-Object System.Management.Automation.Host.ChoiceDescription "&Yes","Yes";
     $no = new-Object System.Management.Automation.Host.ChoiceDescription "&No","No";
     $choices = [System.Management.Automation.Host.ChoiceDescription[]]($yes,$no);
