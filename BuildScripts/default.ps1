@@ -77,14 +77,8 @@ Task Package-DownloadZip -depends Clean-Artifacts {
       Remove-Item "$basedir\BuildArtifacts\Boxstarter.*.zip" -Force
     }
 
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.common" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.WinConfig" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.bootstrapper" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.chocolatey" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.config" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.bat" }
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\license.txt" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\BuildScripts\Setup.ps1" }
+    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\BuildScripts\bootstrapper.ps1" }
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\Setup.bat" }
 }
 
