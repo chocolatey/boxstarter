@@ -53,6 +53,9 @@ Task Version-Module -description 'Stamps the psd1 with the version and last chan
                 % {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } | 
                     Set-Content $path
     }
+    (Get-Content "$baseDir\BuildScripts\bootstrapper.ps1") |
+        % {$_ -replace " -version .*`$", " -version $version" } | 
+            Set-Content "$baseDir\BuildScripts\bootstrapper.ps1"
 }
 
 Task Clean-Artifacts {
