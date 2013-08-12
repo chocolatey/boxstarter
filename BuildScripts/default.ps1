@@ -103,6 +103,22 @@ Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
     }
 }
 
+Task Push-Codeplex {
+    Add-Type -Path "$basedir\CodePlexClientAPI\CodePlex.WebServices.Client.dll"
+     $releaseService=New-Object CodePlex.WebServices.Client.ReleaseService
+     $releaseService.Credentials = Get-Credential -Message "Codeplex credentials" -username "mwrock"
+     $releaseService.CreateARelease("boxstarter","Boxstarter $version","",$null,[CodePlex.WebServices.Client.ReleaseStatus]::Released, $true, $true)
+     $releaseFile = New-Object CodePlex.WebServices.Client.releaseFile
+     $releaseFile.Name="Boxstarter $version"
+     $releaseFile.MimeType="application/zip"
+     $releaseFile.FileName="boxstarter.$version.zip"
+     $releaseFile.FileType=[CodePlex.WebServices.Client.ReleaseFileType]::RuntimeBinary
+     $releaseFile.FileData=[System.IO.File]::ReadAllBytes("$basedir\BuildArtifacts\Boxstarter.$version.zip");
+     $fileList=new-object "System.Collections.Generic.List``2[[CodePlex.WebServices.Client.releaseFile]]"
+     $fileList.Add($releaseFile)
+     $releaseService.UploadReleaseFiles("boxstarter", "Boxstarter $version", releaseFiles);
+}
+
 task Update-Homepage {
      $downloadUrl="Boxstarter.$version.zip"
      $downloadButtonUrlPatern="Boxstarter\.[0-9]+(\.([0-9]+|\*)){1,3}\.zip"
