@@ -104,17 +104,17 @@ Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
 }
 
 Task Push-Codeplex {
-    Add-Type -Path "$basedir\CodePlexClientAPI\CodePlex.WebServices.Client.dll"
+    Add-Type -Path "$basedir\BuildScripts\CodePlexClientAPI\CodePlex.WebServices.Client.dll"
      $releaseService=New-Object CodePlex.WebServices.Client.ReleaseService
      $releaseService.Credentials = Get-Credential -Message "Codeplex credentials" -username "mwrock"
-     $releaseService.CreateARelease("boxstarter","Boxstarter $version","",$null,[CodePlex.WebServices.Client.ReleaseStatus]::Released, $true, $true)
+     $releaseService.CreateARelease("boxstarter","Boxstarter $version","Running the Setup.bat file will install Chocolatey if not present and then install the Boxstarter modules.",[DateTime]::Now,[CodePlex.WebServices.Client.ReleaseStatus]::Beta, $true, $true)
      $releaseFile = New-Object CodePlex.WebServices.Client.releaseFile
      $releaseFile.Name="Boxstarter $version"
      $releaseFile.MimeType="application/zip"
      $releaseFile.FileName="boxstarter.$version.zip"
      $releaseFile.FileType=[CodePlex.WebServices.Client.ReleaseFileType]::RuntimeBinary
      $releaseFile.FileData=[System.IO.File]::ReadAllBytes("$basedir\BuildArtifacts\Boxstarter.$version.zip")
-     $fileList=new-object "System.Collections.Generic.List``2[[CodePlex.WebServices.Client.releaseFile]]"
+     $fileList=new-object "System.Collections.Generic.List``1[[CodePlex.WebServices.Client.ReleaseFile]]"
      $fileList.Add($releaseFile)
      $releaseService.UploadReleaseFiles("boxstarter", "Boxstarter $version", $fileList)
 }
