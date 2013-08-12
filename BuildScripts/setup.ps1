@@ -40,8 +40,13 @@ function PersistBoxStarterPathToEnvironmentVariable($variableName){
     if($value){
         $values=($value -split ';' | ?{ !($_.ToLower() -match "\\boxstarter$")}) -join ';'
         $values+=";$boxstarterPath"
-    } else {
-        $values=$boxstarterPath
+    } 
+    elseif($variableName -eq "PSModulePath") {
+        $values=[environment]::getfolderpath("mydocuments")
+        $values +="\WindowsPowerShell\Modules;$boxstarterPath"
+    }
+    else {
+        $values ="$boxstarterPath"
     }
     if(!$value -or !($values -contains $boxstarterPath)){
         $values = $values.Replace(';;',';')
