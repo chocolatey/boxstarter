@@ -113,10 +113,10 @@ Task Push-Codeplex {
      $releaseFile.MimeType="application/zip"
      $releaseFile.FileName="boxstarter.$version.zip"
      $releaseFile.FileType=[CodePlex.WebServices.Client.ReleaseFileType]::RuntimeBinary
-     $releaseFile.FileData=[System.IO.File]::ReadAllBytes("$basedir\BuildArtifacts\Boxstarter.$version.zip");
+     $releaseFile.FileData=[System.IO.File]::ReadAllBytes("$basedir\BuildArtifacts\Boxstarter.$version.zip")
      $fileList=new-object "System.Collections.Generic.List``2[[CodePlex.WebServices.Client.releaseFile]]"
      $fileList.Add($releaseFile)
-     $releaseService.UploadReleaseFiles("boxstarter", "Boxstarter $version", releaseFiles);
+     $releaseService.UploadReleaseFiles("boxstarter", "Boxstarter $version", $fileList)
 }
 
 task Update-Homepage {
