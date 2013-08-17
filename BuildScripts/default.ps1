@@ -11,6 +11,7 @@ properties {
         $version="1.0.0"
     }
     $nugetExe = "$env:ChocolateyInstall\ChocolateyInstall\nuget"
+    $ftpHost="waws-prod-bay-001.ftp.azurewebsites.windows.net"
 }
 
 Task default -depends Build
@@ -145,6 +146,24 @@ task Test-VM -requiredVariables "VmName","package"{
     until ((Get-VMIntegrationService $vm | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
     Write-Host "Importing Module at $modPath"
     Invoke-Command -ComputerName $vmName -Credential $creds -Authentication Credssp -ScriptBlock $script -Argumentlist $modPath,$package,$creds.Password
+}
+
+task Get-ClickOnceStats {
+    $creds = Get-Credential
+    mkdir "$basedir\sitelogs"
+    pushd "$basedir\sitelogs"
+    $ftpScript = @"
+user $($creds.UserName) $($creds.GetNetworkCredential().Password)
+cd LogFiles/http/RawLogs
+mget *
+bye
+"@
+    $ftpScript | ftp -i -n $ftpHost
+    if(!(Test-Path $env:ChocolateyInstall\lib\logparser*)) { cinst logparser }
+    $logParser = "${env:programFiles(x86)}\Log Parser 2.2\LogParser.exe"
+    .$logparser -i:w3c "SELECT Date, EXTRACT_VALUE(cs-uri-query,'package') as package, COUNT(*) as count FROM * where cs-uri-stem = '/launch/Boxstarter.WebLaunch.Application' Group by Date, package Order by Date, package" -rtp:-1
+    popd
+    del "$basedir\sitelogs" -Recurse -Force
 }
 
 function PackDirectory($path){
