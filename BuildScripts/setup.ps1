@@ -20,7 +20,7 @@ function Install-Boxstarter($here, $ModuleName) {
     Import-Module "$boxstarterPath\Boxstarter.Common" -DisableNameChecking
     write-host "Boxstarter is now ready. You can type 'Boxstarter' from any command line at any path."
     $successMsg = @"
-A Boxstarter Module has been added to your Module path. 
+The $ModuleName Module has been copied to $boxstarterPath and added to your Module path. 
 You will need to open a new console for the path to be visible.
 Use 'Get-Module Boxstarter.* -ListAvailable' to list all Boxstarter Modules.
 To list all available Boxstarter Commands, use:
@@ -40,8 +40,13 @@ function PersistBoxStarterPathToEnvironmentVariable($variableName){
     if($value){
         $values=($value -split ';' | ?{ !($_.ToLower() -match "\\boxstarter$")}) -join ';'
         $values+=";$boxstarterPath"
-    } else {
-        $values=$boxstarterPath
+    } 
+    elseif($variableName -eq "PSModulePath") {
+        $values=[environment]::getfolderpath("mydocuments")
+        $values +="\WindowsPowerShell\Modules;$boxstarterPath"
+    }
+    else {
+        $values ="$boxstarterPath"
     }
     if(!$value -or !($values -contains $boxstarterPath)){
         $values = $values.Replace(';;',';')

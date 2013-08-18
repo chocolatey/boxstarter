@@ -11,6 +11,7 @@ properties {
         $version="1.0.0"
     }
     $nugetExe = "$env:ChocolateyInstall\ChocolateyInstall\nuget"
+    $ftpHost="waws-prod-bay-001.ftp.azurewebsites.windows.net"
 }
 
 Task default -depends Build
@@ -53,6 +54,9 @@ Task Version-Module -description 'Stamps the psd1 with the version and last chan
                 % {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } | 
                     Set-Content $path
     }
+    (Get-Content "$baseDir\BuildScripts\bootstrapper.ps1") |
+        % {$_ -replace " -version .*`$", " -version $version" } | 
+            Set-Content "$baseDir\BuildScripts\bootstrapper.ps1"
 }
 
 Task Clean-Artifacts {
@@ -77,14 +81,8 @@ Task Package-DownloadZip -depends Clean-Artifacts {
       Remove-Item "$basedir\BuildArtifacts\Boxstarter.*.zip" -Force
     }
 
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.common" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.WinConfig" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.bootstrapper" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.chocolatey" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.config" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\boxstarter.bat" }
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\license.txt" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\BuildScripts\Setup.ps1" }
+    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\BuildScripts\bootstrapper.ps1" }
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\Setup.bat" }
 }
 
@@ -104,6 +102,22 @@ Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
         Get-ChildItem "$baseDir\buildArtifacts\*.nupkg" | 
             % { cpush $_  }
     }
+}
+
+Task Push-Codeplex {
+    Add-Type -Path "$basedir\BuildScripts\CodePlexClientAPI\CodePlex.WebServices.Client.dll"
+     $releaseService=New-Object CodePlex.WebServices.Client.ReleaseService
+     $releaseService.Credentials = Get-Credential -Message "Codeplex credentials" -username "mwrock"
+     $releaseService.CreateARelease("boxstarter","Boxstarter $version","Running the Setup.bat file will install Chocolatey if not present and then install the Boxstarter modules.",[DateTime]::Now,[CodePlex.WebServices.Client.ReleaseStatus]::Beta, $true, $true)
+     $releaseFile = New-Object CodePlex.WebServices.Client.releaseFile
+     $releaseFile.Name="Boxstarter $version"
+     $releaseFile.MimeType="application/zip"
+     $releaseFile.FileName="boxstarter.$version.zip"
+     $releaseFile.FileType=[CodePlex.WebServices.Client.ReleaseFileType]::RuntimeBinary
+     $releaseFile.FileData=[System.IO.File]::ReadAllBytes("$basedir\BuildArtifacts\Boxstarter.$version.zip")
+     $fileList=new-object "System.Collections.Generic.List``1[[CodePlex.WebServices.Client.ReleaseFile]]"
+     $fileList.Add($releaseFile)
+     $releaseService.UploadReleaseFiles("boxstarter", "Boxstarter $version", $fileList)
 }
 
 task Update-Homepage {
@@ -132,6 +146,24 @@ task Test-VM -requiredVariables "VmName","package"{
     until ((Get-VMIntegrationService $vm | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
     Write-Host "Importing Module at $modPath"
     Invoke-Command -ComputerName $vmName -Credential $creds -Authentication Credssp -ScriptBlock $script -Argumentlist $modPath,$package,$creds.Password
+}
+
+task Get-ClickOnceStats {
+    $creds = Get-Credential
+    mkdir "$basedir\sitelogs"
+    pushd "$basedir\sitelogs"
+    $ftpScript = @"
+user $($creds.UserName) $($creds.GetNetworkCredential().Password)
+cd LogFiles/http/RawLogs
+mget *
+bye
+"@
+    $ftpScript | ftp -i -n $ftpHost
+    if(!(Test-Path $env:ChocolateyInstall\lib\logparser*)) { cinst logparser }
+    $logParser = "${env:programFiles(x86)}\Log Parser 2.2\LogParser.exe"
+    .$logparser -i:w3c "SELECT Date, EXTRACT_VALUE(cs-uri-query,'package') as package, COUNT(*) as count FROM * where cs-uri-stem = '/launch/Boxstarter.WebLaunch.Application' Group by Date, package Order by Date, package" -rtp:-1
+    popd
+    del "$basedir\sitelogs" -Recurse -Force
 }
 
 function PackDirectory($path){
