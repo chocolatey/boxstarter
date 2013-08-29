@@ -15,7 +15,7 @@ Windows Registry Editor Version 5.00
 "PSScriptOrder"=dword:00000001
 
 [HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\0\0]
-"Script"="c:\\boxstarter\\EnablePsRemoting.bat"
+"Script"="c:\\boxstarter\\EnableFirewallRule.bat"
 "Parameters"=""
 "ExecTime"=hex(b):00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
 
@@ -34,7 +34,7 @@ Windows Registry Editor Version 5.00
 "PSScriptOrder"=dword:00000001
 
 [HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0]
-"Script"="c:\\boxstarter\\EnablePsRemoting.bat"
+"Script"="c:\\boxstarter\\EnableFirewallRule.bat"
 "Parameters"=""
 "IsPowershell"=dword:00000000
 "ExecTime"=hex(b):00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00

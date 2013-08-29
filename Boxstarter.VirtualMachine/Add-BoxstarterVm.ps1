@@ -9,23 +9,20 @@ function Add-BoxstarterVm {
     $volume=mount-vhd $vhd.Path -Passthru | get-disk | Get-Partition | Get-Volume
     $winVolume = $volume | ? {Test-Path "$($_.DriveLetter):\windows"}
     mkdir "$($winVolume.DriveLetter):\boxstarter"
-    #New-Item "$($winVolume.DriveLetter):\boxstarter\EnablePsRemotingOnServer.bat" -Type File -Value "powershell -NoProfile -ExecutionPolicy bypass -file c:\boxstarter\EnablePsRemotingOnServer.ps1"
-    New-Item "$($winVolume.DriveLetter):\boxstarter\EnablePsRemoting.bat" -Type File -Value @"
-REM powershell -NoProfile -ExecutionPolicy bypass -command "Enable-PsRemoting -Force;Set-Item wsman:\localhost\client\trustedhosts * -Force;Enable-WSManCredSSP -Role Server -Force"
-powershell -NoProfile -ExecutionPolicy bypass -command "new-item c:\boxstarter\test.txt -type file -value `"`"I am `$env:UserName`"`""
-"@
+    New-Item "$($winVolume.DriveLetter):\boxstarter\EnableFirewallRule.bat" -Type File -Value "netsh advfirewall firewall set rule name=`"File and Printer Sharing (SMB-In)`" new enable=yes profile=any"
+    Copy-Item "$($boxstarter.BaseDir)\boxstarter.VirtualMachine\EnablePsRemotingOnServer.ps1" "$($winVolume.DriveLetter):\boxstarter"
     write-host "loading reistry"
     reg load HKLM\VHDSYS "$($winVolume.DriveLetter):\windows\system32\config\software"
     write-host "importing keys"
     reg import "c:\dev\boxstarter\boxstarter.VirtualMachine\startupScript.reg"
+    reg add HKLM\VHDSYS\Microsoft\Windows\CurrentVersion\Policies\system /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1 /f
     write-host "unloading registry"
     reg unload HKLM\VHDSYS
     Dismount-VHD $vhd.Path
     Start-VM $vmName
-    <#
     $creds = Get-Credential -Message "$vmName credentials" -UserName "$env:UserDomain\$env:username"
     $me=$env:computername
-    #$remoteDir = $Boxstarter.BaseDir.replace(':','$')
+    $remoteDir = $Boxstarter.BaseDir.replace(':','$')
     $encryptedPass = convertfrom-securestring -securestring $creds.password
     $modPath="\\$me\$remoteDir\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1"
     $script = {
@@ -35,6 +32,9 @@ powershell -NoProfile -ExecutionPolicy bypass -command "new-item c:\boxstarter\t
     Write-BoxstarterMessage "Waiting for $vmName to start..."
     do {Start-Sleep -milliseconds 100} 
     until ((Get-VMIntegrationService $vm | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
+    Start-Sleep -milliseconds 2000
+    write-host "\\$(Get-GuestComputerName $vmName)"
+    PSEXEC "\\$(Get-GuestComputerName $vmName)" -u $creds.UserName -p $creds.GetNetworkCredential().Password -h powershell.exe -ExecutionPolicy Bypass -NoProfile -File "C:\Boxstarter\EnablePsRemotingOnServer.ps1"
     Write-BoxstarterMessage "Importing Boxstarter Module at $modPath"
     #Invoke-Command -ComputerName (Get-GuestComputerName $vmName) -Credential $creds -Authentication Credssp -ScriptBlock $script -Argumentlist $modPath,$package,$creds.Password
 #>
