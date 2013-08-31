@@ -9,13 +9,13 @@ Windows Registry Editor Version 5.00
 [HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\0]
 "GPO-ID"="LocalGPO"
 "SOM-ID"="Local"
-"FileSysPath"="C:\\WINDOWS\\System32\\GroupPolicy\\Machine"
+"FileSysPath"="%SystemRoot%\\System32\\GroupPolicy\\Machine"
 "DisplayName"="Local Group Policy"
 "GPOName"="Local Group Policy"
 "PSScriptOrder"=dword:00000001
 
 [HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\0\0]
-"Script"="c:\\boxstarter\\EnableFirewallRule.bat"
+"Script"="%SystemDrive%\\%startupDir%\\startup.bat"
 "Parameters"=""
 "ExecTime"=hex(b):00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
 
@@ -28,13 +28,13 @@ Windows Registry Editor Version 5.00
 [HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0]
 "GPO-ID"="LocalGPO"
 "SOM-ID"="Local"
-"FileSysPath"="C:\\WINDOWS\\System32\\GroupPolicy\\Machine"
+"FileSysPath"="%SystemRoot%\\System32\\GroupPolicy\\Machine"
 "DisplayName"="Local Group Policy"
 "GPOName"="Local Group Policy"
 "PSScriptOrder"=dword:00000001
 
 [HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0]
-"Script"="c:\\boxstarter\\EnableFirewallRule.bat"
+"Script"="%SystemDrive%\\%startupDir%\\startup.bat"
 "Parameters"=""
 "IsPowershell"=dword:00000000
 "ExecTime"=hex(b):00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
