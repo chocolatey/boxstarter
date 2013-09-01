@@ -49,11 +49,15 @@ http://boxstarter.codeplex.com
 #>
     [CmdletBinding()]
     param(
+        [ValidateScript({(Test-Path $_) -and ($_ -like "*.vhd" -or $_ -like "*.vhdx")})]
         [string]$VHDPath,
         [string]$TargetScriptDirectory,
         [string[]]$FilesToCopy = @(),
         [ScriptBlock]$Script
-    )    
+    )
+    if((Get-ItemProperty $VHDPath -Name IsReadOnly).IsReadOnly){
+        throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD is Read-Only"
+    }    
     $volume=mount-vhd $VHDPath -Passthru | get-disk | Get-Partition | Get-Volume
     $winVolume = $volume | ? {Test-Path "$($_.DriveLetter):\windows"}
     mkdir "$($winVolume.DriveLetter):\$targetScriptDirectory"
