@@ -15,13 +15,9 @@ identity with administrative privileges.
 .PARAMETER VHDPath
 The path where the VHD exists.
 
-.PARAMETER TargetScriptDirectory
-The name of the directory that will be created at the root of the 
-SystemDrive where the script will be saved as Startup.ps1 and all
-paths in FilesToCopy will be saved.
-
 .PARAMETER FilesToCopy
-A array of paths that will be copied to TargetScriptDirectory
+A array of paths that will be copied to the 'Boxstarter.Startup'
+directory in the root of the VHD.
 
 .PARAMETER Script
 ScriptBlock to invoke when the VHD boots
@@ -29,7 +25,7 @@ ScriptBlock to invoke when the VHD boots
 .EXAMPLE
 $vhd=Get-VMHardDiskDrive -VMName MyVM
 $fileToCopy="c:\path\EnablePsRemotingOnServer.ps1"
-Add-VHDStartupScript $vhd.Path "MyStartupDir" $fileToCopy {
+Add-VHDStartupScript $vhd.Path $fileToCopy {
     netsh advfirewall firewall set rule name="File and Printer Sharing (SMB-In)" new enable=yes profile=any
     reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\system /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1 /f
 }
@@ -51,7 +47,6 @@ http://boxstarter.codeplex.com
     param(
         [ValidateScript({(Test-Path $_) -and ($_ -like "*.vhd" -or $_ -like "*.vhdx")})]
         [string]$VHDPath,
-        [string]$TargetScriptDirectory,
         [string[]]$FilesToCopy = @(),
         [ScriptBlock]$Script
     )
@@ -60,6 +55,8 @@ http://boxstarter.codeplex.com
     }    
     $volume=mount-vhd $VHDPath -Passthru | get-disk | Get-Partition | Get-Volume
     $winVolume = $volume | ? {Test-Path "$($_.DriveLetter):\windows"}
+
+    $TargetScriptDirectory = "Boxstarter.Startup"
     mkdir "$($winVolume.DriveLetter):\$targetScriptDirectory"
 
     New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.bat" -Type File -Value "@echo off`r`npowershell -ExecutionPolicy Bypass -NoProfile -File `"%~dp0startup.ps1`""
@@ -67,12 +64,9 @@ http://boxstarter.codeplex.com
     ForEach($file in $FilesToCopy){
         Copy-Item $file "$($winVolume.DriveLetter):\$targetScriptDirectory"
     }
-    $startupRegFile = "$env:Temp\startupScript.reg"
-    Get-Content "$($boxstarter.BaseDir)\boxstarter.VirtualMachine\startupScript.reg" | % {
-        $_ -Replace "%startupDir%", $TargetScriptDirectory
-    } | Set-Content $startupRegFile
+
     reg load HKLM\VHDSYS "$($winVolume.DriveLetter):\windows\system32\config\software"
-    reg import $startupRegFile
+    reg import "$($boxstarter.BaseDir)\boxstarter.VirtualMachine\startupScript.reg"
     reg unload HKLM\VHDSYS
     Dismount-VHD $VHDPath
 }
