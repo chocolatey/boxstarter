@@ -45,10 +45,14 @@ http://boxstarter.codeplex.com
 #>
     [CmdletBinding()]
     param(
+        [Parameter(Position=0,Mandatory=$true)]
         [ValidateScript({(Test-Path $_) -and ($_ -like "*.vhd" -or $_ -like "*.vhdx")})]
         [string]$VHDPath,
-        [string[]]$FilesToCopy = @(),
-        [ScriptBlock]$Script
+        [Parameter(Position=1,Mandatory=$true)]
+        [ScriptBlock]$Script,
+        [Parameter(Position=2,Mandatory=$false)]
+        [ValidateScript({ $_ | % {Test-Path $_} })]
+        [string[]]$FilesToCopy = @()
     )
     if((Get-ItemProperty $VHDPath -Name IsReadOnly).IsReadOnly){
         throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD is Read-Only"
@@ -57,12 +61,12 @@ http://boxstarter.codeplex.com
     $winVolume = $volume | ? {Test-Path "$($_.DriveLetter):\windows"}
 
     $TargetScriptDirectory = "Boxstarter.Startup"
-    mkdir "$($winVolume.DriveLetter):\$targetScriptDirectory"
+    mkdir "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force
 
-    New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.bat" -Type File -Value "@echo off`r`npowershell -ExecutionPolicy Bypass -NoProfile -File `"%~dp0startup.ps1`""
-    New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.ps1" -Type File -Value $script.ToString()
+    New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.bat" -Type File -Value "@echo off`r`npowershell -ExecutionPolicy Bypass -NoProfile -File `"%~dp0startup.ps1`"" -force
+    New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.ps1" -Type File -Value $script.ToString() -force
     ForEach($file in $FilesToCopy){
-        Copy-Item $file "$($winVolume.DriveLetter):\$targetScriptDirectory"
+        Copy-Item $file "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force
     }
 
     reg load HKLM\VHDSYS "$($winVolume.DriveLetter):\windows\system32\config\software"

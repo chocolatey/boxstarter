@@ -4,18 +4,19 @@ Describe "Add-VHDStartupScript" {
     try{
         $TargetScriptDirectory = "Boxstarter.Startup"
         Import-Module "$here\..\..\Boxstarter.VirtualMachine\Boxstarter.VirtualMachine.psd1" -Force
-        $testRoot=(Get-PSDrive TestDrive).Root
+        mkdir $env:temp\Boxstarter.tests | Out-Null
+        $testRoot="$env:temp\Boxstarter.tests"
+        $v = new-vhd -Path $testRoot\test.vhdx -SizeBytes 200MB | Mount-VHD -PassThru | Initialize-Disk -PartitionStyle mbr -Confirm:$false -PassThru | New-Partition -UseMaximumSize -AssignDriveLetter -MbrType IFS | Format-Volume -Confirm:$false
+        Get-PSDrive | Out-Null
+        mkdir "$($v.DriveLetter):\Windows\System32\config" | Out-Null
+        reg save HKLM\Software "$($v.DriveLetter):\Windows\System32\config\SOFTWARE" /y /c | Out-Null
+        Dismount-VHD $testRoot\test.vhdx
+        New-Item "$testRoot\file1.ps1" -Type File | Out-Null
+        New-Item "$testRoot\file2.ps1" -Type File | Out-Null
 
         Context "When adding a startup script to a clean vhd" {
-            $v = new-vhd -Path $testRoot\test.vhdx -SizeBytes 200MB | Mount-VHD -PassThru | Initialize-Disk -PartitionStyle mbr -Confirm:$false -PassThru | New-Partition -UseMaximumSize -AssignDriveLetter -MbrType IFS | Format-Volume -Confirm:$false
-            Get-PSDrive | Out-Null
-            mkdir "$($v.DriveLetter):\Windows\System32\config" | Out-Null
-            reg save HKLM\Software "$($v.DriveLetter):\Windows\System32\config\SOFTWARE" /y /c | Out-Null
-            Dismount-VHD $testRoot\test.vhdx
-            New-Item "TestDrive:\file1.ps1" -Type File | Out-Null
-            New-Item "TestDrive:\file2.ps1" -Type File | Out-Null
 
-            Add-VHDStartupScript $testRoot\test.vhdx "$testRoot\file1.ps1","$testRoot\file2.ps1" {
+            Add-VHDStartupScript $testRoot\test.vhdx -FilesToCopy "$testRoot\file1.ps1","$testRoot\file2.ps1" {
                     function say-hi {"hi"}
                     say-hi
                 } | Out-Null
@@ -39,7 +40,24 @@ Describe "Add-VHDStartupScript" {
         Context "When providing a nonexistent vhd path" {
 
             try {
-                Add-VHDStartupScript $testRoot\notest.vhdx "$testRoot\file1.ps1","$testRoot\file2.ps1" {
+                Add-VHDStartupScript $testRoot\notest.vhdx {
+                    function say-hi {"hi"}
+                    say-hi
+                } | Out-Null
+            }
+            catch{
+                $err = $_
+            }
+
+            It "Should throw a validation error"{
+                $err.CategoryInfo.Category | should be "InvalidData"
+            }
+        }
+
+        Context "When providing a nonexistent file to copy" {
+
+            try {
+                Add-VHDStartupScript $testRoot\test.vhdx -FilesToCopy "$testRoot\nofile1.ps1","$testRoot\nofile2.ps1" {
                     function say-hi {"hi"}
                     say-hi
                 } | Out-Null
@@ -56,7 +74,7 @@ Describe "Add-VHDStartupScript" {
         Context "When providing a path to a non vhd" {
 
             try {
-                Add-VHDStartupScript $env:SystemRoot "$testRoot\file1.ps1","$testRoot\file2.ps1" {
+                Add-VHDStartupScript $env:SystemRoot {
                     function say-hi {"hi"}
                     say-hi
                 } | Out-Null
@@ -71,15 +89,10 @@ Describe "Add-VHDStartupScript" {
         }
 
         Context "When the vhd is read only" {
-            $v = new-vhd -Path $testRoot\test.vhdx -SizeBytes 200MB | Mount-VHD -PassThru | Initialize-Disk -PartitionStyle mbr -PassThru | New-Partition -UseMaximumSize -AssignDriveLetter -MbrType IFS | Format-Volume -Confirm:$false
-            Get-PSDrive | Out-Null
-            mkdir "$($v.DriveLetter):\Windows\System32\config" | Out-Null
-            reg save HKLM\Software "$($v.DriveLetter):\Windows\System32\config\SOFTWARE" /y /c | Out-Null
-            Dismount-VHD $testRoot\test.vhdx
             Set-ItemProperty $testRoot\test.vhdx -name IsReadOnly -Value $true
 
             try {
-                Add-VHDStartupScript $testRoot\test.vhdx "$testRoot\file1.ps1","$testRoot\file2.ps1" {
+                Add-VHDStartupScript $testRoot\test.vhdx {
                     function say-hi {"hi"}
                     say-hi
                 } | Out-Null
@@ -87,14 +100,19 @@ Describe "Add-VHDStartupScript" {
             catch{
                 $err = $_
             }
+            finally{
+                Set-ItemProperty $testRoot\test.vhdx -name IsReadOnly -Value $false
+            }
 
             It "Should throw a InvalidOperation Exception"{
                 $err.CategoryInfo.Reason | should be "InvalidOperationException"
             }
+
         }
 
     }
     finally{
+        del $env:temp\Boxstarter.tests -recurse -force
         reg unload HKLM\VHDSYS 2>&1 | Out-Null
         if(Test-Path $testRoot\test.vhdx){
             Dismount-VHD $testRoot\test.vhdx -ErrorAction SilentlyContinue
