@@ -6,7 +6,7 @@ Describe "Add-VHDStartupScript" {
         Import-Module "$here\..\..\Boxstarter.VirtualMachine\Boxstarter.VirtualMachine.psd1" -Force
         mkdir $env:temp\Boxstarter.tests | Out-Null
         $testRoot="$env:temp\Boxstarter.tests"
-        $v = new-vhd -Path $testRoot\test.vhdx -SizeBytes 200MB | Mount-VHD -PassThru | Initialize-Disk -PartitionStyle mbr -Confirm:$false -PassThru | New-Partition -UseMaximumSize -AssignDriveLetter -MbrType IFS | Format-Volume -Confirm:$false
+        $v = new-vhd -Path $testRoot\test.vhdx -SizeBytes 200MB | Mount-VHD -PassThru | Initialize-Disk -PartitionStyle mbr -Confirm:$false -PassThru | New-Partition -UseMaximumSize -AssignDriveLetter -MbrType IFS | Format-Volume -NewFileSystemLabel "VHD" -Confirm:$false
         Get-PSDrive | Out-Null
         mkdir "$($v.DriveLetter):\Windows\System32\config" | Out-Null
         reg save HKLM\Software "$($v.DriveLetter):\Windows\System32\config\SOFTWARE" /y /c | Out-Null
@@ -123,6 +123,12 @@ Describe "Add-VHDStartupScript" {
             }
             catch{
                 $err = $_
+            }
+            finally{
+                $v = Get-Volume | ? {$_.FileSystemLabel -eq "VHD"}
+                Get-PSDrive | Out-Null
+                mkdir "$($v.DriveLetter):\Windows\System32\config" | Out-Null
+                reg save HKLM\Software "$($v.DriveLetter):\Windows\System32\config\SOFTWARE" /y /c | Out-Null
             }
 
             It "Should throw a InvalidOperation Exception"{
