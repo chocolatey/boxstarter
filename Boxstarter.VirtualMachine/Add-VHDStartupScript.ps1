@@ -59,6 +59,9 @@ http://boxstarter.codeplex.com
     }    
     $volume=mount-vhd $VHDPath -Passthru | get-disk | Get-Partition | Get-Volume
     $winVolume = $volume | ? {Test-Path "$($_.DriveLetter):\windows"}
+    if($winVolume -eq $null){
+        throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD does not contain system volume"
+    }    
 
     $TargetScriptDirectory = "Boxstarter.Startup"
     mkdir "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force
