@@ -59,13 +59,45 @@ Describe "Add-VHDStartupScript" {
                     say-hi
                 } | Out-Null
 
-            It "Should set Group Policy"{
+            It "Should add a new script in GPO"{
                 $vol = Mount-VHD "$testRoot\test.vhdx" -Passthru | get-disk | Get-Partition | Get-Volume
                 reg load HKLM\VHDSYS "$($vol.DriveLetter):\windows\system32\config\software" | Out-Null
                 (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\1" -name Script).Script | should be "%SystemDrive%\$TargetScriptDirectory\startup.bat"
             }
             [GC]::Collect()
             reg unload HKLM\VHDSYS | Out-Null
+            $v = Get-Volume | ? {$_.FileSystemLabel -eq "VHD"}
+            Remove-Item "$($v.DriveLetter):\Windows\System32\config\SOFTWARE"
+            reg save HKLM\Software "$($v.DriveLetter):\Windows\System32\config\SOFTWARE" /y /c | Out-Null
+            Dismount-VHD $testRoot\test.vhdx
+        }
+
+        Context "When adding a startup script when another startup script installed by this cmdlet exists" {
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                    function say-hi {"hi"}
+                    say-hi
+                }
+
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                    function say-hi {"hi"}
+                    say-hi
+                }
+
+            $vol = Mount-VHD "$testRoot\test.vhdx" -Passthru | get-disk | Get-Partition | Get-Volume
+            reg load HKLM\VHDSYS "$($vol.DriveLetter):\windows\system32\config\software" | Out-Null
+            It "Should overwrite the current Script"{
+                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0" -name Script).Script | should be "%SystemDrive%\$TargetScriptDirectory\startup.bat"
+            }
+            It "Should not create a new script"{
+                $dirs = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0"
+                $dirs.count | should be 1
+            }
+            $dirs=$null
+            [GC]::Collect()
+            reg unload HKLM\VHDSYS | Out-Null
+            $v = Get-Volume | ? {$_.FileSystemLabel -eq "VHD"}
+            Remove-Item "$($v.DriveLetter):\Windows\System32\config\SOFTWARE"
+            reg save HKLM\Software "$($v.DriveLetter):\Windows\System32\config\SOFTWARE" /y /c | Out-Null
             Dismount-VHD $testRoot\test.vhdx
         }
 

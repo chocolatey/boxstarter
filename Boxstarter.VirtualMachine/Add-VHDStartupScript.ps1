@@ -77,8 +77,18 @@ http://boxstarter.codeplex.com
     $startupRegFile = "$env:Temp\startupScript.reg"
     if(Test-Path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0"){
         $dirs = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0"
-        [int]$n = $dirs[-1].PSChildName
-        $new = "\0\$($n+1)"
+        $dir = $dirs | ? { 
+            (Get-ItemProperty -path $_.PSPath -Name Script).Script -like "*\Boxstarter.Startup\startup.bat"
+        }
+        if($dir -eq $null){
+            [int]$n = $dirs[-1].PSChildName
+            $new = "\0\$($n+1)"
+        }
+        else {
+            [int]$n = $dir.PSChildName
+            $new = "\0\$n"
+            $dir = $null
+        }
         (Get-Content $regFileTemplate) | % {
             $_ -Replace "\\0\\0", $new
         } | Set-Content $startupRegFile -force
