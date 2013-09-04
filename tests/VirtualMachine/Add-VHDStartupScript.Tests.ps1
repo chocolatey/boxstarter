@@ -22,6 +22,7 @@ Describe "Add-VHDStartupScript" {
                 } | Out-Null
 
             $vol = Mount-VHD "$testRoot\test.vhdx" -Passthru | get-disk | Get-Partition | Get-Volume
+            Get-PSDrive | Out-Null
             It "Should create startup script"{
                 & "$($vol.DriveLetter):\$TargetScriptDirectory\startup.bat" | should be "hi"
             }
@@ -33,6 +34,37 @@ Describe "Add-VHDStartupScript" {
                 reg load HKLM\VHDSYS "$($vol.DriveLetter):\windows\system32\config\software" | Out-Null
                 (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0" -name Script).Script | should be "%SystemDrive%\$TargetScriptDirectory\startup.bat"
             }
+            [GC]::Collect()
+            reg unload HKLM\VHDSYS | Out-Null
+            Remove-Item "$($vol.DriveLetter):\Windows\System32\config\SOFTWARE"
+            reg save HKLM\Software "$($vol.DriveLetter):\Windows\System32\config\SOFTWARE" /y /c | Out-Null
+            Dismount-VHD $testRoot\test.vhdx
+        }
+
+        Context "When adding a startup script when another startup script exists" {
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                    function say-hi {"hi"}
+                    say-hi
+                }
+            $v = Mount-VHD $testRoot\test.vhdx -Passthru | get-disk | Get-Partition | Get-Volume
+            Get-PSDrive | Out-Null
+            reg load HKLM\VHDSYS "$($v.DriveLetter):\windows\system32\config\software" | out-null
+            Set-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0" -name Script -value "%SystemDrive%\$TargetScriptDirectory\otherstartup.bat"
+            [GC]::Collect()
+            reg unload HKLM\VHDSYS | out-null
+            Dismount-VHD $testRoot\test.vhdx
+
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                    function say-hi {"hi"}
+                    say-hi
+                } | Out-Null
+
+            It "Should set Group Policy"{
+                $vol = Mount-VHD "$testRoot\test.vhdx" -Passthru | get-disk | Get-Partition | Get-Volume
+                reg load HKLM\VHDSYS "$($vol.DriveLetter):\windows\system32\config\software" | Out-Null
+                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\1" -name Script).Script | should be "%SystemDrive%\$TargetScriptDirectory\startup.bat"
+            }
+            [GC]::Collect()
             reg unload HKLM\VHDSYS | Out-Null
             Dismount-VHD $testRoot\test.vhdx
         }
@@ -137,6 +169,7 @@ Describe "Add-VHDStartupScript" {
         }        
     }
     finally{
+        [GC]::Collect()
         reg unload HKLM\VHDSYS 2>&1 | Out-Null
         if(Test-Path $testRoot\test.vhdx){
             Dismount-VHD $testRoot\test.vhdx -ErrorAction SilentlyContinue

@@ -64,16 +64,32 @@ http://boxstarter.codeplex.com
     }    
 
     $TargetScriptDirectory = "Boxstarter.Startup"
-    mkdir "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force
+    mkdir "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force | out-null
 
-    New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.bat" -Type File -Value "@echo off`r`npowershell -ExecutionPolicy Bypass -NoProfile -File `"%~dp0startup.ps1`"" -force
-    New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.ps1" -Type File -Value $script.ToString() -force
+    New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.bat" -Type File -Value "@echo off`r`npowershell -ExecutionPolicy Bypass -NoProfile -File `"%~dp0startup.ps1`"" -force | out-null
+    New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.ps1" -Type File -Value $script.ToString() -force | out-null
     ForEach($file in $FilesToCopy){
         Copy-Item $file "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force
     }
 
-    reg load HKLM\VHDSYS "$($winVolume.DriveLetter):\windows\system32\config\software"
-    reg import "$($boxstarter.BaseDir)\boxstarter.VirtualMachine\startupScript.reg"
-    reg unload HKLM\VHDSYS
+    reg load HKLM\VHDSYS "$($winVolume.DriveLetter):\windows\system32\config\software" | out-null
+    $regFileTemplate = "$($boxstarter.BaseDir)\boxstarter.VirtualMachine\startupScript.reg"
+    $startupRegFile = "$env:Temp\startupScript.reg"
+    if(Test-Path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0"){
+        $dirs = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0"
+        [int]$n = $dirs[-1].PSChildName
+        $new = "\0\$($n+1)"
+        (Get-Content $regFileTemplate) | % {
+            $_ -Replace "\\0\\0", $new
+        } | Set-Content $startupRegFile -force
+        $dirs=$null
+    }
+    else{
+        Copy-Item $regFileTemplate $env:Temp
+    }
+    reg import $startupRegFile 2>&1 | out-null
+    [GC]::Collect()
+    reg unload HKLM\VHDSYS | out-null
+    Remove-Item $startupRegFile -force
     Dismount-VHD $VHDPath
 }
