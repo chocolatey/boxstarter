@@ -76,6 +76,39 @@ Describe "Add-VHDStartupScript" {
             Clean-VHD
         }
 
+        Context "When adding a startup script when another startup script exists but not in Local GPO" {
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                    function say-hi {"hi"}
+                    say-hi
+                }
+            $v = Mount-TestVHD
+            Set-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0" -name DisplayName -value "Not Local"
+            Set-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\0" -name DisplayName -value "Not Local"
+            [GC]::Collect()
+            reg unload HKLM\VHDSYS | out-null
+            Dismount-VHD $testRoot\test.vhdx
+
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                    function say-hi {"hi"}
+                    say-hi
+                } | Out-Null
+
+            $v = Mount-TestVHD
+            It "Should add a Local GPO to position 0"{
+                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0" -name DisplayName).DisplayName | should be "Local Group Policy"
+            }
+            It "Should Move Non Local GPO to position 1"{
+                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\1" -name DisplayName).DisplayName | should be "Not Local"
+            }
+            It "Should add a Local GPO to state position 0"{
+                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\0" -name DisplayName).DisplayName | should be "Local Group Policy"
+            }
+            It "Should Move Non Local GPO to state position 1"{
+                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\1" -name DisplayName).DisplayName | should be "Not Local"
+            }
+            Clean-VHD
+        }
+
         Context "When adding a startup script when another startup script installed by this cmdlet exists" {
             Add-VHDStartupScript $testRoot\test.vhdx {
                     function say-hi {"hi"}

@@ -93,7 +93,8 @@ function Get-RegFile {
         }
         else{
             $localGPONum = "0"
-            Shift-OtherGPOs   
+            Shift-OtherGPOs "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup"
+            Shift-OtherGPOs "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup"
         }
         $scriptDirs = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\$localGPONum"
         $existingScriptDir = $scriptDirs | ? { 
@@ -116,4 +117,13 @@ function Get-RegFile {
         Copy-Item $regFileTemplate $env:Temp
     }
     return $startupRegFile
+}
+
+function Shift-OtherGPOs($parentPath){
+    Get-ChildItem $parentPath | Sort-Object -Descending | % {
+        [int]$num = $_.PSChildName
+        $oldName = $_.Name.Replace("HKEY_LOCAL_MACHINE","HKLM:")
+        [string]$newName = "$($num+1)"
+        try {Rename-Item -Path $oldName -NewName $newName} catch [System.InvalidCastException] {}
+    }
 }
