@@ -101,17 +101,22 @@ function Get-RegFile {
             Shift-OtherGPOs "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup"
             Shift-OtherGPOs "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup"
         }
-        $scriptDirs = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\$localGPONum"
-        $existingScriptDir = $scriptDirs | ? { 
-            (Get-ItemProperty -path $_.PSPath -Name Script).Script -like "*\Boxstarter.Startup\startup.bat"
-        }
-        if($existingScriptDir -eq $null){
-            [int]$scriptNum = $scriptDirs[-1].PSChildName
-            $scriptNum += 1
+        if(test-path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\$localGPONum"){
+            $scriptDirs = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\$localGPONum"
+            $existingScriptDir = $scriptDirs | ? { 
+                (Get-ItemProperty -path $_.PSPath -Name Script).Script -like "*\Boxstarter.Startup\startup.bat"
+            }
+            if($existingScriptDir -eq $null){
+                [int]$scriptNum = $scriptDirs[-1].PSChildName
+                $scriptNum += 1
+            }
+            else {
+                [int]$scriptNum = $existingScriptDir.PSChildName
+                $existingScriptDir = $null #free the key for GC so it can be unloaded
+            }
         }
         else {
-            [int]$scriptNum = $existingScriptDir.PSChildName
-            $existingScriptDir = $null #free the key for GC so it can be unloaded
+            $scriptNum=0
         }
         (Get-Content $regFileTemplate) | % {
             $_ -Replace "\\0\\0", "\$localGPONum\$scriptNum"
@@ -129,6 +134,9 @@ function Shift-OtherGPOs($parentPath){
         [int]$num = $_.PSChildName
         $oldName = $_.Name.Replace("HKEY_LOCAL_MACHINE","HKLM:")
         [string]$newName = "$($num+1)"
-        try {Rename-Item -Path $oldName -NewName $newName} catch [System.InvalidCastException] {}
+        write-host "renaming $oldName to $newName"
+        try {Rename-Item -Path $oldName -NewName $newName} catch [System.InvalidCastException] {
+            Remove-Item $oldName -Recurse -force
+        }
     }
 }
