@@ -65,7 +65,6 @@ http://boxstarter.codeplex.com
 
     $TargetScriptDirectory = "Boxstarter.Startup"
     mkdir "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force | out-null
-
     New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.bat" -Type File -Value "@echo off`r`npowershell -ExecutionPolicy Bypass -NoProfile -File `"%~dp0startup.ps1`"" -force | out-null
     New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.ps1" -Type File -Value $script.ToString() -force | out-null
     ForEach($file in $FilesToCopy){
@@ -73,33 +72,48 @@ http://boxstarter.codeplex.com
     }
 
     reg load HKLM\VHDSYS "$($winVolume.DriveLetter):\windows\system32\config\software" | out-null
-    $regFileTemplate = "$($boxstarter.BaseDir)\boxstarter.VirtualMachine\startupScript.reg"
-    $startupRegFile = "$env:Temp\startupScript.reg"
-    if(Test-Path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0"){
-        $dirs = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0"
-        $dir = $dirs | ? { 
-            (Get-ItemProperty -path $_.PSPath -Name Script).Script -like "*\Boxstarter.Startup\startup.bat"
-        }
-        if($dir -eq $null){
-            [int]$n = $dirs[-1].PSChildName
-            $new = "\0\$($n+1)"
-        }
-        else {
-            [int]$n = $dir.PSChildName
-            $new = "\0\$n"
-            $dir = $null
-        }
-        (Get-Content $regFileTemplate) | % {
-            $_ -Replace "\\0\\0", $new
-        } | Set-Content $startupRegFile -force
-        $dirs=$null
-    }
-    else{
-        Copy-Item $regFileTemplate $env:Temp
-    }
+    $startupRegFile = Get-RegFile
     reg import $startupRegFile 2>&1 | out-null
     [GC]::Collect()
     reg unload HKLM\VHDSYS | out-null
     Remove-Item $startupRegFile -force
     Dismount-VHD $VHDPath
+}
+
+function Get-RegFile {
+    $regFileTemplate = "$($boxstarter.BaseDir)\boxstarter.VirtualMachine\startupScript.reg"
+    $startupRegFile = "$env:Temp\startupScript.reg"
+    if(Test-Path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0"){
+        $localGPO = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup" | ? {
+            (Get-ItemProperty -path $_.PSPath -Name DisplayName).DisplayName -eq "Local Group Policy"
+        }
+        if($localGPO -ne $null) {
+            $localGPONum = $localGPO.PSChildName
+            $localGPO=$null
+        }
+        else{
+            $localGPONum = "0"
+            Shift-OtherGPOs   
+        }
+        $scriptDirs = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\$localGPONum"
+        $existingScriptDir = $scriptDirs | ? { 
+            (Get-ItemProperty -path $_.PSPath -Name Script).Script -like "*\Boxstarter.Startup\startup.bat"
+        }
+        if($existingScriptDir -eq $null){
+            [int]$scriptNum = $scriptDirs[-1].PSChildName
+            $scriptNum += 1
+        }
+        else {
+            [int]$scriptNum = $existingScriptDir.PSChildName
+            $existingScriptDir = $null
+        }
+        (Get-Content $regFileTemplate) | % {
+            $_ -Replace "\\0\\0", "\$localGPONum\$scriptNum"
+        } | Set-Content $startupRegFile -force
+        $scriptDirs=$null
+    }
+    else{
+        Copy-Item $regFileTemplate $env:Temp
+    }
+    return $startupRegFile
 }
