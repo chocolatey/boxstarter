@@ -46,7 +46,7 @@ http://boxstarter.codeplex.com
     [CmdletBinding()]
     param(
         [Parameter(Position=0,Mandatory=$true)]
-        [ValidateScript({(Test-Path $_) -and ($_ -like "*.vhd" -or $_ -like "*.vhdx")})]
+        [ValidateScript({(Test-Path $_) -and ($_ -like "*.vhd" -or $_ -like "*.vhdx" -or $_ -like "*.avhdx")})]
         [string]$VHDPath,
         [Parameter(Position=1,Mandatory=$true)]
         [ScriptBlock]$Script,
@@ -58,26 +58,30 @@ http://boxstarter.codeplex.com
         throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD is Read-Only"
     }    
     $volume=mount-vhd $VHDPath -Passthru | get-disk | Get-Partition | Get-Volume
-    $winVolume = $volume | ? {Test-Path "$($_.DriveLetter):\windows"}
-    if($winVolume -eq $null){
-        throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD does not contain system volume"
-    }    
+    try{
+        $winVolume = $volume | ? {Test-Path "$($_.DriveLetter):\windows"}
+        if($winVolume -eq $null){
+            throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD does not contain system volume"
+        }    
 
-    $TargetScriptDirectory = "Boxstarter.Startup"
-    mkdir "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force | out-null
-    New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.bat" -Type File -Value "@echo off`r`npowershell -ExecutionPolicy Bypass -NoProfile -File `"%~dp0startup.ps1`"" -force | out-null
-    New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.ps1" -Type File -Value $script.ToString() -force | out-null
-    ForEach($file in $FilesToCopy){
-        Copy-Item $file "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force
+        $TargetScriptDirectory = "Boxstarter.Startup"
+        mkdir "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force | out-null
+        New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.bat" -Type File -Value "@echo off`r`npowershell -ExecutionPolicy Bypass -NoProfile -File `"%~dp0startup.ps1`"" -force | out-null
+        New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.ps1" -Type File -Value $script.ToString() -force | out-null
+        ForEach($file in $FilesToCopy){
+            Copy-Item $file "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force
+        }
+
+        reg load HKLM\VHDSYS "$($winVolume.DriveLetter):\windows\system32\config\software" | out-null
+        $startupRegFile = Get-RegFile
+        reg import $startupRegFile 2>&1 | out-null
+        [GC]::Collect() # The next line will fail without this since handles to the loaded hive have not yet been collected
+        reg unload HKLM\VHDSYS | out-null
+        Remove-Item $startupRegFile -force
     }
-
-    reg load HKLM\VHDSYS "$($winVolume.DriveLetter):\windows\system32\config\software" | out-null
-    $startupRegFile = Get-RegFile
-    reg import $startupRegFile 2>&1 | out-null
-    [GC]::Collect()
-    reg unload HKLM\VHDSYS | out-null
-    Remove-Item $startupRegFile -force
-    Dismount-VHD $VHDPath
+    finally{
+        Dismount-VHD $VHDPath
+    }
 }
 
 function Get-RegFile {
@@ -89,7 +93,7 @@ function Get-RegFile {
         }
         if($localGPO -ne $null) {
             $localGPONum = $localGPO.PSChildName
-            $localGPO=$null
+            $localGPO=$null #free the key for GC so it can be unloaded
         }
         else{
             $localGPONum = "0"
@@ -106,7 +110,7 @@ function Get-RegFile {
         }
         else {
             [int]$scriptNum = $existingScriptDir.PSChildName
-            $existingScriptDir = $null
+            $existingScriptDir = $null #free the key for GC so it can be unloaded
         }
         (Get-Content $regFileTemplate) | % {
             $_ -Replace "\\0\\0", "\$localGPONum\$scriptNum"
