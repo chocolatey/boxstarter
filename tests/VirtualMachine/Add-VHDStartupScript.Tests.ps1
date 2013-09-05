@@ -87,6 +87,16 @@ Describe "Add-VHDStartupScript" {
             [GC]::Collect()
             reg unload HKLM\VHDSYS | out-null
             Dismount-VHD $testRoot\test.vhdx
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                    function say-hi {"hi"}
+                    say-hi
+                }
+            $v = Mount-TestVHD
+            Set-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0" -name DisplayName -value "Still Not Local"
+            Set-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\0" -name DisplayName -value "Still Not Local"
+            [GC]::Collect()
+            reg unload HKLM\VHDSYS | out-null
+            Dismount-VHD $testRoot\test.vhdx
 
             Add-VHDStartupScript $testRoot\test.vhdx {
                     function say-hi {"hi"}
@@ -98,13 +108,19 @@ Describe "Add-VHDStartupScript" {
                 (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0" -name DisplayName).DisplayName | should be "Local Group Policy"
             }
             It "Should Move Non Local GPO to position 1"{
-                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\1" -name DisplayName).DisplayName | should be "Not Local"
+                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\1" -name DisplayName).DisplayName | should be "Still Not Local"
+            }
+            It "Should Move Non Local GPO to position 2"{
+                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\2" -name DisplayName).DisplayName | should be "Not Local"
             }
             It "Should add a Local GPO to state position 0"{
                 (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\0" -name DisplayName).DisplayName | should be "Local Group Policy"
             }
             It "Should Move Non Local GPO to state position 1"{
-                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\1" -name DisplayName).DisplayName | should be "Not Local"
+                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\1" -name DisplayName).DisplayName | should be "Still Not Local"
+            }
+            It "Should Move Non Local GPO to state position 2"{
+                (Get-ItemProperty -path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\2" -name DisplayName).DisplayName | should be "Not Local"
             }
             Clean-VHD
         }
@@ -206,7 +222,7 @@ Describe "Add-VHDStartupScript" {
 
         Context "When the vhd is not a system volume" {
             $v = Mount-TestVHD -DoNotLoadRegistry
-            Remove-Item "$($v.DriveLetter):\Windows" -recurse -Force
+            Remove-Item "$($v.DriveLetter):\Windows\System32\config" -recurse -Force
             Dismount-VHD $testRoot\test.vhdx
 
             try {
@@ -219,8 +235,7 @@ Describe "Add-VHDStartupScript" {
                 $err = $_
             }
             finally{
-                $v = Get-Volume | ? {$_.FileSystemLabel -eq "VHD"}
-                Get-PSDrive | Out-Null
+                $v = Mount-TestVHD -DoNotLoadRegistry
                 mkdir "$($v.DriveLetter):\Windows\System32\config" | Out-Null
                 reg save HKLM\Software "$($v.DriveLetter):\Windows\System32\config\SOFTWARE" /y /c | Out-Null
             }

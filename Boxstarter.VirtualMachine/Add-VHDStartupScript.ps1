@@ -60,7 +60,7 @@ http://boxstarter.codeplex.com
     $volume=mount-vhd $VHDPath -Passthru | get-disk | Get-Partition | Get-Volume
     try{
         Get-PSDrive | Out-Null
-        $winVolume = $volume | ? {Test-Path "$($_.DriveLetter):\windows"}
+        $winVolume = $volume | ? {Test-Path "$($_.DriveLetter):\windows\System32\config"}
         if($winVolume -eq $null){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD does not contain system volume"
         }    
@@ -134,8 +134,10 @@ function Shift-OtherGPOs($parentPath){
         [int]$num = $_.PSChildName
         $oldName = $_.Name.Replace("HKEY_LOCAL_MACHINE","HKLM:")
         [string]$newName = "$($num+1)"
-        write-host "renaming $oldName to $newName"
+        Log-BoxstarterMessage "renaming $oldName to $newName"
         try {Rename-Item -Path $oldName -NewName $newName} catch [System.InvalidCastException] {
+            #possible powershell bug when renaming reg keys that are numeric
+            #the key is copied but the old key remains
             Remove-Item $oldName -Recurse -force
         }
     }
