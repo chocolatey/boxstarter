@@ -59,6 +59,7 @@ http://boxstarter.codeplex.com
     }    
     $volume=mount-vhd $VHDPath -Passthru | get-disk | Get-Partition | Get-Volume
     try{
+        Get-PSDrive | Out-Null
         $winVolume = $volume | ? {Test-Path "$($_.DriveLetter):\windows"}
         if($winVolume -eq $null){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD does not contain system volume"
