@@ -54,6 +54,7 @@ http://boxstarter.codeplex.com
         [ValidateScript({ $_ | % {Test-Path $_} })]
         [string[]]$FilesToCopy = @()
     )
+    Write-BoxstarterMessage "Adding startup script to $VHDPath"
     if((Get-ItemProperty $VHDPath -Name IsReadOnly).IsReadOnly){
         throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD is Read-Only"
     }    
@@ -64,15 +65,16 @@ http://boxstarter.codeplex.com
         if($winVolume -eq $null){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD does not contain system volume"
         }    
-
+        Write-BoxstarterMessage "Mounted VHD with system volume to Drive $($winVolume.DriveLetter)"
         $TargetScriptDirectory = "Boxstarter.Startup"
         mkdir "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force | out-null
         New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.bat" -Type File -Value "@echo off`r`npowershell -ExecutionPolicy Bypass -NoProfile -File `"%~dp0startup.ps1`"" -force | out-null
         New-Item "$($winVolume.DriveLetter):\$targetScriptDirectory\startup.ps1" -Type File -Value $script.ToString() -force | out-null
         ForEach($file in $FilesToCopy){
+            Write-BoxstarterMessage "Copying $file to $($winVolume.DriveLetter):\$targetScriptDirectory"
             Copy-Item $file "$($winVolume.DriveLetter):\$targetScriptDirectory" -Force
         }
-
+        Write-BoxstarterMessage "Loading VHD HKLM\Software hive to HKLM\VHDSYS"
         reg load HKLM\VHDSYS "$($winVolume.DriveLetter):\windows\system32\config\software" | out-null
         $startupRegFile = Get-RegFile
         reg import $startupRegFile 2>&1 | out-null
@@ -81,13 +83,18 @@ http://boxstarter.codeplex.com
     finally{
         [GC]::Collect() # The next line will fail without this since handles to the loaded hive have not yet been collected
         reg unload HKLM\VHDSYS 2>&1 | out-null
+        Write-BoxstarterMessage "VHD Registry Unloaded"
         Dismount-VHD $VHDPath
+        Write-BoxstarterMessage "VHD Dismounted"
     }
 }
 
 function Get-RegFile {
+    Write-BoxstarterMessage "Creating Local Group Policy on VHD to run Statrtup script on Boot"
     $regFileTemplate = "$($boxstarter.BaseDir)\boxstarter.VirtualMachine\startupScript.reg"
     $startupRegFile = "$env:Temp\startupScript.reg"
+    $scriptNum=0
+    $localGPONum=0
     if(Test-Path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0"){
         $localGPO = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup" | ? {
             (Get-ItemProperty -path $_.PSPath -Name DisplayName).DisplayName -eq "Local Group Policy"
@@ -97,7 +104,6 @@ function Get-RegFile {
             $localGPO=$null #free the key for GC so it can be unloaded
         }
         else{
-            $localGPONum = "0"
             Shift-OtherGPOs "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup"
             Shift-OtherGPOs "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup"
         }
@@ -111,21 +117,16 @@ function Get-RegFile {
                 $scriptNum += 1
             }
             else {
-                [int]$scriptNum = $existingScriptDir.PSChildName
+                $scriptNum = $existingScriptDir.PSChildName
                 $existingScriptDir = $null #free the key for GC so it can be unloaded
             }
         }
-        else {
-            $scriptNum=0
-        }
-        (Get-Content $regFileTemplate) | % {
-            $_ -Replace "\\0\\0", "\$localGPONum\$scriptNum"
-        } | Set-Content $startupRegFile -force
         $scriptDirs=$null
     }
-    else{
-        Copy-Item $regFileTemplate $env:Temp
-    }
+    (Get-Content $regFileTemplate) | % {
+        $_ -Replace "\\0\\0", "\$localGPONum\$scriptNum"
+    } | Set-Content $startupRegFile -force
+    Write-BoxstarterMessage "Policy created at HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\$localGPONum\$scriptNum"
     return $startupRegFile
 }
 
