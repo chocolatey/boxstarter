@@ -46,7 +46,8 @@ http://boxstarter.codeplex.com
     [CmdletBinding()]
     param(
         [Parameter(Position=0,Mandatory=$true)]
-        [ValidateScript({(Test-Path $_) -and ($_ -like "*.vhd" -or $_ -like "*.vhdx" -or $_ -like "*.avhdx")})]
+        [ValidateScript({Test-Path $_})]
+        [ValidatePattern("\.(a)?vhd(x)?$")]
         [string]$VHDPath,
         [Parameter(Position=1,Mandatory=$true)]
         [ScriptBlock]$Script,
@@ -93,10 +94,11 @@ function Get-RegFile {
     Write-BoxstarterMessage "Creating Local Group Policy on VHD to run Statrtup script on Boot"
     $regFileTemplate = "$($boxstarter.BaseDir)\boxstarter.VirtualMachine\startupScript.reg"
     $startupRegFile = "$env:Temp\startupScript.reg"
+    $policyKey = "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy"
     $scriptNum=0
     $localGPONum=0
-    if(Test-Path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0"){
-        $localGPO = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup" | ? {
+    if(Test-Path "$policyKey\Scripts\Startup\0\0"){
+        $localGPO = Get-ChildItem "$policyKey\Scripts\Startup" | ? {
             (Get-ItemProperty -path $_.PSPath -Name DisplayName).DisplayName -eq "Local Group Policy"
         }
         if($localGPO -ne $null) {
@@ -104,11 +106,11 @@ function Get-RegFile {
             $localGPO=$null #free the key for GC so it can be unloaded
         }
         else{
-            Shift-OtherGPOs "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup"
-            Shift-OtherGPOs "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup"
+            Shift-OtherGPOs "$policyKey\Scripts\Startup"
+            Shift-OtherGPOs "$policyKey\State\Machine\Scripts\Startup"
         }
-        if(test-path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\$localGPONum"){
-            $scriptDirs = Get-ChildItem "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\$localGPONum"
+        if(test-path "$policyKey\Scripts\Startup\$localGPONum"){
+            $scriptDirs = Get-ChildItem "$policyKey\Scripts\Startup\$localGPONum"
             $existingScriptDir = $scriptDirs | ? { 
                 (Get-ItemProperty -path $_.PSPath -Name Script).Script -like "*\Boxstarter.Startup\startup.bat"
             }
