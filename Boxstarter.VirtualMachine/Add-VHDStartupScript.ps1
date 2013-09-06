@@ -76,11 +76,11 @@ http://boxstarter.codeplex.com
         reg load HKLM\VHDSYS "$($winVolume.DriveLetter):\windows\system32\config\software" | out-null
         $startupRegFile = Get-RegFile
         reg import $startupRegFile 2>&1 | out-null
-        [GC]::Collect() # The next line will fail without this since handles to the loaded hive have not yet been collected
-        reg unload HKLM\VHDSYS | out-null
         Remove-Item $startupRegFile -force
     }
     finally{
+        [GC]::Collect() # The next line will fail without this since handles to the loaded hive have not yet been collected
+        reg unload HKLM\VHDSYS 2>&1 | out-null
         Dismount-VHD $VHDPath
     }
 }
