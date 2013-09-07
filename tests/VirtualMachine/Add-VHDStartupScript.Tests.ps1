@@ -1,22 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-
-function Mount-TestVHD ([switch]$DoNotLoadRegistry){
-    $v = Mount-VHD $testRoot\test.vhdx -Passthru | get-disk | Get-Partition | Get-Volume
-    Get-PSDrive | Out-Null
-    if(!$DoNotLoadRegistry){
-        reg load HKLM\VHDSYS "$($v.DriveLetter):\windows\system32\config\software" | Out-Null
-    }
-    return $v
-}
-
-function Clean-VHD {
-    [GC]::Collect()
-    $vol = Get-Volume | ? {$_.FileSystemLabel -eq "VHD"}
-    reg unload HKLM\VHDSYS | Out-Null
-    Remove-Item "$($vol.DriveLetter):\Windows\System32\config\SOFTWARE"
-    reg save HKLM\Software "$($vol.DriveLetter):\Windows\System32\config\SOFTWARE" /y /c | Out-Null
-    Dismount-VHD $testRoot\test.vhdx
-}
+. "$here\common.ps1"
 
 Describe "Add-VHDStartupScript" {
     try{
@@ -155,7 +138,7 @@ Describe "Add-VHDStartupScript" {
                 Add-VHDStartupScript $testRoot\notest.vhdx {
                     function say-hi {"hi"}
                     say-hi
-                } | Out-Null
+                }
             }
             catch{
                 $err = $_
@@ -172,7 +155,7 @@ Describe "Add-VHDStartupScript" {
                 Add-VHDStartupScript $testRoot\test.vhdx -FilesToCopy "$testRoot\nofile1.ps1","$testRoot\nofile2.ps1" {
                     function say-hi {"hi"}
                     say-hi
-                } | Out-Null
+                }
             }
             catch{
                 $err = $_
@@ -189,7 +172,7 @@ Describe "Add-VHDStartupScript" {
                 Add-VHDStartupScript $env:SystemRoot {
                     function say-hi {"hi"}
                     say-hi
-                } | Out-Null
+                }
             }
             catch{
                 $err = $_
@@ -207,7 +190,7 @@ Describe "Add-VHDStartupScript" {
                 Add-VHDStartupScript $testRoot\test.vhdx {
                     function say-hi {"hi"}
                     say-hi
-                } | Out-Null
+                }
             }
             catch{
                 $err = $_
@@ -230,7 +213,7 @@ Describe "Add-VHDStartupScript" {
                 Add-VHDStartupScript $testRoot\test.vhdx {
                     function say-hi {"hi"}
                     say-hi
-                } | Out-Null
+                }
             }
             catch{
                 $err = $_
