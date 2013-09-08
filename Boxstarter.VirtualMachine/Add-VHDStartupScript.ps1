@@ -82,8 +82,7 @@ Remove-VHDStartupScript
         reg import $startupRegFile 2>&1 | out-null
     }
     finally{
-        try{ 
-        Remove-Item $startupRegFile -force } catch {}
+        try{ Remove-Item $startupRegFile -force } catch {}
         [GC]::Collect() # The next line will fail without this since handles to the loaded hive have not yet been collected
         reg unload HKLM\VHDSYS 2>&1 | out-null
         Write-BoxstarterMessage "VHD Registry Unloaded"

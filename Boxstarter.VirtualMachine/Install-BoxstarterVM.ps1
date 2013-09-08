@@ -27,6 +27,7 @@ function Enable-VMPSRemoting {
     $vm = Get-VM $VmName
     Stop-VM $VmName
     $vhd=Get-VMHardDiskDrive -VMName $vmName
+    $vmComputername=Get-VHDComputerName $vhd.Path
     $fileToCopy="$($boxstarter.BaseDir)\boxstarter.VirtualMachine\EnablePsRemotingOnServer.ps1"
 
     Add-VHDStartupScript $vhd.Path $fileToCopy {
@@ -38,19 +39,5 @@ function Enable-VMPSRemoting {
     Write-BoxstarterMessage "Waiting for $vmName to start..."
     do {Start-Sleep -milliseconds 100} 
     until ((Get-VMIntegrationService $vm | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
-    do {Start-Sleep -milliseconds 100}
-    until ((Get-GuestComputerName $vmName) -ne $null)
-    $vmComputerName = Get-GuestComputerName $vmName
     PSEXEC "\\$vmComputerName" -u $Credential.UserName -p $Credential.GetNetworkCredential().Password -h powershell.exe -ExecutionPolicy Bypass -NoProfile -File "C:\Boxstarter\EnablePsRemotingOnServer.ps1"
-}
-
-function Get-VMGuestComputerName($vmName) {
-    $vm = Get-WmiObject -Namespace root\virtualization\v2 -Class Msvm_ComputerSystem -Filter "ElementName='$vmName'"
-    $vm.GetRelated("Msvm_KvpExchangeComponent").GuestIntrinsicExchangeItems | % {
-        $GuestExchangeItemXml = ([XML]$_).SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Name']/VALUE[child::text()='FullyQualifiedDomainName']") 
-        
-        if ($GuestExchangeItemXml -ne $null) { 
-            $GuestExchangeItemXml.SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Data']/VALUE/child::text()").Value 
-        }    
-    }    
 }
