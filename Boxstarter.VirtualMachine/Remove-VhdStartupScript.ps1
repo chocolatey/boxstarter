@@ -64,17 +64,41 @@ Add-VHDStartupScript
 }
 
 function Remove-StartupScriptPolicy($regKey) {
-    #Find Script Node
-    #Delete it
+    if(!(Test-Path $regKey\Startup)){return}
+    $scriptKey = Get-ChildItem "$regKey\Startup" | ? {
+        (Get-ItemProperty -path $_.PSPath -Name DisplayName).DisplayName -eq "Local Group Policy"
+    } | Get-ChildItem | ? {
+        (Get-ItemProperty -path $_.PSPath -Name Script).Script -like "*\Boxstarter.Startup\startup.bat"
+    }
+    $scriptKeyPath = $scriptKey.Name.Replace("HKEY_LOCAL_MACHINE","HKLM:")
+    $policy = Split-Path -parent $scriptKeyPath
+    [int]$policyNum= Split-Path -leaf $Policy
+    if((Get-ChildItem $policy).Count -eq 1){
+        Write-BoxstarterMessage "Removing $Policy"
+        Remove-Item $Policy -Recurse -Force
+    }
+    else {
+        Write-BoxstarterMessage "Removing $scriptKey.Name"
+        $scriptKey | Remove-Item -Force
+    }
+    $scriptKey=$null
 
-    #DoesParent Have Items?
-    #No? - Delete it
+    Get-ChildItem "$regKey\Startup" | % {
+        $num=[int]($_.PSChildName)
+        if($num -gt $policyNum) {
+            $oldName = $_.Name.Replace("HKEY_LOCAL_MACHINE","HKLM:")
+            [string]$newName = "$($num-1)"
+            Log-BoxstarterMessage "renaming $oldName to $newName"
+            try {Rename-Item -Path $oldName -NewName $newName} 
+            catch [System.InvalidCastException] {
+                #possible powershell bug when renaming reg keys that are numeric
+                #the key is copied but the old key remains
+                Remove-Item $oldName -Recurse -force
+            }
+        }
+    }
 
-    #Does Grandparent have Items?
-    #No? - Delete startup node
-    #Yes? - Shift Them Up
-
-    #Are there shutdown scripts?
-    #No? Delete Scripts node
-    Remove-Item $regKey -Recurse -Force
+    if(((Get-ChildItem "$regKey\Startup").Count -eq 0) -AND (Get-ChildItem "$regKey\Shutdown").Count -eq 0){
+        Remove-Item $regKey -Recurse -Force
+    }
 }

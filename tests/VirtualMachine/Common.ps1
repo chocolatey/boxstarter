@@ -2,7 +2,7 @@ function Mount-TestVHD ([switch]$DoNotLoadRegistry){
     $v = Mount-VHD $testRoot\test.vhdx -Passthru | get-disk | Get-Partition | Get-Volume
     Get-PSDrive | Out-Null
     if(!$DoNotLoadRegistry){
-        reg load HKLM\VHDSYS "$($v.DriveLetter):\windows\system32\config\software" | Out-Null
+        reg load HKLM\VHDSYS "$($v.DriveLetter):\windows\system32\config\software" 2>&1 | out-null
     }
     return $v
 }

@@ -140,7 +140,8 @@ function Shift-OtherGPOs($parentPath){
         $oldName = $_.Name.Replace("HKEY_LOCAL_MACHINE","HKLM:")
         [string]$newName = "$($num+1)"
         Log-BoxstarterMessage "renaming $oldName to $newName"
-        try {Rename-Item -Path $oldName -NewName $newName} catch [System.InvalidCastException] {
+        try {Rename-Item -Path $oldName -NewName $newName} 
+        catch [System.InvalidCastException] {
             #possible powershell bug when renaming reg keys that are numeric
             #the key is copied but the old key remains
             Remove-Item $oldName -Recurse -force

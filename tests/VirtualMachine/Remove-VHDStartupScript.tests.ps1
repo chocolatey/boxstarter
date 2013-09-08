@@ -3,6 +3,7 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 Describe "Remove-VHDStartupScript" {
     try{
+        $policyKey = "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy"
         $TargetScriptDirectory = "Boxstarter.Startup"
         Import-Module "$here\..\..\Boxstarter.VirtualMachine\Boxstarter.VirtualMachine.psd1" -Force
         $Boxstarter.SuppressLogging=$true
@@ -18,9 +19,9 @@ Describe "Remove-VHDStartupScript" {
 
         Context "When Removing a startup script from a vhd with a single script" {
             Add-VHDStartupScript $testRoot\test.vhdx -FilesToCopy "$testRoot\file1.ps1","$testRoot\file2.ps1" {
-                    function say-hi {"hi"}
-                    say-hi
-                }
+                function say-hi {"hi"}
+                say-hi
+            }
 
             Remove-VHDStartupScript $testRoot\test.vhdx
 
@@ -29,10 +30,108 @@ Describe "Remove-VHDStartupScript" {
                 Test-Path "$($vol.DriveLetter):\$TargetScriptDirectory" | should be $False
             }
             It "Should Remove Group Policy Scripts"{
-                test-path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts" | should be $false
+                test-path "$policyKey\Scripts" | should be $false
             }
             It "Should Remove Group Policy State Scripts"{
-                test-path "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts" | should be $false
+                test-path "$policyKey\State\Machine\Scripts" | should be $false
+            }
+            Clean-VHD
+        }
+
+        Context "When Removing a startup script from a vhd with two local scripts" {
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                function say-hi {"hi"}
+                say-hi
+            }
+            $v = Mount-TestVHD
+            Set-ItemProperty -path "$policyKey\Scripts\Startup\0\0" -name Script -value "%SystemDrive%\$TargetScriptDirectory\otherstartup.bat"
+            Set-ItemProperty -path "$policyKey\State\Machine\Scripts\Startup\0\0" -name Script -value "%SystemDrive%\$TargetScriptDirectory\otherstartup.bat"
+            [GC]::Collect()
+            reg unload HKLM\VHDSYS | out-null
+            Dismount-VHD $testRoot\test.vhdx
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                function say-hi {"hi"}
+                say-hi
+            }
+
+            Remove-VHDStartupScript $testRoot\test.vhdx
+
+            $vol = Mount-TestVHD
+            It "Should Remove 2nd Group Policy Scripts"{
+                test-path "$policyKey\Scripts\Startup\0\1" | should be $false
+            }
+            It "Should Remove 2nd Group Policy State Scripts"{
+                test-path "$policyKey\State\Machine\Scripts\Startup\0\1" | should be $false
+            }            
+            It "Should keep 1st Group Policy Scripts"{
+                test-path "$policyKey\Scripts\Startup\0\0" | should be $true
+            }
+            It "Should keep 1st Group Policy State Scripts"{
+                test-path "$policyKey\State\Machine\Scripts\Startup\0\0" | should be $true
+            }
+            Clean-VHD
+        }
+
+        Context "When Removing a startup script from a vhd with a local script and Domain Script" {
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                function say-hi {"hi"}
+                say-hi
+            }
+            $v = Mount-TestVHD
+            Set-ItemProperty -path "$policyKey\Scripts\Startup\0" -name DisplayName -value "Domain Policy"
+            Set-ItemProperty -path "$policyKey\State\Machine\Scripts\Startup\0" -name DisplayName -value "Domain Policy"
+            [GC]::Collect()
+            reg unload HKLM\VHDSYS | out-null
+            Dismount-VHD $testRoot\test.vhdx
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                function say-hi {"hi"}
+                say-hi
+            }
+
+            Remove-VHDStartupScript $testRoot\test.vhdx
+
+            $vol = Mount-TestVHD
+            It "Should move Domain Group Policy to position 0"{
+                (Get-ItemProperty -path "$policyKey\Scripts\Startup\0" -name DisplayName).DisplayName | should be "Domain Policy"
+            }
+            It "Should move state Domain Group Policy State Script to position 0"{
+                (Get-ItemProperty -path "$policyKey\State\Machine\Scripts\Startup\0" -name DisplayName).DisplayName | should be "Domain Policy"
+            }            
+            It "Should Remove Local Group Policy Scripts"{
+                test-path "$policyKey\Scripts\Startup\1\0" | should be $false
+            }
+            It "Should Remove Local Group Policy State Scripts"{
+                test-path "$policyKey\State\Machine\Scripts\Startup\1\0" | should be $false
+            }
+            Clean-VHD
+        }
+
+        Context "When Removing a startup script from a vhd with a single script and shutdown script" {
+            Add-VHDStartupScript $testRoot\test.vhdx {
+                function say-hi {"hi"}
+                say-hi
+            }
+            $v = Mount-TestVHD
+            New-Item "$policyKey\Scripts\Shutdown\0" | Out-Null
+            New-Item "$policyKey\State\Machine\Scripts\Shutdown\0" | Out-Null
+            [GC]::Collect()
+            reg unload HKLM\VHDSYS | out-null
+            Dismount-VHD $testRoot\test.vhdx
+
+            Remove-VHDStartupScript $testRoot\test.vhdx
+
+            $vol = Mount-TestVHD
+            It "Should Remove Startup Scripts"{
+                (Get-ChildItem "$policyKey\Scripts\Startup").Count | should be 0
+            }
+            It "Should Remove Startup State Scripts"{
+                (Get-ChildItem "$policyKey\State\Machine\Scripts\Startup").Count | should be 0
+            }
+            It "Should keep shutdown Scripts"{
+                (Get-ChildItem "$policyKey\Scripts\Shutdown").Count | should be 1
+            }
+            It "Should keep shutdown State Scripts"{
+                (Get-ChildItem "$policyKey\State\Machine\Scripts\Shutdown").Count | should be 1
             }            
             Clean-VHD
         }
