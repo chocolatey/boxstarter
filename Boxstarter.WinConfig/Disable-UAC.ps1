@@ -9,6 +9,6 @@ http://boxstarter.codeplex.com
 Enable-UAC
 
 #>
-    Write-BoxstarterMessage "Enabling UAC"
+    Write-BoxstarterMessage "Disabling UAC"
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA  -Value 0
 }
