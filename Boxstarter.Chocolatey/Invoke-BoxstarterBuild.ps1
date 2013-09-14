@@ -35,20 +35,28 @@ New-BoxstarterPackage
     pushd $Boxstarter.LocalRepo
     try{
         if($name){
-            if(!(Test-Path (join-path $name "$name.nuspec"))){
-                throw "Cannot find nuspec for $name"
+            $searchPath = join-path $name "$name.nuspec"
+            Write-BoxstarterMessage "Searching for $searchPath"
+            if(!(Test-Path $searchPath)){
+                throw "Cannot find $searchPath"
             }
             .$choco Pack (join-path $name "$name.nuspec")
             Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $name or Invoke-ChocolateyBoxstarter $name will run this package." -nologo
         } else {
              if($all){
+                Write-BoxstarterMessage "Scanning $($Boxstarter.LocalRepo) for package folders"
                 Get-ChildItem . | ? { $_.PSIsContainer } | % {
+                    $directoriesExist=$true
+                    Write-BoxstarterMessage "Found directory $($_.name). Looking for $($_.name).nuspec"
                     if(!(Test-Path (join-path $_.name "$($_.name).nuspec"))){
                         throw "Cannot find nuspec for $_"
                     }
                     .$choco Pack (join-path . "$($_.Name)\$($_.Name).nuspec")
                     Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Invoke-ChocolateyBoxstarter $($_.Name) will run this package." -nologo
-                }                
+                }
+                if($directoriesExist -eq $null){
+                    Write-BoxstarterMessage "No Directories exist under $($boxstarter.LocalRepo)"
+                }
             }
         }
     }
