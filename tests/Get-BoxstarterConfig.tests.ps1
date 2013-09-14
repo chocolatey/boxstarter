@@ -4,6 +4,8 @@ import-module "$here\..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1" -Force
 Describe "Get-BoxstarterConfig" {
     $testRoot=(Get-PSDrive TestDrive).Root
     $currentBase = $Boxstarter.BaseDir
+    $currentNugetSources = $Boxstarter.NugetSources
+    $currentLocalRepo = $Boxstarter.LocalRepo
     [xml]$configXml = Get-Content (Join-Path $Boxstarter.BaseDir BoxStarter.config)
     $Boxstarter.BaseDir = $testRoot
 
@@ -36,6 +38,9 @@ Describe "Get-BoxstarterConfig" {
         It "Get-BoxstarterConfig will reflect the set NugetSources"{
             (Get-BoxstarterConfig).NugetSources | Should be $expected
         }
+        It "`$Boxstarter.NugetSources will reflect the set NugetSources"{
+            $Boxstarter.NugetSources | Should be $expected
+        }
     }
 
     Context "When Setting LocalRepo to a new value" {
@@ -46,6 +51,9 @@ Describe "Get-BoxstarterConfig" {
 
         It "Get-BoxstarterConfig will reflect the set LocalRepo"{
             (Get-BoxstarterConfig).LocalRepo | Should be $expected
+        }
+        It "`$Boxstarter.LocalRepo will reflect the set LocalRepo"{
+            $Boxstarter.LocalRepo | Should be $expected
         }
     }
 
@@ -63,4 +71,6 @@ Describe "Get-BoxstarterConfig" {
     }
 
     $Boxstarter.BaseDir = $currentBase
+    $Boxstarter.NugetSources = $currentNugetSources
+    $Boxstarter.LocalRepo = $currentLocalRepo
 }

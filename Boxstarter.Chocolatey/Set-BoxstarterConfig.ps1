@@ -26,14 +26,14 @@ Get-BoxstarterConfig
     [xml]$configXml = Get-Content (Join-Path $Boxstarter.BaseDir BoxStarter.config)
 
     if($NugetSources){
-        $configXml.config.NugetSources = $NugetSources
+        $boxstarter.NugetSources = $configXml.config.NugetSources = $NugetSources
     }
     if($LocalRepo){
         if($configXml.config.LocalRepo -eq $null) {
             $localRepoElement = $configXml.CreateElement("LocalRepo")
             $configXml.config.AppendChild($localRepoElement) | Out-Null
         }
-        $configXml.config.LocalRepo = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LocalRepo)
+        $boxstarter.LocalRepo = $configXml.config.LocalRepo = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LocalRepo)
     }
 
     $configXml.Save((Join-Path $Boxstarter.BaseDir BoxStarter.config))
