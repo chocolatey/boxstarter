@@ -81,5 +81,6 @@ Describe "Invoke-BoxstarterBuild" {
         It "Will throw No Nuspec" {
             $ex | Should be "Cannot find nuspec for pkg1"
         }
+        [GC]::Collect() #pester test drive kept bombing on cleanup without this
     }
 }
