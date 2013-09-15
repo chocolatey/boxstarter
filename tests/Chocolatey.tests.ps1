@@ -166,5 +166,8 @@ Describe "Getting-Chocolatey" {
         it "will delete package folder" {
             Assert-MockCalled Remove-Item -parameterFilter {$path -eq "dir2"}
         }
-    }    
+    }
+    #Not sure why I need to do this but pester test drive cleanup
+    #does not properly cleanup without it
+    Remove-Item $TestDrive -recurse -force
 }

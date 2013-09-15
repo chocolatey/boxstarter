@@ -6,7 +6,7 @@ Describe "Add-VHDStartupScript" {
         $TargetScriptDirectory = "Boxstarter.Startup"
         Import-Module "$here\..\..\Boxstarter.Virtualization\Boxstarter.Virtualization.psd1" -Force
         $Boxstarter.SuppressLogging=$true
-        mkdir $env:temp\Boxstarter.tests | Out-Null
+        mkdir $env:temp\Boxstarter.tests -force | Out-Null
         $testRoot="$env:temp\Boxstarter.tests"
         $v = new-vhd -Path $testRoot\test.vhdx -SizeBytes 200MB | Mount-VHD -PassThru | Initialize-Disk -PartitionStyle mbr -Confirm:$false -PassThru | New-Partition -UseMaximumSize -AssignDriveLetter -MbrType IFS | Format-Volume -NewFileSystemLabel "VHD" -Confirm:$false
         Get-PSDrive | Out-Null
