@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>boxstarter.VirtualMachine</id>
+    <id>boxstarter.Virtualization</id>
     <version>$version$</version>
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
@@ -20,6 +20,6 @@
     <file src="..\..\LICENSE.txt" target="tools"/>
     <file src="chocolateyinstall.ps1" target="tools"/>
     <file src="..\Setup.ps1" target="tools"/>    
-    <file src="..\..\Boxstarter.VirtualMachine\**\*.*" target="tools\Boxstarter.VirtualMachine"/>
+    <file src="..\..\Boxstarter.Virtualization\**\*.*" target="tools\Boxstarter.Virtualization"/>
   </files>
 </package>

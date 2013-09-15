@@ -3,7 +3,7 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 Describe "Get-VHDComputerName" {
     try{
-        Import-Module "$here\..\..\Boxstarter.VirtualMachine\Boxstarter.VirtualMachine.psd1" -Force
+        Import-Module "$here\..\..\Boxstarter.Virtualization\Boxstarter.Virtualization.psd1" -Force
         $Boxstarter.SuppressLogging=$true
         mkdir $env:temp\Boxstarter.tests | Out-Null
         $testRoot="$env:temp\Boxstarter.tests"

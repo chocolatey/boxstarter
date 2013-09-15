@@ -10,7 +10,7 @@ function Enable-VMPSRemoting {
     Stop-VM $VmName
     $vhd=Get-VMHardDiskDrive -VMName $vmName
     $vmComputername=Get-VHDComputerName $vhd.Path
-    $fileToCopy="$($boxstarter.BaseDir)\boxstarter.VirtualMachine\EnablePsRemotingOnServer.ps1"
+    $fileToCopy="$($boxstarter.BaseDir)\boxstarter.Virtualization\EnablePsRemotingOnServer.ps1"
 
     Add-VHDStartupScript $vhd.Path -FilesToCopy $fileToCopy {
         netsh advfirewall firewall set rule name="File and Printer Sharing (SMB-In)" new enable=yes profile=any

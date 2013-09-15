@@ -93,7 +93,7 @@ Remove-VHDStartupScript
 
 function Get-RegFile {
     Write-BoxstarterMessage "Creating Local Group Policy on VHD to run Statrtup script on Boot"
-    $regFileTemplate = "$($boxstarter.BaseDir)\boxstarter.VirtualMachine\startupScript.reg"
+    $regFileTemplate = "$($boxstarter.BaseDir)\boxstarter.Virtualization\startupScript.reg"
     $startupRegFile = "$env:Temp\startupScript.reg"
     $policyKey = "HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy"
     $scriptNum=0

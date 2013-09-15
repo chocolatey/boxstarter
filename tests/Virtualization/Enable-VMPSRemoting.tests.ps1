@@ -6,7 +6,7 @@ Describe "Enable-VMPSRemoting" {
         Remove-Module boxstarter.*
         Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
             % { . $_.ProviderPath }
-        Resolve-Path $here\..\..\boxstarter.VirtualMachine\*-*.ps1 | 
+        Resolve-Path $here\..\..\boxstarter.Virtualization\*-*.ps1 | 
             % { . $_.ProviderPath }
         $Boxstarter.SuppressLogging=$true
         $vhdFile="$env:temp\Boxstarter.vhd"
