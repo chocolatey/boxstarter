@@ -17,7 +17,11 @@ function Check-Chocolatey {
             $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
             New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
             $url="http://chocolatey.org/api/v2/package/chocolatey/"
-            iex ((new-object net.webclient).DownloadString("http://chocolatey.org/install.ps1"))
+            $wc=new-object net.webclient
+            $wp=[system.net.WebProxy]::GetDefaultProxy()
+            $wp.UseDefaultCredentials=$true
+            $wc.Proxy=$wp
+            iex ($wc.DownloadString("http://chocolatey.org/install.ps1"))            
             Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
             $env:path="$env:path;$env:systemdrive\chocolatey\bin"
             Enable-Net40

@@ -6,7 +6,11 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
         $config = Get-BoxstarterConfig
         $url=$config.ChocolateyPackage
         Enter-BoxstarterLogable {
-            iex ((new-object net.webclient).DownloadString($config.ChocolateyRepo))
+            $wc=new-object net.webclient
+            $wp=[system.net.WebProxy]::GetDefaultProxy()
+            $wp.UseDefaultCredentials=$true
+            $wc.Proxy=$wp
+            iex ($wc.DownloadString($config.ChocolateyRepo))            
             Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
             Enable-Net40
         }
