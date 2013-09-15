@@ -44,10 +44,14 @@ User's password as a Secure string to be used for reboot autologons.
 This will suppress the password prompt at the beginning of the 
 Boxstarter installer.
 
-.PARAMETER NoNewWindow
+.PARAMETER KeepWindowOpen
 Enabling this switch will prevent the command window from closing and 
 prompt the user to pres the Enter key before the window closes. This 
 is ideal when not invoking boxstarter from a console.
+
+.PARAMETER NoPassword
+When set, Boxstarter will never prompt for logon. Use this if using
+an account without password validation.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter example
@@ -83,7 +87,8 @@ Set-BoxstarterConfig
       [string]$LocalRepo,
       [switch]$DisableReboots,
       [System.Security.SecureString]$Password,
-      [switch]$KeepWindowOpen
+      [switch]$KeepWindowOpen,
+      [switch]$NoPassword      
     )
     try{
         if($DisableReboots){$Boxstarter.RebootOk=$false}
@@ -98,7 +103,7 @@ Set-BoxstarterConfig
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
 Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstrapPackage"}) $(if($LocalRepo){"-Localrepo $localRepo"})
 "@
-            Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password -KeepWindowOpen:$KeepWindowOpen
+            Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password -KeepWindowOpen:$KeepWindowOpen -NoPassword:$NoPassword
             return
         }
         if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }

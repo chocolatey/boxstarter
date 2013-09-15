@@ -32,7 +32,7 @@ parameterBoxstarter will prompt the user to enter a password which
 will be used for automatic logins in the event a restart is 
 required.
 
-.PARAMETER NoNewWindow
+.PARAMETER KeepWindowOpen
 Enabling this switch will prevent the command window from closing and 
 prompt the user to pres the Enter key before the window closes. This 
 is ideal when not invoking boxstarter from a console.

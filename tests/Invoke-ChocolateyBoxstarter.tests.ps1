@@ -66,6 +66,19 @@ Describe "Invoke-ChocolateyBoxstarter" {
         }
     }
 
+    Context "When not invoked via boxstarter and passing NoPassword" {
+        $Boxstarter.ScriptToCall=$null
+        Mock Invoke-Boxstarter
+        Mock Chocolatey
+        Mock Check-Chocolatey
+
+        Invoke-ChocolateyBoxstarter package -NoPassword
+
+        it "should Call Boxstarter with NoPassword" {
+            Assert-MockCalled Invoke-Boxstarter -ParameterFilter {$Nopassword -eq $True}
+        }
+    }
+
     Context "When invoked via boxstarter" {
         $Boxstarter.ScriptToCall="return"
         Mock Invoke-Boxstarter
