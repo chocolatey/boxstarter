@@ -37,6 +37,10 @@ Enabling this switch will prevent the command window from closing and
 prompt the user to pres the Enter key before the window closes. This 
 is ideal when not invoking boxstarter from a console.
 
+.PARAMETER NoPassword
+When set, Boxstarter will never prompt for logon. Use this if using
+an account without password validation.
+
 .EXAMPLE
 Invoke-Boxstarter {Import-Modler myinstaller;Invoke-MyInstall} -RebootOk
 
@@ -62,7 +66,9 @@ Invoke-Reboot
       [Parameter(Position=3,Mandatory=0)]
       [string]$encryptedPassword=$null,
       [Parameter(Position=4,Mandatory=0)]
-      [switch]$KeepWindowOpen      
+      [switch]$KeepWindowOpen,
+      [Parameter(Position=5,Mandatory=0)]
+      [switch]$NoPassword      
     )
     $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
     if(!(Test-Admin)) {
@@ -85,7 +91,13 @@ Invoke-Reboot
         $session=Start-TimedSection "Installation session."
         if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
         if($encryptedPassword){$password = ConvertTo-SecureString -string $encryptedPassword}
-        $script:BoxstarterPassword=InitAutologon $password
+        if(!$NoPassword){
+            $boxstarter.NoPassword=$False
+            $script:BoxstarterPassword=InitAutologon $password
+        } 
+        else {
+            $boxstarter.NoPassword=$True
+        }
         $script:BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
@@ -93,7 +105,7 @@ Invoke-Reboot
     }
     catch {
        Log-BoxStarterMessage $_
-       $_ | write-host -ForeGroundColor red
+       throw $_
     }
     finally{
         Cleanup-Boxstarter -KeepWindowOpen:$KeepWindowOpen

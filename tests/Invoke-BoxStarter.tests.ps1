@@ -57,7 +57,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         Mock Get-Service {new-Object -TypeName PSObject -Property @{CanStop=$True}} -ParameterFilter {$include -eq "CCMEXEC"}
 
-        try { Invoke-Boxstarter {throw "error"} } catch {} 
+        try { Invoke-Boxstarter { throw "error" } } catch {}
 
         it "will stop WUA" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
@@ -91,6 +91,9 @@ Describe "Invoke-Boxstarter" {
         }
         it "Restart file will have RebootOk" {
             Assert-MockCalled New-Item -ParameterFilter {$Path -eq "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat" -and ($Value -like "*-RebootOk*")}
+        }
+        it "Restart file will have NoPassword Set To False" {
+            Assert-MockCalled New-Item -ParameterFilter {$Path -eq "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat" -and ($Value -like "*-NoPassword:`$False*")}
         }
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
     }
@@ -169,6 +172,26 @@ Describe "Invoke-Boxstarter" {
 
         it "will not read host for the password" {
             Assert-MockCalled Read-AuthenticatedPassword -times 0
+        }
+    }
+
+    Context "When the NoPassword switch is specified and reboot is ok" {
+        Mock Test-Admin {return $true}
+        Mock Stop-Service
+        Mock Start-Service
+        Mock Set-Service
+        Mock Set-SecureAutoLogon
+        Mock Restart
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+
+        Invoke-Boxstarter {Invoke-Reboot} -RebootOk -NoPassword
+
+        it "will not read host for the password" {
+            Assert-MockCalled Read-AuthenticatedPassword -times 0
+        }
+        it "Restart file will specify NoPassword" {
+            Assert-MockCalled New-Item -ParameterFilter {$Path -eq "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat" -and ($Value -like "*-NoPassword:`$True*")}
         }
     }
 
