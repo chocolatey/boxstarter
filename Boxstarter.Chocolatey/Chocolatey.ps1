@@ -46,14 +46,17 @@ Intercepts Chocolatey call to check for reboots
 
     if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
     try {Call-Chocolatey @PSBoundParameters}catch { $ex=$_}
-    if($Boxstarter.rebootOk -and $global:error.count -gt 0) {
+    if(!$Boxstarter.rebootOk) {return}
+    if($Boxstarter.IsRebooting){
+        Remove-ChocolateyPackageInProgress $packageName
+        return
+    }
+    if($global:error.count -gt 0) {
         if ($ex -ne $null -and ($ex -match "code was '(-?\d+)'")) {
             $errorCode=$matches[1]
             if($RebootCodes -contains $errorCode) {
                 Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code"
-                $pkgDir = (dir $env:ChocolateyInstall\lib\$packageName.*)
-                if($pkgDir.length -gt 0) {$pkgDir = $pkgDir[-1]}
-                remove-item $pkgDir -Recurse -Force
+                Remove-ChocolateyPackageInProgress $packageName
                 Invoke-Reboot
             }
         }
@@ -108,4 +111,10 @@ function Add-DefaultRebootCodes($codes) {
     $codes += 3010 #common MSI reboot needed code
     $codes += -2067919934 #returned by sql server when it needs a reboot
     return $codes
+}
+
+function Remove-ChocolateyPackageInProgress($packageName) {
+    $pkgDir = (dir $env:ChocolateyInstall\lib\$packageName.*)
+    if($pkgDir.length -gt 0) {$pkgDir = $pkgDir[-1]}
+    remove-item $pkgDir -Recurse -Force    
 }

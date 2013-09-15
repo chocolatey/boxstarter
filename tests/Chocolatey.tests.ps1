@@ -13,7 +13,7 @@ Intercept-Chocolatey
 
 function DISM { return; }
 
-Describe "Getting Chocolatey" {
+Describe "Getting-Chocolatey" {
     Context "When a reboot is pending and reboots are ok" {
         Mock Call-Chocolatey
         Mock Test-PendingReboot {$true}
@@ -141,7 +141,7 @@ Describe "Getting Chocolatey" {
         }
     }   
 
-        Context "When WindowsFeature is not already installed" {
+    Context "When WindowsFeature is not already installed" {
         Mock Test-PendingReboot {return $false}
         Mock Invoke-Reboot
         Mock Call-Chocolatey
@@ -151,5 +151,20 @@ Describe "Getting Chocolatey" {
         it "will Call Chocolatey" {
             Assert-MockCalled Call-Chocolatey
         }
-    }     
+    }
+
+    Context "When a reboot was triggered" {
+        Mock Call-Chocolatey { $Boxstarter.IsRebooting=$true }
+        Mock Test-PendingReboot {$false}
+        $boxstarter.RebootOk=$true
+        Mock Invoke-Reboot
+        Mock Remove-Item
+        Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
+
+        Chocolatey Install pkg
+
+        it "will delete package folder" {
+            Assert-MockCalled Remove-Item -parameterFilter {$path -eq "dir2"}
+        }
+    }    
 }
