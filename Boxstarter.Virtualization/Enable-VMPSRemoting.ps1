@@ -7,7 +7,7 @@ function Enable-VMPSRemoting {
     if($vm -eq $null){
         throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not fine VM: $vmName"
     }
-    Stop-VM $VmName
+    Stop-VM $VmName -WarningAction SilentlyContinue
     $vhd=Get-VMHardDiskDrive -VMName $vmName
     $vmComputername=Get-VHDComputerName $vhd.Path
     $fileToCopy="$($boxstarter.BaseDir)\boxstarter.Virtualization\EnablePsRemotingOnServer.ps1"
