@@ -58,43 +58,47 @@ function Install-BoxstarterPackage {
         }
     }
 
-    if($ComputerAdded -eq $null){
-        Enable-WSManCredSSP -DelegateComputer $ComputerName -Role Client -Force
+    try{
+        if($ComputerAdded -eq $null){
+            Enable-WSManCredSSP -DelegateComputer $ComputerName -Role Client -Force
+        }
+
+    <#
+        If (remoting Not enabled) {
+            if(wmi not enabled){
+                throw
+            }
+            If(!Force){
+                confirm ok to enable remoting
+            }
+            if(confirmed){
+                enable remoting
+            }
+            if(!test-remoting){
+                throw
+            }
+        }
+
+        build zip of modules and package (if local)
+        copy bytes
+        invoke remote extraction
+
+        Build script to invoke boxstarter
+
+        Invoke script remotely
+
+        If a new script was returned{
+            restart remote computer
+            wait for it to come back
+            invoke the script
+        }
+    #>
     }
-
-<#
-    If (remoting Not enabled) {
-        if(wmi not enabled){
-            throw
+    finally{
+        Disable-WSManCredSSP -Role Client
+        if($credsspEnabled){
+            Enable-WSManCredSSP -DelegateComputer $currentHosts.Replace("wsman/","") -Role Client -Force
         }
-        If(!Force){
-            confirm ok to enable remoting
-        }
-        if(confirmed){
-            enable remoting
-        }
-        if(!test-remoting){
-            throw
-        }
-    }
-
-    build zip of modules and package (if local)
-    copy bytes
-    invoke remote extraction
-
-    Build script to invoke boxstarter
-
-    Invoke script remotely
-
-    If a new script was returned{
-        restart remote computer
-        wait for it to come back
-        invoke the script
-    }
-#>
-    Disable-WSManCredSSP -Role Client
-    if($credsspEnabled){
-        Enable-WSManCredSSP -DelegateComputer $currentHosts.Replace("wsman/","") -Role Client -Force
     }
 }
 
