@@ -35,13 +35,34 @@ function Install-BoxstarterPackage {
         Invoke-ChocolateyBoxstarter @PSBoundParameters
         return
     }
-<#
-    If(remote not trusted){
-        add computer to trusted hosts
+
+    try { $credssp = Get-WSManCredSSP } catch { $credssp = $_}
+    if($credssp.Exception -ne $null){
+        if($Force -or (Confirm-Choice "Powershell remoting is not enabled locally. Should Boxstarter enable powershell remoting?"))
+        {
+            Enable-PSRemoting -Force
+        }else {
+            return
+        }
     }
 
-    setup credssp
+    if($credssp -is [Object[]]){
+        $idxHosts=$credssp[0].IndexOf(": ")
+        if($idxHosts -gt -1){
+            $credsspEnabled=$True
+            $currentHosts+=$credssp[0].substring($idxHosts+2)
+            $hostArray=$currentHosts.Split(",")
+            if($hostArray -contains "wsman/$ComputerName"){
+                $ComputerAdded=$True
+            }
+        }
+    }
 
+    if($ComputerAdded -eq $null){
+        Enable-WSManCredSSP -DelegateComputer $ComputerName -Role Client -Force
+    }
+
+<#
     If (remoting Not enabled) {
         if(wmi not enabled){
             throw
@@ -71,4 +92,20 @@ function Install-BoxstarterPackage {
         invoke the script
     }
 #>
+    Disable-WSManCredSSP -Role Client
+    if($credsspEnabled){
+        Enable-WSManCredSSP -DelegateComputer $currentHosts.Replace("wsman/","") -Role Client -Force
+    }
+}
+
+function Confirm-Choice ($message, $caption = $message) {
+    $yes = new-Object System.Management.Automation.Host.ChoiceDescription "&Yes","Yes";
+    $no = new-Object System.Management.Automation.Host.ChoiceDescription "&No","No";
+    $choices = [System.Management.Automation.Host.ChoiceDescription[]]($yes,$no);
+    $answer = $host.ui.PromptForChoice($caption,$message,$choices,0)
+
+    switch ($answer){
+        0 {return $true; break}
+        1 {return $false; break}
+    }    
 }

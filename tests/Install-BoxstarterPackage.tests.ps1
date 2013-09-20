@@ -12,7 +12,10 @@ Resolve-Path $here\..\boxstarter.chocolatey\*.ps1 |
 $Boxstarter.SuppressLogging=$true
 
 Describe "Install-BoxstarterPackage" {
-    Mock Invoke-ChocolateyBoxstarter 
+    Mock Invoke-ChocolateyBoxstarter
+    Mock Enable-PSRemoting
+    Mock Enable-WSManCredSSP
+    Mock Disable-WSManCredSSP
 
     Context "When calling locally" {
         
@@ -44,4 +47,68 @@ Describe "Install-BoxstarterPackage" {
             Assert-MockCalled Invoke-ChocolateyBoxstarter -ParameterFilter {$Password -eq $cred.Password}
         }
     }
+
+    Context "When Remoting is not enabled locally" {
+        Mock Get-WSManCredSSP {throw "remoting not enabled"}
+        Mock Confirm-Choice
+
+        Install-BoxstarterPackage -computerName blah -PackageName test
+
+        It "will confirm to enable remoting"{
+            Assert-MockCalled Confirm-Choice -ParameterFilter {$message -like "*Remoting is not enabled locally*"}
+        }
+    }
+
+    Context "When Remoting is not enabled locally" {
+        Mock Get-WSManCredSSP {throw "remoting not enabled"}
+        Mock Confirm-Choice {return $True}
+
+        Install-BoxstarterPackage -computerName blah -PackageName test
+
+        It "will enable remoting if user confirms"{
+            Assert-MockCalled Enable-PSRemoting
+        }
+    }
+
+    Context "When Remoting is not enabled locally" {
+        Mock Get-WSManCredSSP {throw "remoting not enabled"}
+        Mock Confirm-Choice {return $False}
+
+        Install-BoxstarterPackage -computerName blah -PackageName test
+
+        It "will not enable remoting if user does not confirm"{
+            Assert-MockCalled Enable-PSRemoting -Times 0
+        }
+    }
+
+    Context "When credssp is not enabled at all" {
+        Mock Get-WSManCredSSP {return @("The machine is not","")}
+        Mock Confirm-Choice {return $False}
+
+        Install-BoxstarterPackage -computerName blah -PackageName test
+
+        It "will enable for computer"{
+            Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$DelegateComputer -eq "blah"}
+        }
+        It "will disable credssp when done"{
+            Assert-MockCalled Disable-WSManCredSSP -ParameterFilter {$Role -eq "client"}
+        }        
+    }
+
+    Context "When credssp is enabled but not for given computer" {
+        Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah","")}
+        Mock Confirm-Choice {return $False}
+
+        Install-BoxstarterPackage -computerName blah -PackageName test
+
+        It "will enable for computer"{
+            Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$DelegateComputer -eq "blah"}
+        }
+        It "will enable credssp when done for current computer"{
+            Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$Role -eq "client" -and $DelegateComputer -eq "blahblah"}
+        }
+        It "will disable/reset when done"{
+            Assert-MockCalled Disable-WSManCredSSP -ParameterFilter {$Role -eq "client"}
+        }
+    }    
 }
