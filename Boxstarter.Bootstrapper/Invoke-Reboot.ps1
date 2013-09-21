@@ -36,6 +36,9 @@ about_boxstarter_variable_in_bootstrapper
     $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
     $restartScript="Call powershell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$($Boxstarter.BaseDir)\Boxstarter.Bootstrapper\boxstarter.bootstrapper.psd1';Invoke-Boxstarter -RebootOk -NoPassword:`$$($Boxstarter.NoPassword.ToString())`""
     New-Item "$startup\boxstarter-post-restart.bat" -type file -force -value $restartScript | Out-Null
+    if(Get-Module Bitlocker -ListAvailable){
+        Get-BitlockerVolume | Suspend-Bitlocker -RebootCount 1
+    }
     $Boxstarter.IsRebooting=$true
     Restart
 }

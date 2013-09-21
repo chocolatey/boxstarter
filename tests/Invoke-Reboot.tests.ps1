@@ -8,12 +8,14 @@ Resolve-Path $here\..\boxstarter.bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
 $BoxstarterUser="user"
 $Boxstarter.SuppressLogging=$true
+$Boxstarter.NoPassword=$false
 
 Describe "Invoke-Reboot" {
+    Mock New-Item -ParameterFilter { $Path -contains "boxstarter" }
+    Mock Restart
+    if(get-module Bitlocker -ListAvailable){Mock Suspend-Bitlocker}
 
     Context "When reboots are suppressed" {
-        Mock New-Item
-        Mock Restart
         $Boxstarter.RebootOk=$false
         $Boxstarter.IsRebooting=$false
         
@@ -31,8 +33,6 @@ Describe "Invoke-Reboot" {
     }
 
     Context "When reboots are not suppressed" {
-        Mock New-Item
-        Mock Restart
         $Boxstarter.RebootOk=$true
         $Boxstarter.IsRebooting=$false
 
@@ -46,6 +46,9 @@ Describe "Invoke-Reboot" {
         }
         it "will toggle reboot" {
             $Boxstarter.IsRebooting | should be $true
+        }
+        it "will suspend bitlocker" {
+            if(get-module bitlocker -ListAvailable){Assert-MockCalled Suspend-Bitlocker}
         }
     }
 }
