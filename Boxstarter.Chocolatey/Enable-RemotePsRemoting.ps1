@@ -1,3 +1,4 @@
+function Enable-RemotePsRemoting {
 ##############################################################################
 ##
 ## Enable-RemotePsRemoting
@@ -26,10 +27,9 @@ param(
     $Computername,
 
     ## The credential to use when connecting
-    $Credential = (Get-Credential)
+    [PSCredential]$Credential
 )
 
-Set-StrictMode -Version Latest
 $VerbosePreference = "Continue"
 
 $credential = Get-Credential $credential
@@ -82,3 +82,4 @@ $null = Invoke-WmiMethod -Computer $computername -Credential $credential `
 Write-Verbose "Testing connection"
 Invoke-Command $computername {
     Get-WmiObject Win32_ComputerSystem } -Credential $credential
+}
