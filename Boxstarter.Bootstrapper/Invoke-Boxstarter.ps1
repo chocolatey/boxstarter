@@ -68,7 +68,9 @@ Invoke-Reboot
       [Parameter(Position=4,Mandatory=0)]
       [switch]$KeepWindowOpen,
       [Parameter(Position=5,Mandatory=0)]
-      [switch]$NoPassword      
+      [switch]$NoPassword,
+      [Parameter(Position=6,Mandatory=0)]
+      [switch]$SuppressRebootScript
     )
     $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
     if(!(Test-Admin)) {
@@ -90,6 +92,7 @@ Invoke-Reboot
         write-BoxstarterMessage "$($boxMod.Copyright) http://boxstarter.codeplex.com`r`n" -nologo -Color White
         $session=Start-TimedSection "Installation session."
         if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
+        $Boxstarter.SuppressRebootScript=$SuppressRebootScript
         if($encryptedPassword){$password = ConvertTo-SecureString -string $encryptedPassword}
         if(!$NoPassword){
             $boxstarter.NoPassword=$False

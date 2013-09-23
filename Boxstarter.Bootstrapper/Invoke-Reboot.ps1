@@ -31,11 +31,13 @@ about_boxstarter_variable_in_bootstrapper
         Write-BoxstarterMessage "A Reboot was requested but Reboots are surpressed. Either call Invoke-Boxstarter with -RebootOk or set `$Boxstarter.RebootOk to `$true"
         return 
     }
-    Write-BoxstarterMessage "writing restart file"
-    New-Item "$(Get-BoxstarterTempDir)\Boxstarter.script" -type file -value $boxstarter.ScriptToCall -force | Out-Null
-    $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
-    $restartScript="Call powershell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$($Boxstarter.BaseDir)\Boxstarter.Bootstrapper\boxstarter.bootstrapper.psd1';Invoke-Boxstarter -RebootOk -NoPassword:`$$($Boxstarter.NoPassword.ToString())`""
-    New-Item "$startup\boxstarter-post-restart.bat" -type file -force -value $restartScript | Out-Null
+    if(!$Boxstarter.SuppressRebootScript){
+        Write-BoxstarterMessage "writing restart file"
+        New-Item "$(Get-BoxstarterTempDir)\Boxstarter.script" -type file -value $boxstarter.ScriptToCall -force | Out-Null
+        $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
+        $restartScript="Call powershell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$($Boxstarter.BaseDir)\Boxstarter.Bootstrapper\boxstarter.bootstrapper.psd1';Invoke-Boxstarter -RebootOk -NoPassword:`$$($Boxstarter.NoPassword.ToString())`""
+        New-Item "$startup\boxstarter-post-restart.bat" -type file -force -value $restartScript | Out-Null
+    }
     if(Get-Module Bitlocker -ListAvailable){
         Get-BitlockerVolume | Suspend-Bitlocker -RebootCount 1
     }

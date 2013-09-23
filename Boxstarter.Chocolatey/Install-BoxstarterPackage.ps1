@@ -36,7 +36,7 @@ function Install-BoxstarterPackage {
 
         Setup-BoxstarterModuleAndLocalRepo $session
         
-        Invoke-Remotely $session $Credential
+        Invoke-Remotely $session $Credential $PackageName $DisableReboots $NoPassword
     }
     finally{
         if($ClientRemotingStatus.Success){
@@ -169,9 +169,13 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
     }
 }
 
-function Invoke-Remotely($session,$Credential){
+function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPassword){
     while($session.State -eq "Opened") {
-        if($postReboot -ne $null){
+        $postReboot=Invoke-Command $session {
+            param($pkg,$password,$DisableReboots,$NoPassword)
+            Invoke-ChocolateyBoxstarter $pkg -Password $password -SuppressRebootScript -NoPassword:$NoPassword -DisableReboots:$DisableReboots
+        } -Argumentist $Package, $Credential.GetNetworkCredential().Password, $DisableReboots, $NoPassword
+        if($session.State -ne "Opened") {
             $response=$null
             Do{
                 $response=Invoke-Command $session.ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
@@ -179,9 +183,5 @@ function Invoke-Remotely($session,$Credential){
             Until($response -ne $null)
             $session = New-PSSession $ComputerName -Credential $Credential
         }
-        $postReboot=Invoke-Command $session {
-            param($pkg,$password)
-            Invoke-ChocolateyBoxstarter $pkg -Password $password -ReturnRebootScript
-        } -Argumentist $Package, $Credential.GetNetworkCredential().Password
     }
 }
