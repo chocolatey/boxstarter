@@ -62,7 +62,7 @@ $remoteScript = {
     ## Convert the destination path to a full filesytem path (to support
     ## relative paths)
     $Destination = $executionContext.SessionState.`
-        Path.GetUnresolvedProviderPathFromPSPath($env:temp\$Destination)
+        Path.GetUnresolvedProviderPathFromPSPath("$env:temp\$Destination")
 
     ## Create a new array to hold the file content
     $destBytes = New-Object byte[] $length

@@ -13,7 +13,7 @@ function Get-Boxstarter ([switch]$Force){
 
 function Test-Chocolatey ([switch]$Force){
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
-        if($Force -or Confirm-Install){
+        if($Force -or (Confirm-Install)){
             $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
             New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
             $url="http://chocolatey.org/api/v2/package/chocolatey/"
