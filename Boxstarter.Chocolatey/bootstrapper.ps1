@@ -2,13 +2,13 @@ function Get-Boxstarter ([switch]$Force){
     Write-Output "Welcome to the Boxstarter Module installer!"
     if(Test-Chocolatey -Force:$Force){    
         Write-Output "Chocoltey installed, Installing Boxstarter Modules."
-        cinst Boxstarter.Virtualization -version 1.1.35
+        cinst Boxstarter.Chocolatey -version 1.1.35
         $Message = "Boxstarter Module Installer completed"
     }
     else {
         $Message = "Did not detect Chocolatey and unable to install. Installation of Boxstarter has been aborted."
     }
-    if(!Force){ Read-Host $Message }
+    if(!$Force){ Read-Host $Message }
 }
 
 function Test-Chocolatey ([switch]$Force){
@@ -37,14 +37,15 @@ function Test-64Bit {  [IntPtr]::Size -eq 8  }
 
 function Enable-DotNet40 {
     if(Test-64Bit) {$fx="framework64"} else {$fx="framework"}
+    Write-Output "Checking for .net 4 in $env:windir\Microsoft.Net\$fx\v4.0.30319"
     if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
         Write-Output "Download and install .NET 4.0 Framework"
         $env:chocolateyPackageFolder="$env:temp\chocolatey\webcmd"
         Install-ChocolateyZipPackage 'webcmd' 'http://www.iis.net/community/files/webpi/webpicmdline_anycpu.zip' $env:temp
-        Write-Output "The .Net 4 framework is about to be installed. This may take several minutes."
         Remove-Module chocolateyInstaller
+        Write-Output "The .Net 4 framework is about to be installed. This may take several minutes."
         if(Test-Admin){
-            ."$env:temp\WebpiCmdLine.exe" /products: NetFramework4 /SuppressReboot /accepteula
+            ."$env:temp\WebpiCmdLine.exe" /products: NetFramework4 /SuppressReboot /accepteula /Log:$env:temp\net40.log
         }
         else{
             Write-Output "Installing .NET 4 in a separate window. Boxstarter instalation will complete when it finishes..."

@@ -39,13 +39,16 @@ function Install-BoxstarterPackage {
         Invoke-Remotely $session $Credential $PackageName $DisableReboots $NoPassword
     }
     finally{
+        if($session -ne $null) {Remove-PSSession $Session}
         if($ClientRemotingStatus.Success){
             Disable-WSManCredSSP -Role Client
             if($ClientRemotingStatus.PreviousCSSPTrustedHosts -ne $null){
+                Write-BoxstarterMessage "Reseting CredSSP Trusted Hosts to $($ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace('wsman/',''))"
                 Enable-WSManCredSSP -DelegateComputer $ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace("wsman/","") -Role Client -Force
             }
             if($ClientRemotingStatus.PreviousTrustedHosts -ne $null){
-                Set-Item "wsman:\localhost\client\trustedhosts" -Value $ClientRemotingStatus.PreviousTrustedHosts -Force
+                Write-BoxstarterMessage "Reseting wsman Trusted Hosts to $($ClientRemotingStatus.PreviousTrustedHosts)"
+                Set-Item "wsman:\localhost\client\trustedhosts" -Value "$($ClientRemotingStatus.PreviousTrustedHosts)" -Force
             }
         }
     }
@@ -96,10 +99,13 @@ function Enable-RemotingOnClient($RemoteHostToTrust){
 
     try { $credssp = Get-WSManCredSSP } catch { $credssp = $_}
     if($credssp.Exception -ne $null){
+        Write-BoxstarterMessage "Local Powershell Remoting is not enabled"
         if($Force -or (Confirm-Choice "Powershell remoting is not enabled locally. Should Boxstarter enable powershell remoting?"))
         {
+            Write-BoxstarterMessage "Enabling local Powershell Remoting"
             Enable-PSRemoting -Force
         }else {
+            Write-BoxstarterMessage "Not enabling local Powershell Remoting aborting package install"
             return $Result
         }
     }
@@ -117,6 +123,7 @@ function Enable-RemotingOnClient($RemoteHostToTrust){
     }
 
     if($ComputerAdded -eq $null){
+        Write-BoxstarterMessage "Adding $RemoteHostToTrust to allowed credSSP hosts"
         Enable-WSManCredSSP -DelegateComputer $RemoteHostToTrust -Role Client -Force
     }
 
@@ -129,6 +136,7 @@ function Enable-RemotingOnClient($RemoteHostToTrust){
         $newHosts=$Result.PreviousTrustedHosts + "," + $RemoteHostToTrust
     }
     if($newHosts -ne $null) {
+        Write-BoxstarterMessage "Adding $newHosts to allowed wsman hosts"
         Set-Item "wsman:\localhost\client\trustedhosts" -Value $newHosts -Force
     }
 
@@ -137,8 +145,10 @@ function Enable-RemotingOnClient($RemoteHostToTrust){
 }
 
 function Enable-RemotingOnRemote ($ComputerName, $Credential){
+    Write-BoxstarterMessage "Testing remoting access on $ComputerName"
     $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
     if($remotingTest -eq $null){
+        Write-BoxstarterMessage "Powershell Remoting is not enabled or accesible on $ComputerName"
         $wmiTest=Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
         if($wmiTest -eq $null){
             Throw @"
@@ -149,39 +159,53 @@ from an Administrator Powershell console on the remote computer.
 "@
         }
         if($Force -or (Confirm-Choice "Powershell Remoting is not enabled on Remote computer. Should Boxstarter enable powershell remoting?")){
+            Write-BoxstarterMessage "Enabling Powershell Remoting on $ComputerName"
             Enable-RemotePSRemoting $ComputerName $Credential
         }
         else {
+            Write-BoxstarterMessage "Not enabling local Powershell Remoting on $ComputerName. Aborting package install"
             return $False
         }
+    }
+    else {
+        Write-BoxstarterMessage "Remoting is accesible on $ComputerName"
     }
     return $True
 }
 
 function Setup-BoxstarterModuleAndLocalRepo($session){
-    Send-File "$basedir\Boxstarter.Chocolatey\bootstrapper.ps1" boxstarter\bootstrapper.ps1 $session
-    Get-ChildItem $Boxstarter.LocalRepo\*.nupkg | % { Send-File $_.ProviderPath Boxstarter\$_.Name $session }
+    Write-BoxstarterMessage "Copying Bootstraper to $($Session.ComputerName)"
+    Send-File "$($Boxstarter.basedir)\Boxstarter.Chocolatey\bootstrapper.ps1" "boxstarter\bootstrapper.ps1" $session
+    Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % { 
+        Write-BoxstarterMessage "Copying $($_.Name) to $($Session.ComputerName)"
+        Send-File "$($_.FullName)" "Boxstarter\$($_.Name)" $session 
+    }
     Invoke-Command -Session $Session {
+        Set-ExecutionPolicy Bypass -Force
         . $env:temp\boxstarter\bootstrapper.ps1
         Get-Boxstarter -Force
-        Import-Module $env:Appdata\Boxstarter\Boxstarter.Chocolatey.psd1
+        Import-Module $env:Appdata\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
         $Boxstarter.LocalRepo="$env:temp\boxstarter"
     }
 }
 
 function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPassword){
     while($session.State -eq "Opened") {
-        $postReboot=Invoke-Command $session {
+        Invoke-Command $session {
             param($pkg,$password,$DisableReboots,$NoPassword)
             Invoke-ChocolateyBoxstarter $pkg -Password $password -SuppressRebootScript -NoPassword:$NoPassword -DisableReboots:$DisableReboots
-        } -Argumentist $Package, $Credential.GetNetworkCredential().Password, $DisableReboots, $NoPassword
+        } -ArgumentList $Package, $Credential.Password, $DisableReboots, $NoPassword
         if($session.State -ne "Opened") {
             $response=$null
             Do{
                 $response=Invoke-Command $session.ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
             }
             Until($response -ne $null)
+            Remove-PSSession $session
             $session = New-PSSession $ComputerName -Credential $Credential
+        }
+        else {
+            Remove-PSSession $session
         }
     }
 }
