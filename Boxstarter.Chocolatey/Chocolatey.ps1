@@ -45,7 +45,7 @@ Intercepts Chocolatey call to check for reboots
     }
 
     if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
-    try {Call-Chocolatey @PSBoundParameters}catch { $ex=$_}
+    try {Call-Chocolatey @PSBoundParameters}catch { $ex=$_;throw $_}
     if(!$Boxstarter.rebootOk) {return}
     if($Boxstarter.IsRebooting){
         Remove-ChocolateyPackageInProgress $packageName
@@ -65,7 +65,16 @@ Intercepts Chocolatey call to check for reboots
 
 function Call-Chocolatey {
     $session=Start-TimedSection "Calling Chocolatey to install $packageName"
-    ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
+    if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
+        Invoke-FromTask @"
+import-module $env:appdata\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1
+
+Set-BoxstarterConfig -LocalRepo $env:temp\boxstarter;$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1 $(Expand-Splat $PSBoundParameters)
+"@
+    }
+    else{
+        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
+    }
     Stop-Timedsection $session
 }
 
@@ -117,4 +126,35 @@ function Remove-ChocolateyPackageInProgress($packageName) {
     $pkgDir = (dir $env:ChocolateyInstall\lib\$packageName.*)
     if($pkgDir.length -gt 0) {$pkgDir = $pkgDir[-1]}
     remove-item $pkgDir -Recurse -Force    
+}
+
+function Expand-Splat($splat){
+    $ret=""
+    ForEach($item in $splat.KEYS.GetEnumerator()) {
+        $ret += "-$item$(Resolve-SplatValue $splat[$item]) " 
+    }
+    return $ret
+}
+
+function Resolve-SplatValue($val){
+    if($val -is [switch]){
+        if($val.IsPresent){
+            return ":`$True"
+        }
+        else{
+            return ":`$False"
+        }
+    }
+    if($val -is [Array]){
+        $ret=" @("
+        $firstVal=$False
+        foreach($arrayVal in $val){
+            if($firstVal){$ret+=","}
+            $ret += "`"$arrayVal`""
+            $firstVal=$true
+        }
+        $ret += ")"
+        return $ret
+    }
+    return " `"$val`""
 }

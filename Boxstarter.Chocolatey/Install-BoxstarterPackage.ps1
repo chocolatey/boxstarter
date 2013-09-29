@@ -31,7 +31,7 @@ function Install-BoxstarterPackage {
         if(!(Enable-RemotingOnRemote $ComputerName $Credential)){return}
 
         if($session -eq $null){
-            $session = New-PSSession $ComputerName -Credential $Credential
+            $session = New-PSSession $ComputerName -Credential $Credential -Authentication credssp -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}}
         }
 
         Setup-BoxstarterModuleAndLocalRepo $session
@@ -175,17 +175,27 @@ from an Administrator Powershell console on the remote computer.
 
 function Setup-BoxstarterModuleAndLocalRepo($session){
     Write-BoxstarterMessage "Copying Bootstraper to $($Session.ComputerName)"
-    Send-File "$($Boxstarter.basedir)\Boxstarter.Chocolatey\bootstrapper.ps1" "boxstarter\bootstrapper.ps1" $session
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.Common"
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.WinConfig"
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.bootstrapper"
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.chocolatey"
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.config"
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\license.txt"
+    Invoke-Command -Session $Session { mkdir $env:temp\boxstarter -Force }
+    Send-File "$env:temp\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
     Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % { 
         Write-BoxstarterMessage "Copying $($_.Name) to $($Session.ComputerName)"
         Send-File "$($_.FullName)" "Boxstarter\$($_.Name)" $session 
     }
     Invoke-Command -Session $Session {
         Set-ExecutionPolicy Bypass -Force
-        . $env:temp\boxstarter\bootstrapper.ps1
-        Get-Boxstarter -Force
+        mkdir $env:appdata\boxstarter -Force
+        $shellApplication = new-object -com shell.application 
+        $zipPackage = $shellApplication.NameSpace("$env:temp\Boxstarter\Boxstarter.zip") 
+        $destinationFolder = $shellApplication.NameSpace("$env:appdata\boxstarter") 
+        $destinationFolder.CopyHere($zipPackage.Items(),0x10)
         Import-Module $env:Appdata\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
-        $Boxstarter.LocalRepo="$env:temp\boxstarter"
+        Set-BoxstarterConfig -LocalRepo "$env:temp\boxstarter"
     }
 }
 
@@ -193,8 +203,11 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
     while($session.State -eq "Opened") {
         Invoke-Command $session {
             param($pkg,$password,$DisableReboots,$NoPassword)
+            Import-Module $env:Appdata\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
+            Set-BoxstarterConfig -LocalRepo "$env:temp\boxstarter"
             Invoke-ChocolateyBoxstarter $pkg -Password $password -SuppressRebootScript -NoPassword:$NoPassword -DisableReboots:$DisableReboots
         } -ArgumentList $Package, $Credential.Password, $DisableReboots, $NoPassword
+        write-host "session state $($session.state)"
         if($session.State -ne "Opened") {
             $response=$null
             Do{
@@ -202,7 +215,8 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             }
             Until($response -ne $null)
             Remove-PSSession $session
-            $session = New-PSSession $ComputerName -Credential $Credential
+            $session = New-PSSession $ComputerName -Credential $Credential -Authentication credssp -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}}
+            write-host "new session is $($session.state)"
         }
         else {
             Remove-PSSession $session

@@ -82,7 +82,7 @@ Task Package-DownloadZip -depends Clean-Artifacts {
     }
 
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\license.txt" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\Boxstarter.Chocolatey\bootstrapper.ps1" }
+    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\buildscripts\bootstrapper.ps1" }
     exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\Setup.bat" }
 }
 

@@ -104,7 +104,7 @@ Invoke-Reboot
         $script:BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
-        &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
+        &([ScriptBlock]::Create($Boxstarter.ScriptToCall)) $BoxstarterPassword
     }
     catch {
        Log-BoxStarterMessage $_
