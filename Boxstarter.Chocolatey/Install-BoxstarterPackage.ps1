@@ -207,16 +207,17 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             Set-BoxstarterConfig -LocalRepo "$env:temp\boxstarter"
             Invoke-ChocolateyBoxstarter $pkg -Password $password -SuppressRebootScript -NoPassword:$NoPassword -DisableReboots:$DisableReboots
         } -ArgumentList $Package, $Credential.Password, $DisableReboots, $NoPassword
-        write-host "session state $($session.state)"
-        if($session.State -ne "Opened") {
-            $response=$null
+        Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
+        start-sleep -seconds 1
+        $response=$null
+        $response=Invoke-Command $session.ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
+        if($response -eq $null) {
             Do{
                 $response=Invoke-Command $session.ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
             }
             Until($response -ne $null)
             Remove-PSSession $session
             $session = New-PSSession $ComputerName -Credential $Credential -Authentication credssp -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}}
-            write-host "new session is $($session.state)"
         }
         else {
             Remove-PSSession $session
