@@ -1,3 +1,17 @@
+function Install-ChocolateyInstallPackageOverride {
+    if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
+        Invoke-FromTask @"
+Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
+Install-ChocolateyInstallPackage $(Expand-Splat $PSBoundParameters)
+"@
+    }
+    else{
+        chocolateyInstaller\Install-ChocolateyInstallPackage @PSBoundParameters
+    }
+}
+
+new-alias Install-ChocolateyInstallPackage Install-ChocolateyInstallPackageOverride -force
+
 function cinst {
 <#
 .SYNOPSIS
@@ -65,22 +79,21 @@ Intercepts Chocolatey call to check for reboots
 
 function Call-Chocolatey {
     $session=Start-TimedSection "Calling Chocolatey to install $packageName"
-    if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
-        Invoke-FromTask @"
-import-module $env:appdata\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1
-
-Set-BoxstarterConfig -LocalRepo $env:temp\boxstarter;$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1 $(Expand-Splat $PSBoundParameters)
-"@
-    }
-    else{
-        ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
-    }
+    ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
     Stop-Timedsection $session
 }
 
-function Intercept-Command ($commandName, $omitCommandParam) {
-    $metadata=New-Object System.Management.Automation.CommandMetaData (Get-Command "$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1")
-    $srcMetadata=New-Object System.Management.Automation.CommandMetaData (Get-Command $commandName)
+function Intercept-Command {
+    param(
+        $commandName, 
+        $targetCommand = "$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1",
+        [switch]$omitCommandParam
+    )
+    $metadata=Get-MetaData $targetCommand
+    $srcMetadata=Get-MetaData $commandName
+    if($commandName.Split("\").Length -eq 2){
+        $commandName = $commandName.Substring($commandName.IndexOf("\")+1)
+    }
     $metadata.Parameters.Remove("Verbose") | out-null
     $metadata.Parameters.Remove("Debug") | out-null
     $metadata.Parameters.Remove("ErrorAction") | out-null
@@ -105,11 +118,20 @@ function Intercept-Command ($commandName, $omitCommandParam) {
     Set-Item Function:\$commandName -value "$cmdLetBinding `r`n param ( $params )Process{ `r`n$strContent}" -force
 }
 
+function Get-MetaData ($command){
+    $commandParts=$command.Split("\")
+    if($commandParts.length -eq 2){
+        return New-Object System.Management.Automation.CommandMetaData (Get-Command -module $commandParts[0] -name $commandParts[1])
+    }
+    else{
+        return New-Object System.Management.Automation.CommandMetaData (Get-Command $command)
+    }
+}
 function Intercept-Chocolatey {
     if($Script:BoxstarterIntrercepting){return}
-    Intercept-Command cinst $true
-    Intercept-Command cup $true
-    Intercept-Command cinstm $true
+    Intercept-Command cinst -omitCommandParam
+    Intercept-Command cup -omitCommandParam
+    Intercept-Command cinstm -omitCommandParam
     Intercept-Command chocolatey
     Intercept-Command call-chocolatey
     $Script:BoxstarterIntrercepting=$true
@@ -150,7 +172,7 @@ function Resolve-SplatValue($val){
         $firstVal=$False
         foreach($arrayVal in $val){
             if($firstVal){$ret+=","}
-            $ret += "`"$arrayVal`""
+            $ret += "$arrayVal"
             $firstVal=$true
         }
         $ret += ")"

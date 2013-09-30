@@ -10,3 +10,9 @@ Export-ModuleMember Invoke-ChocolateyBoxstarter,
                     Get-BoxstarterConfig,
                     Set-BoxstarterConfig,
                     Install-BoxstarterPackage
+
+Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
+Intercept-Command Boxstarter.Chocolatey\Install-ChocolateyInstallPackageOverride chocolateyInstaller\Install-ChocolateyInstallPackage
+
+Export-ModuleMember Install-ChocolateyInstallPackageOverride
+Export-ModuleMember -alias Install-ChocolateyInstallPackage

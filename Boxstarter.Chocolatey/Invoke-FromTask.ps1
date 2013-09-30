@@ -1,5 +1,6 @@
 function Invoke-FromTask ($command){
     Write-BoxstarterMessage "Invoking $command in scheduled task"
+    Write-Debug "encoding $command"
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($command))
     $fileContent=@"
 Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
@@ -25,9 +26,9 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
     }
     Until($taskProc -ne $null)
     
-    $waitProc=get-process -id $taskProc
+    $waitProc=get-process -id $taskProc -ErrorAction SilentlyContinue
     $reader=New-Object -TypeName System.IO.FileStream -ArgumentList @("$env:temp\BoxstarterOutput.Stream",[system.io.filemode]::Open,[System.io.FileAccess]::ReadWrite,[System.IO.FileShare]::ReadWrite)
-    while(!($waitProc.HasExited)) {
+    while($waitProc -ne $null -and !($waitProc.HasExited)) {
         $byte = New-Object Byte[] 100
         $count=$reader.Read($byte,0,100)
         if($count -ne 0){
@@ -45,8 +46,8 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
     }
     $reader.Dispose()
     schtasks /DELETE /TN 'Ad-Hoc Task' /F | Out-String
-    $errorStream=Get-Content $env:temp\BoxstarterError.stream
-    if($errorStream.Length -gt 0){
+    try{$errorStream=Import-CLIXML $env:temp\BoxstarterError.stream} catch {}
+    if($errorStream -ne $null){
         throw $errorStream
     }
 }
