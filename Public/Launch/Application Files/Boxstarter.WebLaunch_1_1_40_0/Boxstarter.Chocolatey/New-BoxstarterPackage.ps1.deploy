@@ -36,7 +36,8 @@ Get-PackageRoot
     param(
         [string]$Name,
         [string]$description,
-        [string]$path
+        [string]$path,
+        [switch]$quiet
     )
     if(!$boxstarter -or !$boxstarter.LocalRepo){
         throw "No Local Repository has been set in `$Boxstarter.LocalRepo."
@@ -61,7 +62,7 @@ Get-PackageRoot
     }
     $pkgFile = Join-Path $pkgDir "$name.nuspec"
     if(!(test-path $pkgFile)){
-        .$nugetExe spec $Name -NonInteractive
+        .$nugetExe spec $Name -NonInteractive | Out-null
         [xml]$xml = Get-Content $pkgFile
         $metadata = $xml.package.metadata
         $nodesToDelete = @()
@@ -89,6 +90,8 @@ try {
     }
     Popd
 
-    Write-BoxstarterMessage "A new Chocolatey package has been created at $pkgDir." -nologo
-    Write-BoxstarterMessage "You may now edit the files in this package and build the final .nupkg using Invoke-BoxstarterBuild." -nologo
+    if(!$quiet){
+        Write-BoxstarterMessage "A new Chocolatey package has been created at $pkgDir." -nologo
+        Write-BoxstarterMessage "You may now edit the files in this package and build the final .nupkg using Invoke-BoxstarterBuild." -nologo
+    }
 }

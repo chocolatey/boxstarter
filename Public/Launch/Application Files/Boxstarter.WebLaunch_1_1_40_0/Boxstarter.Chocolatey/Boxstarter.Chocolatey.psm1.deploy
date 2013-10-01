@@ -8,4 +8,5 @@ Export-ModuleMember Invoke-ChocolateyBoxstarter,
                     Get-PackageRoot, 
                     Set-BoxstarterShare,
                     Get-BoxstarterConfig,
-                    Set-BoxstarterConfig
+                    Set-BoxstarterConfig,
+                    New-PackageFromScript

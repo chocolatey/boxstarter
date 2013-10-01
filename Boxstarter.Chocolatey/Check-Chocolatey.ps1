@@ -15,8 +15,11 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
             Enable-Net40
         }
     }
-    Write-BoxstarterMessage "Chocoltey installed, seting up interception of Chocolatey methods."
-    if($ShouldIntercept){Intercept-Chocolatey}
+    if(!$BoxstarterIntrercepting)
+    {
+        Write-BoxstarterMessage "Chocoltey installed, seting up interception of Chocolatey methods."
+        if($ShouldIntercept){Intercept-Chocolatey}
+    }
 }
 
 function Is64Bit {  [IntPtr]::Size -eq 8  }

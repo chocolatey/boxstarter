@@ -25,7 +25,8 @@ New-BoxstarterPackage
         [Parameter(Position=0,ParameterSetName='name')]
         [string]$name,
         [Parameter(Position=0,ParameterSetName='all')]
-        [switch]$all
+        [switch]$all,
+        [switch]$quiet
     )
     Check-Chocolatey
     $choco="$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1"
@@ -40,8 +41,10 @@ New-BoxstarterPackage
             if(!(Test-Path $searchPath)){
                 throw "Cannot find $searchPath"
             }
-            .$choco Pack (join-path $name "$name.nuspec")
-            Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $name or Invoke-ChocolateyBoxstarter $name will run this package." -nologo
+            .$choco Pack (join-path $name "$name.nuspec") | out-null
+            if(!$quiet){
+                Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $name or Invoke-ChocolateyBoxstarter $name will run this package." -nologo
+            }
         } else {
              if($all){
                 Write-BoxstarterMessage "Scanning $($Boxstarter.LocalRepo) for package folders"
@@ -51,8 +54,10 @@ New-BoxstarterPackage
                     if(!(Test-Path (join-path $_.name "$($_.name).nuspec"))){
                         throw "Cannot find nuspec for $_"
                     }
-                    .$choco Pack (join-path . "$($_.Name)\$($_.Name).nuspec")
-                    Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Invoke-ChocolateyBoxstarter $($_.Name) will run this package." -nologo
+                    .$choco Pack (join-path . "$($_.Name)\$($_.Name).nuspec") | out-null
+                    if(!$quiet){
+                        Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Invoke-ChocolateyBoxstarter $($_.Name) will run this package." -nologo                        
+                    }
                 }
                 if($directoriesExist -eq $null){
                     Write-BoxstarterMessage "No Directories exist under $($boxstarter.LocalRepo)"

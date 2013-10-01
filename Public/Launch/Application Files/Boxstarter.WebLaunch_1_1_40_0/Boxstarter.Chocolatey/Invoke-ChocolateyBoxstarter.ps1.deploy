@@ -125,6 +125,9 @@ function Resolve-LocalRepo([string]$localRepo) {
 }
 
 function Download-Package([string]$bootstrapPackage) {
+    if($BootstrapPackage -like "*://*" -or (Test-Path($BootstrapPackage))){
+        $BootstrapPackage = New-PackageFromScript $bootstrapPackage
+    }
     $Boxstarter.Package=$bootstrapPackage
     del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
     if(test-path (Join-Path $Boxstarter.LocalRepo "$bootstrapPackage.*.nupkg")){
