@@ -134,6 +134,8 @@ function Intercept-Chocolatey {
     Intercept-Command cinstm -omitCommandParam
     Intercept-Command chocolatey
     Intercept-Command call-chocolatey
+    Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
+    Intercept-Command Boxstarter.Chocolatey\Install-ChocolateyInstallPackageOverride chocolateyInstaller\Install-ChocolateyInstallPackage
     $Script:BoxstarterIntrercepting=$true
 }
 

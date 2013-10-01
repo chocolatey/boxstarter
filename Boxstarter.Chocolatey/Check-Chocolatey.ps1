@@ -24,15 +24,20 @@ function Is64Bit {  [IntPtr]::Size -eq 8  }
 function Enable-Net40 {
     if(Is64Bit) {$fx="framework64"} else {$fx="framework"}
     if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
-        $session=Start-TimedSection "Download and install .NET 4.0 Framework"
-        $env:chocolateyPackageFolder="$env:temp\chocolatey\webcmd"
-        Install-ChocolateyZipPackage 'webcmd' 'http://www.iis.net/community/files/webpi/webpicmdline_anycpu.zip' $env:temp
+        $session=Start-TimedSection "Download and install .NET 4.5 Framework"
+        $downloader=new-object net.webclient
+        $wp=[system.net.WebProxy]::GetDefaultProxy()
+        $wp.UseDefaultCredentials=$true
+        $downloader.Proxy=$wp
+        $downloader.DownloadFile("http://go.microsoft.com/?linkid=9816306", "$env:temp\net45.exe")
         if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
             Write-BoxstarterMessage "Launching $env:temp\WebpiCmdLine.exe"
-            Invoke-FromTask "$env:temp\WebpiCmdLine.exe /products: NetFramework4 /SuppressReboot /accepteula"
+            Invoke-FromTask @"
+Start-Process "$env:temp\net45.exe" -verb runas -wait -argumentList "/quiet /norestart /log $env:temp\net45.log"
+"@
         }
         else{
-            .$env:temp\WebpiCmdLine.exe /products: NetFramework4 /SuppressReboot /accepteula
+            Start-Process "$env:temp\net45.exe" -verb runas -wait -argumentList "/quiet /norestart /log $env:temp\net45.log"
         }
         Stop-TimedSection $session
     }
