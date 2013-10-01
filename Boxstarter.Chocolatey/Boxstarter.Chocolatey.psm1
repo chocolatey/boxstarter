@@ -9,7 +9,7 @@ Export-ModuleMember Invoke-ChocolateyBoxstarter,
                     Set-BoxstarterShare,
                     Get-BoxstarterConfig,
                     Set-BoxstarterConfig,
-                    Install-BoxstarterPackage
+                    Install-BoxstarterPackage,
                     New-PackageFromScript
 
 Export-ModuleMember Install-ChocolateyInstallPackageOverride
