@@ -18,7 +18,7 @@ Task default -depends Build
 Task Build -depends Build-Clickonce, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to Myget'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
-
+Task Push-Public -depends Push-Codeplex, Push-Chocolatey
 task Build-ClickOnce {
     Update-AssemblyInfoFiles $version $changeset
     exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:quiet }
