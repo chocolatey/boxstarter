@@ -101,7 +101,7 @@ Invoke-Reboot
         else {
             $boxstarter.NoPassword=$True
         }
-        $script:BoxstarterUser=$env:username
+        $Boxstarter.BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall)) $BoxstarterPassword

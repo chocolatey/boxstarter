@@ -1,6 +1,5 @@
 function Invoke-FromTask ($command){
     Write-BoxstarterMessage "Invoking $command in scheduled task"
-    Write-Debug "encoding $command"
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($command))
     $fileContent=@"
 Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
@@ -11,15 +10,22 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
     )
 
     schtasks /CREATE /TN 'Ad-Hoc Task' /SC WEEKLY /RL HIGHEST `
-        /RU $env:userdomain\$env:UserName /RP $decryptedPass `
+        /RU "$env:userdomain\$($Boxstarter.BoxstarterUser)" /RP $decryptedPass `
         /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
         Out-String
+    if($LastExitCode -gt 0){
+        throw "Unable to create scheduled task as $env:userdomain\$($Boxstarter.BoxstarterUser)"
+    }
+
     $tasks=@()
     $tasks+=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId
     
     new-Item $env:temp\BoxstarterOutput.stream -Type File -Force
     new-Item $env:temp\BoxstarterError.stream -Type File -Force
     schtasks /RUN /TN 'Ad-Hoc Task' | Out-String
+    if($LastExitCode -gt 0){
+        throw "Unable to run scheduled task"
+    }
     do{
         $taskProc=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId } | ? { !($tasks -contains $_) }
         Start-Sleep -Second 1

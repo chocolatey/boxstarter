@@ -66,7 +66,7 @@ Intercepts Chocolatey call to check for reboots
     }
 
     if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
-    try {Call-Chocolatey @PSBoundParameters}catch { $ex=$_;throw $_}
+    try {Call-Chocolatey @PSBoundParameters}catch { $ex=$_}
     if(!$Boxstarter.rebootOk) {return}
     if($Boxstarter.IsRebooting){
         Remove-ChocolateyPackageInProgress $packageName

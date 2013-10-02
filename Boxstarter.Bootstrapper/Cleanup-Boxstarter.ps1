@@ -30,8 +30,8 @@ function Cleanup-Boxstarter {
         }
     }
     if($BoxstarterPassword.Length -gt 0) {
-        Write-BoxstarterMessage "Securely Storing $($env:userdomain)\$($BoxstarterUser) credentials for automatic logon"
-        Set-SecureAutoLogon $BoxstarterUser $BoxstarterPassword $env:userdomain
+        Write-BoxstarterMessage "Securely Storing $($env:userdomain)\$($Boxstarter.BoxstarterUser) credentials for automatic logon"
+        Set-SecureAutoLogon $Boxstarter.BoxstarterUser $BoxstarterPassword $env:userdomain
         Write-BoxstarterMessage "Logon Set"
     }
 }

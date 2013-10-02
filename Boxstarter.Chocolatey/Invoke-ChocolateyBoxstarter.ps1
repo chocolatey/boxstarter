@@ -108,6 +108,7 @@ Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstra
             Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password -KeepWindowOpen:$KeepWindowOpen -NoPassword:$NoPassword -SuppressRebootScript:$SuppressRebootScript
             return
         }
+        $Boxstarter.BoxstarterUser=$env:username
         if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
         $Boxstarter.ProgramFiles86="$programFiles86"
         $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"

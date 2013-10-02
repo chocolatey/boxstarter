@@ -6,7 +6,7 @@ Resolve-Path $here\..\boxstarter.winconfig\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\boxstarter.bootstrapper\*.ps1 | 
     % { . $_.ProviderPath }
-$BoxstarterUser="user"
+$Boxstarter.BoxstarterUser="user"
 $Boxstarter.SuppressLogging=$true
 $Boxstarter.NoPassword=$false
 
