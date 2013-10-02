@@ -206,12 +206,17 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             Import-Module $env:Appdata\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
             Set-BoxstarterConfig -LocalRepo "$env:temp\boxstarter"
             Invoke-ChocolateyBoxstarter $pkg -Password $password -SuppressRebootScript -NoPassword:$NoPassword -DisableReboots:$DisableReboots
+            return $LastExitCode
         } -ArgumentList $Package, $Credential.Password, $DisableReboots, $NoPassword
-        
-        if($exitCode -eq 3010) {
+        if($exitCode -eq 3010 -or $session.State -ne "Opened") {
             $response=$null
+            Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
+            while($session.State -eq "Opened"){
+                start-sleep -seconds 2
+            }
             Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
             Do{
+                start-sleep -seconds 2
                 $response=Invoke-Command $session.ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
             }
             Until($response -ne $null)

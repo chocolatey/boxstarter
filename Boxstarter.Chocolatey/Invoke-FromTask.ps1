@@ -25,7 +25,7 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
         Start-Sleep -Second 1
     }
     Until($taskProc -ne $null)
-    
+    write-host "found task process"
     $waitProc=get-process -id $taskProc -ErrorAction SilentlyContinue
     $reader=New-Object -TypeName System.IO.FileStream -ArgumentList @("$env:temp\BoxstarterOutput.Stream",[system.io.filemode]::Open,[System.io.FileAccess]::ReadWrite,[System.IO.FileShare]::ReadWrite)
     while($waitProc -ne $null -and !($waitProc.HasExited)) {
@@ -38,6 +38,7 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
             Start-Sleep -Second 1
         }
     }
+    write-host "task completed"
     Start-Sleep -Second 1
     $byte=$reader.ReadByte()
     while($byte -ne -1){

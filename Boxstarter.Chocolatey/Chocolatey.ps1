@@ -1,4 +1,11 @@
 function Install-ChocolateyInstallPackageOverride {
+param(
+  [string] $packageName, 
+  [string] $fileType = 'exe',
+  [string] $silentArgs = '',
+  [string] $file,
+  $validExitCodes = @(0)
+)    
     if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
         Invoke-FromTask @"
 Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
@@ -134,8 +141,6 @@ function Intercept-Chocolatey {
     Intercept-Command cinstm -omitCommandParam
     Intercept-Command chocolatey
     Intercept-Command call-chocolatey
-    Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
-    Intercept-Command Boxstarter.Chocolatey\Install-ChocolateyInstallPackageOverride chocolateyInstaller\Install-ChocolateyInstallPackage
     $Script:BoxstarterIntrercepting=$true
 }
 

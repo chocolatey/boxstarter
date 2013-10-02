@@ -46,5 +46,5 @@ about_boxstarter_variable_in_bootstrapper
 }
 
 function Restart {
-    exit 3010 #This is the standard MSI 'needs reboot' exit code
+    exit 3010
 }

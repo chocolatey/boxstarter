@@ -15,6 +15,7 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
             Enable-Net40
         }
     }
+    write-host "interception: $BoxstarterIntrercepting"
     if(!$BoxstarterIntrercepting)
     {
         Write-BoxstarterMessage "Chocoltey installed, seting up interception of Chocolatey methods."
