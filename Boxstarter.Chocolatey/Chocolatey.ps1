@@ -185,5 +185,6 @@ function Resolve-SplatValue($val){
         $ret += ")"
         return $ret
     }
-    return " `"$val`""
+    $ret = " `"$($val.Replace('"','`' + '"'))`""
+    return $ret
 }
