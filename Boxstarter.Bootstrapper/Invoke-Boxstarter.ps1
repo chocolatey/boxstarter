@@ -122,7 +122,7 @@ Invoke-Reboot
 
 function RestartNow {
     Write-BoxstarterMessage "Restarting..."
-    Restart-Computer -force
+    Restart-Computer -force -ErrorAction SilentlyContinue
 }
 
 function Read-AuthenticatedPassword {
