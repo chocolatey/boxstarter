@@ -19,6 +19,8 @@ Task Build -depends Build-Clickonce, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to Myget'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Codeplex, Push-Chocolatey
+Task All-Tests -depends Test, Integration-Test
+
 task Build-ClickOnce {
     Update-AssemblyInfoFiles $version $changeset
     exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:quiet }
@@ -42,6 +44,19 @@ Task Test {
     }
     else{
         exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests }
+    }
+    popd
+}
+
+Task Integration-Test -depends Pack-Nuget {
+    pushd "$baseDir"
+    $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
+    if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}
+    if($testName){
+        exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/IntegrationTests -testName $testName}
+    }
+    else{
+        exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/IntegrationTests }
     }
     popd
 }

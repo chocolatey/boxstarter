@@ -11,7 +11,7 @@ $Boxstarter.SuppressLogging=$true
 $Boxstarter.NoPassword=$false
 
 Describe "Invoke-Reboot" {
-    Mock New-Item -ParameterFilter { $Path -contains "boxstarter" }
+    Mock New-Item -ParameterFilter { $Path -like "*boxstarter*" }
     Mock Restart
     if(get-module Bitlocker -ListAvailable){Mock Suspend-Bitlocker}
 

@@ -18,7 +18,9 @@ function Cleanup-Boxstarter {
         Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue
         Write-Debug "Cleaned up logon registry and restart file"
         Start-UpdateServices
-        if($promptToExit -or $KeepWindowOpen){Read-Host 'Type ENTER to exit'}
+        if($promptToExit -or $KeepWindowOpen){
+            Read-Host 'Type ENTER to exit'
+        }
         return
     } 
 
