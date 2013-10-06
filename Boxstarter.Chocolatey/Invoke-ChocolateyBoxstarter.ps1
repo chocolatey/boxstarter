@@ -134,7 +134,7 @@ function Resolve-LocalRepo([string]$localRepo) {
 }
 
 function Download-Package([string]$bootstrapPackage) {
-    if($BootstrapPackage -like "*://*" -or (Test-Path($BootstrapPackage))){
+    if($BootstrapPackage -like "*://*" -or (Test-Path $BootstrapPackage -PathType Leaf)){
         $BootstrapPackage = New-PackageFromScript $bootstrapPackage
     }
     $Boxstarter.Package=$bootstrapPackage

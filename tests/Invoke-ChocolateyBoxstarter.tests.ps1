@@ -35,7 +35,7 @@ Resolve-Path $here\..\boxstarter.chocolatey\*.ps1 |
     % { . $_.ProviderPath }    
 Intercept-Chocolatey
 
-Describe "Invoke-ChocolateyBoxstarter" {
+Describe "Invoke-ChocolateyBoxstarter" {  
     Context "When not invoked via boxstarter" {
         $Boxstarter.ScriptToCall=$null
         Mock Invoke-Boxstarter
@@ -122,4 +122,46 @@ Describe "Invoke-ChocolateyBoxstarter" {
             $Boxstarter.LocalRepo | should be "c:\anotherRepo"
         }
     }
+
+    Context "When specifying a file instead of a package" {
+        Mock New-PackageFromScript {return "somePackage"} -ParameterFilter {$source -eq "TestDrive:\package.txt"}
+        Mock Chocolatey
+        Mock Check-Chocolatey
+        New-Item TestDrive:\package.txt -type file | Out-Null
+
+        Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword
+
+        it "should use package returned from ScriptFromPackage" {
+            Assert-MockCalled chocolatey -ParameterFilter {$packageName -eq "somePackage"}
+        }
+    }
+
+    Context "When specifying a http uri instead of a package" {
+        Mock New-PackageFromScript {return "somePackage"} -ParameterFilter {$source -eq "http://someurl"}
+        Mock Chocolatey
+        Mock Check-Chocolatey
+
+        Invoke-ChocolateyBoxstarter http://someurl -NoPassword
+
+        it "should use package returned from ScriptFromPackage" {
+            Assert-MockCalled chocolatey -ParameterFilter {$packageName -eq "somePackage"}
+        }
+    }
+
+    Context "When specifying a package that is also a directory name" {
+        Mock New-PackageFromScript
+        Mock Chocolatey
+        Mock Check-Chocolatey
+        New-Item TestDrive:\package -type directory | Out-Null
+
+        Invoke-ChocolateyBoxstarter "TestDrive:\package" -NoPassword
+
+        it "should not use package from ScriptFromPackage" {
+            Assert-MockCalled New-PackageFromScript -times 0
+        }
+        it "should use package as is" {
+            Assert-MockCalled chocolatey -ParameterFilter {$packageName -eq "TestDrive:\package"}
+        }        
+    }
+
 }
