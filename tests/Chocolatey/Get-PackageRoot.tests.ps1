@@ -3,7 +3,7 @@ if(get-module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
 
 Describe "Get-PackageRoot" {
     $testRoot=(Get-PSDrive TestDrive).Root
-    Import-Module "$here\..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1"
+    Import-Module "$here\..\..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1"
 
     Context "When Calling from ChocolateyInstall" {
         MkDir "$testRoot\tools" | Out-Null
