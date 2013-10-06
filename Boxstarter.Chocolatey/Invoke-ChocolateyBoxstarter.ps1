@@ -11,7 +11,7 @@ Invokes the installation of a Boxstarter package
 .DESCRIPTION
 This essentially wraps Chocolatey Install and provides these additional features
  - Installs chocolatey if it is not already installed
- - Installs the .net 4.0 framework if it is not installed which is a chocolatey requirement
+ - Installs the .net 4.5 framework if it is not installed which is a chocolatey requirement
  - Turns off the windows update service during installation to prevent installation conflicts and minimize the need for reboots
  - Imports the Boxstarter.WinConfig module that provides functions for customizing windows
  - Provides Reboot Resiliency by ensuring the package installation is immediately restarted up on reboot if there is a reboot during the installation.
@@ -23,9 +23,14 @@ This essentially wraps Chocolatey Install and provides these additional features
  - The boxstarter feed on myget
  This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
 
+ If the package name provided is a URL or resolves to a file. Then 
+ it is assumed that this contains the chocolatey install script and
+ a .nupkg file will be created using the script.
+ 
  .PARAMETER BootstrapPackage
- The package to be installed.
- The .nupkg file for the provided package name is searched in the following locations and order:
+ The name of a NugetPackage The package to be installed or a URI or 
+ file path pointing to a chocolatey script. If using a package name,
+ the .nupkg file for the provided package name is searched in the following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
  - The chocolatey feed
  - The boxstarter feed on myget
@@ -56,10 +61,27 @@ an account without password validation.
 .EXAMPLE
 Invoke-ChocolateyBoxstarter example
 
-This invokes boxstarter and installs the example .nupkg. In pending 
+This invokes boxstarter and installs the example .nupkg. If pending 
 reboots are detected, boxstarter will restart the machine. Boxstarter
 will prompt the user to enter a password which will be used for 
 automatic logins in the event a restart is required.
+
+.EXAMPLE
+Invoke-ChocolateyBoxstarter https://gist.github.com/mwrock/6771863/raw/b579aa269c791a53ee1481ad01711b60090db1e2/gistfile1.txt
+
+This invokes boxstarter and installs the script uploaded to the github gist.
+
+.EXAMPLE
+Invoke-ChocolateyBoxstarter script.ps1
+
+This invokes boxstarter and installs the script located at script.ps1 
+in the command line's current directory.
+
+.EXAMPLE
+Invoke-ChocolateyBoxstarter \\server\share\script.ps1
+
+This invokes boxstarter and installs the script located at the 
+specified share.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter win8Install -LocalRepo \\server\share\boxstarter

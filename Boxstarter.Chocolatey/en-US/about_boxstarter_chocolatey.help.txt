@@ -15,7 +15,7 @@ Installing Chocolatey
 	Boxstarter will check to ensure if Chocolatey is installed. If 
 	Chocolatey is not installed it will install it before running any 
 	Chocolatey commands. Boxstarter will also check to see if the .Net 
-	4.0 Framework is installed before installing Chocolatey since the 
+	4.5 Framework is installed before installing Chocolatey since the 
 	.Net 4 runtime is a prerequisite.
 
 Chocolatey Boxstarter Packages
@@ -30,6 +30,11 @@ Chocolatey Boxstarter Packages
 	functions as well as all Boxstarter logging, WinConfig and 
 	Bootstrapper commands. See About_Boxstarter_Bootstrapper and 
 	About_Boxstarter_Logging for information regarding those comands.
+
+	This can also be a script file containing the chocolatey install 
+	script. If the package name provided is a URL or resolves to a file. 
+	Then it is assumed that this contains the chocolatey install 
+	script and a .nupkg file will be created using the script.
 
 Creating Packages
 	Boxstarter provides some functions to make creation and deployment of 
