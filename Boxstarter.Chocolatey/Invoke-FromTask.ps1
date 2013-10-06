@@ -48,7 +48,7 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
                 #write-host "mem:$lastMemUsageCount"
                 #write-host $memUsageStack.Count
                 $memUsageStack.Push($lastMemUsageCount)
-                if(($memUsageStack.ToArray() | ? { $_ -ne $lastMemUsageCount }) -ne $null){
+                if($lastMemUsageCount -eq 0 -or (($memUsageStack.ToArray() | ? { $_ -ne $lastMemUsageCount }) -ne $null)){
                     $memUsageStack.Clear()
                 }
                 if($memUsageStack.Count -gt 120){

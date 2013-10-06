@@ -28,6 +28,19 @@ http://boxstarter.codeplex.com
         [switch]$SuppressReboots,
         [string]$criteria="IsHidden=0 and IsInstalled=0 and Type='Software'"
     )
+
+    if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
+        $PSBoundParameters.SuppressReboots=[switch]::Present
+        Invoke-FromTask @"
+Import-Module $($boxstarter.BaseDir)\boxstarter.WinConfig\Boxstarter.Winconfig.psd1
+Install-WindowsUpdate $(Expand-Splat $PSBoundParameters)
+"@
+        if(Test-PendingReboot){
+            Invoke-Reboot
+        }
+        return
+    }
+
     if($getUpdatesFromMS) {
         $auPath="HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"
         if(Test-Path $auPath) {
@@ -36,7 +49,7 @@ http://boxstarter.codeplex.com
         }
     }
     try{
-        $searchSession=Start-TimedSection "Checking for updates..."
+        $searchSession=Start-TimedSection "Checking for updates..."        
         $updateSession =new-object -comobject "Microsoft.Update.Session"
         $updatesToDownload =new-Object -com "Microsoft.Update.UpdateColl"
         $updatesToInstall =new-object -com "Microsoft.Update.UpdateColl"
