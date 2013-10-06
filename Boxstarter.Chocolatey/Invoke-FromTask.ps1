@@ -1,4 +1,4 @@
-function Invoke-FromTask ($command){
+function Invoke-FromTask ($command, $timeout=120){
     Write-BoxstarterMessage "Invoking $command in scheduled task"
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$command"))
     $fileContent=@"
@@ -44,16 +44,19 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
                 [System.Text.Encoding]::Default.GetString($byte,0,$count) | write-host -NoNewline
             }
             else {
-                $lastMemUsageCount=Get-ChildProcessMemoryUsage $waitProc.ID
-                #write-host "mem:$lastMemUsageCount"
-                #write-host $memUsageStack.Count
-                $memUsageStack.Push($lastMemUsageCount)
-                if($lastMemUsageCount -eq 0 -or (($memUsageStack.ToArray() | ? { $_ -ne $lastMemUsageCount }) -ne $null)){
-                    $memUsageStack.Clear()
-                }
-                if($memUsageStack.Count -gt 120){
-                    $waitProc.Kill()
-                    throw "TASK:`r`n$command`r`n`r`nIs likely in a hung state."
+                if($timeout -gt 0){
+                    $lastMemUsageCount=Get-ChildProcessMemoryUsage $waitProc.ID
+                    write-host "mem:$lastMemUsageCount"
+                    write-host $memUsageStack.Count
+                    $memUsageStack.Push($lastMemUsageCount)
+                    if($lastMemUsageCount -eq 0 -or (($memUsageStack.ToArray() | ? { $_ -ne $lastMemUsageCount }) -ne $null)){
+                        $memUsageStack.Clear()
+                    }
+                    if($memUsageStack.Count -gt $timeout){
+                        Write-BoxstarterMessage "Task has exceeded its timeout with no activity. Killing task..."
+                        $waitProc.Kill()
+                        throw "TASK:`r`n$command`r`n`r`nIs likely in a hung state."
+                    }
                 }
                 Start-Sleep -Second 1
             }
@@ -67,7 +70,9 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
         }
     }
     finally{
-        if(!$waitProc.HasExited){$waitProc.Kill()}
+        if(!$waitProc.HasExited){
+            $waitProc.Kill()
+        }
         $reader.Dispose()
         schtasks /DELETE /TN 'Ad-Hoc Task' /F | Out-String
     }

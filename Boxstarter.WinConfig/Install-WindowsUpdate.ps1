@@ -34,7 +34,7 @@ http://boxstarter.codeplex.com
         Invoke-FromTask @"
 Import-Module $($boxstarter.BaseDir)\boxstarter.WinConfig\Boxstarter.Winconfig.psd1
 Install-WindowsUpdate $(Expand-Splat $PSBoundParameters)
-"@
+"@ -Timeout 0
         if(Test-PendingReboot){
             Invoke-Reboot
         }
