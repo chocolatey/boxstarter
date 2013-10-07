@@ -175,6 +175,7 @@ from an Administrator Powershell console on the remote computer.
 
 function Setup-BoxstarterModuleAndLocalRepo($session){
     Write-BoxstarterMessage "Copying Bootstraper to $($Session.ComputerName)"
+    Remove-Item "$env:temp\Boxstarter.zip" -Force
     ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.Common"
     ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.WinConfig"
     ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.bootstrapper"

@@ -10,9 +10,7 @@ Export-ModuleMember Invoke-ChocolateyBoxstarter,
                     Get-BoxstarterConfig,
                     Set-BoxstarterConfig,
                     Install-BoxstarterPackage,
-                    New-PackageFromScript,
-                    Invoke-FromTask,
-                    Expand-Splat
+                    New-PackageFromScript
 
 Export-ModuleMember Install-ChocolateyInstallPackageOverride
 Export-ModuleMember -alias Install-ChocolateyInstallPackage

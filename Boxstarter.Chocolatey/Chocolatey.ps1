@@ -7,10 +7,12 @@ param(
   $validExitCodes = @(0)
 )    
     if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
+        $pass=(& (Get-Module Boxstarter.Bootstrapper) Get-Variable -Name BoxstarterPassword).Value
+        $mycreds = New-Object System.Management.Automation.PSCredential ("$env:userdomain\$($Boxstarter.BoxstarterUser)", $pass)
         Invoke-FromTask @"
 Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
 Install-ChocolateyInstallPackage $(Expand-Splat $PSBoundParameters)
-"@
+"@ -Credential $mycreds
     }
     else{
         chocolateyInstaller\Install-ChocolateyInstallPackage @PSBoundParameters

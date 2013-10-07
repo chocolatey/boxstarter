@@ -1,22 +1,18 @@
-function Invoke-FromTask ($command, $timeout=120){
+function Invoke-FromTask ($command, $Credential, $timeout=120){
     Write-BoxstarterMessage "Invoking $command in scheduled task"
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$command"))
     $fileContent=@"
 Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
 "@
     Set-Content $env:temp\BoxstarterTask.ps1 -value $fileContent -force
-    $decryptedPass = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-        [Runtime.InteropServices.Marshal]::SecureStringToBSTR($ChocolateyPassword)
-    )
 
     schtasks /CREATE /TN 'Ad-Hoc Task' /SC WEEKLY /RL HIGHEST `
-        /RU "$env:userdomain\$($Boxstarter.BoxstarterUser)" /RP $decryptedPass `
+        /RU $credential.Username /RP $credential.GetNetworkCredential().Password `
         /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
         Out-String
     if($LastExitCode -gt 0){
         throw "Unable to create scheduled task as $env:userdomain\$($Boxstarter.BoxstarterUser)"
     }
-
     $tasks=@()
     $tasks+=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
     
@@ -32,7 +28,6 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
     }
     Until($taskProc -ne $null)
 
-    write-host "found task process"
     $waitProc=get-process -id $taskProc -ErrorAction SilentlyContinue
     $memUsageStack = New-Object -TypeName System.Collections.Stack
     $reader=New-Object -TypeName System.IO.FileStream -ArgumentList @("$env:temp\BoxstarterOutput.Stream",[system.io.filemode]::Open,[System.io.FileAccess]::ReadWrite,[System.IO.FileShare]::ReadWrite)
@@ -46,8 +41,6 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
             else {
                 if($timeout -gt 0){
                     $lastMemUsageCount=Get-ChildProcessMemoryUsage $waitProc.ID
-                    write-host "mem:$lastMemUsageCount"
-                    write-host $memUsageStack.Count
                     $memUsageStack.Push($lastMemUsageCount)
                     if($lastMemUsageCount -eq 0 -or (($memUsageStack.ToArray() | ? { $_ -ne $lastMemUsageCount }) -ne $null)){
                         $memUsageStack.Clear()
@@ -61,7 +54,6 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
                 Start-Sleep -Second 1
             }
         }
-        write-host "task completed"
         Start-Sleep -Second 1
         $byte=$reader.ReadByte()
         while($byte -ne -1){

@@ -35,9 +35,11 @@ function Enable-Net40 {
         $downloader.DownloadFile("http://go.microsoft.com/?linkid=9816306", "$env:temp\net45.exe")
         if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
             Write-BoxstarterMessage "Launching $env:temp\WebpiCmdLine.exe"
+            $pass=(& (Get-Module Boxstarter.Bootstrapper) Get-Variable -Name BoxstarterPassword).Value
+            $mycreds = New-Object System.Management.Automation.PSCredential ("$env:userdomain\$($Boxstarter.BoxstarterUser)", $pass)
             Invoke-FromTask @"
 Start-Process "$env:temp\net45.exe" -verb runas -wait -argumentList "/quiet /norestart /log $env:temp\net45.log"
-"@
+"@ -Credential $mycreds
         }
         else{
             Start-Process "$env:temp\net45.exe" -verb runas -wait -argumentList "/quiet /norestart /log $env:temp\net45.log"

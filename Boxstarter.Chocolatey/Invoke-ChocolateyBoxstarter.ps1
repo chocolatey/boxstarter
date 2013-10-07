@@ -135,7 +135,6 @@ Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstra
         $Boxstarter.ProgramFiles86="$programFiles86"
         $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
         $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
-        $script:ChocolateyPassword=$password
         Check-Chocolatey -ShouldIntercept
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
         if($bootstrapPackage -ne $null){
