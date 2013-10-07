@@ -43,8 +43,10 @@ about_boxstarter_chocolatey
         [string] $Source
     )
 
-    Check-Chocolatey
-    . "$env:ChocolateyInstall\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
+    if(!(test-path function:\Get-WebFile)){
+        Check-Chocolatey
+        . "$env:ChocolateyInstall\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
+    }
     if($source -like "*://*"){
         try {$text = Get-WebFile -url $Source -passthru } catch{
             throw "Unable to retrieve script from $source `r`nInner Exception is:`r`n$_"
