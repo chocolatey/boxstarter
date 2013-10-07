@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-import-module "$here\..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1" -Force
+import-module "$here\..\..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1" -Force
 
 Describe "Get-BoxstarterConfig" {
     $testRoot=(Get-PSDrive TestDrive).Root
