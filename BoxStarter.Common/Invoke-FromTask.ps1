@@ -5,11 +5,20 @@ function Invoke-FromTask ($command, $Credential, $timeout=120){
 Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
 "@
     Set-Content $env:temp\BoxstarterTask.ps1 -value $fileContent -force
+    $pass=$credential.GetNetworkCredential().Password
 
-    schtasks /CREATE /TN 'Ad-Hoc Task' /SC WEEKLY /RL HIGHEST `
-        /RU $credential.Username /RP $credential.GetNetworkCredential().Password `
-        /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
-        Out-String
+    if($pass.length -gt 0){
+        schtasks /CREATE /TN 'Ad-Hoc Task' /SC WEEKLY /RL HIGHEST `
+            /RU $credential.Username /RP $pass `
+            /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
+            Out-String
+    }
+    else { #For testing
+        schtasks /CREATE /TN 'Ad-Hoc Task' /SC WEEKLY /RL HIGHEST `
+                /RU $credential.Username /IT `
+                /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
+                Out-String
+    }
     if($LastExitCode -gt 0){
         throw "Unable to create scheduled task as $env:userdomain\$($Boxstarter.BoxstarterUser)"
     }
@@ -62,7 +71,7 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
         }
     }
     finally{
-        if(!$waitProc.HasExited){
+        if($waitProc -ne $null -and !$waitProc.HasExited){
             $waitProc.Kill()
         }
         $reader.Dispose()
