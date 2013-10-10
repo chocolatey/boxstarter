@@ -9,7 +9,7 @@ Describe "Invoke-FromTask" {
     $mycreds = New-Object System.Management.Automation.PSCredential ("$env:username", (New-Object System.Security.SecureString))
 
     Context "When Invoking Task Normally"{
-        Invoke-FromTask "new-Item $env:temp\test.txt -value 'this is a test' -type file" -Credential $mycreds -Timeout 0
+        Invoke-FromTask "new-Item $env:temp\test.txt -value 'this is a test' -type file | Out-Null" -Credential $mycreds -Timeout 0
 
         It "Should invoke the command"{
             Get-Content $env:temp\test.txt | should be "this is a test"

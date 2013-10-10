@@ -3,6 +3,7 @@ function Invoke-FromTask ($command, $Credential, $timeout=120){
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$command"))
     $fileContent=@"
 Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
+Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
 "@
     Set-Content $env:temp\BoxstarterTask.ps1 -value $fileContent -force
     $pass=$credential.GetNetworkCredential().Password
@@ -11,34 +12,44 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
         schtasks /CREATE /TN 'Ad-Hoc Task' /SC WEEKLY /RL HIGHEST `
             /RU $credential.Username /RP $pass `
             /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
-            Out-String
+            Out-Null
     }
     else { #For testing
         schtasks /CREATE /TN 'Ad-Hoc Task' /SC WEEKLY /RL HIGHEST `
                 /RU $credential.Username /IT `
                 /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
-                Out-String
+                Out-Null
     }
     if($LastExitCode -gt 0){
         throw "Unable to create scheduled task as $env:userdomain\$($Boxstarter.BoxstarterUser)"
     }
     $tasks=@()
     $tasks+=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
+    Write-Debug "Found $($tasks.Length) tasks already running"
     
-    new-Item $env:temp\BoxstarterOutput.stream -Type File -Force
-    new-Item $env:temp\BoxstarterError.stream -Type File -Force
-    schtasks /RUN /TN 'Ad-Hoc Task' | Out-String
+    new-Item $env:temp\BoxstarterOutput.stream -Type File -Force | out-null
+    new-Item $env:temp\BoxstarterError.stream -Type File -Force | out-null
+    schtasks /RUN /I /TN 'Ad-Hoc Task' | Out-Null
     if($LastExitCode -gt 0){
         throw "Unable to run scheduled task"
     }
+    write-debug "Launched task. Waiting for task to launch comand..."
     do{
-        $taskProc=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId } | ? { !($tasks -contains $_) }
+        if(!(Test-Path $env:temp\BoxstarterTask.ps1)){
+            Write-Debug "Task Completed before its process was captured."
+            break
+        }
+        $taskProc=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%BoxstarterTask%'" | select ProcessId | % { $_.ProcessId } | ? { !($tasks -contains $_) }
+
         Start-Sleep -Second 1
     }
     Until($taskProc -ne $null)
 
-    $waitProc=get-process -id $taskProc -ErrorAction SilentlyContinue
-    $memUsageStack = New-Object -TypeName System.Collections.Stack
+    if($taskProc -ne $null){
+        write-debug "Command launched in process $taskProc"
+        $waitProc=get-process -id $taskProc -ErrorAction SilentlyContinue
+        $memUsageStack = New-Object -TypeName System.Collections.Stack
+    }
     $reader=New-Object -TypeName System.IO.FileStream -ArgumentList @("$env:temp\BoxstarterOutput.Stream",[system.io.filemode]::Open,[System.io.FileAccess]::ReadWrite,[System.IO.FileShare]::ReadWrite)
     try{
         while($waitProc -ne $null -and !($waitProc.HasExited)) {
@@ -75,7 +86,7 @@ Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream
             $waitProc.Kill()
         }
         $reader.Dispose()
-        schtasks /DELETE /TN 'Ad-Hoc Task' /F | Out-String
+        schtasks /DELETE /TN 'Ad-Hoc Task' /F | Out-null
     }
     
     try{$errorStream=Import-CLIXML $env:temp\BoxstarterError.stream} catch {}
