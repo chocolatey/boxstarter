@@ -62,6 +62,7 @@ Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
             else {
                 if($timeout -gt 0){
                     $lastMemUsageCount=Get-ChildProcessMemoryUsage $waitProc.ID
+                    Write-Debug "Memory read: $lastMemUsageCount"
                     $memUsageStack.Push($lastMemUsageCount)
                     if($lastMemUsageCount -eq 0 -or (($memUsageStack.ToArray() | ? { $_ -ne $lastMemUsageCount }) -ne $null)){
                         $memUsageStack.Clear()
@@ -102,8 +103,8 @@ function Get-ChildProcessMemoryUsage {
     param($ID=$PID)
     [int]$res=0
     Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | out-null
-    % { if($_.ProcessID -ne $null) {$res += $_.WorkingSetSize}}
+    % { if($_.ProcessID -ne $null) {$res += $_.WorkingSetSize;Write-Debug "$($_.Name) $($_.WorkingSetSize)"}}
     Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" |
-      % { if($_.ProcessID -ne $null) {$res += Get-ChildProcessMemoryUsage $_.ProcessID}}
+      % { if($_.ProcessID -ne $null) {$res += Get-ChildProcessMemoryUsage $_.ProcessID;Write-Debug "$($_.Name) $($_.WorkingSetSize)"}}
     $res
 }

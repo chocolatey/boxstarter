@@ -17,6 +17,16 @@ Describe "Invoke-FromTask" {
         }
     }
 
+    Context "When Invoking Task with output"{
+        Remove-Item $env:temp\test.txt -ErrorAction SilentlyContinue
+
+        $result=Invoke-FromTask "Write-Output 'here is some output'" -Credential $mycreds -Timeout 0
+
+        It "Should invoke the command"{
+            $result | should be "here is some output"
+        }
+    }
+
     Context "When Invoking Task with bad credentials"{
         $myBadcreds = New-Object System.Management.Automation.PSCredential ("poo", (New-Object System.Security.SecureString))
 
@@ -34,6 +44,16 @@ Describe "Invoke-FromTask" {
 
         It "Should block until finished"{
             "$env:temp\test.txt" | should Exist
+        }
+    }
+
+    Context "When Invoking Task that is idle longer than timeout"{
+        try { Invoke-FromTask "Start-Process calc.exe -Wait" -Credential $mycreds -Timeout 2} catch {$err=$_}
+        $id=Get-WmiObject -Class Win32_Process -Filter "Name='calc.exe'" | select ProcessId | % { $_.ProcessId }
+        KILL $id
+
+        It "Should timeout"{
+            $err.Exception | should match "likely in a hung state"
         }
     }
 }
