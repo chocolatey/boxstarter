@@ -2,7 +2,7 @@ function Invoke-FromTask ($command, $Credential, $timeout=120){
     Write-BoxstarterMessage "Invoking $command in scheduled task"
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$command"))
     $fileContent=@"
-Start-Process powershell -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
+Start-Process powershell -Wait -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
 Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
 "@
     Set-Content $env:temp\BoxstarterTask.ps1 -value $fileContent -force
@@ -21,7 +21,7 @@ Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
                 Out-Null
     }
     if($LastExitCode -gt 0){
-        throw "Unable to create scheduled task as $env:userdomain\$($Boxstarter.BoxstarterUser)"
+        throw "Unable to create scheduled task as $($credential.Username)"
     }
     $tasks=@()
     $tasks+=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
@@ -39,7 +39,7 @@ Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
             Write-Debug "Task Completed before its process was captured."
             break
         }
-        $taskProc=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%BoxstarterTask%'" | select ProcessId | % { $_.ProcessId } | ? { !($tasks -contains $_) }
+        $taskProc=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId } | ? { !($tasks -contains $_) }
 
         Start-Sleep -Second 1
     }
@@ -48,6 +48,7 @@ Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
     if($taskProc -ne $null){
         write-debug "Command launched in process $taskProc"
         $waitProc=get-process -id $taskProc -ErrorAction SilentlyContinue
+        Write-Debug "Waiting on $($waitProc.Id)"
         $memUsageStack = New-Object -TypeName System.Collections.Stack
     }
     $reader=New-Object -TypeName System.IO.FileStream -ArgumentList @("$env:temp\BoxstarterOutput.Stream",[system.io.filemode]::Open,[System.io.FileAccess]::ReadWrite,[System.IO.FileShare]::ReadWrite)
@@ -67,6 +68,7 @@ Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
                     }
                     if($memUsageStack.Count -gt $timeout){
                         Write-BoxstarterMessage "Task has exceeded its timeout with no activity. Killing task..."
+                        Write-Debug "Timed out"
                         $waitProc.Kill()
                         throw "TASK:`r`n$command`r`n`r`nIs likely in a hung state."
                     }
@@ -75,6 +77,7 @@ Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
             }
         }
         Start-Sleep -Second 1
+        Write-Debug "Proc has exited: $($waitProc.HasExited) or Is Null: $($waitProc -eq $null)"
         $byte=$reader.ReadByte()
         while($byte -ne -1){
             [System.Text.Encoding]::Default.GetString($byte) | write-host -NoNewline
