@@ -1,4 +1,40 @@
-function Invoke-FromTask ($command, $Credential, $timeout=120){
+function Invoke-FromTask {
+<#
+.SYNOPSIS
+Invokes a command inside of a scheduled task
+
+.DESCRIPTION
+This creates a scheduled task and attempts to run it immediately. 
+The task is run in an elevated session using the provided 
+credentials. If the processes started by the task become idle for 
+more that the specified timeout, the task will be termiated. All 
+output and ny errors from the task will be streamed to the calling 
+session. 
+
+ .PARAMETER Command
+ The command to run in the task.
+
+.Parameter Credential
+The credentials under which the task will execute.
+
+.PARAMETER Timeout
+The number of seconds after which the task will be terminated if it 
+becomes idle. The value 0 is an indefinite timeout and 120 is the 
+default.
+
+.EXAMPLE
+Invoke-FromTask Install-WindowsUpdate -AcceptEula
+
+This will install Windows Updates in a scheduled task
+
+.LINK
+http://boxstarter.codeplex.com
+#>
+    param(
+        $command, 
+        $Credential, 
+        $timeout=120
+    )
     Write-BoxstarterMessage "Invoking $command in scheduled task"
     Add-TaskFiles $command
 
@@ -13,8 +49,8 @@ function Invoke-FromTask ($command, $Credential, $timeout=120){
         $memUsageStack = New-Object -TypeName System.Collections.Stack
     }
 
-    Wait-ForTask $waitProc
-    
+    Wait-ForTask $waitProc $timeout
+
     try{$errorStream=Import-CLIXML $env:temp\BoxstarterError.stream} catch {}
     if($errorStream -ne $null){
         throw $errorStream
@@ -84,7 +120,7 @@ function start-Task{
     return $taskProc
 }
 
-function Test-TaskTimeout($waitProc) {
+function Test-TaskTimeout($waitProc, $timeout) {
     if($timeout -gt 0){
         $lastMemUsageCount=Get-ChildProcessMemoryUsage $waitProc.ID
         Write-Debug "Memory read: $lastMemUsageCount"
@@ -102,7 +138,7 @@ function Test-TaskTimeout($waitProc) {
     Start-Sleep -Second 1
 }
 
-function Wait-ForTask($waitProc){
+function Wait-ForTask($waitProc, $timeout){
     $reader=New-Object -TypeName System.IO.FileStream -ArgumentList @(
         "$env:temp\BoxstarterOutput.Stream",
         [system.io.filemode]::Open,[System.io.FileAccess]::ReadWrite,
@@ -115,7 +151,7 @@ function Wait-ForTask($waitProc){
                 [System.Text.Encoding]::Default.GetString($byte,0,$count) | write-host -NoNewline
             }
             else {
-                Test-TaskTimeout $waitProc
+                Test-TaskTimeout $waitProc $timeout
             }
         }
         Start-Sleep -Second 1
