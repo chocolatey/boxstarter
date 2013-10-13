@@ -193,23 +193,34 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
         mkdir $env:appdata\boxstarter -Force
         $shellApplication = new-object -com shell.application 
         $zipPackage = $shellApplication.NameSpace("$env:temp\Boxstarter\Boxstarter.zip") 
-        $destinationFolder = $shellApplication.NameSpace("$env:appdata\boxstarter") 
+        $destinationFolder = $shellApplication.NameSpace("$env:temp\boxstarter") 
         $destinationFolder.CopyHere($zipPackage.Items(),0x10)
-        Import-Module $env:Appdata\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
-        Set-BoxstarterConfig -LocalRepo "$env:temp\boxstarter"
+        Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
     }
 }
 
 function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPassword){
+    $possibleResult=@{Rebooting=10;Succeeded=$true;Disconnected=$null}
     while($session.State -eq "Opened") {
-        $exitCode = Invoke-Command $session {
-            param($pkg,$password,$DisableReboots,$NoPassword)
-            Import-Module $env:Appdata\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
-            Set-BoxstarterConfig -LocalRepo "$env:temp\boxstarter"
-            Invoke-ChocolateyBoxstarter $pkg -Password $password -SuppressRebootScript -NoPassword:$NoPassword -DisableReboots:$DisableReboots
-            return $LastExitCode
-        } -ArgumentList $Package, $Credential.Password, $DisableReboots, $NoPassword
-        if($exitCode -eq 3010 -or $session.State -ne "Opened") {
+        $remoteResult = Invoke-Command $session {
+            param($possibleResult,$pkg,$password,$DisableReboots,$NoPassword)
+            Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
+            $result=$false
+            try {
+                $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -SuppressRebootScript -NoPassword:$NoPassword -DisableReboots:$DisableReboots
+            }
+            catch{
+                throw
+            }
+            if($result -eq $true){
+                return $possibleResult.Succeeded
+            }
+            elseif($LastExitCode -eq $possibleResult.Rebooting){
+                return $possibleResult.Rebooting
+            }
+            return $possibleResult.Disconnected
+        } -ArgumentList $possibleResult, $Package, $Credential.Password, $DisableReboots, $NoPassword
+        if($remoteResult -eq $possibleResult.Rebooting -or $remoteResult -eq $possibleResult.Disconnected) {
             $response=$null
             Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
             while($session.State -eq "Opened"){
