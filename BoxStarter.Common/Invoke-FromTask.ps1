@@ -33,7 +33,7 @@ http://boxstarter.codeplex.com
     param(
         $command, 
         $Credential, 
-        $timeout=120
+        $timeout=20
     )
     Write-BoxstarterMessage "Invoking $command in scheduled task"
     Add-TaskFiles $command
@@ -124,6 +124,7 @@ function Test-TaskTimeout($waitProc, $timeout) {
     if($timeout -gt 0){
         $lastMemUsageCount=Get-ChildProcessMemoryUsage $waitProc.ID
         Write-Debug "Memory read: $lastMemUsageCount"
+        Write-Debug "Memory count: $($memUsageStack.Count)"
         $memUsageStack.Push($lastMemUsageCount)
         if($lastMemUsageCount -eq 0 -or (($memUsageStack.ToArray() | ? { $_ -ne $lastMemUsageCount }) -ne $null)){
             $memUsageStack.Clear()
