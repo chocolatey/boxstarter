@@ -18,11 +18,11 @@ Describe "Install-BoxstarterPackage" {
     Mock Enable-WSManCredSSP
     Mock Disable-WSManCredSSP
     Mock Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
-    Mock Invoke-Command { New-Object System.Object }
+    Mock Invoke-Command { New-Object System.Object } -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
     Mock Invoke-WmiMethod { New-Object System.Object }
     Mock Setup-BoxstarterModuleAndLocalRepo
     Mock Invoke-Remotely
-    Mock New-PSSession
+    Mock New-PSSession -ParameterFilter{$computerName -ne "localhost"}
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
