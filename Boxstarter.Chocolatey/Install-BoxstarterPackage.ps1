@@ -222,9 +222,11 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
         } -ArgumentList $possibleResult, $Package, $Credential.Password, $DisableReboots, $NoPassword
         if($remoteResult -eq $possibleResult.Rebooting -or $remoteResult -eq $possibleResult.Disconnected) {
             $response=$null
-            Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
-            while($session.State -eq "Opened"){
-                start-sleep -seconds 2
+            if($remoteResult -eq $possibleResult.Rebooting){
+                Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
+                while($session.State -eq "Opened"){
+                    start-sleep -seconds 2
+                }
             }
             Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
             Do{
@@ -237,6 +239,7 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
         }
         else {
             Remove-PSSession $session
+            $session=$null
         }
     }
 }
