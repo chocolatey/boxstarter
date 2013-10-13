@@ -8,7 +8,7 @@ Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 |
 Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 | 
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 | 
-    % { . $_.ProviderPath }    
+    % { . $_.ProviderPath }
 $Boxstarter.SuppressLogging=$true
 
 Describe "Install-BoxstarterPackage" {
@@ -161,7 +161,7 @@ Describe "Install-BoxstarterPackage" {
     }    
 
     Context "When remoting and wmi are not enabled on remote computer" {
-        Mock Invoke-Command
+        Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
         Mock Invoke-WmiMethod
 
         try {Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds} catch {$err=$_}
@@ -172,7 +172,7 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When remoting not enabled on remote computer but WMI is and the force switch is not set" {
-        Mock Invoke-Command
+        Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
         Mock Confirm-Choice
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
@@ -183,7 +183,7 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When remoting not enabled on remote computer but WMI is and the force switch is set" {
-        Mock Invoke-Command
+        Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
         Mock Confirm-Choice
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force
