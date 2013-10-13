@@ -71,10 +71,6 @@ $remoteScript = {
     ## Go through the input, and fill in the new array of file content
     foreach($chunk in $input)
     {
-        Write-Progress -Activity "Writing $Destination" `
-            -Status "Sending file" `
-            -PercentComplete ($position / $length * 100)
-
         [GC]::Collect()
         [Array]::Copy($chunk, 0, $destBytes, $position, $chunk.Length)
         $position += $chunk.Length
@@ -83,8 +79,6 @@ $remoteScript = {
     ## Write the content to the new file
     [IO.File]::WriteAllBytes($destination, $destBytes)
 
-    ## Show the result
-    Get-Item $destination
     [GC]::Collect()
 }
 

@@ -20,7 +20,7 @@ Describe "Install-BoxstarterPackage" {
     Mock Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
     Mock Invoke-Command { New-Object System.Object } -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
     Mock Invoke-WmiMethod { New-Object System.Object }
-    Mock Setup-BoxstarterModuleAndLocalRepo
+    Mock Setup-BoxstarterModuleAndLocalRepo -ParameterFilter{$session -eq $null}
     Mock Invoke-Remotely
     Mock New-PSSession -ParameterFilter{$computerName -ne "localhost"}
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
@@ -196,4 +196,24 @@ Describe "Install-BoxstarterPackage" {
         }
     }
 
+    Context "When remoting enabled on remote and local computer" {
+        $session = New-PSSession localhost
+        Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
+        Mock Enable-RemotingOnClient {return @{Success=$true}}
+        Mock Enable-RemotingOnRemote {return $true}
+
+        Install-BoxstarterPackage -session $session -PackageName test
+
+        It "will copy boxstarter modules"{
+            "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.bootstrapper\boxstarter.bootstrapper.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.winconfig\boxstarter.winconfig.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.common\boxstarter.common.psd1" | should exist
+        }
+        It "will copy boxstarter build packages"{
+            Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % {
+                "$env:temp\boxstarter\buildpackages\$($_.Name)" | should exist
+            }
+        }        
+    }
 }

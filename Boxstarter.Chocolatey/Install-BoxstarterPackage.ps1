@@ -174,23 +174,22 @@ from an Administrator Powershell console on the remote computer.
 }
 
 function Setup-BoxstarterModuleAndLocalRepo($session){
-    Write-BoxstarterMessage "Copying Bootstraper to $($Session.ComputerName)"
-    Remove-Item "$env:temp\Boxstarter.zip" -Force
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.Common"
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.WinConfig"
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.bootstrapper"
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.chocolatey"
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.config"
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\license.txt"
-    Invoke-Command -Session $Session { mkdir $env:temp\boxstarter -Force }
+    Write-BoxstarterMessage "Copying Boxstarter Modules to $env:temp\boxstarter on $($Session.ComputerName)"
+    Remove-Item "$env:temp\Boxstarter.zip" -Force -ErrorAction SilentlyContinue
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.Common" | out-Null
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.WinConfig" | out-Null
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.bootstrapper" | out-Null
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.chocolatey" | out-Null
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.config" | out-Null
+    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\license.txt" | out-Null
+    Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | out-Null }
     Send-File "$env:temp\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
     Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % { 
         Write-BoxstarterMessage "Copying $($_.Name) to $($Session.ComputerName)"
-        Send-File "$($_.FullName)" "Boxstarter\$($_.Name)" $session 
+        Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $session 
     }
     Invoke-Command -Session $Session {
         Set-ExecutionPolicy Bypass -Force
-        mkdir $env:appdata\boxstarter -Force
         $shellApplication = new-object -com shell.application 
         $zipPackage = $shellApplication.NameSpace("$env:temp\Boxstarter\Boxstarter.zip") 
         $destinationFolder = $shellApplication.NameSpace("$env:temp\boxstarter") 
