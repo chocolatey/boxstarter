@@ -43,7 +43,6 @@ $sourceBytes = [IO.File]::ReadAllBytes($sourcePath)
 $streamChunks = @()
 
 ## Now break it into chunks to stream
-Write-Progress -Activity "Sending $Source" -Status "Preparing file"
 $streamSize = 1MB
 for($position = 0; $position -lt $sourceBytes.Length;
     $position += $streamSize)
