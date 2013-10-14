@@ -23,14 +23,16 @@ function Install-BoxstarterPackage {
         Invoke-Locally @PSBoundParameters
         return
     }
-
-    $ClientRemotingStatus=Enable-RemotingOnClient $ComputerName
-    if(!$ClientRemotingStatus.Success){return}
-
     try{
-        if(!(Enable-RemotingOnRemote $ComputerName $Credential)){return}
+        if($Session -ne $null){
+            $siid = $session.InstanceId
+        }
+        else{
+            $ClientRemotingStatus=Enable-RemotingOnClient $ComputerName
+            if(!$ClientRemotingStatus.Success){return}
 
-        if($session -eq $null){
+            if(!(Enable-RemotingOnRemote $ComputerName $Credential)){return}
+
             $session = New-PSSession $ComputerName -Credential $Credential -Authentication credssp -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}}
         }
 
@@ -39,8 +41,8 @@ function Install-BoxstarterPackage {
         Invoke-Remotely $session $Credential $PackageName $DisableReboots $NoPassword
     }
     finally{
-        if($session -ne $null) {Remove-PSSession $Session}
-        if($ClientRemotingStatus.Success){
+        if($session -ne $null -and $session.InstanceId -ne $siid) {Remove-PSSession $Session}
+        if($ClientRemotingStatus -ne $null -and $ClientRemotingStatus.Success){
             Disable-WSManCredSSP -Role Client
             if($ClientRemotingStatus.PreviousCSSPTrustedHosts -ne $null){
                 Write-BoxstarterMessage "Reseting CredSSP Trusted Hosts to $($ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace('wsman/',''))"
@@ -174,7 +176,7 @@ from an Administrator Powershell console on the remote computer.
 }
 
 function Setup-BoxstarterModuleAndLocalRepo($session){
-    Write-BoxstarterMessage "Copying Boxstarter Modules to $env:temp\boxstarter on $($Session.ComputerName)"
+    Write-BoxstarterMessage "Copying Boxstarter Modules to $env:temp on $($Session.ComputerName)"
     Remove-Item "$env:temp\Boxstarter.zip" -Force -ErrorAction SilentlyContinue
     ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.Common" | out-Null
     ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.WinConfig" | out-Null
@@ -199,11 +201,13 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
 }
 
 function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPassword){
-    $possibleResult=@{Rebooting=10;Succeeded=$true;Disconnected=$null}
+    $possibleResult=@{Rebooting=10;Succeeded=$true;Disconnected=0}
     while($session.State -eq "Opened") {
+        [int]$remoteResult=$null
         $remoteResult = Invoke-Command $session {
-            param($possibleResult,$pkg,$password,$DisableReboots,$NoPassword)
+            param($possibleResult,$SuppressLogging,$pkg,$password,$DisableReboots,$NoPassword)
             Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
+            $Boxstarter.SuppressLogging=$SuppressLogging
             $result=$false
             try {
                 $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -SuppressRebootScript -NoPassword:$NoPassword -DisableReboots:$DisableReboots
@@ -211,34 +215,34 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             catch{
                 throw
             }
-            if($result -eq $true){
+            if($LastExitCode -eq $possibleResult.Rebooting){
+                
+                return $possibleResult.Rebooting
+            }            
+            elseif($result -eq $true){
                 return $possibleResult.Succeeded
             }
-            elseif($LastExitCode -eq $possibleResult.Rebooting){
-                return $possibleResult.Rebooting
-            }
             return $possibleResult.Disconnected
-        } -ArgumentList $possibleResult, $Package, $Credential.Password, $DisableReboots, $NoPassword
-        if($remoteResult -eq $possibleResult.Rebooting -or $remoteResult -eq $possibleResult.Disconnected) {
-            $response=$null
-            if($remoteResult -eq $possibleResult.Rebooting){
-                Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
-                while($session.State -eq "Opened"){
-                    start-sleep -seconds 2
-                }
-            }
+        } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $Credential.Password, $DisableReboots, $NoPassword
+        if($remoteResult -ne $possibleResult.Succeeded) {
+            $reconnected=$false
             Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
             Do{
                 start-sleep -seconds 2
                 $response=Invoke-Command $session.ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
+                if($response -ne $null){
+                    Remove-PSSession $session
+                    $session = New-PSSession $ComputerName -Credential $Credential -Authentication credssp -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} -ErrorAction SilentlyContinue
+                    if($Session.State -eq "Opened"){
+                        $reconnected = $true
+                    }
+                    $response=$null
+                }
             }
-            Until($response -ne $null)
-            Remove-PSSession $session
-            $session = New-PSSession $ComputerName -Credential $Credential -Authentication credssp -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}}
+            Until($reconnected -eq $true)
         }
         else {
-            Remove-PSSession $session
-            $session=$null
+            break
         }
     }
 }
