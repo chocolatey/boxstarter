@@ -17,9 +17,26 @@ properties {
 Task default -depends Build
 Task Build -depends Build-Clickonce, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to Myget'
-Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
+Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Codeplex, Push-Chocolatey
 Task All-Tests -depends Test, Integration-Test
+
+task Create-ModuleZipForRemoting {
+    if (Test-Path "$basedir\Boxstarter.Chocolatey\Boxstarter.zip") {
+      Remove-Item "$baseDir\Boxstarter.Chocolatey\boxstarter.zip" -Recurse -Force
+    }
+    if(!(Test-Path "$baseDir\buildArtifacts")){
+        mkdir "$baseDir\buildArtifacts"
+    }
+    Remove-Item "$env:temp\Boxstarter.zip" -Force -ErrorAction SilentlyContinue
+    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.Common" | out-Null
+    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.WinConfig" | out-Null
+    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.bootstrapper" | out-Null
+    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.chocolatey" | out-Null
+    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.config" | out-Null
+    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\license.txt" | out-Null
+    Move-Item "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.chocolatey\Boxstarter.zip"
+}
 
 task Build-ClickOnce {
     Update-AssemblyInfoFiles $version $changeset
@@ -35,7 +52,7 @@ task Publish-ClickOnce {
     Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\public\Launch" -Recurse -Force
 }
 
-Task Test {
+Task Test -depends Create-ModuleZipForRemoting {
     pushd "$baseDir"
     $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
     if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}

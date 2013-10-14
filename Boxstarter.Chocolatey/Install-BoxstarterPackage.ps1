@@ -177,15 +177,8 @@ from an Administrator Powershell console on the remote computer.
 
 function Setup-BoxstarterModuleAndLocalRepo($session){
     Write-BoxstarterMessage "Copying Boxstarter Modules to $env:temp on $($Session.ComputerName)"
-    Remove-Item "$env:temp\Boxstarter.zip" -Force -ErrorAction SilentlyContinue
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.Common" | out-Null
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.WinConfig" | out-Null
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.bootstrapper" | out-Null
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.chocolatey" | out-Null
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\boxstarter.config" | out-Null
-    ."7za" a -tzip "$env:temp\Boxstarter.zip" "$($Boxstarter.basedir)\license.txt" | out-Null
     Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | out-Null }
-    Send-File "$env:temp\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
+    Send-File "$($Boxstarter.BaseDir)\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
     Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % { 
         Write-BoxstarterMessage "Copying $($_.Name) to $($Session.ComputerName)"
         Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $session 

@@ -208,8 +208,6 @@ Describe "Install-BoxstarterPackage" {
     Context "When remoting enabled on remote and local computer" {
         $session = New-PSSession localhost
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-        Mock Enable-RemotingOnClient {return @{Success=$true}}
-        Mock Enable-RemotingOnRemote {return $true}
 
         Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
 
@@ -226,6 +224,26 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will execute package"{
             Get-Content "$env:temp\testpackage.txt" | should be "test-package"
+        }        
+    }
+
+    Context "When passing in a session" {
+        $session = New-PSSession localhost
+        Mock Enable-RemotingOnClient
+        Mock Enable-RemotingOnRemote
+        Mock Setup-BoxstarterModuleAndLocalRepo
+        Mock Invoke-Remotely
+        
+        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
+
+        It "will not try to enable local side remoting"{
+            Assert-MockCalled Enable-RemotingOnClient -Times 0
+        }
+        It "will not try to enable remote side remoting"{
+            Assert-MockCalled Enable-RemotingOnRemote -Times 0
+        }
+        It "will not reset session"{
+            $session.State | should be "Opened"
         }        
     }
 }
