@@ -18,10 +18,9 @@ Describe "Install-BoxstarterPackage" {
     Mock Enable-WSManCredSSP
     Mock Disable-WSManCredSSP
     Mock Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
-    Mock Invoke-Command { New-Object System.Object } -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
     Mock Invoke-WmiMethod { New-Object System.Object }
     Mock Setup-BoxstarterModuleAndLocalRepo -ParameterFilter{$session -eq $null}
-    Mock Invoke-Remotely
+    Mock Invoke-Remotely -ParameterFilter{$session -eq $null}
     Mock New-PSSession -ParameterFilter{$computerName -ne "localhost"}
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
@@ -60,7 +59,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When Remoting is not enabled locally" {
         Mock Get-WSManCredSSP {throw "remoting not enabled"}
         Mock Confirm-Choice
-
+        Mock Invoke-Command { New-Object System.Object }
         Install-BoxstarterPackage -computerName blah -PackageName test
 
         It "will confirm to enable remoting"{
@@ -71,6 +70,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When Remoting is not enabled locally and user confirms" {
         Mock Get-WSManCredSSP {throw "remoting not enabled"}
         Mock Confirm-Choice {return $True}
+        Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
@@ -82,6 +82,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When Remoting is not enabled locally" {
         Mock Get-WSManCredSSP {throw "remoting not enabled"}
         Mock Confirm-Choice {return $False}
+        Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
@@ -93,6 +94,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When credssp is not enabled at all" {
         Mock Get-WSManCredSSP {return @("The machine is not","")}
         Mock Confirm-Choice {return $False}
+        Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
@@ -107,6 +109,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When credssp is enabled but not for given computer" {
         Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah","")}
         Mock Confirm-Choice {return $False}
+        Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
@@ -123,6 +126,7 @@ Describe "Install-BoxstarterPackage" {
 
     Context "When no entries in trusted hosts" {
         Mock Get-Item {@{Value=""}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
+        Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
@@ -136,6 +140,7 @@ Describe "Install-BoxstarterPackage" {
 
     Context "When entries in trusted hosts do not contain computer" {
         Mock Get-Item {@{Value="bler,blur,blor"}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
+        Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
@@ -149,6 +154,7 @@ Describe "Install-BoxstarterPackage" {
 
     Context "When entries in trusted hosts contain computer" {
         Mock Get-Item {@{Value="bler,blah,blor"}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
+        Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
@@ -163,6 +169,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When remoting and wmi are not enabled on remote computer" {
         Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
         Mock Invoke-WmiMethod
+        Mock Invoke-Command { New-Object System.Object }
 
         try {Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds} catch {$err=$_}
 
@@ -174,6 +181,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When remoting not enabled on remote computer but WMI is and the force switch is not set" {
         Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
         Mock Confirm-Choice
+        Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
@@ -185,6 +193,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When remoting not enabled on remote computer but WMI is and the force switch is set" {
         Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
         Mock Confirm-Choice
+        Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force
 
@@ -202,7 +211,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Enable-RemotingOnClient {return @{Success=$true}}
         Mock Enable-RemotingOnRemote {return $true}
 
-        Install-BoxstarterPackage -session $session -PackageName test
+        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -214,6 +223,9 @@ Describe "Install-BoxstarterPackage" {
             Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % {
                 "$env:temp\boxstarter\buildpackages\$($_.Name)" | should exist
             }
+        }
+        It "will execute package"{
+            Get-Content "$env:temp\testpackage.txt" | should be "test-package"
         }        
     }
 }
