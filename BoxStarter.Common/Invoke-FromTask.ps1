@@ -17,7 +17,7 @@ session.
 .Parameter Credential
 The credentials under which the task will execute.
 
-.PARAMETER Timeout
+.PARAMETER IdleTimeout
 The number of seconds after which the task will be terminated if it 
 becomes idle. The value 0 is an indefinite timeout and 120 is the 
 default.
@@ -33,7 +33,8 @@ http://boxstarter.codeplex.com
     param(
         $command, 
         $Credential, 
-        $timeout=20
+        $idleTimeout=20,
+        $totalTimeout=360
     )
     Write-BoxstarterMessage "Invoking $command in scheduled task"
     Add-TaskFiles $command
@@ -46,10 +47,9 @@ http://boxstarter.codeplex.com
         write-debug "Command launched in process $taskProc"
         $waitProc=get-process -id $taskProc -ErrorAction SilentlyContinue
         Write-Debug "Waiting on $($waitProc.Id)"
-        $memUsageStack = New-Object -TypeName System.Collections.Stack
     }
 
-    Wait-ForTask $waitProc $timeout
+    Wait-ForTask $waitProc $idleTimeout $totalTimeout
 
     try{$errorStream=Import-CLIXML $env:temp\BoxstarterError.stream} catch {}
     if($errorStream -ne $null){
@@ -120,8 +120,11 @@ function start-Task{
     return $taskProc
 }
 
-function Test-TaskTimeout($waitProc, $timeout) {
-    if($timeout -gt 0){
+function Test-TaskTimeout($waitProc, $idleTimeout) {
+    if($memUsageStack -eq $null){
+        $script:memUsageStack=New-Object -TypeName System.Collections.Stack
+    }
+    if($idleTimeout -gt 0){
         $lastMemUsageCount=Get-ChildProcessMemoryUsage $waitProc.ID
         Write-Debug "Memory read: $lastMemUsageCount"
         Write-Debug "Memory count: $($memUsageStack.Count)"
@@ -129,9 +132,8 @@ function Test-TaskTimeout($waitProc, $timeout) {
         if($lastMemUsageCount -eq 0 -or (($memUsageStack.ToArray() | ? { $_ -ne $lastMemUsageCount }) -ne $null)){
             $memUsageStack.Clear()
         }
-        if($memUsageStack.Count -gt $timeout){
+        if($memUsageStack.Count -gt $idleTimeout){
             Write-BoxstarterMessage "Task has exceeded its timeout with no activity. Killing task..."
-            Write-Debug "Timed out"
             $waitProc.Kill()
             throw "TASK:`r`n$command`r`n`r`nIs likely in a hung state."
         }
@@ -139,20 +141,28 @@ function Test-TaskTimeout($waitProc, $timeout) {
     Start-Sleep -Second 1
 }
 
-function Wait-ForTask($waitProc, $timeout){
+function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
     $reader=New-Object -TypeName System.IO.FileStream -ArgumentList @(
         "$env:temp\BoxstarterOutput.Stream",
         [system.io.filemode]::Open,[System.io.FileAccess]::ReadWrite,
         [System.IO.FileShare]::ReadWrite)
     try{
+        $procStartTime = $waitProc.StartTime
         while($waitProc -ne $null -and !($waitProc.HasExited)) {
+            $timeTaken = [DateTime]::Now.Subtract($procStartTime)
+            if($timeTaken.TotalSeconds -gt $totalTimeout){
+                Write-BoxstarterMessage "Task has exceeded its total timeout. Killing task..."
+                $waitProc.Kill()
+                throw "TASK:`r`n$command`r`n`r`nIs likely in a hung state."
+            }
+
             $byte = New-Object Byte[] 100
             $count=$reader.Read($byte,0,100)
             if($count -ne 0){
                 [System.Text.Encoding]::Default.GetString($byte,0,$count) | write-host -NoNewline
             }
             else {
-                Test-TaskTimeout $waitProc $timeout
+                Test-TaskTimeout $waitProc $idleTimeout
             }
         }
         Start-Sleep -Second 1
