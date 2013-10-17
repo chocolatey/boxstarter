@@ -34,7 +34,7 @@ http://boxstarter.codeplex.com
         $command, 
         $Credential, 
         $idleTimeout=20,
-        $totalTimeout=360
+        $totalTimeout=3600
     )
     Write-BoxstarterMessage "Invoking $command in scheduled task"
     Add-TaskFiles $command
