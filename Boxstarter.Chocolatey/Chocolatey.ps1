@@ -64,10 +64,24 @@ Intercepts Chocolatey call to check for reboots
             Write-BoxstarterMessage "$packageName is already installed"
             return
         }
+        else{
+            $winFeature=$true
+        }
     }
 
     if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
-    try {Call-Chocolatey @PSBoundParameters}catch { $ex=$_}
+    try {
+            if($winFeature -eq $true -and $PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
+                $mycreds = New-Object System.Management.Automation.PSCredential ("$env:userdomain\$($Boxstarter.BoxstarterUser)", $BoxstarterPassword)
+                Invoke-FromTask @"
+."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" $(Expand-Splat $PSBoundParameters)
+"@ -Credential $mycreds
+            }
+            else{
+                Call-Chocolatey @PSBoundParameters
+            }
+        }
+        catch { $ex=$_}
     if(!$Boxstarter.rebootOk) {return}
     if($Boxstarter.IsRebooting){
         Remove-ChocolateyPackageInProgress $packageName
