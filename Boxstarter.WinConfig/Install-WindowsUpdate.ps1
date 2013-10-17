@@ -35,7 +35,7 @@ http://boxstarter.codeplex.com
         Invoke-FromTask @"
 Import-Module $($boxstarter.BaseDir)\boxstarter.WinConfig\Boxstarter.Winconfig.psd1
 Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$AcceptEula -SuppressReboots -Criteria "$Criteria"
-"@ -Credential $mycreds -Timeout 0
+"@ -Credential $mycreds -IdleTimeout 0 -TotalTimeout 7200
         if(Test-PendingReboot){
             Invoke-Reboot
         }
