@@ -195,7 +195,7 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
 
 function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPassword){
     $possibleResult=@{Rebooting=10;Succeeded=$true;Disconnected=0}
-    while($session.State -eq "Opened") {
+    while($session.Availability -eq "Available") {
         [int]$remoteResult=$null
         $remoteResult = Invoke-Command $session {
             param($possibleResult,$SuppressLogging,$pkg,$password,$DisableReboots,$NoPassword)
@@ -220,16 +220,16 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
         if($remoteResult -ne $possibleResult.Succeeded) {
             $reconnected=$false
             Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
+            Remove-PSSession $session
             Do{
+                $response=$null
                 start-sleep -seconds 2
-                $response=Invoke-Command $session.ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
-                if($response -ne $null){
-                    Remove-PSSession $session
-                    $session = New-PSSession $ComputerName -Credential $Credential -Authentication credssp -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} -ErrorAction SilentlyContinue
-                    if($Session.State -eq "Opened"){
+                $session = New-PSSession $ComputerName -Credential $Credential -Authentication credssp -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} -ErrorAction SilentlyContinue
+                if($session != $null -and $Session.Availability -eq "Available"){
+                    $response=Invoke-Command $session.ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
+                    if($response -ne $null){
                         $reconnected = $true
                     }
-                    $response=$null
                 }
             }
             Until($reconnected -eq $true)
