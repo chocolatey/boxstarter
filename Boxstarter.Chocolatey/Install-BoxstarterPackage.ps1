@@ -225,7 +225,7 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
                 $response=$null
                 start-sleep -seconds 2
                 $session = New-PSSession $ComputerName -Credential $Credential -Authentication credssp -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} -ErrorAction SilentlyContinue
-                if($session != $null -and $Session.Availability -eq "Available"){
+                if($session -ne $null -and $Session.Availability -eq "Available"){
                     $response=Invoke-Command $session.ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
                     if($response -ne $null){
                         $reconnected = $true
@@ -237,5 +237,26 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
         else {
             break
         }
+    }
+}
+
+#$allowed = @('WSMAN/*.home.toenuff.com','WSMAN/server1')            
+
+function Add-CredSSPGroupPolicy([string[]]$allowed){
+    $key = 'hklm:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation'
+    if (!(Test-Path $key)) {
+        md $key
+    }
+    New-ItemProperty -Path $key -Name AllowFreshCredentials -Value 1 -PropertyType Dword -Force            
+
+    $key = Join-Path $key 'AllowFreshCredentials'
+    if (!(Test-Path $key)) {
+        md $key
+    }
+    $i = 1
+    $allowed |% {
+        # Script does not take into account existing entries in this key
+        New-ItemProperty -Path $key -Name $i -Value $_ -PropertyType String -Force
+        $i++
     }
 }
