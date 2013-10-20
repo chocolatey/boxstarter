@@ -30,7 +30,7 @@ http://boxstarter.codeplex.com
     )
 
     if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
-        $pass=(& (Get-Module Boxstarter.Bootstrapper) Get-Variable -Name BoxstarterPassword).Value
+        $pass=(& (Get-Module Boxstarter.Chocolatey) Get-Variable -Name BoxstarterPassword).Value
         $mycreds = New-Object System.Management.Automation.PSCredential ("$env:userdomain\$($Boxstarter.BoxstarterUser)", $pass)
         Invoke-FromTask @"
 Import-Module $($boxstarter.BaseDir)\boxstarter.WinConfig\Boxstarter.Winconfig.psd1
@@ -57,6 +57,16 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         $Downloader =$updateSession.CreateUpdateDownloader()
         $Installer =$updateSession.CreateUpdateInstaller()
         $Searcher =$updatesession.CreateUpdateSearcher()
+        $wus=Get-Service wuauserv
+        $origStatus=$wus.Status
+        $origStartupType=$wus.StartupType
+        if($origStatus -eq "Stopped"){
+            if($origStartupType -eq "Disabled"){
+                Set-Service wuauserv -StartupType Automatic
+            }
+            Start-Service wuauserv
+        }
+
         $Result = $Searcher.Search($criteria)
         Stop-TimedSection $searchSession
 
@@ -120,6 +130,11 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
     finally {
         if($origAUVal){
             Set-ItemProperty -Path HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU -Name UseWuServer -Value $origAUVal -ErrorAction SilentlyContinue
+        }
+        if($origStatus -eq "Stopped")
+        {
+            Set-Service wuauserv -StartupType $origStartupType
+            stop-service wuauserv
         }
     }
 }
