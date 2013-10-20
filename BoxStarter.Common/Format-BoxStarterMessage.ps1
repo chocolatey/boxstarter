@@ -1,5 +1,7 @@
 function Format-BoxStarterMessage {
     param($BoxStarterMessage)
-    #I could put some crazy formatting here...if I wanted to.
+        if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
+        $BoxStarterMessage = "[$env:Computername]$BoxStarterMessage"
+    }
     return $BoxStarterMessage
 }
