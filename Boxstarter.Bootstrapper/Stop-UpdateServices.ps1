@@ -1,6 +1,12 @@
 function Stop-UpdateServices {
     write-boxstartermessage "Stopping Windows Update Services"
-    Enter-BoxstarterLogable { Stop-Service -Name wuauserv -WarningAction SilentlyContinue }
+    Enter-BoxstarterLogable { 
+        while((get-Service -Name wuauserv).Status -ne "Stopped"){
+            Stop-Service -Name wuauserv -force 
+            Start-Sleep -Seconds 1
+        }
+        Set-Service -Name wuauserv -StartupType Disabled
+    }
     Stop-CCMEXEC
 }
 
