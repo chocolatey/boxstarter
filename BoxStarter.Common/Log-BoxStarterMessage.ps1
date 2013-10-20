@@ -19,6 +19,6 @@ about_boxstarter_logging
 #>
     param([object[]]$message)
     if($Boxstarter.Log) {
-        "[$(Get-Date -format o)] $message" | out-file $Boxstarter.Log -append
+        "[$(Get-Date -format o):::PID $pid] $message" | out-file $Boxstarter.Log -append
     }
 }
