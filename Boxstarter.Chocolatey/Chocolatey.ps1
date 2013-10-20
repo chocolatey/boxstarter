@@ -6,6 +6,7 @@ param(
   [string] $file,
   $validExitCodes = @(0)
 )    
+    Wait-ForMSIEXEC
     if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
         $mycreds = New-Object System.Management.Automation.PSCredential ("$env:userdomain\$($Boxstarter.BoxstarterUser)", $BoxstarterPassword)
         Invoke-FromTask @"
@@ -202,4 +203,16 @@ function Resolve-SplatValue($val){
     }
     $ret = " `"$($val.Replace('"','`' + '"'))`""
     return $ret
+}
+
+function Wait-ForMSIEXEC{
+    Do{
+        Get-Process "MSIEXEC" -ErrorAction SilentlyContinue | % {
+            if(!($_.HasExited)){
+                $proc=Get-WmiObject -Class Win32_Process -Filter "ProcessID=$($_.Id)"
+                Write-BoxstarterMessage "Another installer is running: $($proc.CommandLine). Waiting for it to complete..."
+                $_.WaitForExit()
+            }
+        }
+    } Until ((Get-Process "MSIEXEC" -ErrorAction SilentlyContinue) -eq $null)
 }
