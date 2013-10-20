@@ -217,6 +217,7 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             }
             return $possibleResult.Disconnected
         } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $Credential.Password, $DisableReboots, $NoPassword
+        write-debug "Code returned from remote boxstarter is $remoteResult"
         if($remoteResult -ne $possibleResult.Succeeded) {
             $reconnected=$false
             Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
