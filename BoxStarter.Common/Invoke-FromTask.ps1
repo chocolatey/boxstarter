@@ -82,7 +82,7 @@ function Create-Task($Credential){
         $pass=$credential.GetNetworkCredential().Password
     if($pass.length -gt 0){
         schtasks /CREATE /TN 'Ad-Hoc Task' /SC WEEKLY /RL HIGHEST `
-            /RU $credential.Username /RP $pass `
+            /RU $credential.Username  /IT /RP $pass `
             /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
             Out-Null
     }
@@ -134,7 +134,7 @@ function Test-TaskTimeout($waitProc, $idleTimeout) {
         }
         if($memUsageStack.Count -gt $idleTimeout){
             Write-BoxstarterMessage "Task has exceeded its timeout with no activity. Killing task..."
-            $waitProc.Kill()
+            KillTree $waitProc.ID
             throw "TASK:`r`n$command`r`n`r`nIs likely in a hung state."
         }
     }
@@ -152,14 +152,16 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
             $timeTaken = [DateTime]::Now.Subtract($procStartTime)
             if($timeTaken.TotalSeconds -gt $totalTimeout){
                 Write-BoxstarterMessage "Task has exceeded its total timeout. Killing task..."
-                $waitProc.Kill()
+                KillTree $waitProc.ID
                 throw "TASK:`r`n$command`r`n`r`nIs likely in a hung state."
             }
 
             $byte = New-Object Byte[] 100
             $count=$reader.Read($byte,0,100)
             if($count -ne 0){
-                [System.Text.Encoding]::Default.GetString($byte,0,$count) | write-host -NoNewline
+                $text = [System.Text.Encoding]::Default.GetString($byte,0,$count)
+                $text | Out-File $boxstarter.Log -append
+                $text | write-host -NoNewline
             }
             else {
                 Test-TaskTimeout $waitProc $idleTimeout
@@ -168,16 +170,32 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
         Start-Sleep -Second 1
         Write-Debug "Proc has exited: $($waitProc.HasExited) or Is Null: $($waitProc -eq $null)"
         $byte=$reader.ReadByte()
+        $text=$null
         while($byte -ne -1){
-            [System.Text.Encoding]::Default.GetString($byte) | write-host -NoNewline
+            $text += [System.Text.Encoding]::Default.GetString($byte)
             $byte=$reader.ReadByte()
+        }
+        if($text -ne $null){
+            $text | out-file $boxstarter.Log -append
+            $text | write-host -NoNewline
         }
     }
     finally{
         if($waitProc -ne $null -and !$waitProc.HasExited){
-            $waitProc.Kill()
+            KillTree $waitProc.ID
         }
         $reader.Dispose()
         schtasks /DELETE /TN 'Ad-Hoc Task' /F | Out-null
     }    
+}
+
+function KillTree($id){
+    Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
+        if($_.ProcessID -ne $null) {
+            kill $_.ProcessID -ErrorAction SilentlyContinue
+            Write-Debug "Killing $($_.Name)"
+            KillTree $_.ProcessID
+        }
+    }
+    Kill $id -ErrorAction SilentlyContinue
 }
