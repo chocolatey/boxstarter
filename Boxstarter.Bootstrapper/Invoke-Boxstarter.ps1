@@ -104,7 +104,9 @@ Invoke-Reboot
         $Boxstarter.BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
-        &([ScriptBlock]::Create($Boxstarter.ScriptToCall)) $BoxstarterPassword
+        Create-Task 
+        &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
+        write-host "finished"
         return $true
     }
     catch {
@@ -175,4 +177,23 @@ function Resolve-Script([ScriptBlock]$script, [string]$scriptFile){
         }
     }
     throw "No Script was specified to call."
+}
+
+function Create-Task{
+    $pass=[Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($BoxstarterPassword))
+    if($pass.length -gt 0){
+        schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
+            /RU "$env:userdomain\$($Boxstarter.BoxstarterUser)"  /IT /RP $pass `
+        /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
+            Out-Null
+    }
+    else { #For testing
+        schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
+                /RU "$env:userdomain\$($Boxstarter.BoxstarterUser)" /IT `
+        /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
+                Out-Null
+    }
+    if($LastExitCode -gt 0){
+        throw "Unable to create scheduled task as $($BoxStarter.BoxstarterUser)"
+    }
 }

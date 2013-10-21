@@ -32,14 +32,11 @@ http://boxstarter.codeplex.com
 #>
     param(
         $command, 
-        $Credential, 
         $idleTimeout=20,
         $totalTimeout=3600
     )
     Write-BoxstarterMessage "Invoking $command in scheduled task"
     Add-TaskFiles $command
-
-    Create-Task $Credential
 
     $taskProc = start-Task
 
@@ -78,30 +75,11 @@ Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
     new-Item $env:temp\BoxstarterError.stream -Type File -Force | out-null
 }
 
-function Create-Task($Credential){
-        $pass=$credential.GetNetworkCredential().Password
-    if($pass.length -gt 0){
-        schtasks /CREATE /TN 'Ad-Hoc Task' /SC WEEKLY /RL HIGHEST `
-            /RU $credential.Username  /IT /RP $pass `
-            /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
-            Out-Null
-    }
-    else { #For testing
-        schtasks /CREATE /TN 'Ad-Hoc Task' /SC WEEKLY /RL HIGHEST `
-                /RU $credential.Username /IT `
-                /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
-                Out-Null
-    }
-    if($LastExitCode -gt 0){
-        throw "Unable to create scheduled task as $($credential.Username)"
-    }
-}
-
 function start-Task{
     $tasks=@()
     $tasks+=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
     Write-Debug "Found $($tasks.Length) tasks already running"
-    schtasks /RUN /I /TN 'Ad-Hoc Task' | Out-Null
+    schtasks /RUN /I /TN 'Boxstarter Task' | Out-Null
     if($LastExitCode -gt 0){
         throw "Unable to run scheduled task"
     }
@@ -185,7 +163,6 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
             KillTree $waitProc.ID
         }
         $reader.Dispose()
-        schtasks /DELETE /TN 'Ad-Hoc Task' /F | Out-null
     }    
 }
 

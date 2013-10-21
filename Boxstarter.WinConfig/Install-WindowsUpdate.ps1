@@ -30,12 +30,10 @@ http://boxstarter.codeplex.com
     )
 
     if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
-        $pass=(& (Get-Module Boxstarter.Chocolatey) Get-Variable -Name BoxstarterPassword).Value
-        $mycreds = New-Object System.Management.Automation.PSCredential ("$env:userdomain\$($Boxstarter.BoxstarterUser)", $pass)
         Invoke-FromTask @"
 Import-Module $($boxstarter.BaseDir)\boxstarter.WinConfig\Boxstarter.Winconfig.psd1
 Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$AcceptEula -SuppressReboots -Criteria "$Criteria"
-"@ -Credential $mycreds -IdleTimeout 0 -TotalTimeout 7200
+"@ -IdleTimeout 0 -TotalTimeout 7200
         if(Test-PendingReboot){
             Invoke-Reboot
         }
@@ -57,9 +55,9 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         $Downloader =$updateSession.CreateUpdateDownloader()
         $Installer =$updateSession.CreateUpdateInstaller()
         $Searcher =$updatesession.CreateUpdateSearcher()
-        $wus=Get-Service wuauserv
-        $origStatus=$wus.Status
-        $origStartupType=$wus.StartupType
+        $wus=Get-WmiObject -Class Win32_Service -Filter "Name='wuauserv'"
+        $origStatus=$wus.State
+        $origStartupType=$wus.StartMode
         if($origStatus -eq "Stopped"){
             if($origStartupType -eq "Disabled"){
                 Set-Service wuauserv -StartupType Automatic

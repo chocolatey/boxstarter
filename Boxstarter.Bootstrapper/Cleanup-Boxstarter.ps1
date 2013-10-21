@@ -1,5 +1,8 @@
 function Cleanup-Boxstarter {
     param([switch]$KeepWindowOpen)
+    schtasks /DELETE /TN 'Boxstarter Task' /F 2>&1 | Out-null
+    Start-UpdateServices
+
     if(Test-Path "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC") {
         del "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC"
         Enable-UAC
@@ -17,7 +20,6 @@ function Cleanup-Boxstarter {
         Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction SilentlyContinue
         Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue
         Write-Debug "Cleaned up logon registry and restart file"
-        Start-UpdateServices
         if($promptToExit -or $KeepWindowOpen){
             Read-Host 'Type ENTER to exit'
         }

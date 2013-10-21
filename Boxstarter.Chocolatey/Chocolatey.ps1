@@ -8,11 +8,10 @@ param(
 )    
     Wait-ForMSIEXEC
     if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
-        $mycreds = New-Object System.Management.Automation.PSCredential ("$env:userdomain\$($Boxstarter.BoxstarterUser)", $BoxstarterPassword)
         Invoke-FromTask @"
 Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
 Install-ChocolateyInstallPackage $(Expand-Splat $PSBoundParameters)
-"@ -Credential $mycreds
+"@
     }
     else{
         chocolateyInstaller\Install-ChocolateyInstallPackage @PSBoundParameters
@@ -73,16 +72,15 @@ Intercepts Chocolatey call to check for reboots
     if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
     try {
             if($winFeature -eq $true -and $PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
-                $mycreds = New-Object System.Management.Automation.PSCredential ("$env:userdomain\$($Boxstarter.BoxstarterUser)", $BoxstarterPassword)
                 Invoke-FromTask @"
 ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" $(Expand-Splat $PSBoundParameters)
-"@ -Credential $mycreds
+"@
             }
             else{
                 Call-Chocolatey @PSBoundParameters
             }
         }
-        catch { $ex=$_}
+        catch { $ex=$_;throw $_}
     if(!$Boxstarter.rebootOk) {return}
     if($Boxstarter.IsRebooting){
         Remove-ChocolateyPackageInProgress $packageName
@@ -103,6 +101,9 @@ Intercepts Chocolatey call to check for reboots
 function Call-Chocolatey {
     $session=Start-TimedSection "Calling Chocolatey to install $packageName"
     ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
+    write-host "finished call at $pid"
+    write-host "stack2"
+    Get-PSCallStack
     Stop-Timedsection $session
 }
 

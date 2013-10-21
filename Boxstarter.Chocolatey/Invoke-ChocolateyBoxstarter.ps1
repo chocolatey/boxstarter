@@ -123,9 +123,8 @@ Set-BoxstarterConfig
                 write-BoxstarterMessage "Installing Chocolatey" -Color Cyan
             }
             $script=@"
-param(`$password)            
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
-Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstrapPackage"}) $(if($LocalRepo){"-Localrepo $localRepo"}) -password `$password
+Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstrapPackage"}) $(if($LocalRepo){"-Localrepo $localRepo"})
 "@
             return Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password -KeepWindowOpen:$KeepWindowOpen -NoPassword:$NoPassword -SuppressRebootScript:$SuppressRebootScript
         }
@@ -134,11 +133,11 @@ Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstra
         $Boxstarter.ProgramFiles86="$programFiles86"
         $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
         $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
-        $script:BoxstarterPassword=$password
         Check-Chocolatey -ShouldIntercept
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
         if($bootstrapPackage -ne $null){
             Download-Package $bootstrapPackage
+            write-host "pkg done"
         }
     }
     finally {
