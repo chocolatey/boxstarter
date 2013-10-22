@@ -104,7 +104,7 @@ Invoke-Reboot
         $Boxstarter.BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
-        Create-Task 
+        if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){ Create-Task }
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
         if($BoxStarter.IsRebooting){
             return @{Result="Rebooting"}

@@ -1,6 +1,8 @@
 function Cleanup-Boxstarter {
     param([switch]$KeepWindowOpen)
-    schtasks /DELETE /TN 'Boxstarter Task' /F 2>&1 | Out-null
+    if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){ 
+        schtasks /DELETE /TN 'Boxstarter Task' /F 2>&1 | Out-null
+    }
     Start-UpdateServices
 
     if(Test-Path "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC") {
