@@ -137,7 +137,6 @@ Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstra
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
         if($bootstrapPackage -ne $null){
             Download-Package $bootstrapPackage
-            write-host "pkg done"
         }
     }
     finally {

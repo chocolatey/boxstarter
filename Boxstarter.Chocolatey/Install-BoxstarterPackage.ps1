@@ -194,31 +194,29 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
 }
 
 function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPassword){
-    $possibleResult=@{Rebooting=10;Succeeded=$true;Disconnected=0}
     while($session.Availability -eq "Available") {
-        [int]$remoteResult=$null
         $remoteResult = Invoke-Command $session {
             param($possibleResult,$SuppressLogging,$pkg,$password,$DisableReboots,$NoPassword)
             Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
             $Boxstarter.SuppressLogging=$SuppressLogging
-            $result=$false
+            $result=$null
             try {
                 $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -SuppressRebootScript -NoPassword:$NoPassword -DisableReboots:$DisableReboots
             }
             catch{
                 throw
             }
-            if($LastExitCode -eq $possibleResult.Rebooting){
-                
-                return $possibleResult.Rebooting
-            }            
-            elseif($result -eq $true){
-                return $possibleResult.Succeeded
-            }
-            return $possibleResult.Disconnected
+            return $result
         } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $Credential.Password, $DisableReboots, $NoPassword
-        write-debug "Code returned from remote boxstarter is $remoteResult"
-        if($remoteResult -ne $possibleResult.Succeeded) {
+
+        write-host "result $($remoteResult.Result)"
+        if($remoteResult -eq $null -or $remoteResult.Result -eq "Rebooting") {
+            if($remoteResult -ne $null -and  $remoteResult.Result -eq "Rebooting"){
+                Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
+                while($session.State -eq "Opened"){
+                    start-sleep -seconds 2
+                }
+            }
             $reconnected=$false
             Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
             Remove-PSSession $session

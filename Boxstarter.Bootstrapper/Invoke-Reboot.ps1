@@ -46,9 +46,5 @@ about_boxstarter_variable_in_bootstrapper
 }
 
 function Restart {
-    write-host "exiting from $pid"
-    write-host "stack"
-    write-host "$(Get-PSCallStack)"
-    exit 10
-    write-host "exited"
+    exit
 }

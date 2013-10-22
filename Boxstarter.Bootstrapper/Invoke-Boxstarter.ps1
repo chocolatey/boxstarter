@@ -106,8 +106,10 @@ Invoke-Reboot
         Stop-UpdateServices
         Create-Task 
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
-        write-host "finished"
-        return $true
+        if($BoxStarter.IsRebooting){
+            return @{Result="Rebooting"}
+        }
+        return @{Result="Completed"}
     }
     catch {
        Log-BoxStarterMessage $_

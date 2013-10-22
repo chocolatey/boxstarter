@@ -80,7 +80,7 @@ Intercepts Chocolatey call to check for reboots
                 Call-Chocolatey @PSBoundParameters
             }
         }
-        catch { $ex=$_;throw $_}
+        catch { $ex=$_ }
     if(!$Boxstarter.rebootOk) {return}
     if($Boxstarter.IsRebooting){
         Remove-ChocolateyPackageInProgress $packageName
@@ -101,9 +101,6 @@ Intercepts Chocolatey call to check for reboots
 function Call-Chocolatey {
     $session=Start-TimedSection "Calling Chocolatey to install $packageName"
     ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
-    write-host "finished call at $pid"
-    write-host "stack2"
-    Get-PSCallStack
     Stop-Timedsection $session
 }
 
