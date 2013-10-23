@@ -1,5 +1,10 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
+schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
+        /RU "$env:userdomain\$($Boxstarter.BoxstarterUser)" /IT `
+/TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
+        Out-Null
+
 Describe "Invoke-FromTask" {
     Remove-Module boxstarter.*
     Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
@@ -45,16 +50,6 @@ Describe "Invoke-FromTask" {
         }
     }
 
-    Context "When Invoking Task with bad credentials"{
-        $myBadcreds = New-Object System.Management.Automation.PSCredential ("poo", (New-Object System.Security.SecureString))
-
-        try {Invoke-FromTask "return" -Credential $myBadcreds -IdleTimeout 0 2>&1 | Out-Null} catch {$err=$_}
-
-        It "Should invoke the command"{
-            $err.Exception | should match "Unable to create scheduled task as"
-        }
-    }
-
     Context "When Invoking Task that takes 3 seconds"{
         Remove-Item $env:temp\test.txt -ErrorAction SilentlyContinue
 
@@ -69,7 +64,6 @@ Describe "Invoke-FromTask" {
         try { Invoke-FromTask "Start-Process calc.exe -Wait" -Credential $mycreds -IdleTimeout 2} catch {$err=$_}
         $origId=Get-WmiObject -Class Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
         $id=Get-WmiObject -Class Win32_Process -Filter "Name='calc.exe'" | select ProcessId | % { $_.ProcessId }
-        KILL $id
         start-sleep -seconds 2
 
         It "Should timeout"{
@@ -99,5 +93,6 @@ Describe "Invoke-FromTask" {
             $origId | should be $null
         }
     }
-
 }
+
+schtasks /DELETE /TN 'Boxstarter Task' /F 2>&1 | Out-null

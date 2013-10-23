@@ -14,6 +14,21 @@ Describe "Invoke-Boxstarter" {
     Mock New-Item -ParameterFilter {$path -like "$env:appdata\*"}
     Mock Enable-UAC
     Mock Disable-UAC
+    Mock Start-Sleep
+    Mock Get-Service {
+            try{
+                Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"} -Times 0
+                $called=$false
+            }catch{
+                $called=$true
+            }
+            if($called){
+                return new-Object -TypeName PSObject -Property @{CanStop=$True;Status="Stopped"}
+            }
+            else {
+                return new-Object -TypeName PSObject -Property @{CanStop=$True;Status="Running"}
+            }
+    } -ParameterFilter {$Name -eq "wuauserv"}
 
     Context "When Configuration Service is installed" {
         Mock Test-Admin {return $true}
@@ -22,8 +37,14 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         Mock Get-Service {new-Object -TypeName PSObject -Property @{CanStop=$True}} -ParameterFilter {$include -eq "CCMEXEC"}
 
-        Invoke-Boxstarter {return}
+        Invoke-Boxstarter {return} | Out-Null
 
+        it "will stop WUA" {
+            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
+        }
+        it "will start WUA" {
+            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "wuauserv"}
+        }
         it "will stop ConfigurationService" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"}
         }
@@ -37,16 +58,56 @@ Describe "Invoke-Boxstarter" {
         Mock Stop-Service
         Mock Start-Service
         Mock Set-Service
-        Mock Get-Service {new-Object -TypeName PSObject -Property @{Status="Stopped"}} -ParameterFilter {$name -eq "wuauserv"}
         Mock Get-Service {$false} -ParameterFilter {$include -eq "CCMEXEC"}
 
-        Invoke-Boxstarter {return}
+        Invoke-Boxstarter {return} | Out-Null
 
-        it "will stop just WUA" {
+        it "will stop WUA" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
         }
-        it "will just start WUA" {
+        it "will disable WUA" {
+            Assert-MockCalled Set-Service -ParameterFilter {$name -eq "wuauserv" -and $StartupType -eq "Disabled"}
+        }        
+        it "will start WUA" {
             Assert-MockCalled Start-Service -ParameterFilter {$name -eq "wuauserv"}
+        }
+        it "will make WUA service start automatically" {
+            Assert-MockCalled Set-Service -ParameterFilter {$name -eq "wuauserv" -and $StartupType -eq "Automatic"}
+        }                
+        it "will not stop ConfigurationService" {
+            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"} -Times 0
+        }
+        it "will not start ConfigurationService" {
+            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "CCMEXEC"} -Times 0
+        }
+    }
+
+      Context "When Configuration Service is not installed" {
+        Mock Test-Admin {return $true}
+        Mock Stop-Service
+        Mock Start-Service
+        Mock Set-Service
+        Mock Get-Service {$false} -ParameterFilter {$include -eq "CCMEXEC"}
+
+        Invoke-Boxstarter {return} | Out-Null
+
+        it "will stop WUA" {
+            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
+        }
+        it "will disable WUA" {
+            Assert-MockCalled Set-Service -ParameterFilter {$name -eq "wuauserv" -and $StartupType -eq "Disabled"}
+        }        
+        it "will start WUA" {
+            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "wuauserv"}
+        }
+        it "will make WUA service start automatically" {
+            Assert-MockCalled Set-Service -ParameterFilter {$name -eq "wuauserv" -and $StartupType -eq "Automatic"}
+        }                
+        it "will not stop ConfigurationService" {
+            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"} -Times 0
+        }
+        it "will not start ConfigurationService" {
+            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "CCMEXEC"} -Times 0
         }
     }
 
@@ -57,7 +118,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         Mock Get-Service {new-Object -TypeName PSObject -Property @{CanStop=$True}} -ParameterFilter {$include -eq "CCMEXEC"}
 
-        try { Invoke-Boxstarter { throw "error" } } catch {}
+        try { Invoke-Boxstarter { throw "error" } | Out-Null } catch {}
 
         it "will stop WUA" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
@@ -78,7 +139,7 @@ Describe "Invoke-Boxstarter" {
         Mock RestartNow
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
 
-        Invoke-Boxstarter {Invoke-Reboot} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+        Invoke-Boxstarter {Invoke-Reboot} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
 
         it "will save startup file" {
             Assert-MockCalled New-Item -ParameterFilter {$Path -eq "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\boxstarter-post-restart.bat"}
@@ -129,7 +190,7 @@ Describe "Invoke-Boxstarter" {
         Mock get-UAC
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
 
-        Invoke-Boxstarter {Invoke-Reboot} -RebootOk
+        Invoke-Boxstarter {Invoke-Reboot} -RebootOk | Out-Null
 
         it "will not read host for the password" {
             Assert-MockCalled Read-AuthenticatedPassword -times 0
@@ -150,7 +211,7 @@ Describe "Invoke-Boxstarter" {
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
         New-Item "$(Get-BoxstarterTempDir)\Boxstarter.script" -type file -value ([ScriptBlock]::Create("`$env:testkey='val'")) -force | Out-Null
 
-        Invoke-Boxstarter -RebootOk
+        Invoke-Boxstarter -RebootOk | Out-Null
 
         it "will call script" {
             $env:testkey | should be "val"
@@ -168,7 +229,7 @@ Describe "Invoke-Boxstarter" {
         Mock RestartNow
         Mock Read-AuthenticatedPassword
 
-        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
 
         it "will not read host for the password" {
             Assert-MockCalled Read-AuthenticatedPassword -times 0
@@ -185,7 +246,7 @@ Describe "Invoke-Boxstarter" {
         Mock RestartNow
         Mock Read-AuthenticatedPassword
 
-        Invoke-Boxstarter {Invoke-Reboot} -RebootOk -NoPassword
+        Invoke-Boxstarter {Invoke-Reboot} -RebootOk -NoPassword | Out-Null
 
         it "will not read host for the password" {
             Assert-MockCalled Read-AuthenticatedPassword -times 0
@@ -206,7 +267,7 @@ Describe "Invoke-Boxstarter" {
         Mock RestartNow
         Mock Read-AuthenticatedPassword
 
-        Invoke-Boxstarter {Invoke-Reboot}
+        Invoke-Boxstarter {Invoke-Reboot} | Out-Null
 
         it "will not read host for the password" {
             Assert-MockCalled Read-AuthenticatedPassword -times 0
@@ -242,7 +303,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-Service
         New-Item "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" -type file | Out-Null
 
-        Invoke-Boxstarter {return}
+        Invoke-Boxstarter {return} | Out-Null
 
         it "will Enable UAC" {
             Assert-MockCalled Enable-UAC
@@ -258,7 +319,7 @@ Describe "Invoke-Boxstarter" {
         Mock Start-Service
         Mock Set-Service
 
-        Invoke-Boxstarter {return}
+        Invoke-Boxstarter {return} | Out-Null
 
         it "will Not Enable UAC" {
             Assert-MockCalled Enable-UAC -times 0
@@ -270,7 +331,7 @@ Describe "Invoke-Boxstarter" {
         Mock Start-Process
         Mock Stop-UpdateServices
 
-        Invoke-Boxstarter {return}
+        Invoke-Boxstarter {return} | Out-Null
 
         it "will Write Script File" {
             "$(Get-BoxstarterTempDir)\boxstarter.script" | should Contain "return"
@@ -289,7 +350,7 @@ Describe "Invoke-Boxstarter" {
         Mock Stop-UpdateServices
         $securePassword = (ConvertTo-SecureString "mypassword" -asplaintext -force)
 
-        Invoke-Boxstarter {return} -password $securePassword
+        Invoke-Boxstarter {return} -password $securePassword | Out-Null
 
         it "will pass password to elevated console encryptedPassword arg"{
             Assert-MockCalled Start-Process -ParameterFilter {$argumentlist -like "*-encryptedPassword *"}
@@ -320,7 +381,7 @@ Describe "Invoke-Boxstarter" {
         $Boxstarter.IsRebooting=$true
         Mock Set-SecureAutoLogon
 
-        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
 
         it "will Set AutoLogin" {
             Assert-MockCalled Set-SecureAutoLogon
@@ -360,7 +421,7 @@ Describe "Invoke-Boxstarter" {
         Mock New-Item
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
 
-        Invoke-Boxstarter {return} -RebootOk
+        Invoke-Boxstarter {return} -RebootOk | Out-Null
 
         it "will Disable UAC" {
             Assert-MockCalled Disable-UAC
@@ -403,7 +464,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-SecureAutoLogon
         Mock New-Item
 
-        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
 
         it "will not Disable UAC" {
             Assert-MockCalled Disable-UAC -times 0

@@ -128,7 +128,7 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
         $procStartTime = $waitProc.StartTime
         while($waitProc -ne $null -and !($waitProc.HasExited)) {
             $timeTaken = [DateTime]::Now.Subtract($procStartTime)
-            if($timeTaken.TotalSeconds -gt $totalTimeout){
+            if($totalTimeout -gt 0 -and $timeTaken.TotalSeconds -gt $totalTimeout){
                 Write-BoxstarterMessage "Task has exceeded its total timeout. Killing task..."
                 KillTree $waitProc.ID
                 throw "TASK:`r`n$command`r`n`r`nIs likely in a hung state."
