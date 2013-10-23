@@ -208,6 +208,7 @@ function Wait-ForMSIEXEC{
         Get-Process "MSIEXEC" -ErrorAction SilentlyContinue | % {
             if(!($_.HasExited)){
                 $proc=Get-WmiObject -Class Win32_Process -Filter "ProcessID=$($_.Id)"
+                if($proc.CommandLine.EndsWith(" /V")){ continue }
                 Write-BoxstarterMessage "Another installer is running: $($proc.CommandLine). Waiting for it to complete..."
                 $_.WaitForExit()
             }
