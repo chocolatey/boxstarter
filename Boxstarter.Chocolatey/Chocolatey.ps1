@@ -7,7 +7,7 @@ param(
   $validExitCodes = @(0)
 )    
     Wait-ForMSIEXEC
-    if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
+    if(Get-IsRemote){
         Invoke-FromTask @"
 Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
 Install-ChocolateyInstallPackage $(Expand-Splat $PSBoundParameters)
@@ -71,7 +71,7 @@ Intercepts Chocolatey call to check for reboots
 
     if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
     try {
-            if($winFeature -eq $true -and $PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
+            if($winFeature -eq $true -and (Get-IsRemote)){
                 Invoke-FromTask @"
 ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" $(Expand-Splat $PSBoundParameters)
 "@
@@ -208,7 +208,7 @@ function Wait-ForMSIEXEC{
         Get-Process "MSIEXEC" -ErrorAction SilentlyContinue | % {
             if(!($_.HasExited)){
                 $proc=Get-WmiObject -Class Win32_Process -Filter "ProcessID=$($_.Id)"
-                if($proc.CommandLine.EndsWith(" /V")){ continue }
+                if($proc.CommandLine -ne $null -and $proc.CommandLine.EndsWith(" /V")){ break }
                 Write-BoxstarterMessage "Another installer is running: $($proc.CommandLine). Waiting for it to complete..."
                 $_.WaitForExit()
             }

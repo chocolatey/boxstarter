@@ -12,6 +12,9 @@ $Boxstarter.BaseDir=(split-path -parent (split-path -parent $here))
 Describe "Invoke-Boxstarter" {
     $testRoot = (Get-PSDrive TestDrive).Root
     Mock New-Item -ParameterFilter {$path -like "$env:appdata\*"}
+    Mock Stop-Service
+    Mock Start-Service
+    Mock Set-Service
     Mock Enable-UAC
     Mock Disable-UAC
     Mock Start-Sleep
@@ -31,34 +34,7 @@ Describe "Invoke-Boxstarter" {
     } -ParameterFilter {$Name -eq "wuauserv"}
 
     Context "When Configuration Service is installed" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         Mock Get-Service {new-Object -TypeName PSObject -Property @{CanStop=$True}} -ParameterFilter {$include -eq "CCMEXEC"}
-
-        Invoke-Boxstarter {return} | Out-Null
-
-        it "will stop WUA" {
-            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
-        }
-        it "will start WUA" {
-            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "wuauserv"}
-        }
-        it "will stop ConfigurationService" {
-            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"}
-        }
-        it "will start ConfigurationService" {
-            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "CCMEXEC"}
-        }
-    }
-
-      Context "When Configuration Service is not installed" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
-        Mock Get-Service {$false} -ParameterFilter {$include -eq "CCMEXEC"}
 
         Invoke-Boxstarter {return} | Out-Null
 
@@ -73,20 +49,16 @@ Describe "Invoke-Boxstarter" {
         }
         it "will make WUA service start automatically" {
             Assert-MockCalled Set-Service -ParameterFilter {$name -eq "wuauserv" -and $StartupType -eq "Automatic"}
-        }                
-        it "will not stop ConfigurationService" {
-            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"} -Times 0
         }
-        it "will not start ConfigurationService" {
-            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "CCMEXEC"} -Times 0
+        it "will stop ConfigurationService" {
+            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"}
+        }
+        it "will start ConfigurationService" {
+            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "CCMEXEC"}
         }
     }
 
       Context "When Configuration Service is not installed" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         Mock Get-Service {$false} -ParameterFilter {$include -eq "CCMEXEC"}
 
         Invoke-Boxstarter {return} | Out-Null
@@ -112,10 +84,6 @@ Describe "Invoke-Boxstarter" {
     }
 
       Context "When An exception occurs in the install" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         Mock Get-Service {new-Object -TypeName PSObject -Property @{CanStop=$True}} -ParameterFilter {$include -eq "CCMEXEC"}
 
         try { Invoke-Boxstarter { throw "error" } | Out-Null } catch {}
@@ -127,13 +95,25 @@ Describe "Invoke-Boxstarter" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"}
         }
     }
+
+    Context "When install is remote and invokes task" {
+        Mock Get-IsRemote {$true}
+
+        Invoke-Boxstarter { Invoke-FromTask "add-content $env:temp\test.txt -value '`$pid'" } -NoPassword | Out-Null
+        $boxProc=get-Content $env:temp\test.txt
+        Remove-item $env:temp\test.txt
+
+        it "will run in a different process" {
+            $boxProc | should not be $pid
+        }
+        it "will delete task" {
+            ($result=schtasks.exe /query /TN "Boxstarter Task") 2>&1 | Out-Null
+            $result[0] | should Match "ERROR:"
+        }
+    }
   
       Context "When A reboot is invoked" {
         Mock Get-UAC
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock RestartNow
@@ -160,10 +140,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When no password is provided but reboot is ok" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock RestartNow
@@ -179,10 +155,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When no password is provided, reboot is ok and autologon is toggled" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock RestartNow
@@ -199,10 +171,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When no script is passed on command line but script file exists" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock RestartNow
@@ -220,10 +188,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When a password is provided and reboot is ok" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock RestartNow
@@ -237,10 +201,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When the NoPassword switch is specified and reboot is ok" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock RestartNow
@@ -258,10 +218,6 @@ Describe "Invoke-Boxstarter" {
 
     Context "When reboot is not ok" {
         $Boxstarter.RebootOk=$false
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock RestartNow
@@ -278,10 +234,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When boxstarter.rebootok is set but not passed to command" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock RestartNow
@@ -297,10 +249,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When ReEnableUAC File Exists" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
         New-Item "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" -type file | Out-Null
 
         Invoke-Boxstarter {return} | Out-Null
@@ -314,10 +262,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When ReEnableUAC file does not exist" {
-        Mock Test-Admin {return $true}
-        Mock Stop-Service
-        Mock Start-Service
-        Mock Set-Service
 
         Invoke-Boxstarter {return} | Out-Null
 
@@ -327,9 +271,9 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When Not Running As Admin" {
-        Mock Test-Admin {return $false}
-        Mock Start-Process
         Mock Stop-UpdateServices
+        Mock Test-Admin
+        Mock Start-Process
 
         Invoke-Boxstarter {return} | Out-Null
 
@@ -345,10 +289,10 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When Not Running As Admin and passing a password arg" {
-        Mock Test-Admin {return $false}
-        Mock Start-Process
         Mock Stop-UpdateServices
+        Mock Start-Process
         $securePassword = (ConvertTo-SecureString "mypassword" -asplaintext -force)
+        Mock Test-Admin
 
         Invoke-Boxstarter {return} -password $securePassword | Out-Null
 
@@ -358,7 +302,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When rebooting and No Password is set" {
-        Mock Test-Admin {return $true}
         Mock Set-SecureAutoLogon
         Mock Stop-UpdateServices
         Mock RestartNow
@@ -373,7 +316,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When rebooting and a Password is set" {
-        Mock Test-Admin {return $true}
         Mock Set-SecureAutoLogon
         Mock Stop-UpdateServices
         Mock RestartNow
@@ -389,7 +331,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When rebooting and UAC is Enabled and password is set" {
-        Mock Test-Admin {return $true}
         Mock Set-SecureAutoLogon
         Mock Stop-UpdateServices
         Mock RestartNow
@@ -410,7 +351,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When rebooting and UAC is Enabled and user has been auto loged on" {
-        Mock Test-Admin {return $true}
         Mock Set-SecureAutoLogon
         Mock Stop-UpdateServices
         Mock RestartNow
@@ -433,7 +373,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When rebooting UAC is enabled and password is not set" {
-        Mock Test-Admin {return $true}
         Mock Set-SecureAutoLogon
         Mock Stop-UpdateServices
         Mock RestartNow
@@ -454,7 +393,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When rebooting and UAC is disabled" {
-        Mock Test-Admin {return $true}
         Mock Set-SecureAutoLogon
         Mock Stop-UpdateServices
         Mock RestartNow

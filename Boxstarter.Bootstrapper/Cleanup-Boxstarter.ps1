@@ -1,6 +1,6 @@
 function Cleanup-Boxstarter {
     param([switch]$KeepWindowOpen)
-    if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){ 
+    if(Get-IsRemote){ 
         schtasks /DELETE /TN 'Boxstarter Task' /F 2>&1 | Out-null
     }
     Start-UpdateServices

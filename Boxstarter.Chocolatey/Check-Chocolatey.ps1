@@ -33,7 +33,7 @@ function Enable-Net40 {
         $wp.UseDefaultCredentials=$true
         $downloader.Proxy=$wp
         $downloader.DownloadFile("http://go.microsoft.com/?linkid=9816306", "$env:temp\net45.exe")
-        if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
+        if(Get-IsRemote){
             Invoke-FromTask @"
 Start-Process "$env:temp\net45.exe" -verb runas -wait -argumentList "/quiet /norestart /log $env:temp\net45.log"
 "@

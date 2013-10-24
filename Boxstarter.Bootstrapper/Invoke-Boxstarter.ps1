@@ -104,7 +104,7 @@ Invoke-Reboot
         $Boxstarter.BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
-        if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){ Create-Task }
+        if(Get-IsRemote){ Create-Task }
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
         if($BoxStarter.IsRebooting){
             return @{Result="Rebooting"}
@@ -182,8 +182,8 @@ function Resolve-Script([ScriptBlock]$script, [string]$scriptFile){
 }
 
 function Create-Task{
-    $pass=[Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($BoxstarterPassword))
-    if($pass.length -gt 0){
+    if($BoxstarterPassword.length -gt 0){
+        $pass=[Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($BoxstarterPassword))
         schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
             /RU "$env:userdomain\$($Boxstarter.BoxstarterUser)"  /IT /RP $pass `
         /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |

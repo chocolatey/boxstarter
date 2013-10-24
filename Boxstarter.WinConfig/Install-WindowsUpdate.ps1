@@ -29,7 +29,7 @@ http://boxstarter.codeplex.com
         [string]$criteria="IsHidden=0 and IsInstalled=0 and Type='Software'"
     )
 
-    if($PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null){
+    if(Get-IsRemote){
         Invoke-FromTask @"
 Import-Module $($boxstarter.BaseDir)\boxstarter.WinConfig\Boxstarter.Winconfig.psd1
 Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$AcceptEula -SuppressReboots -Criteria "$Criteria"
