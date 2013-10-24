@@ -107,7 +107,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         Mock Check-Chocolatey
         New-Item TestDrive:\package.txt -type file | Out-Null
 
-        Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword
+        Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | out-null
 
         it "should use package returned from ScriptFromPackage" {
             Assert-MockCalled chocolatey -ParameterFilter {$packageName -eq "somePackage"}
@@ -119,7 +119,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         Mock Chocolatey
         Mock Check-Chocolatey
 
-        Invoke-ChocolateyBoxstarter http://someurl -NoPassword
+        Invoke-ChocolateyBoxstarter http://someurl -NoPassword | out-null
 
         it "should use package returned from ScriptFromPackage" {
             Assert-MockCalled chocolatey -ParameterFilter {$packageName -eq "somePackage"}
@@ -132,7 +132,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         Mock Check-Chocolatey
         New-Item TestDrive:\package -type directory | Out-Null
 
-        Invoke-ChocolateyBoxstarter "TestDrive:\package" -NoPassword
+        Invoke-ChocolateyBoxstarter "TestDrive:\package" -NoPassword | out-null
 
         it "should not use package from ScriptFromPackage" {
             Assert-MockCalled New-PackageFromScript -times 0
