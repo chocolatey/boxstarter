@@ -14,9 +14,6 @@ session.
  .PARAMETER Command
  The command to run in the task.
 
-.Parameter Credential
-The credentials under which the task will execute.
-
 .PARAMETER IdleTimeout
 The number of seconds after which the task will be terminated if it 
 becomes idle. The value 0 is an indefinite timeout and 120 is the 
@@ -49,7 +46,9 @@ http://boxstarter.codeplex.com
     Wait-ForTask $waitProc $idleTimeout $totalTimeout
 
     try{$errorStream=Import-CLIXML $env:temp\BoxstarterError.stream} catch {}
-    if($errorStream -ne $null){
+    $str=($errorStream | Out-String)
+    if($str.Length -gt 0){
+        Log-BoxstarterMessage "Exception raised in task: $str"
         throw $errorStream
     }
 }
@@ -65,7 +64,7 @@ function Get-ChildProcessMemoryUsage {
 }
 
 function Add-TaskFiles($command) {
-    $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$command"))
+    $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("`$ProgressPreference='SilentlyContinue';$command"))
     $fileContent=@"
 Start-Process powershell -Wait -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
 Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
