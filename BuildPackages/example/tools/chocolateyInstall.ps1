@@ -15,7 +15,7 @@ try {
         }
     }catch{}
     
-    cinstm fiddler
+    cinstm fiddler4
     cinstm mssqlserver2012express
     cinstm git-credential-winstore
     cinstm console-devel
