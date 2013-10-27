@@ -12,6 +12,8 @@ Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 |
 $Boxstarter.SuppressLogging=$true
 
 Describe "Install-BoxstarterPackage" {
+    $regRoot="HKCU:\SOFTWARE\Pester\temp"
+    Mock Get-CredentialDelegationKey { $regRoot }
     Mock Enable-RemotePSRemoting
     Mock Invoke-ChocolateyBoxstarter
     Mock Enable-PSRemoting
@@ -124,34 +126,30 @@ Describe "Install-BoxstarterPackage" {
         }
     }    
 
-<#
     Context "When credential delegation is not set for given computer" {
-        $key="HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation"
+        New-Item $regRoot -Force | out-null
         Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah","")}
         Mock Confirm-Choice {return $False}
         Mock Invoke-Command { New-Object System.Object }
-        Mock Set-ItemProperty -ParameterFilter {$Path -eq "$key" -and $Name -eq "AllowFreshCredentialsWhenNTLMOnly"}
-        Mock Get-ItemProperty {@{AllowFreshCredentialsWhenNTLMOnly="0"}} -ParameterFilter {$Path -eq "$key" -and -Name -eq "AllowFreshCredentialsWhenNTLMOnly"}
-        Mock New-ItemProperty -ParameterFilter {$Path -eq "$key/AllowFreshCredentialsWhenNTLMOnly"}
-        Mock Remove-ItemProperty -ParameterFilter {$Path -eq "$key/AllowFreshCredentialsWhenNTLMOnly"}
-        Mock Get-Item {@{}} -ParameterFilter {$Path -eq "$key/AllowFreshCredentialsWhenNTLMOnly"}
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
         It "will enable Allow Settings"{
-            Assert-MockCalled Set-ItemProperty -ParameterFilter {$Path -eq "$key" -and $Name -eq "AllowFreshCredentialsWhenNTLMOnly" -and $Value -eq 1}
+            (Get-ItemProperty -Path "$regRoot\CredentialsDelegation" -Name AllowFreshCredentialsWhenNTLMOnly).AllowFreshCredentialsWhenNTLMOnly | should be 1
         }
         It "will add computer to list"{
-            Assert-MockCalled New-ItemProperty -ParameterFilter {$Path -eq "$key/AllowFreshCredentialsWhenNTLMOnly" -and $Name -eq "2" -and $value -eq "wsman/blah"}
+            (Get-ItemProperty -Path "$regRoot\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly" -Name 1).1 | should be "wsman/blah"
         }
+        <#
         It "will remove computer when done"{
             Assert-MockCalled Remove-ItemProperty -ParameterFilter {$Path -eq "$key/AllowFreshCredentialsWhenNTLMOnly" -and $Name -eq "2"}
         }
         It "will remove setting when done"{
             Assert-MockCalled Set-ItemProperty -ParameterFilter {$Path -eq "$key" -and $Name -eq "AllowFreshCredentialsWhenNTLMOnly" -and $Value -eq 0}
         }
+        #>
     }    
-#>
+
     Context "When no entries in trusted hosts" {
         Mock Get-Item {@{Value=""}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
         Mock Invoke-Command { New-Object System.Object }

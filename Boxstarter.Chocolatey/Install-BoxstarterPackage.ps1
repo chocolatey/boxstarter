@@ -99,7 +99,8 @@ function Enable-RemotingOnClient($RemoteHostToTrust){
     $Result=@{
         Success=$False;
         PreviousTrustedHosts=$null;
-        PreviousCSSPTrustedHosts=$null
+        PreviousCSSPTrustedHosts=$null;
+        PreviousFreshCredDelegationHosts=$null
     }
 
     try { $credssp = Get-WSManCredSSP } catch { $credssp = $_}
@@ -145,6 +146,7 @@ function Enable-RemotingOnClient($RemoteHostToTrust){
         Set-Item "wsman:\localhost\client\trustedhosts" -Value $newHosts -Force
     }
 
+    $result.PreviousFreshCredDelegationHosts = Add-CredSSPGroupPolicy $RemoteHostToTrust
     $Result.Success=$True
     return $Result
 }
@@ -242,23 +244,30 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
     }
 }
 
-#$allowed = @('WSMAN/*.home.toenuff.com','WSMAN/server1')            
+function Add-CredSSPGroupPolicy([string]$allowed){
+    $allowed='wsman/' + $allowed
+    $key = Get-CredentialDelegationKey
+    if (!(Test-Path "$key\CredentialsDelegation")) {
+        New-Item $key -Name CredentialsDelegation
+    }
+    New-ItemProperty -Path "$key\CredentialsDelegation" -Name AllowFreshCredentialsWhenNTLMOnly -Value 1 -PropertyType Dword -Force            
 
-function Add-CredSSPGroupPolicy([string[]]$allowed){
-    $key = 'hklm:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation'
+    $key = Join-Path $key 'CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly'
     if (!(Test-Path $key)) {
         md $key
     }
-    New-ItemProperty -Path $key -Name AllowFreshCredentials -Value 1 -PropertyType Dword -Force            
+    $currentHostProps=@()
+    (Get-Item $key).Property | % {
+        $currentHostProps += (Get-ItemProperty -Path $key -Name $_).($_)
+    }
 
-    $key = Join-Path $key 'AllowFreshCredentials'
-    if (!(Test-Path $key)) {
-        md $key
+    if(!($currentHostProps -contains $allowed)){
+        New-ItemProperty -Path $key -Name $($currentHostProps.Length+1) -Value $allowed -PropertyType String -Force
     }
-    $i = 1
-    $allowed |% {
-        # Script does not take into account existing entries in this key
-        New-ItemProperty -Path $key -Name $i -Value $_ -PropertyType String -Force
-        $i++
-    }
+
+    return $currentHostProps.Length
+}
+
+function Get-CredentialDelegationKey {
+    return "HKLM:\SOFTWARE\Policies\Microsoft\Windows"
 }
