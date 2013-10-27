@@ -1,12 +1,7 @@
 function Start-UpdateServices {
-    $wuaStatus = (Get-Service wuauserv).Status
-    if($wuaStatus -ne "Running"){
-        Write-BoxstarterMessage "Starting Windows Update Service"
-        Enter-BoxstarterLogable {
-            Set-Service -Name wuauserv -StartupType Automatic
-            Start-Service -Name wuauserv -ErrorAction SilentlyContinue 
-        }
-    }
+    write-boxstartermessage "Enabling Automatic Updates from Windows Update"
+    Remove-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -name 'NoAutoUpdate' -force
+    Remove-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -name 'NoAutoRebootWithLoggedOnUsers' -force    
     Start-CCMEXEC
 }
 

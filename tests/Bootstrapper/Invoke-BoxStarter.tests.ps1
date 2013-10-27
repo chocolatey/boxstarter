@@ -11,7 +11,10 @@ $Boxstarter.BaseDir=(split-path -parent (split-path -parent $here))
 
 Describe "Invoke-Boxstarter" {
     $testRoot = (Get-PSDrive TestDrive).Root
+    $winUpdateKey="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
     Mock New-Item -ParameterFilter {$path -like "$env:appdata\*"}
+    Mock New-ItemProperty -ParameterFilter { $path -eq $winUpdateKey }
+    Mock Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey }
     Mock Stop-Service
     Mock Start-Service
     Mock Set-Service
@@ -38,17 +41,11 @@ Describe "Invoke-Boxstarter" {
 
         Invoke-Boxstarter {return} | Out-Null
 
-        it "will stop WUA" {
-            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
-        }
         it "will disable WUA" {
-            Assert-MockCalled Set-Service -ParameterFilter {$name -eq "wuauserv" -and $StartupType -eq "Disabled"}
-        }        
-        it "will start WUA" {
-            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "wuauserv"}
+            Assert-MockCalled New-ItemProperty -ParameterFilter { $path -eq $winUpdateKey }
         }
-        it "will make WUA service start automatically" {
-            Assert-MockCalled Set-Service -ParameterFilter {$name -eq "wuauserv" -and $StartupType -eq "Automatic"}
+        it "will enable WUA" {
+            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey }
         }
         it "will stop ConfigurationService" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"}
@@ -63,18 +60,12 @@ Describe "Invoke-Boxstarter" {
 
         Invoke-Boxstarter {return} | Out-Null
 
-        it "will stop WUA" {
-            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
-        }
         it "will disable WUA" {
-            Assert-MockCalled Set-Service -ParameterFilter {$name -eq "wuauserv" -and $StartupType -eq "Disabled"}
-        }        
-        it "will start WUA" {
-            Assert-MockCalled Start-Service -ParameterFilter {$name -eq "wuauserv"}
+            Assert-MockCalled New-ItemProperty -ParameterFilter { $path -eq $winUpdateKey }
         }
-        it "will make WUA service start automatically" {
-            Assert-MockCalled Set-Service -ParameterFilter {$name -eq "wuauserv" -and $StartupType -eq "Automatic"}
-        }                
+        it "will enable WUA" {
+            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey }
+        }
         it "will not stop ConfigurationService" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"} -Times 0
         }
@@ -88,8 +79,8 @@ Describe "Invoke-Boxstarter" {
 
         try { Invoke-Boxstarter { throw "error" } | Out-Null } catch {}
 
-        it "will stop WUA" {
-            Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "wuauserv"}
+        it "will disable WUA" {
+            Assert-MockCalled New-ItemProperty -ParameterFilter { $path -eq $winUpdateKey }
         }
         it "will stop CCM" {
             Assert-MockCalled Stop-Service -ParameterFilter {$name -eq "CCMEXEC"}

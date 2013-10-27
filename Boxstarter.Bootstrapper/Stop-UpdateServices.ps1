@@ -1,12 +1,7 @@
 function Stop-UpdateServices {
-    write-boxstartermessage "Stopping Windows Update Services"
-    Enter-BoxstarterLogable { 
-        while((get-Service -Name wuauserv).Status -ne "Stopped"){
-            Stop-Service -Name wuauserv -force 
-            Start-Sleep -Seconds 1
-        }
-        Set-Service -Name wuauserv -StartupType Disabled
-    }
+    write-boxstartermessage "Disabling Automatic Updates from Windows Update"
+    New-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -name 'NoAutoUpdate' -value '1' -propertyType "DWord" -force
+    New-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -name 'NoAutoRebootWithLoggedOnUsers' -value '1' -propertyType "DWord" -force    
     Stop-CCMEXEC
 }
 
