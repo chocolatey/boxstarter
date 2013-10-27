@@ -45,8 +45,11 @@ function Install-BoxstarterPackage {
         if($ClientRemotingStatus -ne $null -and $ClientRemotingStatus.Success){
             Disable-WSManCredSSP -Role Client
             if($ClientRemotingStatus.PreviousCSSPTrustedHosts -ne $null){
-                Write-BoxstarterMessage "Reseting CredSSP Trusted Hosts to $($ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace('wsman/',''))"
-                Enable-WSManCredSSP -DelegateComputer $ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace("wsman/","") -Role Client -Force
+                try{
+                    Write-BoxstarterMessage "Reseting CredSSP Trusted Hosts to $($ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace('wsman/',''))"
+                    Enable-WSManCredSSP -DelegateComputer $ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace("wsman/","") -Role Client -Force
+                }
+                catch{}
             }
             if($ClientRemotingStatus.PreviousTrustedHosts -ne $null){
                 Write-BoxstarterMessage "Reseting wsman Trusted Hosts to $($ClientRemotingStatus.PreviousTrustedHosts)"
