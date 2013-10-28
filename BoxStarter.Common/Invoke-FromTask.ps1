@@ -168,10 +168,10 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
 function KillTree($id){
     Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
         if($_.ProcessID -ne $null) {
-            kill $_.ProcessID -ErrorAction SilentlyContinue
+            kill $_.ProcessID -ErrorAction SilentlyContinue -Force
             Write-Debug "Killing $($_.Name)"
             KillTree $_.ProcessID
         }
     }
-    Kill $id -ErrorAction SilentlyContinue
+    Kill $id -ErrorAction SilentlyContinue -Force
 }
