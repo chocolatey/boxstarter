@@ -58,41 +58,6 @@ Describe "Install-BoxstarterPackage" {
         }
     }
 
-    Context "When Remoting is not enabled locally" {
-        Mock Get-WSManCredSSP {throw "remoting not enabled"}
-        Mock Confirm-Choice
-        Mock Invoke-Command { New-Object System.Object }
-        Install-BoxstarterPackage -computerName blah -PackageName test
-
-        It "will confirm to enable remoting"{
-            Assert-MockCalled Confirm-Choice -ParameterFilter {$message -like "*Remoting is not enabled locally*"}
-        }
-    }
-
-    Context "When Remoting is not enabled locally and user confirms" {
-        Mock Get-WSManCredSSP {throw "remoting not enabled"}
-        Mock Confirm-Choice {return $True}
-        Mock Invoke-Command { New-Object System.Object }
-
-        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
-
-        It "will enable remoting"{
-            Assert-MockCalled Enable-PSRemoting
-        }
-    }
-
-    Context "When Remoting is not enabled locally" {
-        Mock Get-WSManCredSSP {throw "remoting not enabled"}
-        Mock Confirm-Choice {return $False}
-        Mock Invoke-Command { New-Object System.Object }
-
-        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
-
-        It "will not enable remoting if user does not confirm"{
-            Assert-MockCalled Enable-PSRemoting -Times 0
-        }
-    }
-
     Context "When credssp is not enabled at all" {
         Mock Get-WSManCredSSP {return @("The machine is not","")}
         Mock Confirm-Choice {return $False}
@@ -100,9 +65,6 @@ Describe "Install-BoxstarterPackage" {
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
-        It "will enable for computer"{
-            Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$DelegateComputer -eq "blah"}
-        }
         It "will disable credssp when done"{
             Assert-MockCalled Disable-WSManCredSSP -ParameterFilter {$Role -eq "client"}
         }        
@@ -115,9 +77,6 @@ Describe "Install-BoxstarterPackage" {
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
-        It "will enable for computer"{
-            Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$DelegateComputer -eq "blah"}
-        }
         It "will enable credssp when done for current computer"{
             Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$Role -eq "client" -and $DelegateComputer -eq "blahblah"}
         }
@@ -134,20 +93,9 @@ Describe "Install-BoxstarterPackage" {
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
-        It "will enable Allow Settings"{
-            (Get-ItemProperty -Path "$regRoot\CredentialsDelegation" -Name AllowFreshCredentialsWhenNTLMOnly).AllowFreshCredentialsWhenNTLMOnly | should be 1
-        }
-        It "will add computer to list"{
-            (Get-ItemProperty -Path "$regRoot\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly" -Name 1).1 | should be "wsman/blah"
-        }
-        <#
         It "will remove computer when done"{
-            Assert-MockCalled Remove-ItemProperty -ParameterFilter {$Path -eq "$key/AllowFreshCredentialsWhenNTLMOnly" -and $Name -eq "2"}
+            (Get-Item -Path "$regRoot\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly").Property.Length | should be 0
         }
-        It "will remove setting when done"{
-            Assert-MockCalled Set-ItemProperty -ParameterFilter {$Path -eq "$key" -and $Name -eq "AllowFreshCredentialsWhenNTLMOnly" -and $Value -eq 0}
-        }
-        #>
     }    
 
     Context "When no entries in trusted hosts" {
@@ -156,9 +104,6 @@ Describe "Install-BoxstarterPackage" {
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
-        It "will enable for computer"{
-            Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq "blah"}
-        }
         It "will clear computer when done"{
             Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq ""}
         }
@@ -170,9 +115,6 @@ Describe "Install-BoxstarterPackage" {
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
-        It "will enable for computer"{
-            Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq "bler,blur,blor,blah"}
-        }
         It "will clear computer when done"{
             Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq "bler,blur,blor"}
         }
@@ -255,7 +197,7 @@ Describe "Install-BoxstarterPackage" {
 
     Context "When passing in a session" {
         $session = New-PSSession localhost
-        Mock Enable-RemotingOnClient
+        Mock Enable-BoxstarterClientRemoting
         Mock Enable-RemotingOnRemote
         Mock Setup-BoxstarterModuleAndLocalRepo
         Mock Invoke-Remotely
@@ -263,7 +205,7 @@ Describe "Install-BoxstarterPackage" {
         Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
 
         It "will not try to enable local side remoting"{
-            Assert-MockCalled Enable-RemotingOnClient -Times 0
+            Assert-MockCalled Enable-BoxstarterClientRemoting -Times 0
         }
         It "will not try to enable remote side remoting"{
             Assert-MockCalled Enable-RemotingOnRemote -Times 0

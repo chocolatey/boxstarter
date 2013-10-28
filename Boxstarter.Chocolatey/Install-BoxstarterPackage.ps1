@@ -28,7 +28,7 @@ function Install-BoxstarterPackage {
             $siid = $session.InstanceId
         }
         else{
-            $ClientRemotingStatus=Enable-RemotingOnClient $ComputerName
+            $ClientRemotingStatus=Enable-BoxstarterClientRemoting $ComputerName
             if(!$ClientRemotingStatus.Success){return}
 
             if(!(Enable-RemotingOnRemote $ComputerName $Credential)){return}
@@ -55,20 +55,14 @@ function Install-BoxstarterPackage {
                 Write-BoxstarterMessage "Reseting wsman Trusted Hosts to $($ClientRemotingStatus.PreviousTrustedHosts)"
                 Set-Item "wsman:\localhost\client\trustedhosts" -Value "$($ClientRemotingStatus.PreviousTrustedHosts)" -Force
             }
+            Write-BoxstarterMessage "Reseting GroupPolicy for Credentials Delegation"
+            (Get-Item "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly").Property | % {
+                if([int]$_ -gt $ClientRemotingStatus["PreviousFreshCredDelegationHostCount"]) {
+                    Remove-ItemProperty "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly" -Name $_
+                }
+            }
         }
     }
-}
-
-function Confirm-Choice ($message, $caption = $message) {
-    $yes = new-Object System.Management.Automation.Host.ChoiceDescription "&Yes","Yes";
-    $no = new-Object System.Management.Automation.Host.ChoiceDescription "&No","No";
-    $choices = [System.Management.Automation.Host.ChoiceDescription[]]($yes,$no);
-    $answer = $host.ui.PromptForChoice($caption,$message,$choices,0)
-
-    switch ($answer){
-        0 {return $true; break}
-        1 {return $false; break}
-    }    
 }
 
 function Invoke-Locally {
@@ -93,62 +87,6 @@ function Invoke-Locally {
     $PSBoundParameters.Remove("PackageName") | out-Null
 
     Invoke-ChocolateyBoxstarter @PSBoundParameters
-}
-
-function Enable-RemotingOnClient($RemoteHostToTrust){
-    $Result=@{
-        Success=$False;
-        PreviousTrustedHosts=$null;
-        PreviousCSSPTrustedHosts=$null;
-        PreviousFreshCredDelegationHosts=$null
-    }
-
-    try { $credssp = Get-WSManCredSSP } catch { $credssp = $_}
-    if($credssp.Exception -ne $null){
-        Write-BoxstarterMessage "Local Powershell Remoting is not enabled"
-        if($Force -or (Confirm-Choice "Powershell remoting is not enabled locally. Should Boxstarter enable powershell remoting?"))
-        {
-            Write-BoxstarterMessage "Enabling local Powershell Remoting"
-            Enable-PSRemoting -Force
-        }else {
-            Write-BoxstarterMessage "Not enabling local Powershell Remoting aborting package install"
-            return $Result
-        }
-    }
-
-    if($credssp -is [Object[]]){
-        $idxHosts=$credssp[0].IndexOf(": ")
-        if($idxHosts -gt -1){
-            $credsspEnabled=$True
-            $Result.PreviousCSSPTrustedHosts=$credssp[0].substring($idxHosts+2)
-            $hostArray=$Result.PreviousCSSPTrustedHosts.Split(",")
-            if($hostArray -contains "wsman/$RemoteHostToTrust"){
-                $ComputerAdded=$True
-            }
-        }
-    }
-
-    if($ComputerAdded -eq $null){
-        Write-BoxstarterMessage "Adding $RemoteHostToTrust to allowed credSSP hosts"
-        Enable-WSManCredSSP -DelegateComputer $RemoteHostToTrust -Role Client -Force
-    }
-
-    $Result.PreviousTrustedHosts=(Get-Item "wsman:\localhost\client\trustedhosts").Value
-    $hostArray=$Result.PreviousTrustedHosts.Split(",")
-    if($hostArray.length -eq 1 -and $hostArray[0].length -eq 0) {
-        $newHosts=$RemoteHostToTrust
-    }
-    elseif(!($hostArray -contains $RemoteHostToTrust)){
-        $newHosts=$Result.PreviousTrustedHosts + "," + $RemoteHostToTrust
-    }
-    if($newHosts -ne $null) {
-        Write-BoxstarterMessage "Adding $newHosts to allowed wsman hosts"
-        Set-Item "wsman:\localhost\client\trustedhosts" -Value $newHosts -Force
-    }
-
-    $result.PreviousFreshCredDelegationHosts = Add-CredSSPGroupPolicy $RemoteHostToTrust
-    $Result.Success=$True
-    return $Result
 }
 
 function Enable-RemotingOnRemote ($ComputerName, $Credential){
@@ -242,32 +180,4 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             break
         }
     }
-}
-
-function Add-CredSSPGroupPolicy([string]$allowed){
-    $allowed='wsman/' + $allowed
-    $key = Get-CredentialDelegationKey
-    if (!(Test-Path "$key\CredentialsDelegation")) {
-        New-Item $key -Name CredentialsDelegation
-    }
-    New-ItemProperty -Path "$key\CredentialsDelegation" -Name AllowFreshCredentialsWhenNTLMOnly -Value 1 -PropertyType Dword -Force            
-
-    $key = Join-Path $key 'CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly'
-    if (!(Test-Path $key)) {
-        md $key
-    }
-    $currentHostProps=@()
-    (Get-Item $key).Property | % {
-        $currentHostProps += (Get-ItemProperty -Path $key -Name $_).($_)
-    }
-
-    if(!($currentHostProps -contains $allowed)){
-        New-ItemProperty -Path $key -Name $($currentHostProps.Length+1) -Value $allowed -PropertyType String -Force
-    }
-
-    return $currentHostProps.Length
-}
-
-function Get-CredentialDelegationKey {
-    return "HKLM:\SOFTWARE\Policies\Microsoft\Windows"
 }
