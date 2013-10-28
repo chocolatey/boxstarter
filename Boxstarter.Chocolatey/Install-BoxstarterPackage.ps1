@@ -153,7 +153,7 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
         } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $Credential.Password, $DisableReboots, $NoPassword
 
         write-host "result $($remoteResult.Result)"
-        if($remoteResult -eq $null -or $remoteResult.Result -eq "Rebooting") {
+        if($remoteResult -eq $null -or $remoteResult.Result -eq $null -or $remoteResult.Result -eq "Rebooting") {
             if($remoteResult -ne $null -and  $remoteResult.Result -eq "Rebooting"){
                 Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
                 while($session.State -eq "Opened"){
