@@ -1,6 +1,8 @@
 try {
     Update-ExecutionPolicy Unrestricted
-    Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
+    try{
+        Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
+    } catch{}
     Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
     Set-TaskbarSmall
     Enable-RemoteDesktop
