@@ -18,6 +18,7 @@ Describe "Install-BoxstarterPackage" {
     Mock Invoke-ChocolateyBoxstarter
     Mock Enable-PSRemoting
     Mock Enable-WSManCredSSP
+    Mock Test-WSMan { return New-Object PSObject }
     Mock Disable-WSManCredSSP
     Mock Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
     Mock Invoke-WmiMethod { New-Object System.Object }
@@ -171,6 +172,36 @@ Describe "Install-BoxstarterPackage" {
         It "will run the cookbook script"{
             Assert-MockCalled Enable-RemotePSRemoting
         }
+    }
+
+    Context "When remoting enabled on remote and local computer and CredSSP is enabled on remote" {
+        Mock Enable-RemotePSRemoting { return New-Object PSObject }
+        Mock Test-WSMan { New-Object PSObject }
+        Mock Invoke-Command
+
+        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force
+
+        It "will Enable CredSSP on Remote"{
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -eq " Enable-WSManCredSSP -Role Server -Force "} -Times 0
+        }
+        It "will disable CredSSP when done"{
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -eq " Disable-WSManCredSSP -Role Server "} -Times 0
+        }        
+    }
+
+    Context "When remoting enabled on remote and local computer but CredSSP is not enabled on remote" {
+        Mock Enable-RemotePSRemoting { return New-Object PSObject }
+        Mock Test-WSMan
+        Mock Invoke-Command
+
+        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force
+
+        It "will Enable CredSSP on Remote"{
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -eq " Enable-WSManCredSSP -Role Server -Force "}
+        }
+        It "will disable CredSSP when done"{
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -eq " Disable-WSManCredSSP -Role Server "}
+        }        
     }
 
     Context "When remoting enabled on remote and local computer" {
