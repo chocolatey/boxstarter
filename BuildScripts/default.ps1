@@ -29,12 +29,12 @@ task Create-ModuleZipForRemoting {
         mkdir "$baseDir\buildArtifacts"
     }
     Remove-Item "$env:temp\Boxstarter.zip" -Force -ErrorAction SilentlyContinue
-    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.Common" | out-Null
-    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.WinConfig" | out-Null
-    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.bootstrapper" | out-Null
-    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.chocolatey" | out-Null
-    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.config" | out-Null
-    ."7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\license.txt" | out-Null
+    ."$env:chocolateyInstall\bin\7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.Common" | out-Null
+    ."$env:chocolateyInstall\bin\7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.WinConfig" | out-Null
+    ."$env:chocolateyInstall\bin\7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.bootstrapper" | out-Null
+    ."$env:chocolateyInstall\bin\7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.chocolatey" | out-Null
+    ."$env:chocolateyInstall\bin\7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.config" | out-Null
+    ."$env:chocolateyInstall\bin\7za" a -tzip "$basedir\buildartifacts\Boxstarter.zip" "$basedir\license.txt" | out-Null
     Move-Item "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.chocolatey\Boxstarter.zip"
 }
 
@@ -113,9 +113,9 @@ Task Package-DownloadZip -depends Clean-Artifacts {
       Remove-Item "$basedir\BuildArtifacts\Boxstarter.*.zip" -Force
     }
 
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\license.txt" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\buildscripts\bootstrapper.ps1" }
-    exec { 7za a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\Setup.bat" }
+    exec { ."$env:chocolateyInstall\bin\7za" a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\license.txt" }
+    exec { ."$env:chocolateyInstall\bin\7za" a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\buildscripts\bootstrapper.ps1" }
+    exec { ."$env:chocolateyInstall\bin\7za" a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\Setup.bat" }
 }
 
 Task Deploy-DownloadZip -depends Package-DownloadZip {
