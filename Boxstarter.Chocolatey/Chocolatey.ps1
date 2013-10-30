@@ -140,13 +140,8 @@ function Intercept-Command {
 }
 
 function Get-MetaData ($command){
-    $commandParts=$command.Split("\")
-    if($commandParts.length -eq 2){
-        return New-Object System.Management.Automation.CommandMetaData (Get-Command -module $commandParts[0] -name $commandParts[1])
-    }
-    else{
-        return New-Object System.Management.Automation.CommandMetaData (Get-Command $command)
-    }
+    $cmdDef = Get-Command $command | ? {$_.CommandType -ne "Application"}
+    return New-Object System.Management.Automation.CommandMetaData ($cmdDef)
 }
 function Intercept-Chocolatey {
     if($Script:BoxstarterIntrercepting){return}
