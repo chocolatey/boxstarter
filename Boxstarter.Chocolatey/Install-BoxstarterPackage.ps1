@@ -37,10 +37,7 @@ function Install-BoxstarterPackage {
             if(!(Enable-RemotingOnRemote $ComputerName $Credential)){return}
             $credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $Credential -Authentication CredSSP -ErrorAction SilentlyContinue
             if($credsspEnabled -eq $null){
-                $enabledCredSSP=$True
-                Write-BoxstarterMessage "Enabling CredSSP Authentication on $ComputerName"
-                Invoke-Command -ComputerName $ComputerName -Credential $Credential { Enable-WSManCredSSP -Role Server -Force } | out-Null
-                $authArgs.Authentication="CredSSP"
+                $enableCredSSP=$True
             }
             else{
                 $credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $Credential -Authentication CredSSP -ErrorAction SilentlyContinue
@@ -49,23 +46,41 @@ function Install-BoxstarterPackage {
             $session = New-PSSession $ComputerName -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} @authArgs
         }
 
-
         Setup-BoxstarterModuleAndLocalRepo $session
+
+        if($enableCredSSP){
+            Write-BoxstarterMessage "Enabling CredSSP Authentication on $ComputerName"
+            Invoke-Command $Session { 
+                param($Credential)
+                Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
+                Create-BoxstarterTask $Credential
+                Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null" 
+            } -ArgumentList $Credential
+            $authArgs.Authentication="CredSSP"
+            Remove-PSSession $session
+            $session = New-PSSession $ComputerName -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} @authArgs
+        }
         
         Invoke-Remotely $session $Credential $PackageName $DisableReboots $NoPassword $authArgs
     }
     finally{
-        if($session -ne $null -and $session.InstanceId -ne $siid) {Remove-PSSession $Session}
-        if($enabledCredSSP){
+        if($enableCredSSP){
             Write-BoxstarterMessage "Disabling CredSSP Authentication on $ComputerName"
-            Invoke-Command -ComputerName $ComputerName -Credential $Credential { Disable-WSManCredSSP -Role Server } | out-Null
+            Invoke-Command $Session { 
+                param($Credential)
+                Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
+                Create-BoxstarterTask $Credential
+                Invoke-FromTask "Disable-WSManCredSSP -Role Server | Out-Null"
+                Remove-BoxstarterTask
+            } -ArgumentList $Credential
         }
+        if($session -ne $null -and $session.InstanceId -ne $siid) {Remove-PSSession $Session}
         if($ClientRemotingStatus -ne $null -and $ClientRemotingStatus.Success){
             Disable-WSManCredSSP -Role Client
             if($ClientRemotingStatus.PreviousCSSPTrustedHosts -ne $null){
                 try{
                     Write-BoxstarterMessage "Reseting CredSSP Trusted Hosts to $($ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace('wsman/',''))"
-                    Enable-WSManCredSSP -DelegateComputer $ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace("wsman/","") -Role Client -Force
+                    Enable-WSManCredSSP -DelegateComputer $ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace("wsman/","") -Role Client -Force | Out-Null
                 }
                 catch{}
             }

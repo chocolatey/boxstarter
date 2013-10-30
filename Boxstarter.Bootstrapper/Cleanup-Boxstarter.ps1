@@ -1,7 +1,7 @@
 function Cleanup-Boxstarter {
     param([switch]$KeepWindowOpen)
     if(Get-IsRemote){ 
-        schtasks /DELETE /TN 'Boxstarter Task' /F 2>&1 | Out-null
+        Remove-BoxstarterTask
     }
     Start-UpdateServices
 

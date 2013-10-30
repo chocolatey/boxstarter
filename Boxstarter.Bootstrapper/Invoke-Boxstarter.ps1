@@ -104,7 +104,7 @@ Invoke-Reboot
         $Boxstarter.BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
-        if(Get-IsRemote){ Create-Task }
+        if(Get-IsRemote){ Create-BoxstarterTask (New-Object Management.Automation.PsCredential ($Boxstarter.BoxstarterUser,$BoxstarterPassword)) }
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
         if($BoxStarter.IsRebooting){
             return @{Result="Rebooting"}
@@ -179,23 +179,4 @@ function Resolve-Script([ScriptBlock]$script, [string]$scriptFile){
         }
     }
     throw "No Script was specified to call."
-}
-
-function Create-Task{
-    if($BoxstarterPassword.length -gt 0){
-        $pass=[Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($BoxstarterPassword))
-        schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
-            /RU "$env:userdomain\$($Boxstarter.BoxstarterUser)"  /IT /RP $pass `
-        /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
-            Out-Null
-    }
-    else { #For testing
-        schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
-                /RU "$env:userdomain\$($Boxstarter.BoxstarterUser)" /IT `
-        /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
-                Out-Null
-    }
-    if($LastExitCode -gt 0){
-        throw "Unable to create scheduled task as $($BoxStarter.BoxstarterUser)"
-    }
 }

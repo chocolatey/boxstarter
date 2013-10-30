@@ -10,7 +10,9 @@ Export-ModuleMember     Write-BoxstarterMessage,
                         Test-Admin,
                         Invoke-FromTask,
                         Get-IsRemote,
-                        Confirm-Choice
+                        Confirm-Choice,
+                        Create-BoxstarterTask,
+                        Remove-BoxstarterTask
                         
 Export-ModuleMember -Variable Boxstarter
 
