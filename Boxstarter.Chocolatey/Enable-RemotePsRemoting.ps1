@@ -27,7 +27,7 @@ param(
     $Computername,
 
     ## The credential to use when connecting
-    [PSCredential]$Credential
+    [Management.Automation.PsCredential]$Credential
 )
 
 $VerbosePreference = "Continue"

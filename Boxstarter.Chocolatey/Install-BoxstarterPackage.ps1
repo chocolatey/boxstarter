@@ -12,7 +12,7 @@ function Install-BoxstarterPackage {
         [parameter(Mandatory=$true, Position=1, ParameterSetName="Uri")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="Session")]
         [string]$PackageName,
-        [PSCredential]$Credential,
+        [Management.Automation.PsCredential]$Credential,
         [switch]$Force,
         [switch]$DisableReboots,
         [switch]$KeepWindowOpen,
@@ -24,8 +24,10 @@ function Install-BoxstarterPackage {
         return
     }
     try{
+        $appArgs = New-PSSessionOption -ApplicationArguments @{RemoteBoxstarter="MyValue"}
         $authArgs=@{
             Credential=$Credential
+            SessionOption=$appArgs
         }
         if($Session -ne $null){
             $siid = $session.InstanceId
@@ -35,7 +37,7 @@ function Install-BoxstarterPackage {
             if(!$ClientRemotingStatus.Success){return}
 
             if(!(Enable-RemotingOnRemote $ComputerName $Credential)){return}
-            $credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $Credential -Authentication CredSSP -ErrorAction SilentlyContinue
+            try {$credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $Credential -Authentication CredSSP -ErrorAction SilentlyContinue} catch{}
             if($credsspEnabled -eq $null){
                 $enableCredSSP=$True
             }
@@ -43,7 +45,8 @@ function Install-BoxstarterPackage {
                 $credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $Credential -Authentication CredSSP -ErrorAction SilentlyContinue
                 if($credsspEnabled -ne $null){ $authArgs.Authentication="CredSSP" }
             }
-            $session = New-PSSession $ComputerName -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} @authArgs
+            write-host "creating session"
+            $session = New-PSSession $ComputerName @authArgs
         }
 
         Setup-BoxstarterModuleAndLocalRepo $session
@@ -58,7 +61,7 @@ function Install-BoxstarterPackage {
             } -ArgumentList $Credential
             $authArgs.Authentication="CredSSP"
             if($session){Remove-PSSession $session}
-            $session = New-PSSession $ComputerName -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} @authArgs
+            $session = New-PSSession $ComputerName @authArgs
         }
         
         Invoke-Remotely $session $Credential $PackageName $DisableReboots $NoPassword $authArgs
@@ -74,7 +77,10 @@ function Install-BoxstarterPackage {
                 Remove-BoxstarterTask
             } -ArgumentList $Credential
         }
-        if($session -ne $null -and $session.InstanceId -ne $siid) {Remove-PSSession $Session}
+        if($session -ne $null -and $session.InstanceId -ne $siid) {
+            Remove-PSSession $Session
+            $Session=$Null
+        }
         if($ClientRemotingStatus -ne $null -and $ClientRemotingStatus.Success){
             Disable-WSManCredSSP -Role Client
             if($ClientRemotingStatus.PreviousCSSPTrustedHosts -ne $null){
@@ -101,7 +107,7 @@ function Install-BoxstarterPackage {
 function Invoke-Locally {
     param(
         [string]$PackageName,
-        [PSCredential]$Credential,
+        [Management.Automation.PsCredential]$Credential,
         [switch]$Force,
         [switch]$DisableReboots,
         [switch]$KeepWindowOpen,
@@ -199,7 +205,7 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             Do{
                 $response=$null
                 start-sleep -seconds 2
-                $session = New-PSSession $ComputerName -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} -ErrorAction SilentlyContinue @authArgs
+                $session = New-PSSession $ComputerName -ErrorAction SilentlyContinue @authArgs
                 if($session -ne $null -and $Session.Availability -eq "Available"){
                     $response=Invoke-Command $session.ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
                     if($response -ne $null){
