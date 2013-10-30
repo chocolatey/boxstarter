@@ -50,14 +50,14 @@ function Install-BoxstarterPackage {
 
         if($enableCredSSP){
             Write-BoxstarterMessage "Enabling CredSSP Authentication on $ComputerName"
-            Invoke-Command $Session { 
+            Invoke-Command $ComputerName -Credential $Credential { 
                 param($Credential)
                 Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
                 Create-BoxstarterTask $Credential
                 Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null" 
             } -ArgumentList $Credential
             $authArgs.Authentication="CredSSP"
-            Remove-PSSession $session
+            if($session){Remove-PSSession $session}
             $session = New-PSSession $ComputerName -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} @authArgs
         }
         
@@ -66,7 +66,7 @@ function Install-BoxstarterPackage {
     finally{
         if($enableCredSSP){
             Write-BoxstarterMessage "Disabling CredSSP Authentication on $ComputerName"
-            Invoke-Command $Session { 
+            Invoke-Command $ComputerName -Credential $Credential { 
                 param($Credential)
                 Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
                 Create-BoxstarterTask $Credential

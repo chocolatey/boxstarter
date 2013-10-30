@@ -104,7 +104,9 @@ Invoke-Reboot
         $Boxstarter.BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
-        if(Get-IsRemote){ Create-BoxstarterTask (New-Object Management.Automation.PsCredential ($Boxstarter.BoxstarterUser,$BoxstarterPassword)) }
+        $credPassword = $BoxstarterPassword
+        if($credPassword -eq $null) {$credPassword=(New-Object System.Security.SecureString)}
+        if(Get-IsRemote){ Create-BoxstarterTask (New-Object Management.Automation.PsCredential ($Boxstarter.BoxstarterUser,$credPassword)) }
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
         if($BoxStarter.IsRebooting){
             return @{Result="Rebooting"}

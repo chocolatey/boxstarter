@@ -182,10 +182,10 @@ Describe "Install-BoxstarterPackage" {
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force
 
         It "will Enable CredSSP on Remote"{
-            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -eq " Enable-WSManCredSSP -Role Server -Force "} -Times 0
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"} -Times 0
         }
         It "will disable CredSSP when done"{
-            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -eq " Disable-WSManCredSSP -Role Server "} -Times 0
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server | out-Null`"*"} -Times 0
         }        
     }
 
@@ -197,18 +197,20 @@ Describe "Install-BoxstarterPackage" {
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force
 
         It "will Enable CredSSP on Remote"{
-            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -eq " Enable-WSManCredSSP -Role Server -Force "}
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"}
         }
         It "will disable CredSSP when done"{
-            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -eq " Disable-WSManCredSSP -Role Server "}
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server | out-Null`"*"}
         }        
     }
 
     Context "When remoting enabled on remote and local computer" {
         $session = New-PSSession localhost
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host $env:username
 
         Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
+        Write-Host $env:username
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
