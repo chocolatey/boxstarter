@@ -72,6 +72,7 @@ Invoke-Reboot
       [Parameter(Position=6,Mandatory=0)]
       [switch]$SuppressRebootScript
     )
+    $BoxStarter.IsRebooting = $false
     $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
     if(!(Test-Admin)) {
         New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | out-null
@@ -108,10 +109,7 @@ Invoke-Reboot
         if($credPassword -eq $null) {$credPassword=(New-Object System.Security.SecureString)}
         if(Get-IsRemote){ Create-BoxstarterTask (New-Object Management.Automation.PsCredential ($Boxstarter.BoxstarterUser,$credPassword)) }
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
-        if($BoxStarter.IsRebooting){
-            return @{Result="Rebooting"}
-        }
-        return @{Result="Completed"}
+        return $true
     }
     catch {
        Log-BoxStarterMessage $_
@@ -121,7 +119,6 @@ Invoke-Reboot
         Cleanup-Boxstarter -KeepWindowOpen:$KeepWindowOpen
         Stop-TimedSection $session
         if($BoxStarter.IsRebooting) {
-            $BoxStarter.IsRebooting = $false #reset
             RestartNow
         }
     }

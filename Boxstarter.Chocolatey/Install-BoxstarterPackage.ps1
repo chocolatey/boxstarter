@@ -178,20 +178,25 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             $result=$null
             try {
                 $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -SuppressRebootScript -NoPassword:$NoPassword -DisableReboots:$DisableReboots
+                if($Boxstarter.IsRebooting){
+                    return @{Result="Rebooting"}
+                }
+                if($result=$true){
+                    return @{Result="Completed"}
+                }
             }
             catch{
                 throw
             }
-            return $result
         } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $Credential.Password, $DisableReboots, $NoPassword
-
-        write-host "result $($remoteResult.Result)"
+        
+        Write-Debug "Result from Remote Boxstarter: $($remoteResult.Result)"
         if($remoteResult -eq $null -or $remoteResult.Result -eq $null -or $remoteResult.Result -eq "Rebooting") {
-            if($remoteResult -ne $null -and  $remoteResult.Result -eq "Rebooting"){
-                Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
-                while($session.State -eq "Opened"){
-                    start-sleep -seconds 2
-                }
+            Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
+            $timeout=0
+            while($session.State -eq "Opened" -and $timeout -lt 120){
+                $timeout += 2
+                start-sleep -seconds 2
             }
             $reconnected=$false
             Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
