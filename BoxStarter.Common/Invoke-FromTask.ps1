@@ -48,7 +48,6 @@ http://boxstarter.codeplex.com
     try{$errorStream=Import-CLIXML $env:temp\BoxstarterError.stream} catch {}
     $str=($errorStream | Out-String)
     if($str.Length -gt 0){
-        Log-BoxstarterMessage "Exception raised in task: $str"
         throw $errorStream
     }
 }

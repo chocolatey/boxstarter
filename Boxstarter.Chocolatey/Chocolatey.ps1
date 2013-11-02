@@ -80,7 +80,20 @@ Intercepts Chocolatey call to check for reboots
                 Call-Chocolatey @PSBoundParameters
             }
         }
-        catch { $ex=$_ }
+        catch { 
+            $ex=$_
+            Log-BoxstarterMessage $_
+            #Only write the error to the error stream if it was not previously
+            #written by chocolatey
+            if($global:error.Count -gt 1){
+                if(($global:error[1].Exception.Message | Out-String).Contains($_.Exception.Message)){
+                    $errorWritten=$true
+                }
+            }
+            if(!$errorWritten){
+                Write-Error $_
+            }
+        }
     if(!$Boxstarter.rebootOk) {return}
     if($Boxstarter.IsRebooting){
         Remove-ChocolateyPackageInProgress $packageName
