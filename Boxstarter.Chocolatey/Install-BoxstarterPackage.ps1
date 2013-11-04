@@ -23,50 +23,62 @@ function Install-BoxstarterPackage {
         Invoke-Locally @PSBoundParameters
         return
     }
+
     try{
-        $authArgs=@{
-            Credential=$Credential
+        $sessionArgs=@{}
+        if($Credential){
+            $sessionArgs.Credential=$Credential
         }
         if($Session -ne $null){
             $siid = $session.InstanceId
+            Set-SessionArgs $Session $sessionArgs
         }
         else{
+            if($ConnectionURI){
+                $sessionArgs.ConnectionURI = $ConnectionURI
+                $computerName=$ConnectionURI.Host
+            }
+            else {
+                $sessionArgs.ComputerName = $ComputerName
+            }
             $ClientRemotingStatus=Enable-BoxstarterClientRemoting $ComputerName
             if(!$ClientRemotingStatus.Success){return}
 
             if(!(Enable-RemotingOnRemote $ComputerName $Credential)){return}
-            $credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $Credential -Authentication CredSSP -ErrorAction SilentlyContinue
-            if($credsspEnabled -eq $null){
-                $enableCredSSP=$True
+            if($Credential){
+                $credsspEnabled = Test-WsMan @sessionArgs -Authentication CredSSP -ErrorAction SilentlyContinue
+                if($credsspEnabled -eq $null){
+                    $enableCredSSP=$True
+                }
+                else{
+                    $credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $Credential -Authentication CredSSP -ErrorAction SilentlyContinue
+                    if($credsspEnabled -ne $null){ $sessionArgs.Authentication="CredSSP" }
+                }
             }
-            else{
-                $credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $Credential -Authentication CredSSP -ErrorAction SilentlyContinue
-                if($credsspEnabled -ne $null){ $authArgs.Authentication="CredSSP" }
-            }
-            $session = New-PSSession $ComputerName -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} @authArgs
+            $session = New-PSSession -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} @sessionArgs
         }
 
         Setup-BoxstarterModuleAndLocalRepo $session
 
         if($enableCredSSP){
             Write-BoxstarterMessage "Enabling CredSSP Authentication on $ComputerName"
-            Invoke-Command $ComputerName -Credential $Credential { 
+            Invoke-Command @sessionArgs { 
                 param($Credential)
                 Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
                 Create-BoxstarterTask $Credential
                 Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null" 
             } -ArgumentList $Credential
-            $authArgs.Authentication="CredSSP"
+            $sessionArgs.Authentication="CredSSP"
             if($session){Remove-PSSession $session}
-            $session = New-PSSession $ComputerName -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} @authArgs
+            $session = New-PSSession -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} @sessionArgs
         }
         
-        Invoke-Remotely $session $Credential $PackageName $DisableReboots $NoPassword $authArgs
+        Invoke-Remotely $session $Credential $PackageName $DisableReboots $NoPassword $sessionArgs
     }
     finally{
         if($enableCredSSP){
             Write-BoxstarterMessage "Disabling CredSSP Authentication on $ComputerName"
-            Invoke-Command $ComputerName -Credential $Credential { 
+            Invoke-Command @sessionArgs { 
                 param($Credential)
                 Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
                 Create-BoxstarterTask $Credential
@@ -169,7 +181,7 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
     }
 }
 
-function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPassword,$authArgs){
+function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPassword,$sessionArgs){
     while($session.Availability -eq "Available") {
         $remoteResult = Invoke-Command $session {
             param($possibleResult,$SuppressLogging,$pkg,$password,$DisableReboots,$NoPassword)
@@ -204,9 +216,9 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             Do{
                 $response=$null
                 start-sleep -seconds 2
-                $session = New-PSSession $ComputerName -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} -ErrorAction SilentlyContinue @authArgs
+                $session = New-PSSession @sessionArgs -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}}
                 if($session -ne $null -and $Session.Availability -eq "Available"){
-                    $response=Invoke-Command $session.ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
+                    $response=Invoke-Command @sessionArgs { Get-WmiObject Win32_ComputerSystem } -ErrorAction SilentlyContinue
                     if($response -ne $null){
                         $reconnected = $true
                     }
@@ -218,4 +230,31 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             break
         }
     }
+}
+
+function Get-ConnectionURI($session){
+    $conn=$session.RunSpace.ConnectionInfo
+
+    if(Test-WsMan -ComputerName $conn.ComputerName -Port $conn.Port -UseSSL:$($conn.Scheme -eq "https") -ErrorAction SilentlyContinue){
+        return $conn.ConnectionURI
+    }
+
+    $computername=$session.ComputerName
+
+    if(Test-WsMan -ComputerName $computername -port 5985 -ErrorAction SilentlyContinue){
+        return "http://$($computername):5985/wsman"
+    }
+    if(Test-WsMan -ComputerName $computername -port 5986 -UseSSL -ErrorAction SilentlyContinue){
+        return "https://$($computername):5986/wsman"
+    }
+}
+
+function Set-SessionArgs($session, $sessionArgs) {
+    $uri = Get-ConnectionURI $session
+    if($uri){
+        $sessionArgs.ConnectionURI=$uri
+    }
+    else{
+        $sessionArgs.ComputerName=$session.ComputerName
+    }    
 }

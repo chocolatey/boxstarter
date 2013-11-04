@@ -18,13 +18,13 @@ Describe "Install-BoxstarterPackage" {
     Mock Invoke-ChocolateyBoxstarter
     Mock Enable-PSRemoting
     Mock Enable-WSManCredSSP
-    Mock Test-WSMan { return New-Object PSObject }
+    Mock Test-WSMan { return New-Object PSObject } -ParameterFilter { $Credential -ne $null }
     Mock Disable-WSManCredSSP
     Mock Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
     Mock Invoke-WmiMethod { New-Object System.Object }
     Mock Setup-BoxstarterModuleAndLocalRepo -ParameterFilter{$session -eq $null}
     Mock Invoke-Remotely -ParameterFilter{$session -eq $null}
-    Mock New-PSSession -ParameterFilter{$computerName -ne "localhost"}
+    Mock New-PSSession -ParameterFilter{$ComputerName -ne "localhost" -and $computerName -ne $null}
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
@@ -191,7 +191,7 @@ Describe "Install-BoxstarterPackage" {
 
     Context "When remoting enabled on remote and local computer but CredSSP is not enabled on remote" {
         Mock Enable-RemotePSRemoting { return New-Object PSObject }
-        Mock Test-WSMan
+        Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
         Mock Invoke-Command
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force
@@ -204,13 +204,11 @@ Describe "Install-BoxstarterPackage" {
         }        
     }
 
-    Context "When remoting enabled on remote and local computer" {
+    Context "When using a session and remoting enabled on remote and local computer" {
         $session = New-PSSession localhost
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Host $env:username
-
+    
         Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
-        Write-Host $env:username
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -225,16 +223,63 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will execute package"{
             Get-Content "$env:temp\testpackage.txt" | should be "test-package"
-        }        
+        }
+        Remove-PSSession $session
     }
 
-    Context "When passing in a session" {
+    Context "When using a computer name and remoting enabled on remote and local computer" {
+        Mock Enable-RemotingOnRemote { return $true }
+        Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
+        Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
+    
+        Install-BoxstarterPackage -computerName localhost -PackageName test-package -DisableReboots
+
+        It "will copy boxstarter modules"{
+            "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.bootstrapper\boxstarter.bootstrapper.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.winconfig\boxstarter.winconfig.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.common\boxstarter.common.psd1" | should exist
+        }
+        It "will copy boxstarter build packages"{
+            Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % {
+                "$env:temp\boxstarter\buildpackages\$($_.Name)" | should exist
+            }
+        }
+        It "will execute package"{
+            Get-Content "$env:temp\testpackage.txt" | should be "test-package"
+        }
+    }
+
+    Context "When using a connectionURI and remoting enabled on remote and local computer" {
+        Mock Enable-RemotingOnRemote { return $true }
+        Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
+        Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
+    
+        Install-BoxstarterPackage -ConnectionURI "http://localhost:5985/wsman" -PackageName test-package -DisableReboots
+
+        It "will copy boxstarter modules"{
+            "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.bootstrapper\boxstarter.bootstrapper.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.winconfig\boxstarter.winconfig.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.common\boxstarter.common.psd1" | should exist
+        }
+        It "will copy boxstarter build packages"{
+            Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % {
+                "$env:temp\boxstarter\buildpackages\$($_.Name)" | should exist
+            }
+        }
+        It "will execute package"{
+            Get-Content "$env:temp\testpackage.txt" | should be "test-package"
+        }
+    }
+
+    Context "When passing in a session and no reboots" {
         $session = New-PSSession localhost
         Mock Enable-BoxstarterClientRemoting
         Mock Enable-RemotingOnRemote
         Mock Setup-BoxstarterModuleAndLocalRepo
         Mock Invoke-Remotely
-        
+
         Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
 
         It "will not try to enable local side remoting"{
@@ -245,6 +290,46 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will not reset session"{
             $session.State | should be "Opened"
-        }        
+        }
+        Remove-PSSession $session
+    }
+
+    Context "When passing in a session that reboots" {
+        $session = New-PSSession -ComputerName localhost -Name "testSession"
+        Mock Enable-BoxstarterClientRemoting
+        Mock Enable-RemotingOnRemote
+        Mock Setup-BoxstarterModuleAndLocalRepo
+        Mock Invoke-Command { return @{Result="Completed"} }
+        Mock Invoke-Command { Remove-PSSession -Name "testSession" } -ParameterFilter {$Session.Name -eq "testSession" }
+        Mock New-PSSession { return Microsoft.PowerShell.Core\New-PSSession localhost }
+
+        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
+
+        It "will not try to enable local side remoting"{
+            Assert-MockCalled Enable-BoxstarterClientRemoting -Times 0
+        }
+        It "will not try to enable remote side remoting"{
+            Assert-MockCalled Enable-RemotingOnRemote -Times 0
+        }
+        It "will reconnect with the correct uri"{
+            Assert-MockCalled New-PSSession -ParameterFilter {$ConnectionURI -eq "http://localhost:5985/wsman"}
+        }
+    }
+
+    Context "When passing in a session that reboots and cant find port" {
+        $session = New-PSSession -ComputerName localhost -Name "testSession"
+        Mock Enable-BoxstarterClientRemoting
+        Mock Enable-RemotingOnRemote
+        Mock Test-WSMan
+        Mock Setup-BoxstarterModuleAndLocalRepo
+        Mock Invoke-Command { return @{Result="Completed"} }
+        Mock Invoke-Command { Remove-PSSession -Name "testSession" } -ParameterFilter {$Session.Name -eq "testSession" }
+        Mock New-PSSession { return Microsoft.PowerShell.Core\New-PSSession localhost }
+
+        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
+
+        It "will reconnect with the computer name"{
+            Assert-MockCalled New-PSSession -ParameterFilter {$computerName -eq "localhost"}
+        }
     }
 }
