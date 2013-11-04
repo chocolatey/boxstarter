@@ -332,4 +332,20 @@ Describe "Install-BoxstarterPackage" {
             Assert-MockCalled New-PSSession -ParameterFilter {$computerName -eq "localhost"}
         }
     }
+
+    Context "When passing in an unavailable session" {
+        $session = New-PSSession localhost
+        Remove-PSSession $session
+
+        try{
+            Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
+        }
+        catch{
+            $err=$_
+        }
+
+        It "Should throw a validation error"{
+            $err.CategoryInfo.Reason | should be "ArgumentException"
+        }
+    }
 }

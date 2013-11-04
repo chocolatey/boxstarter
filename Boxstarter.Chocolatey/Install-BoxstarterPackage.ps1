@@ -30,6 +30,9 @@ function Install-BoxstarterPackage {
             $sessionArgs.Credential=$Credential
         }
         if($Session -ne $null){
+            if($session.Availability -ne "Available"){
+                throw New-Object -TypeName ArgumentException -ArgumentList "The Session is not Available"
+            }
             $siid = $session.InstanceId
             Set-SessionArgs $Session $sessionArgs
         }
