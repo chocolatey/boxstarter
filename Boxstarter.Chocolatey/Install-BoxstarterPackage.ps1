@@ -12,7 +12,7 @@ function Install-BoxstarterPackage {
         [parameter(Mandatory=$true, Position=1, ParameterSetName="Uri")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="Session")]
         [string]$PackageName,
-        [PSCredential]$Credential,
+        [Management.Automation.PsCredential]$Credential,
         [switch]$Force,
         [switch]$DisableReboots,
         [switch]$KeepWindowOpen,
@@ -25,7 +25,8 @@ function Install-BoxstarterPackage {
     }
 
     try{
-        $sessionArgs=@{}
+        $appArgs = New-PSSessionOption -ApplicationArguments @{RemoteBoxstarter="MyValue"}
+        $sessionArgs=@{SessionOption=$appArgs}
         if($Credential){
             $sessionArgs.Credential=$Credential
         }
@@ -51,7 +52,7 @@ function Install-BoxstarterPackage {
 
             $enableCredSSP = Should-EnableCredSSP $Credential $sessionArgs $computerName
 
-            $session = New-PSSession -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} @sessionArgs
+            $session = New-PSSession @sessionArgs
         }
 
         Setup-BoxstarterModuleAndLocalRepo $session
@@ -67,7 +68,10 @@ function Install-BoxstarterPackage {
         if($enableCredSSP){
             Disable-RemoteCredSSP $sessionArgs $Credential
         }
-        if($session -ne $null -and $session.InstanceId -ne $siid) {Remove-PSSession $Session}
+        if($session -ne $null -and $session.InstanceId -ne $siid) {
+            Remove-PSSession $Session
+            $Session = $null
+        }
         Rollback-ClientRemoting $ClientRemotingStatus
     }
 }
@@ -75,7 +79,7 @@ function Install-BoxstarterPackage {
 function Invoke-Locally {
     param(
         [string]$PackageName,
-        [PSCredential]$Credential,
+        [Management.Automation.PsCredential]$Credential,
         [switch]$Force,
         [switch]$DisableReboots,
         [switch]$KeepWindowOpen,
@@ -178,7 +182,7 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             Do{
                 $response=$null
                 start-sleep -seconds 2
-                $session = New-PSSession @sessionArgs -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}}
+                $session = New-PSSession @sessionArgs -ErrorAction SilentlyContinue @authArgs
                 if($session -ne $null -and $Session.Availability -eq "Available"){
                     $response=Invoke-Command @sessionArgs { Get-WmiObject Win32_ComputerSystem } -ErrorAction SilentlyContinue
                     if($response -ne $null){
@@ -244,7 +248,7 @@ function Enable-RemoteCredSSP($Credential, $sessionArgs) {
         Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null" 
     } -ArgumentList $Credential
     $sessionArgs.Authentication="CredSSP"
-    return New-PSSession -SessionOption @{ApplicationArguments=@{RemoteBoxstarter="MyValue"}} @sessionArgs
+    return New-PSSession @sessionArgs
 }
 
 function Disable-RemoteCredSSP ($sessionArgs, $Credential){
