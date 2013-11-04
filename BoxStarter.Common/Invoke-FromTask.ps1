@@ -29,7 +29,7 @@ http://boxstarter.codeplex.com
 #>
     param(
         $command, 
-        $idleTimeout=20,
+        $idleTimeout=60,
         $totalTimeout=3600
     )
     Write-BoxstarterMessage "Invoking $command in scheduled task"
@@ -55,10 +55,24 @@ http://boxstarter.codeplex.com
 function Get-ChildProcessMemoryUsage {
     param($ID=$PID)
     [int]$res=0
-    Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | out-null
-    % { if($_.ProcessID -ne $null) {$res += $_.WorkingSetSize;Write-Debug "$($_.Name) $($_.WorkingSetSize)"}}
-    Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" |
-      % { if($_.ProcessID -ne $null) {$res += Get-ChildProcessMemoryUsage $_.ProcessID;Write-Debug "$($_.Name) $($_.WorkingSetSize)"}}
+    Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
+        if($_.ProcessID -ne $null) {
+            $proc = Get-Process -ID $_.ProcessID -ErrorAction SilentlyContinue
+            if($proc -ne $null){
+                $res += $proc.PrivateMemorySize;
+                Write-Debug "$($_.Name) $($proc.PrivateMemorySize)"
+            }
+        }
+    }
+    Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
+        if($_.ProcessID -ne $null) {
+            $proc = Get-Process -ID $_.ProcessID -ErrorAction SilentlyContinue
+            if($proc -ne $null){
+                $res += Get-ChildProcessMemoryUsage $_.ProcessID;
+                Write-Debug "$($_.Name) $($proc.PrivateMemorySize)"
+            }
+        }
+    }
     $res
 }
 
