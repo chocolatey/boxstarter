@@ -31,7 +31,7 @@ about_boxstarter_variable_in_bootstrapper
         Write-BoxstarterMessage "A Reboot was requested but Reboots are surpressed. Either call Invoke-Boxstarter with -RebootOk or set `$Boxstarter.RebootOk to `$true"
         return 
     }
-    if(!$Boxstarter.SuppressRebootScript){
+    if(!(Get-IsRemote)){
         Write-BoxstarterMessage "writing restart file"
         New-Item "$(Get-BoxstarterTempDir)\Boxstarter.script" -type file -value $boxstarter.ScriptToCall -force | Out-Null
         $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"

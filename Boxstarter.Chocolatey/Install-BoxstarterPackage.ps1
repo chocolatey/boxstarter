@@ -154,7 +154,7 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             $Boxstarter.SuppressLogging=$SuppressLogging
             $result=$null
             try {
-                $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -SuppressRebootScript -NoPassword:$NoPassword -DisableReboots:$DisableReboots
+                $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -NoPassword:$NoPassword -DisableReboots:$DisableReboots
                 if($Boxstarter.IsRebooting){
                     return @{Result="Rebooting"}
                 }
