@@ -25,8 +25,7 @@ function Install-BoxstarterPackage {
     }
 
     try{
-        $appArgs = New-PSSessionOption -ApplicationArguments @{RemoteBoxstarter="MyValue"}
-        $sessionArgs=@{SessionOption=$appArgs}
+        $sessionArgs=@{}
         if($Credential){
             $sessionArgs.Credential=$Credential
         }
@@ -182,7 +181,7 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             Do{
                 $response=$null
                 start-sleep -seconds 2
-                $session = New-PSSession @sessionArgs -ErrorAction SilentlyContinue @authArgs
+                $session = New-PSSession @sessionArgs -ErrorAction SilentlyContinue
                 if($session -ne $null -and $Session.Availability -eq "Available"){
                     $response=Invoke-Command @sessionArgs { Get-WmiObject Win32_ComputerSystem } -ErrorAction SilentlyContinue
                     if($response -ne $null){
@@ -198,25 +197,8 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
     }
 }
 
-function Get-ConnectionURI($session){
-    $conn=$session.RunSpace.ConnectionInfo
-
-    if(Test-WsMan -ComputerName $conn.ComputerName -Port $conn.Port -UseSSL:$($conn.Scheme -eq "https") -ErrorAction SilentlyContinue){
-        return $conn.ConnectionURI
-    }
-
-    $computername=$session.ComputerName
-
-    if(Test-WsMan -ComputerName $computername -port 5985 -ErrorAction SilentlyContinue){
-        return "http://$($computername):5985/wsman"
-    }
-    if(Test-WsMan -ComputerName $computername -port 5986 -UseSSL -ErrorAction SilentlyContinue){
-        return "https://$($computername):5986/wsman"
-    }
-}
-
 function Set-SessionArgs($session, $sessionArgs) {
-    $uri = Get-ConnectionURI $session
+    $uri = Invoke-Command $session {return $PSSenderInfo.ConnectionString}
     if($uri){
         $sessionArgs.ConnectionURI=$uri
     }

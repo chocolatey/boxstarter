@@ -1,3 +1,3 @@
 function Get-IsRemote {
-	return $PSSenderInfo.ApplicationArguments.RemoteBoxstarter -ne $null
+	return $PSSenderInfo -ne $null
 }

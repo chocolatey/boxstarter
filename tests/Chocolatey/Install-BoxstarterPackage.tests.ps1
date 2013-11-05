@@ -299,8 +299,8 @@ Describe "Install-BoxstarterPackage" {
         Mock Enable-BoxstarterClientRemoting
         Mock Enable-RemotingOnRemote
         Mock Setup-BoxstarterModuleAndLocalRepo
-        Mock Invoke-Command { return @{Result="Completed"} }
-        Mock Invoke-Command { Remove-PSSession -Name "testSession" } -ParameterFilter {$Session.Name -eq "testSession" }
+        Mock Invoke-Command { return @{Result="Completed"} } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*ChocolateyBoxstarter*"}
+        Mock Invoke-Command { Remove-PSSession -Name "testSession" } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*ChocolateyBoxstarter*" -and $Session.Name -eq "testSession" }
         Mock New-PSSession { return Microsoft.PowerShell.Core\New-PSSession localhost }
 
         Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
@@ -312,7 +312,7 @@ Describe "Install-BoxstarterPackage" {
             Assert-MockCalled Enable-RemotingOnRemote -Times 0
         }
         It "will reconnect with the correct uri"{
-            Assert-MockCalled New-PSSession -ParameterFilter {$ConnectionURI -eq "http://localhost:5985/wsman"}
+            Assert-MockCalled New-PSSession -ParameterFilter { $ConnectionURI -like "http://localhost:5985/wsman?PSVersion=*"}
         }
     }
 
@@ -322,7 +322,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Enable-RemotingOnRemote
         Mock Test-WSMan
         Mock Setup-BoxstarterModuleAndLocalRepo
-        Mock Invoke-Command { return @{Result="Completed"} }
+        Mock Invoke-Command { return @{Result="Completed"} } 
         Mock Invoke-Command { Remove-PSSession -Name "testSession" } -ParameterFilter {$Session.Name -eq "testSession" }
         Mock New-PSSession { return Microsoft.PowerShell.Core\New-PSSession localhost }
 
