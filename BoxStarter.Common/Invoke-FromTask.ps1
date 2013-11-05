@@ -59,8 +59,8 @@ function Get-ChildProcessMemoryUsage {
         if($_.ProcessID -ne $null) {
             $proc = Get-Process -ID $_.ProcessID -ErrorAction SilentlyContinue
             if($proc -ne $null){
-                $res += $proc.PrivateMemorySize;
-                Write-Debug "$($_.Name) $($proc.PrivateMemorySize)"
+                $res += $proc.PrivateMemorySize + $proc.WorkingSet
+                Write-Debug "$($_.Name) $($proc.PrivateMemorySize + $proc.WorkingSet)"
             }
         }
     }
@@ -69,7 +69,7 @@ function Get-ChildProcessMemoryUsage {
             $proc = Get-Process -ID $_.ProcessID -ErrorAction SilentlyContinue
             if($proc -ne $null){
                 $res += Get-ChildProcessMemoryUsage $_.ProcessID;
-                Write-Debug "$($_.Name) $($proc.PrivateMemorySize)"
+                Write-Debug "$($_.Name) $($proc.PrivateMemorySize + $proc.WorkingSet)"
             }
         }
     }
