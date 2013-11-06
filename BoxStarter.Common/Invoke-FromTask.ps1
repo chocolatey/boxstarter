@@ -4,7 +4,7 @@ function Invoke-FromTask {
 Invokes a command inside of a scheduled task
 
 .DESCRIPTION
-This creates a scheduled task and attempts to run it immediately. 
+This invokes the boxstarter scheduled task. 
 The task is run in an elevated session using the provided 
 credentials. If the processes started by the task become idle for 
 more that the specified timeout, the task will be termiated. All 
@@ -19,13 +19,25 @@ The number of seconds after which the task will be terminated if it
 becomes idle. The value 0 is an indefinite timeout and 120 is the 
 default.
 
+.PARAMETER TotalTimeout
+The number of seconds after which the task will be terminated whether
+it is idle or active.
+
 .EXAMPLE
 Invoke-FromTask Install-WindowsUpdate -AcceptEula
 
 This will install Windows Updates in a scheduled task
 
+.EXAMPLE
+Invoke-FromTask "DISM /Online /Online /NoRestart /Enable-Feature /Telnet-Client" -IdleTimeout 20
+
+This will use DISM.exe to install the telnet client and will kill 
+the task if it becomes idle for more that 20 seconds.
+
 .LINK
 http://boxstarter.codeplex.com
+Create-BoxstarterTask
+Remove-BoxstarterTask
 #>
     param(
         $command, 
