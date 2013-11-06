@@ -101,7 +101,12 @@ function Invoke-Locally {
 
 function Enable-RemotingOnRemote ($ComputerName, $Credential){
     Write-BoxstarterMessage "Testing remoting access on $ComputerName"
-    $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
+    try { 
+        $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction Stop
+    }
+    catch {
+        $ex=$_
+    }
     if($remotingTest -eq $null){
         Write-BoxstarterMessage "Powershell Remoting is not enabled or accesible on $ComputerName"
         $wmiTest=Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
@@ -111,6 +116,7 @@ Unable at access remote computer via Powershell Remoting or WMI.
 You can enable it by running:
  Enable-PSRemoting -Force 
 from an Administrator Powershell console on the remote computer.
+Original Exception: $ex
 "@
         }
         if($Force -or (Confirm-Choice "Powershell Remoting is not enabled on Remote computer. Should Boxstarter enable powershell remoting?")){
@@ -209,7 +215,7 @@ function Set-SessionArgs($session, $sessionArgs) {
 
 function Should-EnableCredSSP($Credential, $sessionArgs, $computerName) {
     if($Credential){
-        $credsspEnabled = Test-WsMan @sessionArgs -Authentication CredSSP -ErrorAction SilentlyContinue
+        try {$credsspEnabled = Test-WsMan @sessionArgs -Authentication CredSSP -ErrorAction SilentlyContinue } catch {}
         if($credsspEnabled -eq $null){
             return $True
         }

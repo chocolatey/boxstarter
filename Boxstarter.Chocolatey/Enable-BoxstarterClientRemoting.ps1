@@ -33,7 +33,7 @@ function Enable-BoxstarterClientRemoting ($RemoteHostToTrust) {
 
     if($ComputerAdded -eq $null){
         Write-BoxstarterMessage "Adding $RemoteHostToTrust to allowed credSSP hosts"
-        Enable-WSManCredSSP -DelegateComputer $RemoteHostToTrust -Role Client -Force
+        Enable-WSManCredSSP -DelegateComputer $RemoteHostToTrust -Role Client -Force | Out-Null
     }
 
     $Result.PreviousTrustedHosts=(Get-Item "wsman:\localhost\client\trustedhosts").Value
