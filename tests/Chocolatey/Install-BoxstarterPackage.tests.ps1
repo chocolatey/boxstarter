@@ -30,10 +30,10 @@ Describe "Install-BoxstarterPackage" {
 
     Context "When calling locally" {
         
-        Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen
+        Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen -LocalRepo "myRepo"
 
         It "will call InvokeChocolateyBoxstarter with parameters"{
-            Assert-MockCalled Invoke-ChocolateyBoxstarter -ParameterFilter {$BootstrapPackage -eq "test" -and $DisableReboots -eq $True -and $KeepWindowOpen -eq $True}
+            Assert-MockCalled Invoke-ChocolateyBoxstarter -ParameterFilter {$BootstrapPackage -eq "test" -and $DisableReboots -eq $True -and $KeepWindowOpen -eq $True -and $LocalRepo -eq "myRepo"}
         }
     }
 
@@ -223,6 +223,21 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will execute package"{
             Get-Content "$env:temp\testpackage.txt" | should be "test-package"
+        }
+        Remove-PSSession $session
+    }
+
+    Context "When using a session and remoting enabled on remote and local computer and passing LocalRepo" {
+        Mock Invoke-Remotely
+        $repo=(Get-PSDrive TestDrive).Root
+        Copy-Item "$($Boxstarter.LocalRepo)\example.*.nupkg" "$repo\mylocalrepo.nupkg"
+        $session = New-PSSession localhost
+        Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
+    
+        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots -LocalRepo $repo
+
+        It "will copy boxstarter build packages"{
+            "$env:temp\boxstarter\buildpackages\mylocalrepo.nupkg" | should exist
         }
         Remove-PSSession $session
     }

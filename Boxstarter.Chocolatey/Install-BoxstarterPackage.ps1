@@ -168,7 +168,6 @@ about_boxstarter_chocolatey
         [switch]$DisableReboots,
         [parameter(ParameterSetName="Package")]
         [switch]$KeepWindowOpen,
-        [parameter(ParameterSetName="Package")]
         [string]$LocalRepo        
     )
 
@@ -288,7 +287,8 @@ Original Exception: $ex
 }
 
 function Setup-BoxstarterModuleAndLocalRepo($session){
-    Write-BoxstarterMessage "Copying Boxstarter Modules to $env:temp on $($Session.ComputerName)"
+    if($LocalRepo){$Boxstarter.LocalRepo=$LocalRepo}
+    Write-BoxstarterMessage "Copying Boxstarter Modules at $($Boxstarter.LocalRepo) to $env:temp on $($Session.ComputerName)"
     Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | out-Null }
     Send-File "$($Boxstarter.BaseDir)\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
     Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % { 
