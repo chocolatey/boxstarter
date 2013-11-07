@@ -12,8 +12,9 @@ Invokes the installation of a Boxstarter package
 This essentially wraps Chocolatey Install and provides these additional features
  - Installs chocolatey if it is not already installed
  - Installs the .net 4.5 framework if it is not installed which is a chocolatey requirement
- - Turns off the windows update service during installation to prevent installation conflicts and minimize the need for reboots
+ - Disables windows update service during installation to prevent installation conflicts and minimize the need for reboots
  - Imports the Boxstarter.WinConfig module that provides functions for customizing windows
+ - Detects pending reboots and restarts the machine when necessary to avoid installation failures
  - Provides Reboot Resiliency by ensuring the package installation is immediately restarted up on reboot if there is a reboot during the installation.
  - Ensures everything runs under admin
 
