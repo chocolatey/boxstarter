@@ -311,10 +311,9 @@ Describe "Invoke-Boxstarter" {
         Mock Stop-UpdateServices
         Mock RestartNow
         Mock Read-AuthenticatedPassword
-        $Boxstarter.IsRebooting=$true
         Mock Set-SecureAutoLogon
 
-        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
+        Invoke-Boxstarter {$Boxstarter.IsRebooting=$true} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
 
         it "will Set AutoLogin" {
             Assert-MockCalled Set-SecureAutoLogon
@@ -326,12 +325,11 @@ Describe "Invoke-Boxstarter" {
         Mock Stop-UpdateServices
         Mock RestartNow
         Mock Read-AuthenticatedPassword
-        $Boxstarter.IsRebooting=$true
         Mock Get-UAC {return $true}
         Mock Set-SecureAutoLogon
         Mock New-Item
 
-        Invoke-Boxstarter {return} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
+        Invoke-Boxstarter {$Boxstarter.IsRebooting=$true} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
 
         it "will Disable UAC" {
             Assert-MockCalled Disable-UAC
@@ -346,13 +344,12 @@ Describe "Invoke-Boxstarter" {
         Mock Stop-UpdateServices
         Mock RestartNow
         Mock Read-AuthenticatedPassword
-        $Boxstarter.IsRebooting=$true
         Mock Get-UAC {return $true}
         Mock Set-SecureAutoLogon
         Mock New-Item
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
 
-        Invoke-Boxstarter {return} -RebootOk | Out-Null
+        Invoke-Boxstarter {$Boxstarter.IsRebooting=$true} -RebootOk | Out-Null
 
         it "will Disable UAC" {
             Assert-MockCalled Disable-UAC

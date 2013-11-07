@@ -149,7 +149,6 @@ directory.
 .LINK
 http://boxstarter.codeplex.com
 about_boxstarter_chocolatey
-about_boxstarter_variable_in_chocolatey
 #>
     [CmdletBinding()]
 	param(

@@ -69,7 +69,7 @@ Describe "Getting-Chocolatey" {
         Mock Invoke-Reboot
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'."}
         
-        Chocolatey Install pkg -RebootCodes @(56,3010,654)
+        Chocolatey Install pkg -RebootCodes @(56,3010,654) 2>&1 | out-null
 
         it "will Invoke-Reboot" {
             Assert-MockCalled Invoke-Reboot -times 1
@@ -87,7 +87,7 @@ Describe "Getting-Chocolatey" {
         Mock Invoke-Reboot
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '-654'."}
         
-        Chocolatey Install pkg -RebootCodes @(56,3010,-654)
+        Chocolatey Install pkg -RebootCodes @(56,3010,-654) 2>&1 | out-null
 
         it "will Invoke-Reboot" {
             Assert-MockCalled Invoke-Reboot -times 1
@@ -105,7 +105,7 @@ Describe "Getting-Chocolatey" {
         Mock Invoke-Reboot
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'." }
         
-        Chocolatey Install pkg -RebootCodes @(56,-654)
+        Chocolatey Install pkg -RebootCodes @(56,-654) 2>&1 | out-null
 
         it "will Invoke-Reboot when a default code is called too" {
             Assert-MockCalled Invoke-Reboot -times 1

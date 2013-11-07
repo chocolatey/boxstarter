@@ -30,18 +30,18 @@ Describe "Install-BoxstarterPackage" {
 
     Context "When calling locally" {
         
-        Install-BoxstarterPackage -PackageName test -DisableReboots -NoPassword -KeepWindowOpen
+        Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen
 
         It "will call InvokeChocolateyBoxstarter with parameters"{
-            Assert-MockCalled Invoke-ChocolateyBoxstarter -ParameterFilter {$BootstrapPackage -eq "test" -and $DisableReboots -eq $True -and $NoPassword -eq $True -and $KeepWindowOpen -eq $True}
+            Assert-MockCalled Invoke-ChocolateyBoxstarter -ParameterFilter {$BootstrapPackage -eq "test" -and $DisableReboots -eq $True -and $KeepWindowOpen -eq $True}
         }
     }
 
-    Context "When calling locally with a credential and -nopassword" {
+    Context "When calling locally with no credential" {
         $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
         $cred = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
-        Install-BoxstarterPackage -PackageName test -DisableReboots -Credential $cred -NoPassword -KeepWindowOpen
+        Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen
 
         It "will not InvokeChocolateyBoxstarter with password"{
             Assert-MockCalled Invoke-ChocolateyBoxstarter -ParameterFilter {$NoPassword -eq $True -and $Password -eq $null}
