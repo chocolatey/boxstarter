@@ -58,54 +58,61 @@ Intercepts Chocolatey call to check for reboots
 #>  
     param([int[]]$RebootCodes=@())
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
-    if($source -eq "WindowsFeatures"){
-        $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
-        if($dismInfo -contains "State : Enabled" -or $dismInfo -contains "State : Enable Pending") {
-            Write-BoxstarterMessage "$packageName is already installed"
-            return
-        }
-        else{
-            $winFeature=$true
-        }
-    }
 
-    if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
-    try {
-            if($winFeature -eq $true -and (Get-IsRemote)){
-                Invoke-FromTask @"
-."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" $(Expand-Splat $PSBoundParameters)
-"@
+    #backcompat for choco versions prior to 0.9.8.21
+    if(!$packageNames){$packageNames=$packageName}
+    
+    foreach($packageName in $packageNames){
+        $PSBoundParameters.packageNames = $packageName
+        if($source -eq "WindowsFeatures"){
+            $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
+            if($dismInfo -contains "State : Enabled" -or $dismInfo -contains "State : Enable Pending") {
+                Write-BoxstarterMessage "$packageName is already installed"
+                return
             }
             else{
-                Call-Chocolatey @PSBoundParameters
+                $winFeature=$true
             }
         }
-        catch { 
-            $ex=$_
-            Log-BoxstarterMessage $_
-            #Only write the error to the error stream if it was not previously
-            #written by chocolatey
-            if($global:error.Count -gt 1){
-                if(($global:error[1].Exception.Message | Out-String).Contains($_.Exception.Message)){
-                    $errorWritten=$true
+
+        if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
+        try {
+                if($winFeature -eq $true -and (Get-IsRemote)){
+                    Invoke-FromTask @"
+."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" $(Expand-Splat $PSBoundParameters)
+"@
+                }
+                else{
+                    Call-Chocolatey @PSBoundParameters
                 }
             }
-            if(!$errorWritten){
-                Write-Error $_
+            catch { 
+                $ex=$_
+                Log-BoxstarterMessage $_
+                #Only write the error to the error stream if it was not previously
+                #written by chocolatey
+                if($global:error.Count -gt 1){
+                    if(($global:error[1].Exception.Message | Out-String).Contains($_.Exception.Message)){
+                        $errorWritten=$true
+                    }
+                }
+                if(!$errorWritten){
+                    Write-Error $_
+                }
             }
+        if(!$Boxstarter.rebootOk) {return}
+        if($Boxstarter.IsRebooting){
+            Remove-ChocolateyPackageInProgress $packageName
+            return
         }
-    if(!$Boxstarter.rebootOk) {return}
-    if($Boxstarter.IsRebooting){
-        Remove-ChocolateyPackageInProgress $packageName
-        return
-    }
-    if($global:error.count -gt 0) {
-        if ($ex -ne $null -and ($ex -match "code was '(-?\d+)'")) {
-            $errorCode=$matches[1]
-            if($RebootCodes -contains $errorCode) {
-                Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code"
-                Remove-ChocolateyPackageInProgress $packageName
-                Invoke-Reboot
+        if($global:error.count -gt 0) {
+            if ($ex -ne $null -and ($ex -match "code was '(-?\d+)'")) {
+                $errorCode=$matches[1]
+                if($RebootCodes -contains $errorCode) {
+                    Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code"
+                    Remove-ChocolateyPackageInProgress $packageName
+                    Invoke-Reboot
+                }
             }
         }
     }
@@ -203,7 +210,13 @@ function Resolve-SplatValue($val){
         $firstVal=$False
         foreach($arrayVal in $val){
             if($firstVal){$ret+=","}
-            $ret += "$arrayVal"
+            if($arrayVal -is [int]){
+                $ret += "$arrayVal"
+            }
+            else{
+                $ret += "`"$arrayVal`""
+            }
+
             $firstVal=$true
         }
         $ret += ")"
