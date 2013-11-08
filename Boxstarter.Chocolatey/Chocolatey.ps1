@@ -176,7 +176,7 @@ function Add-DefaultRebootCodes($codes) {
 function Remove-ChocolateyPackageInProgress($packageName) {
     $pkgDir = (dir $env:ChocolateyInstall\lib\$packageName.*)
     if($pkgDir.length -gt 0) {$pkgDir = $pkgDir[-1]}
-    remove-item $pkgDir -Recurse -Force    
+    remove-item $pkgDir -Recurse -Force -ErrorAction SilentlyContinue  
 }
 
 function Expand-Splat($splat){
