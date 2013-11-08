@@ -23,15 +23,26 @@
 
 
         <ul>
-          <li><a href="downloads/Boxstarter.1.1.202.zip">Download v1.1.202<strong>ZIP File</strong></a></li>
+          <li><a href="downloads/Boxstarter.2.0.0.zip">Download v2.0.0<strong>ZIP File</strong></a></li>
           <li><a href="http://chocolatey.org/packages/boxstarter.chocolatey">CINST from<strong>Chocolatey</strong></a></li>
           <li><a href="https://boxstarter.codeplex.com/Documentation">Docs on<strong>Codeplex</strong></a></li>
         </ul>
       </header>
       <section>
       	<h1>Boxstarter</h1>
-        <h2>Your personal Windows Install made easy!</h2>
 
+        <h2>v2.0 is here!</h2>
+        Lots of documentation to come but try this new Command:
+        <pre>
+$creds=Get-Credential myusername
+Install-BoxstarterPackage -ComputerName myOtherComputer `
+  -Package MyPackage -Credential $creds
+        </pre>
+        <b>Note:</b>Powershell Remoting must be enabled on target computer (myOtherComputer). You can do this in an administrative Powershell console by invoking:
+        <pre>
+Enable-PSRemoting -Force
+        </pre>
+        <h2>Your personal Windows Install made easy!</h2>
 <ul>
 <li>100% Unattended Install with <b>pending reboot detection and automatic logon</b>.</li>
 <li>Lots of Windows configuration utilities including installing critical updates, changing windows explorer options, and more.</li>
@@ -54,7 +65,7 @@ See <a href="https://boxstarter.codeplex.com/wikipage?title=Boxstarter%20from%20
 <p/>
 <h2>Host your own portable repo</h2>
 If you prefer not to use the ClickOnce web installer or host/use a private feed not on Chocolatey or the Myget.org community feed. Install the Boxstarter Powershell modules:
-<div class="highlight"><pre><span class="c">#After extracting Boxstarter.1.1.202.zip on MYCOMPUTER</span>
+<div class="highlight"><pre><span class="c">#After extracting Boxstarter.2.0.0.zip on MYCOMPUTER</span>
 <span class="p">.\</span><span class="n">setup</span><span class="p">.</span><span class="n">bat</span>
 <span class="nb">Import-Module</span> <span class="nv">$env:appdata</span><span class="p">\</span><span class="n">boxstarter</span><span class="p">\</span><span class="n">Boxstarter</span><span class="p">.</span><span class="n">Chocolatey</span><span class="p">\</span><span class="n">Boxstarter</span><span class="p">.</span><span class="n">Chocolatey</span><span class="p">.</span><span class="n">psd1</span>
 <span class="c">#Create minimal nuspec and chocolateyInstall</span>

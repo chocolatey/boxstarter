@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="Boxstarter.WebLaunch.exe" version="1.1.202.0" publicKeyToken="9b0d113b5eadff54" language="neutral" processorArchitecture="msil" type="win32" />
+  <asmv1:assemblyIdentity name="Boxstarter.WebLaunch.exe" version="2.0.0.0" publicKeyToken="9b0d113b5eadff54" language="neutral" processorArchitecture="msil" type="win32" />
   <description asmv2:iconFile="boxLogo_sm.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="Boxstarter.WebLaunch" version="1.1.202.0" language="neutral" processorArchitecture="msil" />
+    <assemblyIdentity name="Boxstarter.WebLaunch" version="2.0.0.0" language="neutral" processorArchitecture="msil" />
     <commandLine file="Boxstarter.WebLaunch.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -31,14 +31,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Boxstarter.WebLaunch.exe" size="89280">
-      <assemblyIdentity name="Boxstarter.WebLaunch" version="1.1.202.0" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Boxstarter.WebLaunch.exe" size="88768">
+      <assemblyIdentity name="Boxstarter.WebLaunch" version="2.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>odZhPZTYitXx/3UHutDpdYazyFk=</dsig:DigestValue>
+        <dsig:DigestValue>yZL/mZuJ8pIb2gGaS6dL+F7m9UE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -60,13 +60,13 @@
       <dsig:DigestValue>dcT48n6yLTSvLVEHW/lXCBiehBI=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.Bootstrapper\Boxstarter.bootstrapper.psd1" size="1598">
+  <file name="Boxstarter.Bootstrapper\Boxstarter.bootstrapper.psd1" size="1556">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>cUTW8LOCmqrKM1NF8g8n5qws9g0=</dsig:DigestValue>
+      <dsig:DigestValue>JwX4DPZemNjPqTwTGZ2+74XSkTo=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psm1" size="533">
@@ -168,13 +168,13 @@
       <dsig:DigestValue>5GRDUToanE0UXq175M7WzgkyVWU=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1" size="1640">
+  <file name="Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1" size="1598">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>GNlqa+AWUfaQa7UIhsWpnx2JMmM=</dsig:DigestValue>
+      <dsig:DigestValue>M8sF/BokxPw0J6S38DHkPxSC/F4=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.Chocolatey\Boxstarter.Chocolatey.psm1" size="754">
@@ -192,7 +192,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>NC5AeQjU7UUKvRVXsKRf0gWgpfk=</dsig:DigestValue>
+      <dsig:DigestValue>VuGUVh84Bvy0TORGAw5goqR6oJ0=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.Chocolatey\Check-Chocolatey.ps1" size="2086">
@@ -321,13 +321,13 @@
       <dsig:DigestValue>39Cs+CSuG9PNQhhIsCflFfr3C2w=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.Common\boxstarter.common.psd1" size="1498">
+  <file name="Boxstarter.Common\boxstarter.common.psd1" size="1456">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>mYx0ROHC2j2XXTFyLHt/231kcMk=</dsig:DigestValue>
+      <dsig:DigestValue>Rj9o9aWuYypcR577+BlrUZS4yYY=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.Common\Boxstarter.Common.psm1" size="679">
@@ -474,13 +474,13 @@
       <dsig:DigestValue>2IsMvbWsC/GEpIzyD6FhbYMI6xI=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Boxstarter.WinConfig\boxstarter.WinConfig.psd1" size="1551">
+  <file name="Boxstarter.WinConfig\boxstarter.WinConfig.psd1" size="1509">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>Ffb/OZyVgzPzhTYI816amtdJj1c=</dsig:DigestValue>
+      <dsig:DigestValue>uznxBRTY0SPRHHcgo4jULY794p8=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Boxstarter.WinConfig\Boxstarter.WinConfig.psm1" size="574">
@@ -621,4 +621,4 @@
       <!--<supportedOS Id="{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}"></supportedOS>-->
     </application>
   </compatibility>
-<publisherIdentity name="E=matt@mattwrock.com, CN=&quot;Open Source Developer, Boxstarter.org&quot;, O=Boxstarter.org, C=US" issuerKeyHash="04c9da9adc4a4977af300304662ec7cef2f8177d" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>4D4jXaWCsAzglBqcLF+llCV8dvg=</DigestValue></Reference></SignedInfo><SignatureValue>oZ6PunsYR8b0Lkqmm5Mn5FmtLHxeOr257hvGzDAjTsHmB6SGALX4nd0HWAqkqhzje/W2aYgPEXogtC9U+tas1BL1aXaZRe++KCKIw+EkKeok8ktRA3nnU8kXC2OHo+QvMKe5Ob7/jhWG8fP7LHM5MrbowsOa624LOOREK+yADw20ZG98cJvJejYecJj5Su1+tOvhcE4kbYhPzSyxKaL18TwuTxAehcsfaJeB37yqJv6f7FqgcsxVKv8ySBWQvIAcOA3KkCtn7LgL0iFuysQzkyStVpwzdaNU5cpB4prV+8CEsW5gaNjlPjiDnxNNKmwW+MX0FWou2yAsLxre0GsMgw==</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>sL+hBawCCUAatoh0I2B+iA5Mmh4Ynv7cDKSglB0gCaqQ4ejoZORaaep7xznS9/H0au2oDMO+U8R7EJuZPRM0G6CXSec6eyb3orwPuIvX1GGnQDluKhy2VIyCO3WWQ9zyPQjKddbqe5uKwcReweHFp5F28IWBzowwcs15onMi9cK8go04Hh01z9rAkIfXezvGFL24bWgnIejV1mGCJnqB1dsN/GhrJlFqLblt81NLtT7YLQb1iKrEvgunfV5IewJNDqFIAZN6Gi+5TIrrrPuBNQWLXgJXcu/PadZmbRdoldWeU7TLS3HPc7x5O8jRsvbe1b2N9aOT4bQ1WUxvCwenTw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="f8767c2594a55f2c9c1a94e00cb082a55d233ee0" Description="" Url=""><as:assemblyIdentity name="Boxstarter.WebLaunch.exe" version="1.1.202.0" publicKeyToken="9b0d113b5eadff54" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>E=matt@mattwrock.com, CN="Open Source Developer, Boxstarter.org", O=Boxstarter.org, C=US</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>pq+9saG0m9rXyxN640es/eE4cEM=</DigestValue></Reference></SignedInfo><SignatureValue>Km1no+u9FePlce4N3Bfz8km7cmujV2LxSMStTH4gfMm8F+UidXVPW5Tx9KFX0qoyqSh5BZw72EpGtDA0njYIAIHAnBXWIzOsNs3Y4W1TOCbpXcHZ1Yx7KwIPOVi5pzAs2d1FpbOA/cb8uKy+71Ctd5nJaBKVrPdCDSquuHSkAmn+ixb8cadn7C4+DZBCtC45PATsxMbPqfEYjsYJdijlEz5mv7SomTa9iUHN20XpiXKDN3HB0qYA89IsD1KFhDUMAGr/FcTDnxDFKmy4UNYn3wxsUBS5XX6eMXUNVKvaG9MMziUDz85yF3oT87Hb6MeGEym/pIc5wcPmy4gWS9qDfQ==</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>sL+hBawCCUAatoh0I2B+iA5Mmh4Ynv7cDKSglB0gCaqQ4ejoZORaaep7xznS9/H0au2oDMO+U8R7EJuZPRM0G6CXSec6eyb3orwPuIvX1GGnQDluKhy2VIyCO3WWQ9zyPQjKddbqe5uKwcReweHFp5F28IWBzowwcs15onMi9cK8go04Hh01z9rAkIfXezvGFL24bWgnIejV1mGCJnqB1dsN/GhrJlFqLblt81NLtT7YLQb1iKrEvgunfV5IewJNDqFIAZN6Gi+5TIrrrPuBNQWLXgJXcu/PadZmbRdoldWeU7TLS3HPc7x5O8jRsvbe1b2N9aOT4bQ1WUxvCwenTw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIF0jCCBLqgAwIBAgIQU2DxqtPcOK2OiCIW0CMAuzANBgkqhkiG9w0BAQUFADB4MQswCQYDVQQGEwJQTDEiMCAGA1UEChMZVW5pemV0byBUZWNobm9sb2dpZXMgUy5BLjEnMCUGA1UECxMeQ2VydHVtIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRwwGgYDVQQDExNDZXJ0dW0gTGV2ZWwgSUlJIENBMB4XDTEzMDgwNDA2NDMxOVoXDTE0MDgwNDA2NDMxOVoweTELMAkGA1UEBhMCVVMxFzAVBgNVBAoMDkJveHN0YXJ0ZXIub3JnMS4wLAYDVQQDDCVPcGVuIFNvdXJjZSBEZXZlbG9wZXIsIEJveHN0YXJ0ZXIub3JnMSEwHwYJKoZIhvcNAQkBFhJtYXR0QG1hdHR3cm9jay5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCwv6EFrAIJQBq2iHQjYH6IDkyaHhie/twMpKCUHSAJqpDh6Ohk5Fpp6nvHOdL38fRq7agMw75TxHsQm5k9EzQboJdJ5zp7JveivA+4i9fUYadAOW4qHLZUjII7dZZD3PI9CMp11up7m4rBxF7B4cWnkXbwhYHOjDByzXmicyL1wryCjTgeHTXP2sCQh9d7O8YUvbhtaCch6NXWYYImeoHV2w38aGsmUWotuW3zU0u1PtgtBvWIqsS+C6d9Xkh7Ak0OoUgBk3oaL7lMiuus+4E1BYteAldy789p1mZtF2iV1Z5TtMtLcc9zvHk7yNGy9t7VvY31o5PhtDVZTG8LB6dPAgMBAAGjggJVMIICUTAMBgNVHRMBAf8EAjAAMCwGA1UdHwQlMCMwIaAfoB2GG2h0dHA6Ly9jcmwuY2VydHVtLnBsL2wzLmNybDBaBggrBgEFBQcBAQROMEwwIQYIKwYBBQUHMAGGFWh0dHA6Ly9vY3NwLmNlcnR1bS5wbDAnBggrBgEFBQcwAoYbaHR0cDovL3d3dy5jZXJ0dW0ucGwvbDMuY2VyMB8GA1UdIwQYMBaAFATJ2prcSkl3rzADBGYux87y+Bd9MB0GA1UdDgQWBBRyIgLP6ppQTO2aad3pRTXmuUKU4TAOBgNVHQ8BAf8EBAMCB4AwggE9BgNVHSAEggE0MIIBMDCCASwGCiqEaAGG9ncCAgMwggEcMCUGCCsGAQUFBwIBFhlodHRwczovL3d3dy5jZXJ0dW0ucGwvQ1BTMIHyBggrBgEFBQcCAjCB5TAgFhlVbml6ZXRvIFRlY2hub2xvZ2llcyBTLkEuMAMCAQcagcBVc2FnZSBvZiB0aGlzIGNlcnRpZmljYXRlIGlzIHN0cmljdGx5IHN1YmplY3RlZCB0byB0aGUgQ0VSVFVNIENlcnRpZmljYXRpb24gUHJhY3RpY2UgU3RhdGVtZW50IChDUFMpIGluY29ycG9yYXRlZCBieSByZWZlcmVuY2UgaGVyZWluIGFuZCBpbiB0aGUgcmVwb3NpdG9yeSBhdCBodHRwczovL3d3dy5jZXJ0dW0ucGwvcmVwb3NpdG9yeS4wEwYDVR0lBAwwCgYIKwYBBQUHAwMwEQYJYIZIAYb4QgEBBAQDAgQQMA0GCSqGSIb3DQEBBQUAA4IBAQA/HTEv1M8pFDuiioBXdM3oTNdtusrVACILAZz96Q3DzO6vejJByqWK3SVxxbw17cBs7HnHhA6+Vv4HTm3hjhDGr1rIlE/sjJdb3D6FNN/YUjppZVT6kejQSRe07yOdYHnG2khhav8ZGhAToYGbUKn/EpZ6NOTqDISODXxBhTeg4D0bw8KKSg800Nw/jxNNBvL47ktbDFuRMm6XA76fmMyj7xFKh+gmzSk7VU+KHP1LWQfdIcUSO7fDdZc9BqbuTrIrrByi3aspafWASCahydWK11VkRPDCbg1ShBjHtmvn4ky3WvZzZGcn9Iu6S6aF0VVTZlDrEdMurYQyk/fwDV/O</X509Certificate><X509Certificate>MIIENjCCAx6gAwIBAgIDBHpTMA0GCSqGSIb3DQEBBQUAMD4xCzAJBgNVBAYTAlBMMRswGQYDVQQKExJVbml6ZXRvIFNwLiB6IG8uby4xEjAQBgNVBAMTCUNlcnR1bSBDQTAeFw0wOTAzMDMxMjUzNTZaFw0yNDAzMDMxMjUzNTZaMHgxCzAJBgNVBAYTAlBMMSIwIAYDVQQKExlVbml6ZXRvIFRlY2hub2xvZ2llcyBTLkEuMScwJQYDVQQLEx5DZXJ0dW0gQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxHDAaBgNVBAMTE0NlcnR1bSBMZXZlbCBJSUkgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCfUZZcS3wuSUcINT8L7UkdKmpeWGhNCNc/eJdyMUTcYZT1lOnTzZ0drfHk+QeR+f6kCZz7x54x4xsD3Pz1xUsiqa26p+GVZWOsK+KA/WF2Z+jEpDz+dOh2eB5JpRR53HSmn7YSiq4NWfxagCWYwEic28sPd+eG9bLH1k67h1AGTnb1t4wof1/i2uowieREhu5V95V57wyIyn//XyUS7ymkw9/IUZ6LEJVX+urdN71Kpl9qlUXXvPOVUrMU8w6JOhO7gEA8y6D6jtKmRHLcN/4Ug+0Ag/GQEfwO8UPsbfBzA8sMfteClhw3zufuKGSrtW8GWqAESrYNe1Wce2sYwlrHAgMBAAGjggEBMIH+MA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBQEydqa3EpJd68wAwRmLsfO8vgXfTBSBgNVHSMESzBJoUKkQDA+MQswCQYDVQQGEwJQTDEbMBkGA1UEChMSVW5pemV0byBTcC4geiBvLm8uMRIwEAYDVQQDEwlDZXJ0dW0gQ0GCAwEAIDAsBgNVHR8EJTAjMCGgH6AdhhtodHRwOi8vY3JsLmNlcnR1bS5wbC9jYS5jcmwwOgYDVR0gBDMwMTAvBgRVHSAAMCcwJQYIKwYBBQUHAgEWGWh0dHBzOi8vd3d3LmNlcnR1bS5wbC9DUFMwDQYJKoZIhvcNAQEFBQADggEBAIvCzDjOR2ApbA5IvG47OAoN4BefeTwRspwdkMm9vwOiWfKwVOI7kh+pb2MiF5xYpEEdYeuZJCjwcMcqzOgZ4CiQXOQ0kdFQaPxuxX9kijCPhm0sWVRimGGiXSs7KLBx/vRcaFjm/NNhlwQ6z+yx3XIfc26Zc8hqpF993Z2ei4x76sXsd/dkDu3u5a1GzBplTq9EHW5nZENquQxv1gQfX+Ua4Dmp9a/9tchmbDMPc+VDIaT99SO1cfHS7OyzUX0Ew7mZfEyeRo3N9GP8To60q8eCyJNuBEySttNcHmGKKiM2bjjSPqSvHnXaJTMwWP7o0/krJu183xKbIVOaDLEafn4=</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>
+<publisherIdentity name="E=matt@mattwrock.com, CN=&quot;Open Source Developer, Boxstarter.org&quot;, O=Boxstarter.org, C=US" issuerKeyHash="04c9da9adc4a4977af300304662ec7cef2f8177d" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>sPqSvAn1RFoOM8H2BVgNAsA1MMU=</DigestValue></Reference></SignedInfo><SignatureValue>AOBYApJEMfXPJNisTjV4kTa4KVOvHlic/IYwxtQzqiBcKscdjpVti6yspipRFIYWc0Eg0ugf2GcyIvFOvZASVvVF2oMvrhdFHdNpuzLIQoWBfryDuppuGTFv2z72GLFG95Beo3zhbJ/ow/ENU/SqSs7ItVHul89hU/2BC4JZYg3727pZ2NXGe94yOcZPBEPg/fAtJzoTsXIf2FqyL+7p3ipUXnVVqb/28NcEQpCZ8q64N/dEIxAUBJuDXGdZPBTngo5UdQbQWTM7dHYyhJeVcHyIsd2KJVhZ3plhjosw+wOWGi+2IUoUv68PrhzkrpnnaYMAiETppT/ec3xGC4AGxg==</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>sL+hBawCCUAatoh0I2B+iA5Mmh4Ynv7cDKSglB0gCaqQ4ejoZORaaep7xznS9/H0au2oDMO+U8R7EJuZPRM0G6CXSec6eyb3orwPuIvX1GGnQDluKhy2VIyCO3WWQ9zyPQjKddbqe5uKwcReweHFp5F28IWBzowwcs15onMi9cK8go04Hh01z9rAkIfXezvGFL24bWgnIejV1mGCJnqB1dsN/GhrJlFqLblt81NLtT7YLQb1iKrEvgunfV5IewJNDqFIAZN6Gi+5TIrrrPuBNQWLXgJXcu/PadZmbRdoldWeU7TLS3HPc7x5O8jRsvbe1b2N9aOT4bQ1WUxvCwenTw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="c53035c0020d5805f6c1330e5a44f509bc92fab0" Description="" Url=""><as:assemblyIdentity name="Boxstarter.WebLaunch.exe" version="2.0.0.0" publicKeyToken="9b0d113b5eadff54" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>E=matt@mattwrock.com, CN="Open Source Developer, Boxstarter.org", O=Boxstarter.org, C=US</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>0PCiAlXNbpln4mPrmU4zNz4XtsA=</DigestValue></Reference></SignedInfo><SignatureValue>X8/081mMWGCNfpOjItsFwzVcShXetrVTf5PLKawPNg3o376N5BHm+U8WU/jkRx3PegOwFSRWafgbFcOcLN7nXQVCmM7NlF3EJwJYnwgkRSG4DHl5AvYIOcRxI8WdY3TTvmL9+3ZUfjo3S31QuUEWwSjtvz7f6zffGSNaCLo+v9Us4oCYRIlkg9DPtuh2kqtOthbRlZcSAnUsUmLaBm6dO6WHU7fPUQIvSgCFvQlWqgBx7TW9AkvquaZBCQsREMLUXwg4MWjgTmjpH7Wfiz0NkKuMTpIO9ZhuQsqY3Qkow1W57WcTXSusYLDe+V0+1KC2QkSMrmKFcrSicJMosbglmA==</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>sL+hBawCCUAatoh0I2B+iA5Mmh4Ynv7cDKSglB0gCaqQ4ejoZORaaep7xznS9/H0au2oDMO+U8R7EJuZPRM0G6CXSec6eyb3orwPuIvX1GGnQDluKhy2VIyCO3WWQ9zyPQjKddbqe5uKwcReweHFp5F28IWBzowwcs15onMi9cK8go04Hh01z9rAkIfXezvGFL24bWgnIejV1mGCJnqB1dsN/GhrJlFqLblt81NLtT7YLQb1iKrEvgunfV5IewJNDqFIAZN6Gi+5TIrrrPuBNQWLXgJXcu/PadZmbRdoldWeU7TLS3HPc7x5O8jRsvbe1b2N9aOT4bQ1WUxvCwenTw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIF0jCCBLqgAwIBAgIQU2DxqtPcOK2OiCIW0CMAuzANBgkqhkiG9w0BAQUFADB4MQswCQYDVQQGEwJQTDEiMCAGA1UEChMZVW5pemV0byBUZWNobm9sb2dpZXMgUy5BLjEnMCUGA1UECxMeQ2VydHVtIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRwwGgYDVQQDExNDZXJ0dW0gTGV2ZWwgSUlJIENBMB4XDTEzMDgwNDA2NDMxOVoXDTE0MDgwNDA2NDMxOVoweTELMAkGA1UEBhMCVVMxFzAVBgNVBAoMDkJveHN0YXJ0ZXIub3JnMS4wLAYDVQQDDCVPcGVuIFNvdXJjZSBEZXZlbG9wZXIsIEJveHN0YXJ0ZXIub3JnMSEwHwYJKoZIhvcNAQkBFhJtYXR0QG1hdHR3cm9jay5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCwv6EFrAIJQBq2iHQjYH6IDkyaHhie/twMpKCUHSAJqpDh6Ohk5Fpp6nvHOdL38fRq7agMw75TxHsQm5k9EzQboJdJ5zp7JveivA+4i9fUYadAOW4qHLZUjII7dZZD3PI9CMp11up7m4rBxF7B4cWnkXbwhYHOjDByzXmicyL1wryCjTgeHTXP2sCQh9d7O8YUvbhtaCch6NXWYYImeoHV2w38aGsmUWotuW3zU0u1PtgtBvWIqsS+C6d9Xkh7Ak0OoUgBk3oaL7lMiuus+4E1BYteAldy789p1mZtF2iV1Z5TtMtLcc9zvHk7yNGy9t7VvY31o5PhtDVZTG8LB6dPAgMBAAGjggJVMIICUTAMBgNVHRMBAf8EAjAAMCwGA1UdHwQlMCMwIaAfoB2GG2h0dHA6Ly9jcmwuY2VydHVtLnBsL2wzLmNybDBaBggrBgEFBQcBAQROMEwwIQYIKwYBBQUHMAGGFWh0dHA6Ly9vY3NwLmNlcnR1bS5wbDAnBggrBgEFBQcwAoYbaHR0cDovL3d3dy5jZXJ0dW0ucGwvbDMuY2VyMB8GA1UdIwQYMBaAFATJ2prcSkl3rzADBGYux87y+Bd9MB0GA1UdDgQWBBRyIgLP6ppQTO2aad3pRTXmuUKU4TAOBgNVHQ8BAf8EBAMCB4AwggE9BgNVHSAEggE0MIIBMDCCASwGCiqEaAGG9ncCAgMwggEcMCUGCCsGAQUFBwIBFhlodHRwczovL3d3dy5jZXJ0dW0ucGwvQ1BTMIHyBggrBgEFBQcCAjCB5TAgFhlVbml6ZXRvIFRlY2hub2xvZ2llcyBTLkEuMAMCAQcagcBVc2FnZSBvZiB0aGlzIGNlcnRpZmljYXRlIGlzIHN0cmljdGx5IHN1YmplY3RlZCB0byB0aGUgQ0VSVFVNIENlcnRpZmljYXRpb24gUHJhY3RpY2UgU3RhdGVtZW50IChDUFMpIGluY29ycG9yYXRlZCBieSByZWZlcmVuY2UgaGVyZWluIGFuZCBpbiB0aGUgcmVwb3NpdG9yeSBhdCBodHRwczovL3d3dy5jZXJ0dW0ucGwvcmVwb3NpdG9yeS4wEwYDVR0lBAwwCgYIKwYBBQUHAwMwEQYJYIZIAYb4QgEBBAQDAgQQMA0GCSqGSIb3DQEBBQUAA4IBAQA/HTEv1M8pFDuiioBXdM3oTNdtusrVACILAZz96Q3DzO6vejJByqWK3SVxxbw17cBs7HnHhA6+Vv4HTm3hjhDGr1rIlE/sjJdb3D6FNN/YUjppZVT6kejQSRe07yOdYHnG2khhav8ZGhAToYGbUKn/EpZ6NOTqDISODXxBhTeg4D0bw8KKSg800Nw/jxNNBvL47ktbDFuRMm6XA76fmMyj7xFKh+gmzSk7VU+KHP1LWQfdIcUSO7fDdZc9BqbuTrIrrByi3aspafWASCahydWK11VkRPDCbg1ShBjHtmvn4ky3WvZzZGcn9Iu6S6aF0VVTZlDrEdMurYQyk/fwDV/O</X509Certificate><X509Certificate>MIIENjCCAx6gAwIBAgIDBHpTMA0GCSqGSIb3DQEBBQUAMD4xCzAJBgNVBAYTAlBMMRswGQYDVQQKExJVbml6ZXRvIFNwLiB6IG8uby4xEjAQBgNVBAMTCUNlcnR1bSBDQTAeFw0wOTAzMDMxMjUzNTZaFw0yNDAzMDMxMjUzNTZaMHgxCzAJBgNVBAYTAlBMMSIwIAYDVQQKExlVbml6ZXRvIFRlY2hub2xvZ2llcyBTLkEuMScwJQYDVQQLEx5DZXJ0dW0gQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxHDAaBgNVBAMTE0NlcnR1bSBMZXZlbCBJSUkgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCfUZZcS3wuSUcINT8L7UkdKmpeWGhNCNc/eJdyMUTcYZT1lOnTzZ0drfHk+QeR+f6kCZz7x54x4xsD3Pz1xUsiqa26p+GVZWOsK+KA/WF2Z+jEpDz+dOh2eB5JpRR53HSmn7YSiq4NWfxagCWYwEic28sPd+eG9bLH1k67h1AGTnb1t4wof1/i2uowieREhu5V95V57wyIyn//XyUS7ymkw9/IUZ6LEJVX+urdN71Kpl9qlUXXvPOVUrMU8w6JOhO7gEA8y6D6jtKmRHLcN/4Ug+0Ag/GQEfwO8UPsbfBzA8sMfteClhw3zufuKGSrtW8GWqAESrYNe1Wce2sYwlrHAgMBAAGjggEBMIH+MA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBQEydqa3EpJd68wAwRmLsfO8vgXfTBSBgNVHSMESzBJoUKkQDA+MQswCQYDVQQGEwJQTDEbMBkGA1UEChMSVW5pemV0byBTcC4geiBvLm8uMRIwEAYDVQQDEwlDZXJ0dW0gQ0GCAwEAIDAsBgNVHR8EJTAjMCGgH6AdhhtodHRwOi8vY3JsLmNlcnR1bS5wbC9jYS5jcmwwOgYDVR0gBDMwMTAvBgRVHSAAMCcwJQYIKwYBBQUHAgEWGWh0dHBzOi8vd3d3LmNlcnR1bS5wbC9DUFMwDQYJKoZIhvcNAQEFBQADggEBAIvCzDjOR2ApbA5IvG47OAoN4BefeTwRspwdkMm9vwOiWfKwVOI7kh+pb2MiF5xYpEEdYeuZJCjwcMcqzOgZ4CiQXOQ0kdFQaPxuxX9kijCPhm0sWVRimGGiXSs7KLBx/vRcaFjm/NNhlwQ6z+yx3XIfc26Zc8hqpF993Z2ei4x76sXsd/dkDu3u5a1GzBplTq9EHW5nZENquQxv1gQfX+Ua4Dmp9a/9tchmbDMPc+VDIaT99SO1cfHS7OyzUX0Ew7mZfEyeRo3N9GP8To60q8eCyJNuBEySttNcHmGKKiM2bjjSPqSvHnXaJTMwWP7o0/krJu183xKbIVOaDLEafn4=</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>
