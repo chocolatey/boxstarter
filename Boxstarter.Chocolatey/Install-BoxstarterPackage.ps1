@@ -152,7 +152,7 @@ directory.
 http://boxstarter.codeplex.com
 about_boxstarter_chocolatey
 #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Package")]
 	param(
         [parameter(Mandatory=$true, Position=0, ParameterSetName="ComputerName")]
         [string]$ComputerName,
@@ -177,6 +177,12 @@ about_boxstarter_chocolatey
         Invoke-Locally @PSBoundParameters
         return
     }
+
+    if(!(Test-Admin)) {
+        Write-Error "You must be running as an administrator. Please open a Powershell console as Administrator and rerun Install-BoxstarperPackage."
+        return
+    }
+
     try{
         $sessionArgs=@{}
         if($Credential){
