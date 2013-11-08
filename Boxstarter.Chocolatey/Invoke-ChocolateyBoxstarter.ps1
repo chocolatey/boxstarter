@@ -124,7 +124,7 @@ Set-BoxstarterConfig
             }
             $script=@"
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
-Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstrapPackage"}) $(if($LocalRepo){"-Localrepo $localRepo"})
+Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstrapPackage"}) $(if($LocalRepo){"-Localrepo $localRepo"})  $(if($DisableReboots){"-DisableReboots"})
 "@
             return Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password -KeepWindowOpen:$KeepWindowOpen -NoPassword:$NoPassword
         }
