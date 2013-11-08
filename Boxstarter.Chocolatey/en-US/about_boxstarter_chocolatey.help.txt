@@ -75,6 +75,25 @@ Package Sources
 	The last two remote sources can be configured by editing 
 	$($Boxstarter.BaseDir)\Boxstarter.Config.
 
+Running Boxstarter Remotely
+	When using the Computername, ConnectionURI or Session parameters of
+	Install-BoxstarterPackage, Boxstarter will attempt to install the package
+	the the remote maching it is directed at. Boxstarter will check to ensure
+	that all necessary client side Powershell Remoting settings are correctly
+	configured. If they are not, Boxstarter will prompt to confirm whether it 
+	should enable them unless the -Force parameter is used. The -Force 
+	parameter will suppress prompts. As part of this configuration, Boxstarter 
+	will enable CredSSP authentication to ensure that any network connection 
+	that the package may try to establish will pass the users credentials.
+
+	Boxstarter will also attempt to enable Powershell remoting on the target 
+	machine if it is not already installed. Boxstarter can only do this if the
+	WMI firewall ports are open on the target computer. If they are not and 
+	powershell remoting is not enabled on the target machine, the installation 
+	will fail. Users can easily enable powershell remoting manually on the 
+	target machine by opening an administrative powershell console on the remote
+	computer and then issuing 'Enable-PSRemoting -Force'.
+
 Reboot detection
 	Perhaps the most compelling feature of Boxstarter is its way to handle 
 	reboots during an involved environment setup package. Especially when 

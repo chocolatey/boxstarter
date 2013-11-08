@@ -76,7 +76,7 @@ RUNNING AS ADMIN
 
 UPDATE SERVICES
 	In order to provide as little interruption as possible during a 
-	Boxstarter script execution, Windos Update Service and, if installed, 
+	Boxstarter script execution, Windows Update Service and, if installed, 
 	the System Configuration Client are stopped. When Boxstarter 
 	completes, these services are restarted. Boxstarter exposes 
 	functionality to install Windows Updates (see below) and stopping 
