@@ -1,19 +1,19 @@
 @{
-Description = 'Provides an unattended installation evironment supporting automaic reboots, suspension of update services and logging'
+Description = 'Provides Functions for customizing and configuring core windows settings'
 # Script module or binary module file associated with this manifest.
-ModuleToProcess = './boxstarter.bootstrapper.psm1'
+ModuleToProcess = './boxstarter.WinConfig.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.0.0'
+ModuleVersion = '2.0.1'
 
 # ID used to uniquely identify this module
-GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e50'
+GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e52'
 
 # Author of this module
 Author = 'Matt Wrock'
 
 # Copyright statement for this module
-Copyright = '(c) 2013 Matt Wrock'
+Copyright = '(c) 2013 Matt Wrock.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '2.0'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = ''
+PrivateData = 'd0ce139e13f269f706afd584056b9cd661267383'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

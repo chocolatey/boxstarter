@@ -17,13 +17,10 @@
       <dependency id="Boxstarter.Bootstrapper" version="$version$" />  
     </dependencies>
     <releaseNotes>
-      - Fix bug preventing script to continue after reboot
-      - Bunch of bug fixes to make Boxstarter more stable
-      - Protect against reboots during .net4 install
-      - Provide helper cmdlets for reading and editing config settings
-      - Allow SecureString Password to be aded as a commnd line argument
-      - Documentation typo fixes
-      - Clarify some messaging
+      - Support Remote Installs using Install-BoxstarterPackage -ComputerName or -ConnectionURI or -Session
+      - Use a simple url or file to hols install script: http://boxstarter.org/package/url?https://gist.github.com/mwrock/7071154/raw/bbf13791ea07fcaaebe5e5b301dc14f5a0438f34/gistfile1.txt
+      - Suspend Bitlocker on reboot
+      - Lots more docs to follow soon
     </releaseNotes>
   </metadata>
   <files>
