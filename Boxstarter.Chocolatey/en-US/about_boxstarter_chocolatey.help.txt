@@ -19,12 +19,12 @@ Installing Chocolatey
 	.Net 4 runtime is a prerequisite.
 
 Chocolatey Boxstarter Packages
-	When calling Invoke-ChocolateyBoxstarter or just Boxstarter, a 
-	BootstrapperPackage name must be passed to the command. This is a 
+	When calling Install-BoxstarterPackage or just Boxstarter, a 
+	Package name must be passed to the command. This is a 
 	special Chocolatey package provided by the user that boxstarter asks 
 	Chocolatey to install and it contains the script that is intended to 
 	install all the applications and settings the user wants setup on the 
-	local machine.
+	target machine.
 
 	This package script has access to all of the Chocolatey helper 
 	functions as well as all Boxstarter logging, WinConfig and 
@@ -48,7 +48,7 @@ Creating Packages
 
 Consuming Boxstarter Packages
 	The primary gateway to kicking off a Boxstarter.Chocolatey installation 
-	session is Invoke-ChocolateyBoxstarter. While you may use this 
+	session is Install-BoxstarterPackage. While you may use this 
 	powershell function, you can also call Boxstarter.bat which takes the 
 	exact same parameters as Invoke-CocolateyBoxstarter. If you installed 
 	Boxstarter.Chocolatey via Chocolatey or the setup.bat installer, 
@@ -59,7 +59,7 @@ Consuming Boxstarter Packages
 	it via \\serverName\Boxstarter\Boxstarter.bat.
 
 Package Sources
-	Invoke-ChocolateyBoxstarter (or Boxstarter) expects just the name of the
+	Install-BoxstarterPackage (or Boxstarter) expects just the name of the
 	bootstrapping package - just like CINST or Nuget. Boxstarter will search
 	the following locations in this order:
 
