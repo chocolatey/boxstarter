@@ -4,7 +4,9 @@ function Install-BoxstarterPackage {
 Installs a Boxstarter package
 
 .DESCRIPTION
-This essentially wraps Chocolatey Install and provides these additional features
+This fuction must be run as administrator.
+
+This function wraps a Chocolatey Install and provides these additional features
  - Installs chocolatey if it is not already installed
  - Installs the .net 4.5 framework if it is not installed which is a chocolatey requirement
  - Disables windows update service during installation to prevent installation conflicts and minimize the need for reboots
@@ -170,12 +172,11 @@ about_boxstarter_chocolatey
         [switch]$KeepWindowOpen,
         [string]$LocalRepo        
     )
-
+    
     if($PsCmdlet.ParameterSetName -eq "Package"){
         Invoke-Locally @PSBoundParameters
         return
     }
-
     try{
         $sessionArgs=@{}
         if($Credential){
