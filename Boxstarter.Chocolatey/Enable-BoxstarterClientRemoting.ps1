@@ -12,7 +12,12 @@ function Enable-BoxstarterClientRemoting ($RemoteHostToTrust) {
         if($Force -or (Confirm-Choice "Powershell remoting is not enabled locally. Should Boxstarter enable powershell remoting?"))
         {
             Write-BoxstarterMessage "Enabling local Powershell Remoting"
-            Enable-PSRemoting -Force | Out-Null
+            $enableArgs=@{Force=$true}
+            $command=Get-Command Enable-PSRemoting
+            if($command.Parameters.Keys -contains "skipnetworkprofilecheck"){
+                $enableArgs.skipnetworkprofilecheck=$true
+            }
+            Enable-PSRemoting @enableArgs | Out-Null
         }else {
             Write-BoxstarterMessage "Not enabling local Powershell Remoting aborting package install"
             return $Result
