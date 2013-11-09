@@ -58,6 +58,7 @@ Intercepts Chocolatey call to check for reboots
 #>  
     param([int[]]$RebootCodes=@())
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
+    $PSBoundParameters.Remove("RebootCodes")
 
     #backcompat for choco versions prior to 0.9.8.21
     if(!$packageNames){$packageNames=$packageName}

@@ -131,6 +131,7 @@ Package Authoring Considerations
 SEE ALSO
 
 	http://boxstarter.codeplex.com
+	Install-BoxstarterPackage
 	Invoke-ChocolateyBoxstarter
 	about_boxstarter_logging
 	Invoke-Boxstarter

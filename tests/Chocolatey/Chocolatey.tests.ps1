@@ -121,7 +121,7 @@ Describe "Getting-Chocolatey" {
         Mock Invoke-Reboot
         Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '3020'." 2>&1 | out-null}
         
-        Chocolatey Install pkg -RebootCodes @(56,3010,654)
+        Chocolatey Install pkg -RebootCodes @(56,3010,654) | out-null
 
         it "will not Invoke-Reboot" {
             Assert-MockCalled Invoke-Reboot -times 0
@@ -134,7 +134,7 @@ Describe "Getting-Chocolatey" {
         Mock Call-Chocolatey
         Mock DISM {"State : Enabled"}
         
-        Chocolatey Install "somefeature" -source "WindowsFeatures"
+        Chocolatey Install "somefeature" -source "WindowsFeatures" | out-null
 
         it "will not Call Chocolatey" {
             Assert-MockCalled Call-Chocolatey -times 0
@@ -146,7 +146,7 @@ Describe "Getting-Chocolatey" {
         Mock Invoke-Reboot
         Mock Call-Chocolatey
         
-        Chocolatey Install "somefeature" -source "WindowsFeatures"
+        Chocolatey Install "somefeature" -source "WindowsFeatures" | out-null
 
         it "will Call Chocolatey" {
             Assert-MockCalled Call-Chocolatey
@@ -161,7 +161,7 @@ Describe "Getting-Chocolatey" {
         Mock Remove-Item
         Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
 
-        Chocolatey Install pkg
+        Chocolatey Install pkg | out-null
 
         it "will delete package folder" {
             Assert-MockCalled Remove-Item -parameterFilter {$path -eq "dir2"}

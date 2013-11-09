@@ -14,7 +14,7 @@ This function wraps a Chocolatey Install and provides these additional features
  - Detects pending reboots and restarts the machine when necessary to avoid installation failures
  - Provides Reboot Resiliency by ensuring the package installation is immediately restarted up on reboot if there is a reboot during the installation.
  - Ensures everything runs under admin
- - Supports remote installations allowin packages to be installed on a remote machine
+ - Supports remote installations allowing packages to be installed on a remote machine
 
  The .nupkg file for the provided package name is searched in the following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
