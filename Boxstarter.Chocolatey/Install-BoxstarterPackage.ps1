@@ -4,7 +4,7 @@ function Install-BoxstarterPackage {
 Installs a Boxstarter package
 
 .DESCRIPTION
-This fuction must be run as administrator.
+This function must be run as administrator.
 
 This function wraps a Chocolatey Install and provides these additional features
  - Installs chocolatey if it is not already installed
