@@ -12,7 +12,7 @@ given Read permisions.
 
 .PARAMETER ShareName
 The name to give to the share. This is the name by which other 
-machines can access it. Boxstarter is he default.
+machines can access it. Boxstarter is the default.
 
 .PARAMETER Accounts
 A ist of accounts to be given read access to the share. Everyone is 

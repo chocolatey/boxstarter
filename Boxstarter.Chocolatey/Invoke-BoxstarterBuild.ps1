@@ -43,7 +43,7 @@ New-BoxstarterPackage
             }
             .$choco Pack (join-path $name "$name.nuspec") | out-null
             if(!$quiet){
-                Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $name or Invoke-ChocolateyBoxstarter $name will run this package." -nologo
+                Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $name or Install-BoxstarterPackage $name will run this package." -nologo
             }
         } else {
              if($all){
@@ -56,7 +56,7 @@ New-BoxstarterPackage
                     }
                     .$choco Pack (join-path . "$($_.Name)\$($_.Name).nuspec") | out-null
                     if(!$quiet){
-                        Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Invoke-ChocolateyBoxstarter $($_.Name) will run this package." -nologo                        
+                        Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Install-BoxstarterPackage $($_.Name) will run this package." -nologo                        
                     }
                 }
                 if($directoriesExist -eq $null){
