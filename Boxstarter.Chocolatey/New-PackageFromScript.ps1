@@ -12,10 +12,18 @@ Package Name of the package.
  .PARAMETER Source
  Either a file path or URI pointing to a resource containing a script.
 
+ .PARAMETER PackageName
+ The name of the package. If not provided, this will be "temp_$env:computername"
+
 .EXAMPLE
 $packageName = New-PackageFromScript myScript.ps1
 
 Creates a Package from the myScript.ps1 file in the current directory.
+
+.EXAMPLE
+$packageName = New-PackageFromScript myScript.ps1 MyPackage
+
+Creates a Package named "MyPackage" from the myScript.ps1 file in the current directory.
 
 .EXAMPLE
 $packageName = New-PackageFromScript c:\path\myScript.ps1
@@ -40,7 +48,8 @@ about_boxstarter_chocolatey
     [CmdletBinding()]
 	param (
         [Parameter(Mandatory=1)]
-        [string] $Source
+        [string] $Source,
+        [string] $PackageName="temp_$env:Computername"
     )
 
     if(!(test-path function:\Get-WebFile)){
@@ -59,14 +68,13 @@ about_boxstarter_chocolatey
         $text=Get-Content $source
     }
 
-    $thisPackageName="temp_$env:Computername"
-    if(Test-Path "$($boxstarter.LocalRepo)\$thisPackageName"){
-        Remove-Item "$($boxstarter.LocalRepo)\$thisPackageName" -recurse -force
+    if(Test-Path "$($boxstarter.LocalRepo)\$PackageName"){
+        Remove-Item "$($boxstarter.LocalRepo)\$PackageName" -recurse -force
     }
-    New-BoxstarterPackage $thisPackageName -quiet
-    Set-Content "$($boxstarter.LocalRepo)\$thisPackageName\tools\ChocolateyInstall.ps1" -value $text
-    Invoke-BoxstarterBuild $thisPackageName -quiet
+    New-BoxstarterPackage $PackageName -quiet
+    Set-Content "$($boxstarter.LocalRepo)\$PackageName\tools\ChocolateyInstall.ps1" -value $text
+    Invoke-BoxstarterBuild $PackageName -quiet
 
-    Write-BoxstarterMessage "Created a temporary package $thisPackageName from $source in $($boxstarter.LocalRepo)"
-    return $thisPackageName
+    Write-BoxstarterMessage "Created a temporary package $PackageName from $source in $($boxstarter.LocalRepo)"
+    return $PackageName
 }
