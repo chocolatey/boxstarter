@@ -17,7 +17,7 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
     }
     if(!$BoxstarterIntrercepting)
     {
-        Write-BoxstarterMessage "Chocoltey installed, seting up interception of Chocolatey methods."
+        Write-BoxstarterMessage "Chocolatey installed, seting up interception of Chocolatey methods."
         if($ShouldIntercept){Intercept-Chocolatey}
     }
 }
