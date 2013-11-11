@@ -30,6 +30,16 @@ Intercepts Chocolatey call to check for reboots
     chocolatey Install @PSBoundParameters
 }
 
+function choco {
+<#
+.SYNOPSIS
+Intercepts Chocolatey call to check for reboots
+
+#>    
+    param([int[]]$RebootCodes=@())
+    chocolatey @PSBoundParameters
+}
+
 function cup {
 <#
 .SYNOPSIS
@@ -170,6 +180,7 @@ function Intercept-Chocolatey {
     Intercept-Command cup -omitCommandParam
     Intercept-Command cinstm -omitCommandParam
     Intercept-Command chocolatey
+    Intercept-Command choco
     Intercept-Command call-chocolatey
     $Script:BoxstarterIntrercepting=$true
 }
