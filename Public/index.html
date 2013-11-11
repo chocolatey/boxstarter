@@ -1,154 +1,131 @@
 
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Boxstarter</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>Jumbotron Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="dist/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="jumbotron.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
+    <style>
+      .jumbotron {
+      background-color: rgba(235, 214, 61, 0.24);
+      padding-top: 88px;
+      padding-bottom: 10px;
+      }
+    </style>    
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <div><img height="270" src="images/boxlogo.png" width="270"> </div>
-        <p>Creates a fresh Windows environment from a bare OS utilizing powershell and chocolatey.</p>
 
-        <p class="view"><a href="https://boxstarter.codeplex.com/">View the Project on Codeplex<small>http://boxstarter.codeplex.com</small></a></p>
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="https://boxstarter.codeplex.com/">Boxstarter Project</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="https://boxstarter.codeplex.com/documentation">Documentation</a></li>
+            <li><a href="https://boxstarter.codeplex.com/workitem/list/basic">Issues</a></li>
+            <li><a href="https://boxstarter.codeplex.com/discussions">Discussion</a></li>
+            <li><a href="https://boxstarter.codeplex.com/license">License</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a href="https://twitter.com/mwrockx" class="twitter-follow-button" data-show-count="false">Follow @mwrockx</a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>            
+            </li>
+          </ul>
+        </div><!-- /.nav-collapse -->
+      </div><!-- /.container -->
+    </div><!-- /.navbar -->
 
-
-        <ul>
-          <li><a href="downloads/Boxstarter.2.0.4.zip">Download v2.0.4<strong>ZIP File</strong></a></li>
-          <li><a href="http://chocolatey.org/packages/boxstarter.chocolatey">CINST from<strong>Chocolatey</strong></a></li>
-          <li><a href="https://boxstarter.codeplex.com/Documentation">Docs on<strong>Codeplex</strong></a></li>
-        </ul>
-      </header>
-      <section>
-      	<h1>Boxstarter</h1>
-
-        <h2>v2.0.4 is here!</h2>
-        Lots of documentation to come but try this new Command:
-        <pre>
-$creds=Get-Credential myusername
-Install-BoxstarterPackage -ComputerName myOtherComputer `
-  -Package MyPackage -Credential $creds
-        </pre>
-        <b>Note:</b>Powershell Remoting must be enabled on target computer (myOtherComputer). You can do this in an administrative Powershell console by invoking:
-        <pre>
-Enable-PSRemoting -Force
-        </pre>
-        <h2>Your personal Windows Install made easy!</h2>
-<ul>
-<li>100% Unattended Install with <b>pending reboot detection and automatic logon</b>.</li>
-<li>Lots of Windows configuration utilities including installing critical updates, changing windows explorer options, and more.</li>
-<li>Launch via a simple URL, install on a Thumb drive or share it on your network.</li>
-</ul>
-<h2>Build your Environment with one easy command</h2>
-Boxstarter can run any <a href="http://chocolatey.org">Chocolatey</a> standard Nuget package to create an environment customized to your needs and tastes. There is no need to have Chocolatey installed. <b>Any base install of Windows 7, 8, Server 2008 R2 or 2012 is fully compatible</b>. Launch the Boxstarter Web Lancher targeting any public <a href="http://chocolatey.org">Chocolatey</a> or <a href="https://www.myget.org/gallery/boxstarter">Myget.Org Boxstarter feed</a>:
-
-<img src="images/Launch.png"/>
-
-Accept all the prompts and the privilege elevation request. <b>Boxstarter needs to run as admin</b>.
-
-<img src="images/elevate.png"/>
-
-Enter your password so Boxstarter can automatically log you in after each reboot.
-
-<img src="images/console.png"/>
-
-See <a href="https://boxstarter.codeplex.com/wikipage?title=Boxstarter%20from%20web%20via%20ClickOnce">this wiki</a> for more details on installing Boxstarter packages from the web.
-<p/>
-<h2>Host your own portable repo</h2>
-If you prefer not to use the ClickOnce web installer or host/use a private feed not on Chocolatey or the Myget.org community feed. Install the Boxstarter Powershell modules:
-<div class="highlight"><pre><span class="c">#After extracting Boxstarter.2.0.4.zip on MYCOMPUTER</span>
-<span class="p">.\</span><span class="n">setup</span><span class="p">.</span><span class="n">bat</span>
-<span class="nb">Import-Module</span> <span class="nv">$env:appdata</span><span class="p">\</span><span class="n">boxstarter</span><span class="p">\</span><span class="n">Boxstarter</span><span class="p">.</span><span class="n">Chocolatey</span><span class="p">\</span><span class="n">Boxstarter</span><span class="p">.</span><span class="n">Chocolatey</span><span class="p">.</span><span class="n">psd1</span>
-<span class="c">#Create minimal nuspec and chocolateyInstall</span>
-<span class="nb">New-BoxstarterPackage</span> <span class="n">MyPackage</span>
-<span class="c">#Edit Install script to customize your environment</span>
-<span class="n">Notepad</span> <span class="nb">Join-Path</span> <span class="nv">$Boxstarter</span><span class="p">.</span><span class="n">LocalRepo</span> <span class="s2">"tools\ChocolateyInstall.ps1"</span>
-<span class="c">#Pack nupkg</span>
-<span class="nb">Invoke-BoxstarterBuild</span> <span class="n">MyPackage</span>
-
-<span class="c">#share Repo</span>
-<span class="nb">Set-BoxstarterShare</span>
-<span class="c">#Or Copy to thumb drive G</span>
-<span class="nb">Copy-Item</span> <span class="nv">$Boxstarter</span><span class="p">.</span><span class="n">BaseDir</span> <span class="n">G</span><span class="err">:</span><span class="p">\</span> <span class="n">-Recurse</span>
-
-<span class="c">#Logon to your bare Windows install</span>
-<span class="p">\\</span><span class="n">MYCOMPUTER</span><span class="p">\</span><span class="n">Boxstarter</span><span class="p">\</span><span class="n">Boxstarter</span> <span class="n">Mypackage</span>
-
-<span class="c">#Enter password when prompted and come back later to find all your apps installed</span>
-</pre></div>
-
-<h2>Here is an example developer chocolateyInstall.ps1:</h2>
-
-<div class="highlight"><pre><span class="n">Install-WindowsUpdate</span> <span class="n">-AcceptEula</span>
-<span class="nb">Update-ExecutionPolicy</span> <span class="n">Unrestricted</span>
-<span class="nb">Move-LibraryDirectory</span> <span class="s2">"Personal"</span> <span class="s2">"$env:UserProfile\skydrive\documents"</span>
-<span class="nb">Set-ExplorerOptions</span> <span class="n">-showHidenFilesFoldersDrives</span> <span class="n">-showProtectedOSFiles</span> <span class="n">-showFileExtensions</span>
-<span class="nb">Set-TaskbarSmall</span>
-<span class="nb">Enable-RemoteDesktop</span>
-
-<span class="n">cinstm</span> <span class="n">VisualStudioExpress2012Web</span>
-<span class="n">cinstm</span> <span class="n">fiddler</span>
-<span class="n">cinstm</span> <span class="n">mssqlserver2012express</span>
-<span class="n">cinstm</span> <span class="n">git-credential-winstore</span>
-<span class="n">cinstm</span> <span class="n">console-devel</span>
-<span class="n">cinstm</span> <span class="n">skydrive</span>
-<span class="n">cinstm</span> <span class="n">poshgit</span>
-<span class="n">cinstm</span> <span class="n">windbg</span>
-
-<span class="n">cinst</span> <span class="n">Microsoft-Hyper-V-All</span> <span class="n">-source</span> <span class="n">windowsFeatures</span>
-<span class="n">cinst</span> <span class="n">IIS-WebServerRole</span> <span class="n">-source</span> <span class="n">windowsfeatures</span>
-<span class="n">cinst</span> <span class="n">IIS-HttpCompressionDynamic</span> <span class="n">-source</span> <span class="n">windowsfeatures</span>
-<span class="n">cinst</span> <span class="n">IIS-ManagementScriptingTools</span> <span class="n">-source</span> <span class="n">windowsfeatures</span>
-<span class="n">cinst</span> <span class="n">IIS-WindowsAuthentication</span> <span class="n">-source</span> <span class="n">windowsfeatures</span>
-<span class="n">cinst</span> <span class="n">TelnetClient</span> <span class="n">-source</span> <span class="n">windowsFeatures</span>
-
-<span class="n">Install-ChocolateyPinnedTaskBarItem</span> <span class="s2">"$env:windir\system32\mstsc.exe"</span>
-<span class="n">Install-ChocolateyPinnedTaskBarItem</span> <span class="s2">"$env:programfiles\console\console.exe"</span>
-
-<span class="nb">copy-item</span> <span class="p">(</span><span class="nb">Join-Path</span> <span class="p">(</span><span class="nb">Get-PackageRoot</span><span class="p">(</span><span class="nv">$MyInvocation</span><span class="p">))</span> <span class="s1">'console.xml'</span><span class="p">)</span> <span class="n">-Force</span> <span class="nv">$env:appdata</span><span class="p">\</span><span class="n">console</span><span class="p">\</span><span class="n">console</span><span class="p">.</span><span class="n">xml</span>
-
-<span class="n">Install-ChocolateyVsixPackage</span> <span class="n">xunit</span> <span class="n">http</span><span class="err">:</span><span class="p">//</span><span class="n">visualstudiogallery</span><span class="p">.</span><span class="n">msdn</span><span class="p">.</span><span class="n">microsoft</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">463c5987-f82b</span><span class="p">-</span><span class="n">46c8-a97e-b1cde42b9099</span><span class="p">/</span><span class="n">file</span><span class="p">/</span><span class="n">66837</span><span class="p">/</span><span class="n">1</span><span class="p">/</span><span class="n">xunit</span><span class="p">.</span><span class="n">runner</span><span class="p">.</span><span class="n">visualstudio</span><span class="p">.</span><span class="n">vsix</span>
-<span class="n">Install-ChocolateyVsixPackage</span> <span class="n">autowrocktestable</span> <span class="n">http</span><span class="err">:</span><span class="p">//</span><span class="n">visualstudiogallery</span><span class="p">.</span><span class="n">msdn</span><span class="p">.</span><span class="n">microsoft</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">ea3a37c9</span><span class="p">-</span><span class="n">1c76</span><span class="p">-</span><span class="n">4628</span><span class="p">-</span><span class="n">803e-b10a109e7943</span><span class="p">/</span><span class="n">file</span><span class="p">/</span><span class="n">73131</span><span class="p">/</span><span class="n">1</span><span class="p">/</span><span class="n">AutoWrockTestable</span><span class="p">.</span><span class="n">vsix</span>
-</pre></div>
-
-<h2>Get-Help</h2>
-
-<p><a href="https://boxstarter.codeplex.com/Documentation">See the Documentation</a></p>
-
-<div class="highlight"><pre><span class="nb">Import-Module</span> <span class="n">Boxstarter</span><span class="p">.</span><span class="n">Chocolatey</span>
-<span class="nb">Get-Help</span> <span class="n">Boxstarter</span>
-</pre></div>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="http://www.mattwrock.com">Matt Wrock</a></p>
-        <p><a href="https://twitter.com/mwrockx" class="twitter-follow-button" data-show-count="false">Follow @mwrockx</a></p>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-        <p><small>Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <div class="media">
+          <a class="pull-left" href="#">
+            <img height="270" class="media-object" src="images/boxlogo.png" width="270">
+          </a>
+          <div class="media-body">
+            <h1>Boxstarter</h1>
+            <p>Repeatable, <span class="text-primary"><b>reboot resilient</b></span> windows environment installations made easy using <a href="http://chocolatey.org">Chocolatey</a> packages. When its time to repave either <span class="text-primary"><b>bare metal or virtualized</b></span> instances, locally or on a <span class="text-primary"><b>remote machine</b></span>, Boxstarter can automate both trivial and highly complex installations. Compatible with all Windows versions from <span class="text-primary"><b>Windows 7/2008 R2 forward</b></span>.</p>
+            <p><a class="btn btn-primary btn-lg" role="button" href="downloads/Boxstarter.2.0.4.zip"><span class="glyphicon glyphicon-cloud-download"></span> Download v2.0.4</a></p>          
+          </div>
+        </div>
+      </div>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
-<script type="text/javascript">
 
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-39271380-1']);
-  _gaq.push(['_setDomainName', 'boxstarter.org']);
-  _gaq.push(['_trackPageview']);
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-4">
+          <h2>Fast, No prep Installs</h2>
+          <p>You can use Boxstarter to install a complete environment or install a small set of tools and windows settings with absolutely no software pre installed using an easy to remember URL.</p>
+          <p><a class="btn btn-default" href="https://boxstarter.codeplex.com/wikipage?title=Quickly%20setup%20any%20machine%20with%20one%20easy%20to%20remember%20command&referringTitle=Documentation" role="button">View details &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+          <h2>Package Management</h2>
+          <p>Create a private repo on a thumb drive, network share or push your install packages to a public feed. Learn how to create and publish a boxstarter install and then deploy it either to your local machine or a remote computer.</p>
+          <p><a class="btn btn-default" href="https://boxstarter.codeplex.com/wikipage?title=Consuming%20installation%20packages%20from%20a%20local%20or%20hosted%20feed&referringTitle=Documentation" role="button">View details &raquo;</a></p>
+       </div>
+        <div class="col-md-4">
+          <h2>Command Reference</h2>
+          <p>Boxstarter exposes several Powershell commands to customize windows settings, download and install windows updates, automatically generate and pack Nuget packages and handle reboot workflows.</p>
+          <p><a class="btn btn-default" href="https://boxstarter.codeplex.com/documentation" role="button">View details &raquo;</a></p>
+       </div>
+      </div>
 
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
+      <hr>
 
-</script>
+      <footer>
+        <p>&copy; <a href="http://www.mattwrock.com">Matt Wrock 2013</a></p>
+      </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-39271380-1']);
+      _gaq.push(['_setDomainName', 'boxstarter.org']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
   </body>
 </html>
