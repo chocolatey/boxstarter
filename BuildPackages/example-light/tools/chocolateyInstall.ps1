@@ -1,10 +1,10 @@
-Disable-UAC
 Update-ExecutionPolicy Unrestricted
 Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
 Enable-RemoteDesktop
 
-cinstm console-devel
-cinstm sublimetext2
+cinst console-devel
+cinst sublimetext2
+cinst sysinternals
 cinst TelnetClient -source windowsFeatures
 
 $sublimeDir = "$env:programfiles\Sublime Text 2"
