@@ -1,0 +1,35 @@
+﻿@using System.Security.Policy
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    var thisPage = Request.Url.AbsolutePath.ToLower().Substring(1);
+    PageData[thisPage + "Style"] = "active";
+}
+
+<div class="row">
+    <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="list-group">
+            <a href="/" class="list-group-item">Home</a>
+            <a href="WhyBoxstarter" class="list-group-item @PageData["whyBoxstarterStyle"]">Why Boxstarter?</a>
+            <a href="WebLauncher" class="list-group-item @PageData["weblauncherStyle"]">Launch from the Web</a>
+            <a href="InstallBoxstarter" class="list-group-item @PageData["installboxstarterStyle"]">Installing Boxstarter</a>
+            <a href="UsingBoxstarter" class="list-group-item @PageData["usingboxstarterStyle"]">Using Boxstarter Commands</a>
+            <a href="UnderstandingPackages" class="list-group-item @PageData["understandingpackagesStyle"]">Understanding Packages</a>
+            <a href="CreatingPackages" class="list-group-item @PageData["creatingpackagesStyle"]">Creating Packages</a>
+            <a href="PublishingPackages" class="list-group-item @PageData["publishingpackagesStyle"]">Publishing Packages</a>
+            <a href="InstallingPackages" class="list-group-item @PageData["installingpackagesStyle"]">Installing Packages</a>
+            <a href="WinConfig" class="list-group-item @PageData["winconfigStyle"]">Boxstarter WinConfig Features</a>
+            <a href="BoxstarterResources" class="list-group-item @PageData["boxstarterresourcesStyle"]">More Boxstarter Resources</a>
+        </div>
+    </div>
+    <div class="col-md-9" role="main">
+        <div class="media">
+            <a class="pull-right" href="#">
+                <img class="media-object" src="images/boxlogo_sm.png"/>
+            </a>
+            <div class="media-body">
+                @RenderSection("headerBody")
+            </div>
+        </div>
+        @RenderBody()
+    </div>
+</div>

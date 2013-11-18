@@ -1,0 +1,119 @@
+﻿@{
+    Layout = "~/_ContentLayout.cshtml";
+}
+
+@section headerBody {
+    <h1>Creating Packages</h1>
+    <p class="lead">Boxstarter includes some commands that can automate alot of the "grunt" work involved with creating and packing Nuget packages.</p>
+}
+<h3>New-PackageFromScript</h3>
+<p>The simplest way tio create a Nuget package is using the <code>New-PackageFromScript</code> command. This command takes either a file or http URL (like <a href="http://gist.github.com">Github Gist</a>) that represents the install script. The <code>New-PackageFromScript</code> command will create a Chocolatey nuget package with the contents of the script moved to the ChocolateyInstall.ps1 file. While this is an incredibly simple way to create a package for your Boxstarter installations, it does not provide much flexibility in customizing the nuspec manifest or adding other files to your install package.</p>
+
+<h3>New-BoxstarterPackage</h3>
+<p>The New-BoxstarterPackage creates a skeletal package with a minimal Nuspec file and ChocolateyInstall.ps1 file.</p>
+<pre>
+New-BoxstarterPackage -Name MyPackage -Description "I hope you enjoy MyPackage"
+</pre>
+<p>This creates a MyPackage.nuspec file that looks like:</p>
+<pre>
+&lt;?xml version="1.0" ?&gt;
+&lt;package&gt;
+    &lt;metadata&gt;
+    &lt;id&gt;MyPackage&lt;/id&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;authors&gt;Matt&lt;/authors&gt;
+    &lt;owners&gt;Matt&lt;/owners&gt;
+    &lt;description&gt;I hope you enjoy MyPackage&lt;/description&gt;
+    &lt;tags&gt;Boxstarter&lt;/tags&gt;
+  &lt;/metadata&gt;
+&lt;/package&gt;
+</pre>
+<p>And a tools/ChocolateyInstall.ps1 with this code:</p>
+<pre>
+try {
+    Write-ChocolateySuccess 'MyPackage'
+} catch {
+  Write-ChocolateyFailure 'MyPackage' $($_.Exception.Message)
+  throw
+}
+</pre>
+
+<h3>The Boxstarter Local Repository</h3>
+<p>
+    These files are saved to your local Boxstarter Repository. This is where Boxstarter will store your local packages and running Install-BoxstarterPackage will look here first before any external feed. The repo is located in your AppData directory but you can always find out exactly where by inspecting the global Boxstarter variable <code>$Boxstarter.LocalRepo</code>.
+</p>
+<img src="Images/global.png"/>
+<p>You can change the location by using the Set-BoxstarterConfig command:</p>
+<pre>
+Set-BoxstarterConfig -LocalRepo "c:\some\other\location"
+</pre>
+<h3>Editing and adding resources to your package</h3>
+<p>Optionally, you can call New-BoxstarterPackage with a path argument and supply a directory that contains files you want to be included in the package:</p>
+<pre>
+    New-BoxstarterPackage -Name MyPackage -Description "I hope you enjoy MyPackage" -Path "c:\somePath"
+</pre>
+<p>Boxstarter will copy all files at and below c:\somepath and you can refer to these files in your ChocolateyInstall.ps1 using <code>Get-PackageRoot</code>.</p>
+<pre>
+copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'console.xml') -Force $env:appdata\console\console.xml
+</pre>
+<p>Assuming you have a console.xml file at the root of the path you provided to <code>New-BoxstarterPackage</code>, you can access that file from your ChocolateyInstall.ps1 script.</p>
+
+<h3>Composing the ChocolateyIntall Script</h3>
+<p>If you are already familiar with authoring <a href="https://github.com/chocolatey/chocolatey/wiki/CreatePackagesQuickStart">chocolatey package scripts</a>, you know how to do this already. The only difference with boxstarter scripts is that your script also has access to Boxstarter's api for configuring windows, running updates as well as logging and reboot control.</p>
+<p>Lets open the ChocolateyInstall script that New-BoxstarterPackage created for our MyPackage package:</p>
+<pre>
+Notepad (Join-Path $Boxstarter.LocalRepo "MyPackage\tools\ChocolateyInstall.ps1")
+</pre>
+<p>Replace the boilerplate code with something that will actually do something:</p>
+<pre>
+Update-ExecutionPolicy Unrestricted
+Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
+Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
+Set-TaskbarSmall
+Enable-RemoteDesktop
+
+cinst VisualStudio2013ExpressWeb
+cinst fiddler4
+cinst mssqlserver2012express
+cinst git-credential-winstore
+cinst console-devel
+cinstm poshgit
+cinstm windbg
+
+cinst Microsoft-Hyper-V-All -source windowsFeatures
+cinst IIS-WebServerRole -source windowsfeatures
+cinst IIS-HttpCompressionDynamic -source windowsfeatures
+cinst TelnetClient -source windowsFeatures
+
+Install-ChocolateyPinnedTaskBarItem "$env:windir\system32\mstsc.exe"
+Install-ChocolateyPinnedTaskBarItem "$env:programfiles\console\console.exe"
+
+copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'console.xml') -Force $env:appdata\console\console.xml
+
+Install-ChocolateyVsixPackage xunit http://visualstudiogallery.msdn.microsoft.com/463c5987-f82b-46c8-a97e-b1cde42b9099/file/66837/1/xunit.runner.visualstudio.vsix
+Install-ChocolateyVsixPackage autowrocktestable http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix
+
+Install-WindowsUpdate -AcceptEula
+</pre>
+<p>This script does several things and leverages both Chocolatey and Boxstarter commands. Here is what this will do:</p>
+<ul>
+    <li>Set the powershell execution policy to be able to run all scripts</li>
+    <li>Move your personal folders to sync with skydrive</li>
+    <li>Make Windows Explorer tolerable</li>
+    <li>Enable Remote desktop to the box</li>
+    <li>Download and install a bunch of software</li>
+    <li>Enable windows features Hyper-V, IIS and the Telnet client</li>
+    <li>Create some shortcuts in the taskbar for common apps</li>
+    <li>Copy your console configuration file with your favorite settings</li>
+    <li>Install some Visual Studio extensions from the Visual Studio gallery</li>
+    <li>Install all critical windows updates</li>
+</ul>
+
+<h3>Boxstarter ChocolateyInstall Considerations</h3>
+<p>	Boxstarter can run any Chocolatey package and any valid powershell inside that package. However, there are a few things to consider that may make a Boxstarter Chocolatey package a better installation experience.</p>
+<ul>
+    <li>Boxstarter Chocolatey packages should be repeatable. This is especially true if you anticipate the need to reboot. When Boxstarter reboots, it starts running the package from the beginning. So ensure that there is nothing that would cause the package to break if run twice.</li>
+    <li>If you have several Chocolatey packages that you want to install during the Boxstarter session, it is preferable to call CINST directly from inside your ChocolateyInstall instead of declaring them as dependencies. This is because Boxstarter cannot intercept Chocolatey dependencies so those packages will not have any reboot protections.</li>
+</ul>
+<h3>Packing your Package .nupkg</h3>
+<p>Once you are finished composing your package contents, you can call <code>Invoke-BoxstarterBuild MyPackage</code> to generate the nupkg file for MyPackage. Boxstarter saves these files in the root of <code>$Boxstarter.LocalRepo</code>. If you have several packages in the local repo that you want to build all at once, omit the package name from the command to build all packages in the repo.</p>

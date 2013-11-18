@@ -1,0 +1,140 @@
+﻿@{
+    Layout = "~/_ContentLayout.cshtml";
+}
+
+@section headerBody {
+    <h1>Using Boxstarter Commands</h1>
+    <p class="lead">If you are unfamiliar with using Powershell modules, here is some guidance to get you started.
+}
+<h3>Administrative Privileges</h3>
+<p>Many Boxstarter commands require an "Elevated" powershell console. This is a Powershell window opened explicitly with administrative privileges. Where it can, Boxstarter will attempt to open a new command with administrative privileges, but in some other cases, you may get an error stating that administrative rights are required.</p>
+
+<p>Depending on the OS version you are using, there are a few ways to launch Powershell as administrator. One way that works everywhere is:</p>
+<ol>
+    <li>Press the Windows key.</li>
+    <li>Start typing "Powershell" until you see the Windows powershell shortcut appear.</li>
+    <li>Select this shortcut and then type <b>Ctrl+Shift+Enter</b></li>
+</ol>
+<div class="row">
+    <div class="col-sm-6 col-md-4">
+        <div class="thumbnail">
+            <div class="caption">
+                <b>Windows 8</b>
+            </div>
+            <img src="Images/win8admin.png">
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-4">
+        <div class="thumbnail">
+            <div class="caption">
+                <b>Windows 7</b>
+            </div>
+            <img src="Images/win7admin.png">
+        </div>
+    </div>
+</div>
+
+<h3>Execution Policy</h3>
+<p>By default, Poweshell blocks the running of scripts and will therefore block the execution of all Boxstarter commands. If you have not done so already on the machine you are using Boxstarter, there is a one time command you must run in order to lift this restriction:</p>
+<pre>
+Set-ExecutionPolicy Unrestricted -Force
+</pre>
+<p>This must be run with administrative privileges. Now you can call Boxstarter commands.</p>
+
+<h3>Importing the Boxstarter Modules</h3>
+<p>Like all other powershell modules, the Boxstarter modules must be imported in order to be used. As long as Boxstarter was installed using Chocolatey or the Boxstarter download zip file, the directory where the Boxstarter powershell mdules are installed, is added to the PSModulePath. This means that the module can be imported simply by referencing the module name and there is no need to specify the exact path of one's module manifest:</p>
+<pre>
+Import-Module Boxstarter.Chocolatey
+</pre>
+<p>Although there are several Boxstarter modules, you should only ever need to import the Boxstarter.Chocolatey module. This is because during Module initialization, all other modules are loaded by the Boxstarter.Chocolatey module.</p>
+
+<h3>Discovering Boxstarter Commands</h3>
+<p>Once the Boxstarter Modules are imported, you can see them in your session:</p>
+<pre>
+C:\dev\boxstarter> get-module
+ModuleType Version    Name                                ExportedCommands
+---------- -------    ----                                ----------------
+Script     2.0.11     Boxstarter.Bootstrapper             {Enter-BoxstarterL...
+Script     2.0.11     Boxstarter.Chocolatey               {Get-BoxStarterCon...
+Script     2.0.11     BoxStarter.WinConfig                {Disable-InternetE...
+Manifest   3.1.0.0    Microsoft.PowerShell.Management     {Add-Computer, Add...
+Manifest   3.0.0.0    Microsoft.PowerShell.Security       {ConvertFrom-Secur...
+Manifest   3.1.0.0    Microsoft.PowerShell.Utility        {Add-Member, Add-T...
+</pre>
+
+<p>You can list all commands available from a poewershell module by using:</p>
+<pre>
+C:\dev\boxstarter> Get-Command -Module Boxstarter.Chocolatey
+CommandType     Name                                               ModuleName
+-----------     ----                                               ----------
+Alias           Install-ChocolateyInstallPackage                   Boxstarte...
+Function        Get-BoxStarterConfig                               Boxstarte...
+Function        Get-PackageRoot                                    Boxstarte...
+Function        Install-BoxstarterPackage                          Boxstarte...
+Function        Install-ChocolateyInstallPackageOverride           Boxstarte...
+Function        Invoke-BoxStarterBuild                             Boxstarte...
+Function        Invoke-ChocolateyBoxstarter                        Boxstarte...
+Function        New-BoxstarterPackage                              Boxstarte...
+Function        New-PackageFromScript                              Boxstarte...
+Function        Set-BoxStarterConfig                               Boxstarte...
+Function        Set-BoxstarterShare                                Boxstarte...
+</pre>
+
+<h3>Help!</h3>
+<p>Powershell can provide detailed help for any command that provides this metadata. Calling <code>Get-Help CommandName -Full</code> will return this information:</p>
+<pre>
+C:\dev\boxstarter> Get-Help Install-BoxstarterPackage -Full
+NAME
+    Install-BoxstarterPackage
+SYNOPSIS
+    Installs a Boxstarter package
+SYNTAX
+    Install-BoxstarterPackage [-PackageName] &lt;string&gt; [-Credential
+&lt;pscredential&gt;] [-Force] [-DisableReboots] [-KeepWindowOpen] [-LocalRepo
+&lt;string&gt;] [&lt;commonparameters&gt;]
+    Install-BoxstarterPackage [-ComputerName] &lt;string&gt; [-PackageName] &lt;string&gt;
+    [-Credential &lt;pscredential&gt;] [-Force] [-DisableReboots] [-LocalRepo
+&lt;string&gt;] [&lt;commonparameters&gt;]
+    Install-BoxstarterPackage [-ConnectionUri] &lt;uri&gt; [-PackageName] &lt;string&gt;
+    [-Credential &lt;pscredential&gt;] [-Force] [-DisableReboots] [-LocalRepo
+&lt;string&gt;] [&lt;commonparameters&gt;]
+    Install-BoxstarterPackage [-Session] &lt;pssession&gt; [-PackageName] &lt;string&gt;
+    [-Credential &lt;pscredential&gt;] [-Force] [-DisableReboots] [-LocalRepo
+&lt;string&gt;] [&lt;commonparameters&gt;]
+DESCRIPTION
+    This function must be run as administrator.
+    This function wraps a Chocolatey Install and provides these additional
+    features
+     - Installs chocolatey if it is not already installed
+     - Installs the .net 4.5 framework if it is not installed which is a
+    chocolatey requirement
+     - Disables windows update service during installation to prevent
+    installation conflicts and minimize the need for reboots
+     - Imports the Boxstarter.WinConfig module that provides functions for
+    customizing windows
+     - Detects pending reboots and restarts the machine when necessary to
+    avoid installation failures
+     - Provides Reboot Resiliency by ensuring the package installation is
+    immediately restarted up on reboot if there is a reboot during the
+    installation.
+     - Ensures everything runs under admin
+     - Supports remote installations allowing packages to be installed on a
+    remote machine
+    ...
+</pre>
+<p>Boxstarter also provides certain topical help resources you can find with:</p>
+<pre>
+C:\dev\boxstarter> Get-Help about_Boxstarter
+Name                              Category  Module                    Synopsis
+----                              --------  ------                    --------
+about_boxstarter_logging          HelpFile                            Descri...
+about_boxstarter_bootstrapper     HelpFile                            Descri...
+About_Boxstarter_Variable_In_B... HelpFile                            A Hash...
+about_boxstarter_chocolatey       HelpFile                            Descri...
+About_Boxstarter_Variable_In_C... HelpFile                            A Hash...
+about_boxstarter_bootstrapper     HelpFile                            Descri...
+About_Boxstarter_Variable_In_B... HelpFile                            A Hash...
+about_boxstarter_chocolatey       HelpFile                            Descri...
+About_Boxstarter_Variable_In_C... HelpFile                            A Hash...
+about_boxstarter_logging          HelpFile                            Descri...
+</pre>

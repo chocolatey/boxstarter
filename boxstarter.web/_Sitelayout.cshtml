@@ -1,0 +1,102 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <title>Boxstarter</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="content/bootstrap.min.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        .jumbotron {
+            background-color: #fafad2;
+            background-color: rgba(235, 214, 61, 0.24);
+            padding-bottom: 10px;
+        }
+
+        .btn-navbar {
+            margin-top: 8px
+        }
+
+        .twitter-follow-button {
+            margin-top: 8px;
+        }
+    </style>    
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-default" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Boxstarter</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/WhyBoxstarter">Documentation</a></li>
+                <li><a href="https://boxstarter.codeplex.com/workitem/list/basic">Issues</a></li>
+                <li><a href="https://boxstarter.codeplex.com/discussions">Discussion</a></li>
+                <li><a href="http://boxstarter.codeplex.com/SourceControl/latest">Source Code</a></li>
+                <li><a href="/license">License</a></li>
+            </ul>
+            <a class="btn btn-primary btn-navbar" role="button" href="downloads/Boxstarter.2.0.11.zip"><span class="glyphicon glyphicon-cloud-download"></span> Download v2.0.11</a>
+            <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a href="https://twitter.com/mwrockx" class="twitter-follow-button" data-show-count="false">Follow @@mwrockx</a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>            
+            </li>
+          </ul>
+        </div><!-- /.nav-collapse -->
+      </div><!-- /.container -->
+    </div><!-- /.navbar -->
+
+    @RenderSection("featured", required: false)
+
+   <div class="container">
+       @RenderBody()
+      <hr>
+
+      <footer>
+        <p>&copy; <a href="http://www.mattwrock.com">Matt Wrock @DateTime.Now.Year</a></p>
+      </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="scripts/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-39271380-1']);
+      _gaq.push(['_setDomainName', 'boxstarter.org']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+  </body>
+</html>

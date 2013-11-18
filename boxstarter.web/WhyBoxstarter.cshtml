@@ -1,0 +1,46 @@
+﻿@{
+    Layout = "~/_ContentLayout.cshtml";
+}
+
+@section headerBody {
+    <h1>Why Boxstarter?</h1>
+}
+
+<p>Boxstarter leverages <a href="http://chocolatey.org">Chocolatey</a> packages to automate the installation of software and create repeatable, scripted Windows environments. Chocolatey makes installing software very easy with no user intervention. <span class="text-primary">Boxstarter enhances Chocolatey's functionality and provides an environment that is optimized for installing a complete environment on a fresh OS install</span> as well as some other specific scenarios.</p>
+
+<h3>Reboot Resiliency</h3>
+<p>Anyone who has installed much software in a Windows environment understands that, like it or not, reboots are often required to complete an installation. Sometimes an install will simply fail with an obscure error if a reboot is pending or other times, the installation will not be complete untill a reboot is performed. The primary objective of a Boxstarter installation, is to launch an environment installation no matter how complex with no interruption. To achieve this, Boxstarter intercepts all chocolatey install commands and checks for pending reboots. If a pending reboot is detected, Boxstarter will reboot the machine and automatically log the user back on and resume the installation. Boxstarter will even suspend Bitlocker, if enabled, to avoid prompts for the Bitlocker key upon reboot.</p>
+
+<h3>Remote Installations</h3>
+<p>All of the features discussed here can be performed either locally or on a Remote machine. Whether it be a Virtual Machine or bare metal, Boxstarter uses a combination of Powershell Remoting and Scheduled Tasks to allow one to fully configure a Windows environment on another machine. This is ideal for needing to repeatedly tear down and rebuild boxes with the same configuration.</p>
+
+<h3>Runs with Administrative Privileges</h3>
+<p>Many applications require administrative privileges to install. Chocolatey, for good reason, allows non administrative users to perform installs and will request administrative privileges throughout the installation whenever they are required. Since a Boxstarter installation must not interrupt the session once it begins, Boxstarter runs with administrative privileges the whole way through to avoid these interactive prompts.</p>
+
+<h3>Reduce Installation Conflicts</h3>
+<p>Shortly after completing a new OS install, which is when a Boxstarter install often runs, there is alot going on that can conflict with some application installs or cause them to fail.</p>
+
+<h4>Suspend Windows Updates</h4>
+<p>Depending on the version of Windows installed, there may be well over 100 critical updates that Windows, by default, will immediately start downloading and installing. This consumes disk, processor and network resources that affect the performance of the installations you are trying to install and more importantly, it will cause many installations to terminate unsuccesfully upon finding that other installations are in progress.</p>
+
+<h4>Detect other MSIEXEC processes</h4>
+<p>Before all MSI based installations, Boxstater will look for other MSIEXEC processes and wait until those have completed before commencing with the Boxstarter package being installed. This prevents the same installation failures described above.</p>
+
+<h4>Suspend System Center Client</h4>
+<p>For the same reasons that Boxstarter suspends Windows Updates, Boxstarter suspends the System Center Client which is responsible for installing software on a machine in many enterprise environments.</p>
+
+<h3>Windows Customizations</h3>
+<p>Boxstarter includes a set of commands that perform a variety of windows customizations. These are largely registry key toggles that can:</p>
+<ul>
+    <li>Adjust the task bar size</li>
+    <li>Configre common Windows Explorer settings like showing hidden files and folders and more</li>
+    <li>Turn off IE Enhanced security</li>
+    <li>Enable Remote Desktop</li>
+    <li>and many more...</li>
+</ul>
+
+<h3>Check, dowload and install windows updates</h3>
+<p>Almost any environment install will want to include the installation of windows updates. At least those considered "critical." Boxstarter can perform these silently. With Boxstarter's reboot resilliency, it will reboot if the updates require one to complete and Boxstarter will keep checking for updates until all updates have installed without a call to reboot.</p>
+
+<h3>Convenience commands to automate Nuget Package Creation</h3>
+<p>Boxstarter provides commands that can auto generate both the nuspec and provide a skeletal ChocolateyInstall.ps1. You can even point Boxstarter to a single script file and it will generate a .nupkg file that will execute that script.</p>

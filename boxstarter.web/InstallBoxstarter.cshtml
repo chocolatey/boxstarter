@@ -1,0 +1,30 @@
+﻿@{
+    Layout = "~/_ContentLayout.cshtml";
+}
+
+@section headerBody {
+    <h1>Installing Boxstarter</h1>
+    <p class="lead">Boxstarter can be installed using <a href="http://chocolatey.org">Chocolatey</a> or by downloading the Boxstarter zip file and running Setup.Bat</p>
+}
+
+<p>NOTE: If you simply want to install a "one-off" script locally on a machine, you may find it easiest to <a href="weblauncher">launch Boxstarter from the web</a>.</p>
+<h3>Prerequisites</h3>
+<p>Boxstarter requires the following to work:</p>
+<ul>
+    <li>OS: Windows 7 or Windows Server 2008 R2 and higher</li>
+    <li>Powershell Version 2 or higher</li>
+    <li>Administrative privileges on the machine where Boxstarter is running</li>
+</ul>
+
+<h3>Installing from Chocolatey</h3>
+<pre>
+CINST Boxstarter.Chocolatey
+</pre>
+<img src="images\installed.png" />
+<p>This will download and install the Boxstarter modules to your PSModulePath.</p>
+<h3>Downloading the zip file</h3>
+<p>The zip file contains a Setup.Bat file that will go to Chocolatey and install Boxstarter. If Chocolatey is not installed on your machine, the Boxstarter istaller will request the user's permission to install it.</p>
+<img src="Images/setup.png"/>
+<p>Boxstarter is now installed in your modules path!</p> 
+
+<p><span class="text-primary">NOTE:</span> <b>You may need to open a new Powershell window to Import and use Boxstarter</b>.</p>

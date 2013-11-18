@@ -1,0 +1,46 @@
+﻿@{
+    Layout = "~/_ContentLayout.cshtml";
+}
+
+@section headerBody {
+    <h1>Boxstarter WinConfig Features</h1>
+    <p class="lead">Boxstarter provides several commnds for customizing the Windows experience</p>
+}
+<p>Below are the commands that Boxstarter makes available to all packages run from within Boxstarter:</p>
+<h3>Disable-InternetExplorerESC</h3>
+<p>Turns off IE Enhansed Security Configuration that is on by defaulton Server OS versions.</p>
+
+<h3>Disable-UAC</h3>
+<p>Disables UAC. Note that Windows 8 and 8.1 can not launch Windows Store apps with UAC disabled.</p>
+
+<h3>Enable-RemoteDesktop</h3>
+<p>Allows Remote Desktop access to machine and enables Remote Desktop firewall rule.</p>
+
+<h3>Enable-UAC</h3>
+<p>Enables UAC.</p>
+
+<h3>Install-WindowsUpdate</h3>
+<p>Finds, downloads and installs all Windows Updates. By default only critical updates will be searched. However the command takes a <code>-Criteria</code> argument allowing one to pass a custom Windows Update query.</p>
+<p>For details about the <code>Install-WindowsUpdate</code> command, see the <a href="http://boxstarter.codeplex.com/wikipage?title=Install-WindowsUpdate">Boxtarter Command Reference at Codeplex</a>.</p>
+
+<h3>Move-LibraryDirectory</h3>
+<p>Libraries are special folders that map to a specific location on disk. These are usually found somewhere under $env:userprofile. This function can be used to redirect the library folder to a new location on disk. If the new location does not already exist, the directory will be created. Any content in the former library directory will be moved to the new location unless the DoNotMoveOldContent switch is used. Use Get-LibraryNames to discover the names of different libraries and their current physical directories.</p>
+
+<pre>
+Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
+</pre>
+<p>This moves the Personal library (aka Documents) to the documents folder off of the default skydrive directory.</p>
+
+<h3>Set-ExplorerOptions</h3>
+<p>Sets options on the windows Explorer shell</p>
+<pre>
+Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
+</pre>
+
+<h3>Set-TaskbarSmall</h3>
+<p>Makes the windows task bar skinny</p>
+
+<h3>Update-ExecutionPolicy</h3>
+<p>The execution policy is set in a separate elevated powershell process. If running in the chocolatey runner, the current window cannot be used because its execution policy has been explicitly set.</p> 
+
+<p>If on a 64 bit machine, the policy will be set for both 64 and 32 bit shells.</p>
