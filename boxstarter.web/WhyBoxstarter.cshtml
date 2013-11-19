@@ -13,6 +13,7 @@
 
 <h3>Remote Installations</h3>
 <p>All of the features discussed here can be performed either locally or on a Remote machine. Whether it be a Virtual Machine or bare metal, Boxstarter uses a combination of Powershell Remoting and Scheduled Tasks to allow one to fully configure a Windows environment on another machine. This is ideal for needing to repeatedly tear down and rebuild boxes with the same configuration.</p>
+<p>While using Chcolatey in a Powershell remoting session will most often succeed, many installs leverage the Windows Update service under the hood for certain installation steps. These will fail in a remote powershell session. Boxstarter intercepts all calls to MSIEXEC, DISM and its own Windows Update command and wraps then in a scheduled task that an run with a local administrative token leading to a succesful install.</p>
 
 <h3>Runs with Administrative Privileges</h3>
 <p>Many applications require administrative privileges to install. Chocolatey, for good reason, allows non administrative users to perform installs and will request administrative privileges throughout the installation whenever they are required. Since a Boxstarter installation must not interrupt the session once it begins, Boxstarter runs with administrative privileges the whole way through to avoid these interactive prompts.</p>
@@ -39,7 +40,7 @@
     <li>and many more...</li>
 </ul>
 
-<h3>Check, dowload and install windows updates</h3>
+<h3>Check, dowload and install Windows Updates</h3>
 <p>Almost any environment install will want to include the installation of windows updates. At least those considered "critical." Boxstarter can perform these silently. With Boxstarter's reboot resilliency, it will reboot if the updates require one to complete and Boxstarter will keep checking for updates until all updates have installed without a call to reboot.</p>
 
 <h3>Convenience commands to automate Nuget Package Creation</h3>
