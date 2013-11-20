@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5e1cddbb-95bc-4f9d-8491-d7ad6c497d2c}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MyApplication</RootNamespace>
+    <AssemblyName>MyApplication</AssemblyName>
+    <Name>Boxstarter.Bootstrapper</Name>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Boxstarter.bootstrapper.psd1" />
+    <Compile Include="BoxStarter.Bootstrapper.psm1" />
+    <Compile Include="Cleanup-Boxstarter.ps1" />
+    <Compile Include="Get-BoxstarterTempDir.ps1" />
+    <Compile Include="Get-PendingReboot.ps1" />
+    <Compile Include="Init-Settings.ps1" />
+    <Compile Include="Invoke-Boxstarter.ps1" />
+    <Compile Include="Invoke-Reboot.ps1" />
+    <Compile Include="Set-SecureAutoLogon.ps1" />
+    <Compile Include="Start-UpdateServices.ps1" />
+    <Compile Include="Stop-UpdateServices.ps1" />
+    <Compile Include="Test-PendingReboot.ps1" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Target Name="Build" />
+</Project>
