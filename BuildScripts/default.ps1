@@ -15,7 +15,7 @@ properties {
 }
 
 Task default -depends Build
-Task Build -depends Build-Clickonce, Test, Package
+Task Build -depends Build-Clickonce, Build-Web, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to Myget'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Codeplex, Push-Chocolatey
@@ -40,8 +40,13 @@ task Create-ModuleZipForRemoting {
 
 task Build-ClickOnce {
     Update-AssemblyInfoFiles $version $changeset
-    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:quiet }
-    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:quiet }
+    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
+    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
+}
+
+task Build-Web {
+    exec { msbuild "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
+    exec { msbuild "$baseDir\Web\Web.csproj" /t:Build /v:minimal }
 }
 
 task Publish-ClickOnce {
