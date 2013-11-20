@@ -17,9 +17,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildScripts", "BuildScript
 		BuildScripts\bootstrapper.ps1 = BuildScripts\bootstrapper.ps1
 		BuildScripts\build.proj = BuildScripts\build.proj
 		BuildScripts\build.ps1 = BuildScripts\build.ps1
+		BuildScripts\chocolateyinstall.ps1 = BuildScripts\chocolateyinstall.ps1
 		BuildScripts\default.ps1 = BuildScripts\default.ps1
+		BuildScripts\Microsoft.WebApplication.targets = BuildScripts\Microsoft.WebApplication.targets
 		BuildScripts\setup.ps1 = BuildScripts\setup.ps1
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9934F8F4-B4E6-4C70-8BEA-30CCF926284A}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		BoxStarter.bat = BoxStarter.bat
+		boxstarter.config = boxstarter.config
+		build.bat = build.bat
+		LICENSE.txt = LICENSE.txt
+		setup.bat = setup.bat
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{87B9154F-EDBF-47CE-AAF2-7ECF4B6C9A93}"
+	ProjectSection(SolutionItems) = preProject
+		BuildScripts\nuget\boxstarter.bootstrapper.nuspec = BuildScripts\nuget\boxstarter.bootstrapper.nuspec
+		BuildScripts\nuget\boxstarter.chocolatey.nuspec = BuildScripts\nuget\boxstarter.chocolatey.nuspec
+		BuildScripts\nuget\BoxStarter.Common.nuspec = BuildScripts\nuget\BoxStarter.Common.nuspec
+		BuildScripts\nuget\boxstarter.nuspec = BuildScripts\nuget\boxstarter.nuspec
+		BuildScripts\nuget\BoxStarter.WinConfig.nuspec = BuildScripts\nuget\BoxStarter.WinConfig.nuspec
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Boxstarter.WebLaunch", "Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj", "{7339091F-13A0-4353-8DED-589BDFC8FE0F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,8 +54,15 @@ Global
 		{85FA5520-9E21-4B74-92EA-D855DF17E8E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{85FA5520-9E21-4B74-92EA-D855DF17E8E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{85FA5520-9E21-4B74-92EA-D855DF17E8E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7339091F-13A0-4353-8DED-589BDFC8FE0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7339091F-13A0-4353-8DED-589BDFC8FE0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7339091F-13A0-4353-8DED-589BDFC8FE0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7339091F-13A0-4353-8DED-589BDFC8FE0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{87B9154F-EDBF-47CE-AAF2-7ECF4B6C9A93} = {E959DA78-673C-42A8-B935-F9665BC4C54B}
 	EndGlobalSection
 EndGlobal

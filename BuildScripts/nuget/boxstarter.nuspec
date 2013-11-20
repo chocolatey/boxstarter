@@ -22,7 +22,7 @@
       - Use a simple url or file to hols install script: http://boxstarter.org/package/url?https://gist.github.com/mwrock/7071154/raw/bbf13791ea07fcaaebe5e5b301dc14f5a0438f34/gistfile1.txt
       - Make compatible with Chocolatey 0.9.8.21
       - Suspend Bitlocker on reboot
-      - Install .net 4.5 instead of 4.o when missing .net 4 before chocolatey install
+      - Install .net 4.5 instead of 4.0 when missing .net 4 before chocolatey install
       - No longer stop the windows update service. Now we disable the policy to check for updates so installers that need windows update services succeed.
       - Improve multiple MSIEXEC interference detection
       - Add NoPassword parameter to Invoke-ChocolateyBoxstarter for when there is no need to preserve password

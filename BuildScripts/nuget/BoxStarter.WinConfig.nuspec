@@ -18,7 +18,7 @@
   </metadata>
   <files>
     <file src="..\..\LICENSE.txt" target="tools"/>
-    <file src="chocolateyinstall.ps1" target="tools"/>
+    <file src="..\chocolateyinstall.ps1" target="tools"/>
     <file src="..\Setup.ps1" target="tools"/>    
     <file src="..\..\Boxstarter.WinConfig\**\*.*" target="tools\Boxstarter.WinConfig"/>
   </files>

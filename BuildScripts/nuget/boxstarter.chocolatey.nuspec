@@ -28,7 +28,7 @@
     </releaseNotes>
   </metadata>
   <files>
-    <file src="chocolateyinstall.ps1" target="tools"/>
+    <file src="..\chocolateyinstall.ps1" target="tools"/>
     <file src="..\Setup.ps1" target="tools"/>    
     <file src="..\..\boxstarter.bat" target="tools"/>
     <file src="..\..\boxstarter.config" target="tools"/>    

@@ -50,7 +50,7 @@ task Build-Web {
 }
 
 task Publish-ClickOnce {
-    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:quiet /p:ApplicationVersion="$version.0" }
+    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version.0" }
     Remove-Item "$basedir\web\Launch" -Recurse -Force -ErrorAction SilentlyContinue
     MkDir "$basedir\web\Launch"
     Set-Content "$basedir\web\Launch\.gitattributes" -Value "* -text"
