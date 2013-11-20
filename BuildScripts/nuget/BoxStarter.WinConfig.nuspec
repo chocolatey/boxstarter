@@ -4,7 +4,7 @@
     <version>$version$</version>
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
-    <projectUrl>https://BoxStarter.codeplex.com</projectUrl>
+    <projectUrl>http://BoxStarter.org</projectUrl>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <id>BoxStarter.WinConfig</id>
     <title>BoxStarter WinConfig Module</title>

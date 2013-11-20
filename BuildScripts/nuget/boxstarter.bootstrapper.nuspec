@@ -7,7 +7,7 @@
     <owners>Matt Wrock</owners>
     <title>BoxStarter Bootstrapper Module</title>
     <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=boxstarter&amp;DownloadId=635599&amp;Build=20006</iconUrl>
-    <projectUrl>https://BoxStarter.codeplex.com</projectUrl>
+    <projectUrl>http://BoxStarter.org</projectUrl>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <description>Boxstarter's Bootstrapper module provides a powershell wrapper that supports reboots and automatic logons and exposes commands that can detect pending reboots, perform logging and messaging, and several commands that can configure various windows settings.</description>
     <tags>boxstarter bootstrapper environment setup</tags>

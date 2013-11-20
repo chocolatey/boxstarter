@@ -7,7 +7,7 @@
     <owners>Matt Wrock</owners>
     <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=boxstarter&amp;DownloadId=635599&amp;Build=20006</iconUrl>
     <title>BoxStarter Chocolatey Module</title>
-    <projectUrl>https://BoxStarter.codeplex.com</projectUrl>
+    <projectUrl>http://BoxStarter.org</projectUrl>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <description>Creates a fresh developer (or non developer) environment from a bare OS utilizing powershell and chocolatey. Installs chocolatey, cutomizes windows settings, installs windows updates, handles reboots, installs windows features and your favorite applications.</description>
     <tags>boxstarter chocolatey environment setup</tags>
