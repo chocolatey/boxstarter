@@ -2,34 +2,35 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "boxstarter.web(1)", "http://localhost:3768", "{45BB343F-1C9A-4C43-BA7A-6BC4B8FF24EC}"
-	ProjectSection(WebsiteProperties) = preProject
-		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_3768"
-		Debug.AspNetCompiler.PhysicalPath = "boxstarter.web\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_3768\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_3768"
-		Release.AspNetCompiler.PhysicalPath = "boxstarter.web\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_3768\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "boxstarter.web\"
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{926019EE-3404-4C43-BD39-B1AC5C7A2111}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Web\Web.csproj", "{85FA5520-9E21-4B74-92EA-D855DF17E8E1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildScripts", "BuildScripts", "{E959DA78-673C-42A8-B935-F9665BC4C54B}"
+	ProjectSection(SolutionItems) = preProject
+		BuildScripts\bootstrapper.ps1 = BuildScripts\bootstrapper.ps1
+		BuildScripts\build.proj = BuildScripts\build.proj
+		BuildScripts\build.ps1 = BuildScripts\build.ps1
+		BuildScripts\default.ps1 = BuildScripts\default.ps1
+		BuildScripts\setup.ps1 = BuildScripts\setup.ps1
 	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{45BB343F-1C9A-4C43-BA7A-6BC4B8FF24EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{45BB343F-1C9A-4C43-BA7A-6BC4B8FF24EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85FA5520-9E21-4B74-92EA-D855DF17E8E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85FA5520-9E21-4B74-92EA-D855DF17E8E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85FA5520-9E21-4B74-92EA-D855DF17E8E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85FA5520-9E21-4B74-92EA-D855DF17E8E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

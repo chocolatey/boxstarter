@@ -16,3 +16,7 @@ bin
 *.suo
 Boxstarter.Chocolatey/Boxstarter.zip
 Packages
+Web/Content
+Web/fonts
+Web/Scripts
+Web/Launch

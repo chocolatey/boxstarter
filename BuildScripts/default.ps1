@@ -46,10 +46,10 @@ task Build-ClickOnce {
 
 task Publish-ClickOnce {
     exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:quiet /p:ApplicationVersion="$version.0" }
-    Remove-Item "$basedir\public\Launch" -Recurse -Force -ErrorAction SilentlyContinue
-    MkDir "$basedir\public\Launch"
-    Set-Content "$basedir\public\Launch\.gitattributes" -Value "* -text"
-    Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\public\Launch" -Recurse -Force
+    Remove-Item "$basedir\web\Launch" -Recurse -Force -ErrorAction SilentlyContinue
+    MkDir "$basedir\web\Launch"
+    Set-Content "$basedir\web\Launch\.gitattributes" -Value "* -text"
+    Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\web\Launch" -Recurse -Force
 }
 
 Task Test -depends Create-ModuleZipForRemoting {
@@ -119,9 +119,9 @@ Task Package-DownloadZip -depends Clean-Artifacts {
 }
 
 Task Deploy-DownloadZip -depends Package-DownloadZip {
-    Remove-Item "$basedir\public\downloads" -Recurse -Force -ErrorAction SilentlyContinue
-    mkdir "$basedir\public\downloads"
-    Copy-Item "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\public\downloads"
+    Remove-Item "$basedir\web\downloads" -Recurse -Force -ErrorAction SilentlyContinue
+    mkdir "$basedir\web\downloads"
+    Copy-Item "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\web\downloads"
 }
 
 Task Push-Nuget -description 'Pushes the module to Myget feed' {
@@ -153,11 +153,9 @@ Task Push-Codeplex {
 }
 
 task Update-Homepage {
-     $downloadUrl="Boxstarter.$version.zip"
-     $downloadButtonUrlPatern="Boxstarter\.[0-9]+(\.([0-9]+|\*)){1,3}\.zip"
-     $downloadLinkTextPattern="V[0-9]+(\.([0-9]+|\*)){1,3}"
-     $filename = "$baseDir\public\index.html"
-     (Get-Content $filename) | % {$_ -replace $downloadButtonUrlPatern, $downloadUrl } | % {$_ -replace $downloadLinkTextPattern, ("v"+$version) } | Set-Content $filename
+     $versionPattern="[0-9]+(\.([0-9]+|\*)){1,3}"
+     $filename = "$baseDir\web\App_Code\Helper.cshtml"
+     (Get-Content $filename) | % {$_ -replace $versionPattern, ($version) } | Set-Content $filename
 }
 
 task Test-VM -requiredVariables "VmName","package"{
