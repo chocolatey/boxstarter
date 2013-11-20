@@ -2,7 +2,7 @@ function Get-Boxstarter {
     Write-Output "Welcome to the Boxstarter Module installer!"
     if(Check-Chocolatey ){    
         Write-Output "Chocoltey installed, Installing Boxstarter Modules."
-        cinst Boxstarter.Chocolatey -version 2.0.11
+        cinst Boxstarter -version 2.0.11
         $Message = "Boxstarter Module Installer completed"
     }
     else {
@@ -55,7 +55,7 @@ function Enable-Net40 {
 }
 
 function Confirm-Install {
-    $caption = "Installing Chocoltey"
+    $caption = "Installing Chocolatey"
     $message = "Chocolatey is going to be downloaded and installed on your machine. If you do not have the .NET Framework Version 4, that will aldo be downloaded and installed. Do you want to proceed?"
     $yes = new-Object System.Management.Automation.Host.ChoiceDescription "&Yes","Yes";
     $no = new-Object System.Management.Automation.Host.ChoiceDescription "&No","No";
