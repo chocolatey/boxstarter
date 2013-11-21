@@ -40,17 +40,17 @@ task Create-ModuleZipForRemoting {
 
 task Build-ClickOnce {
     Update-AssemblyInfoFiles $version $changeset
-    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
-    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
+    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
+    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
 }
 
 task Build-Web {
-    exec { msbuild "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
-    exec { msbuild "$baseDir\Web\Web.csproj" /t:Build /v:minimal }
+    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
+    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /t:Build /v:minimal }
 }
 
 task Publish-ClickOnce {
-    exec { msbuild "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version.0" }
+    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version.0" }
     Remove-Item "$basedir\web\Launch" -Recurse -Force -ErrorAction SilentlyContinue
     MkDir "$basedir\web\Launch"
     Set-Content "$basedir\web\Launch\.gitattributes" -Value "* -text"
