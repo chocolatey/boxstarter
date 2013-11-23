@@ -28,5 +28,18 @@ about_boxstarter_bootstrapper
         Log-BoxstarterMessage "$rebootPending"
         return $true
     }
+    return IsCCMRebootPending
+}
+
+function IsCCMRebootPending {
+    try { $clientutils = [wmiclass]"\\.\root\ccm\clientsdk:CCM_ClientUtilities" } catch{}
+    if($clientutils) {
+        try {
+            $determination=$clientutils.DetermineIfRebootPending()
+            $isPending=$determination.RebootPending
+            if($isPending){Write-BoxstarterMessage "Configuration manager is pending reboot"}
+            return $isPending
+            } catch {}
+    }
     return $false
 }
