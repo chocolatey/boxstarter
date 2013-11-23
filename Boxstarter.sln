@@ -48,6 +48,8 @@ Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.Chocolatey", "Bo
 EndProject
 Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.Bootstrapper", "Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.pssproj", "{5E1CDDBB-95BC-4F9D-8491-D7AD6C497D2C}"
 EndProject
+Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Tests", "Tests\Tests.pssproj", "{A76A363C-7088-497F-914B-C3239B8D1D73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +72,10 @@ Global
 		{5E1CDDBB-95BC-4F9D-8491-D7AD6C497D2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E1CDDBB-95BC-4F9D-8491-D7AD6C497D2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E1CDDBB-95BC-4F9D-8491-D7AD6C497D2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A76A363C-7088-497F-914B-C3239B8D1D73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A76A363C-7088-497F-914B-C3239B8D1D73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A76A363C-7088-497F-914B-C3239B8D1D73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A76A363C-7088-497F-914B-C3239B8D1D73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

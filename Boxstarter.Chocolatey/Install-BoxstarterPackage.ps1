@@ -155,11 +155,11 @@ about_boxstarter_chocolatey
     [CmdletBinding(DefaultParameterSetName="Package")]
 	param(
         [parameter(Mandatory=$true, Position=0, ParameterSetName="ComputerName")]
-        [string]$ComputerName,
+        [string[]]$ComputerName,
         [parameter(Mandatory=$true, Position=0, ParameterSetName="Uri")]
-        [Uri]$ConnectionUri,
+        [Uri[]]$ConnectionUri,
         [parameter(Mandatory=$true, Position=0, ParameterSetName="Session")]
-        [System.Management.Automation.Runspaces.PSSession]$Session,
+        [System.Management.Automation.Runspaces.PSSession[]]$Session,
         [parameter(Mandatory=$true, Position=0, ParameterSetName="Package")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="ComputerName")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="Uri")]
