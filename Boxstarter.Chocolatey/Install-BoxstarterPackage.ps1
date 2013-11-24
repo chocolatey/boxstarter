@@ -173,64 +173,98 @@ about_boxstarter_chocolatey
         [string]$LocalRepo        
     )
     
+    #If no psremoting based params are present, we just run locally
     if($PsCmdlet.ParameterSetName -eq "Package"){
         Invoke-Locally @PSBoundParameters
         return
     }
 
+    ##Cannot run remotely unelevated. Look into self elevating
     if(!(Test-Admin)) {
         Write-Error "You must be running as an administrator. Please open a Powershell console as Administrator and rerun Install-BoxstarperPackage."
         return
     }
 
+    $sessionArgs=@{}
+    if($Credential){
+        $sessionArgs.Credential=$Credential
+    }
+
+    #If $sessions are being provided we assume remoting is setup on both ends
+    #and dont need to test, configure and tear down
+    if($Session -ne $null){
+        $Session | %{
+            Set-SessionArgs $_ $sessionArgs
+            Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs
+        }
+        return
+    }
+
+    #We need the computernames to configure remoting
+    if($ConnectionURI){
+        $ConnectionUri | %{
+            $computerName+=$_.Host
+        }
+    }
+
     try{
-        $sessionArgs=@{}
-        if($Credential){
-            $sessionArgs.Credential=$Credential
+        #Enable remoting settings if necessary on client
+        $ClientRemotingStatus=Enable-BoxstarterClientRemoting $ComputerName
+
+        #If unable to enable remoting on the client, abort
+        if(!$ClientRemotingStatus.Success){return}
+
+        if($ConnectionURI){
+            $ConnectionUri | %{
+                $sessionArgs.ConnectionURI = $_
+                Install-BoxstarterPackageOnComputer $_.Host $sessionArgs, $PackageName, $DisableReboots
+            }
         }
-        if($Session -ne $null){
-            if($session.Availability -ne "Available"){
-                throw New-Object -TypeName ArgumentException -ArgumentList "The Session is not Available"
+        else {
+            $ComputerName | %{
+                $sessionArgs.ComputerName = $_
+                Install-BoxstarterPackageOnComputer $_ $sessionArgs, $PackageName, $DisableReboots
             }
-            $siid = $session.InstanceId
-            Set-SessionArgs $Session $sessionArgs
         }
-        else{
-            if($ConnectionURI){
-                $sessionArgs.ConnectionURI = $ConnectionURI
-                $computerName=$ConnectionURI.Host
-            }
-            else {
-                $sessionArgs.ComputerName = $ComputerName
-            }
-            $ClientRemotingStatus=Enable-BoxstarterClientRemoting $ComputerName
-            if(!$ClientRemotingStatus.Success){return}
+    }
+    finally{
+        #Client settings should be as they were when we started
+        Rollback-ClientRemoting $ClientRemotingStatus
+    }
+}
 
-            if(!(Enable-RemotingOnRemote $ComputerName $Credential)){return}
+function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots){
+    if(!(Enable-RemotingOnRemote $ComputerName $sessionArgs.Credential)){return}
+    $enableCredSSP = Should-EnableCredSSP $sessionArgs $computerName
 
-            $enableCredSSP = Should-EnableCredSSP $Credential $sessionArgs $computerName
+    $session = New-PSSession @sessionArgs -Name Boxstarter
 
-            $session = New-PSSession @sessionArgs
+    Install-BoxstarterPackageForSession $session $PackageName $DisableReboots $sessionArgs $enableCredSSP
+}
+
+function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReboots, $sessionArgs, $enableCredSSP) {
+    try{
+        if($session.Availability -ne "Available"){
+            throw New-Object -TypeName ArgumentException -ArgumentList "The Session is not Available"
         }
 
         Setup-BoxstarterModuleAndLocalRepo $session
 
         if($enableCredSSP){
             if($session){Remove-PSSession $session}
-            $session = Enable-RemoteCredSSP $Credential $sessionArgs
+            $session = Enable-RemoteCredSSP $sessionArgs
         }
         
-        Invoke-Remotely $session $Credential $PackageName $DisableReboots $NoPassword $sessionArgs
+        Invoke-Remotely $session $PackageName $DisableReboots $sessionArgs
     }
-    finally{
+    finally {
         if($enableCredSSP){
-            Disable-RemoteCredSSP $sessionArgs $Credential
+            Disable-RemoteCredSSP $sessionArgs
         }
-        if($session -ne $null -and $session.InstanceId -ne $siid) {
+        if($session -ne $null -and $session.Name -eq "Boxstarter") {
             Remove-PSSession $Session
             $Session = $null
         }
-        Rollback-ClientRemoting $ClientRemotingStatus
     }
 }
 
@@ -312,15 +346,15 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
     }
 }
 
-function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPassword,$sessionArgs){
+function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
     while($session.Availability -eq "Available") {
         $remoteResult = Invoke-Command $session {
-            param($possibleResult,$SuppressLogging,$pkg,$password,$DisableReboots,$NoPassword)
+            param($possibleResult,$SuppressLogging,$pkg,$password,$DisableReboots)
             Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
             $Boxstarter.SuppressLogging=$SuppressLogging
             $result=$null
             try {
-                $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -NoPassword:$NoPassword -DisableReboots:$DisableReboots
+                $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -DisableReboots:$DisableReboots
                 if($Boxstarter.IsRebooting){
                     return @{Result="Rebooting"}
                 }
@@ -331,7 +365,7 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             catch{
                 throw
             }
-        } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $Credential.Password, $DisableReboots, $NoPassword
+        } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $sessionArgs.Credential.Password, $DisableReboots
         
         Write-Debug "Result from Remote Boxstarter: $($remoteResult.Result)"
         if($remoteResult -eq $null -or $remoteResult.Result -eq $null -or $remoteResult.Result -eq "Rebooting") {
@@ -347,7 +381,7 @@ function Invoke-Remotely($session,$Credential,$Package,$DisableReboots,$NoPasswo
             Do{
                 $response=$null
                 start-sleep -seconds 2
-                $session = New-PSSession @sessionArgs -ErrorAction SilentlyContinue
+                $session = New-PSSession @sessionArgs -Name Boxstarter -ErrorAction SilentlyContinue
                 if($session -ne $null -and $Session.Availability -eq "Available"){
                     $response=Invoke-Command @sessionArgs { Get-WmiObject Win32_ComputerSystem } -ErrorAction SilentlyContinue
                     if($response -ne $null){
@@ -373,33 +407,33 @@ function Set-SessionArgs($session, $sessionArgs) {
     }    
 }
 
-function Should-EnableCredSSP($Credential, $sessionArgs, $computerName) {
-    if($Credential){
+function Should-EnableCredSSP($sessionArgs, $computerName) {
+    if($sessionArgs.Credential){
         try {$credsspEnabled = Test-WsMan @sessionArgs -Authentication CredSSP -ErrorAction SilentlyContinue } catch {}
         if($credsspEnabled -eq $null){
             return $True
         }
         else{
-            $credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $Credential -Authentication CredSSP -ErrorAction SilentlyContinue
+            $credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue
             if($credsspEnabled -ne $null){ $sessionArgs.Authentication="CredSSP" }
         }
     }
     return $false
 }
 
-function Enable-RemoteCredSSP($Credential, $sessionArgs) {
+function Enable-RemoteCredSSP($sessionArgs) {
     Write-BoxstarterMessage "Enabling CredSSP Authentication on $ComputerName"
     Invoke-Command @sessionArgs { 
         param($Credential)
         Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
         Create-BoxstarterTask $Credential
         Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null" 
-    } -ArgumentList $Credential
+    } -ArgumentList $sessionArgs.Credential
     $sessionArgs.Authentication="CredSSP"
-    return New-PSSession @sessionArgs
+    return New-PSSession @sessionArgs -Name Boxstarter
 }
 
-function Disable-RemoteCredSSP ($sessionArgs, $Credential){
+function Disable-RemoteCredSSP ($sessionArgs){
     Write-BoxstarterMessage "Disabling CredSSP Authentication on $ComputerName"
     Invoke-Command @sessionArgs { 
         param($Credential)
@@ -407,7 +441,7 @@ function Disable-RemoteCredSSP ($sessionArgs, $Credential){
         Create-BoxstarterTask $Credential
         Invoke-FromTask "Disable-WSManCredSSP -Role Server | Out-Null"
         Remove-BoxstarterTask
-    } -ArgumentList $Credential
+    } -ArgumentList $sessionArgs.Credential
 }
 
 function Rollback-ClientRemoting($ClientRemotingStatus) {

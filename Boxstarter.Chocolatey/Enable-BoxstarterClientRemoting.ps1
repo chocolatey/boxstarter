@@ -1,4 +1,4 @@
-function Enable-BoxstarterClientRemoting ($RemoteHostToTrust) {
+function Enable-BoxstarterClientRemoting ([string[]] $RemoteHostsToTrust) {
     $Result=@{    
         Success=$False;
         PreviousTrustedHosts=$null;
@@ -24,43 +24,38 @@ function Enable-BoxstarterClientRemoting ($RemoteHostToTrust) {
         }
     }
 
+    $ComputersToAdd = @()
     if($credssp -is [Object[]]){
         $idxHosts=$credssp[0].IndexOf(": ")
         if($idxHosts -gt -1){
             $credsspEnabled=$True
             $Result.PreviousCSSPTrustedHosts=$credssp[0].substring($idxHosts+2)
             $hostArray=$Result.PreviousCSSPTrustedHosts.Split(",")
-            if($hostArray -contains "wsman/$RemoteHostToTrust"){
-                $ComputerAdded=$True
-            }
+            $RemoteHostsToTrust | ? { $hostArray -notcontains "wsman/$_" } | % { $ComputersToAdd += $_ }
         }
     }
 
-    if($ComputerAdded -eq $null){
-        Write-BoxstarterMessage "Adding $RemoteHostToTrust to allowed credSSP hosts"
-        Enable-WSManCredSSP -DelegateComputer $RemoteHostToTrust -Role Client -Force | Out-Null
+    if($ComputersToAdd.Count -gt 0){
+        Write-BoxstarterMessage "Adding $($ComputersToAdd -join ',') to allowed credSSP hosts"
+        Enable-WSManCredSSP -DelegateComputer $ComputersToAdd -Role Client -Force | Out-Null
     }
 
+    $newHosts = @()
     $Result.PreviousTrustedHosts=(Get-Item "wsman:\localhost\client\trustedhosts").Value
     $hostArray=$Result.PreviousTrustedHosts.Split(",")
-    if($hostArray.length -eq 1 -and $hostArray[0].length -eq 0) {
-        $newHosts=$RemoteHostToTrust
-    }
-    elseif(!($hostArray -contains $RemoteHostToTrust)){
-        $newHosts=$Result.PreviousTrustedHosts + "," + $RemoteHostToTrust
-    }
-    if($newHosts -ne $null) {
-        Write-BoxstarterMessage "Adding $newHosts to allowed wsman hosts"
-        Set-Item "wsman:\localhost\client\trustedhosts" -Value $newHosts -Force
+    $RemoteHostsToTrust | ? { $hostArray -NotContains $_ } | % { $newHosts += $_ }
+    if($newHosts.Count -gt 0) {
+        $strNewHosts = $newHosts -join ","
+        Write-BoxstarterMessage "Adding $strNewHosts to allowed wsman hosts"
+        Set-Item "wsman:\localhost\client\trustedhosts" -Value ($Result.PreviousTrustedHosts + "," + $strNewHosts) -Force
     }
 
-    $result.PreviousFreshCredDelegationHostCount = [int](Add-CredSSPGroupPolicy $RemoteHostToTrust)
+    $result.PreviousFreshCredDelegationHostCount = [int](Add-CredSSPGroupPolicy $RemoteHostsToTrust)
     $Result.Success=$True
     return $Result
 }
 
-function Add-CredSSPGroupPolicy([string]$allowed){
-    $allowed='wsman/' + $allowed
+function Add-CredSSPGroupPolicy([string[]]$allowed){
     $key = Get-CredentialDelegationKey
     if (!(Test-Path "$key\CredentialsDelegation")) {
         New-Item $key -Name CredentialsDelegation | Out-Null
@@ -76,8 +71,9 @@ function Add-CredSSPGroupPolicy([string]$allowed){
         $currentHostProps += (Get-ItemProperty -Path $key -Name $_).($_)
     }
     $currentLength = $currentHostProps.Length
-    if(!($currentHostProps -contains $allowed)){
-        New-ItemProperty -Path $key -Name $($currentHostProps.Length+1) -Value $allowed -PropertyType String -Force | Out-Null
+    $idx=$currentLength
+    $allowed | ? { $currentHostProps -notcontains "wsman/$_"} | % {
+        New-ItemProperty -Path $key -Name $($++idx) -Value "wsman/$_" -PropertyType String -Force | Out-Null
     }
 
     return $currentLength
