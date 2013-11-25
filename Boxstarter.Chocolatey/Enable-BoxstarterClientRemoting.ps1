@@ -33,6 +33,9 @@ function Enable-BoxstarterClientRemoting ([string[]] $RemoteHostsToTrust) {
             $hostArray=$Result.PreviousCSSPTrustedHosts.Split(",")
             $RemoteHostsToTrust | ? { $hostArray -notcontains "wsman/$_" } | % { $ComputersToAdd += $_ }
         }
+        else {
+            $ComputersToAdd = $RemoteHostsToTrust
+        }
     }
 
     if($ComputersToAdd.Count -gt 0){
@@ -46,34 +49,43 @@ function Enable-BoxstarterClientRemoting ([string[]] $RemoteHostsToTrust) {
     $RemoteHostsToTrust | ? { $hostArray -NotContains $_ } | % { $newHosts += $_ }
     if($newHosts.Count -gt 0) {
         $strNewHosts = $newHosts -join ","
+        if($Result.PreviousTrustedHosts.Length -gt 0){
+            $strNewHosts = $Result.PreviousTrustedHosts + "," + $strNewHosts
+        }
         Write-BoxstarterMessage "Adding $strNewHosts to allowed wsman hosts"
-        Set-Item "wsman:\localhost\client\trustedhosts" -Value ($Result.PreviousTrustedHosts + "," + $strNewHosts) -Force
+        Set-Item "wsman:\localhost\client\trustedhosts" -Value $strNewHosts -Force
     }
 
-    $result.PreviousFreshCredDelegationHostCount = [int](Add-CredSSPGroupPolicy $RemoteHostsToTrust)
-    $Result.Success=$True
-    return $Result
-}
-
-function Add-CredSSPGroupPolicy([string[]]$allowed){
     $key = Get-CredentialDelegationKey
     if (!(Test-Path "$key\CredentialsDelegation")) {
         New-Item $key -Name CredentialsDelegation | Out-Null
     }
-    New-ItemProperty -Path "$key\CredentialsDelegation" -Name AllowFreshCredentialsWhenNTLMOnly -Value 1 -PropertyType Dword -Force | Out-Null
+    $key = Join-Path $key "CredentialsDelegation"
+    New-ItemProperty -Path "$key" -Name "ConcatenateDefaults_AllowFresh" -Value 1 -PropertyType Dword -Force | Out-Null
+    New-ItemProperty -Path "$key" -Name "ConcatenateDefaults_AllowFreshNTLMOnly" -Value 1 -PropertyType Dword -Force | Out-Null
 
-    $key = Join-Path $key 'CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly'
-    if (!(Test-Path $key)) {
-        md $key | Out-Null
+    $result.PreviousFreshNTLMCredDelegationHostCount = Set-CredentialDelegation $key 'AllowFreshCredentialsWhenNTLMOnly' $RemoteHostsToTrust
+    $result.PreviousFreshCredDelegationHostCount = Set-CredentialDelegation $key 'AllowFreshCredentials' $RemoteHostsToTrust
+
+    $Result.Success=$True
+    return $Result
+}
+
+function Set-CredentialDelegation($key, $subKey, $allowed){
+    New-ItemProperty -Path "$key" -Name $subKey -Value 1 -PropertyType Dword -Force | Out-Null
+    $policyNode = Join-Path $key $subKey
+    if (!(Test-Path $policyNode)) {
+        md $policyNode | Out-Null
     }
     $currentHostProps=@()
-    (Get-Item $key).Property | % {
-        $currentHostProps += (Get-ItemProperty -Path $key -Name $_).($_)
+    (Get-Item $policyNode).Property | % {
+        $currentHostProps += (Get-ItemProperty -Path $policyNode -Name $_).($_)
     }
     $currentLength = $currentHostProps.Length
     $idx=$currentLength
     $allowed | ? { $currentHostProps -notcontains "wsman/$_"} | % {
-        New-ItemProperty -Path $key -Name $($++idx) -Value "wsman/$_" -PropertyType String -Force | Out-Null
+        ++$idx
+        New-ItemProperty -Path $policyNode -Name "$idx" -Value "wsman/$_" -PropertyType String -Force | Out-Null
     }
 
     return $currentLength

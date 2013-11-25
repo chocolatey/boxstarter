@@ -217,13 +217,13 @@ about_boxstarter_chocolatey
         if($ConnectionURI){
             $ConnectionUri | %{
                 $sessionArgs.ConnectionURI = $_
-                Install-BoxstarterPackageOnComputer $_.Host $sessionArgs, $PackageName, $DisableReboots
+                Install-BoxstarterPackageOnComputer $_.Host $sessionArgs $PackageName $DisableReboots
             }
         }
         else {
             $ComputerName | %{
                 $sessionArgs.ComputerName = $_
-                Install-BoxstarterPackageOnComputer $_ $sessionArgs, $PackageName, $DisableReboots
+                Install-BoxstarterPackageOnComputer $_ $sessionArgs $PackageName $DisableReboots
             }
         }
     }
@@ -260,6 +260,9 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
     finally {
         if($enableCredSSP){
             Disable-RemoteCredSSP $sessionArgs
+        }
+        if($sessionArgs.Authentication){
+            $sessionArgs.Remove("Authentication")
         }
         if($session -ne $null -and $session.Name -eq "Boxstarter") {
             Remove-PSSession $Session
@@ -460,8 +463,15 @@ function Rollback-ClientRemoting($ClientRemotingStatus) {
         }
         Write-BoxstarterMessage "Reseting GroupPolicy for Credentials Delegation"
         (Get-Item "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly").Property | % {
-            if([int]$_ -gt $ClientRemotingStatus["PreviousFreshCredDelegationHostCount"]) {
+            if([int]$_ -gt $ClientRemotingStatus["PreviousFreshNTLMCredDelegationHostCount"]) {
                 Remove-ItemProperty "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly" -Name $_
+            }
+        }
+        if(Test-Path "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentials") {
+            (Get-Item "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentials").Property | % {
+                if([int]$_ -gt $ClientRemotingStatus["PreviousFreshCredDelegationHostCount"]) {
+                    Remove-ItemProperty "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentials" -Name $_
+                }
             }
         }
     }
