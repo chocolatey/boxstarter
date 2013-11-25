@@ -194,6 +194,11 @@ about_boxstarter_chocolatey
     #and dont need to test, configure and tear down
     if($Session -ne $null){
         $Session | %{
+            if($_.Availability -ne "Available"){
+                Write-Error "The Session with $($_.ComputerName) is not Available"
+                return
+            }
+
             Set-SessionArgs $_ $sessionArgs
             Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs
         }
@@ -244,10 +249,6 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
 
 function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReboots, $sessionArgs, $enableCredSSP) {
     try{
-        if($session.Availability -ne "Available"){
-            throw New-Object -TypeName ArgumentException -ArgumentList "The Session is not Available"
-        }
-
         Setup-BoxstarterModuleAndLocalRepo $session
 
         if($enableCredSSP){
