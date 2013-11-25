@@ -22,9 +22,9 @@ Describe "Install-BoxstarterPackage" {
     Mock Disable-WSManCredSSP
     Mock Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
     Mock Invoke-WmiMethod { New-Object System.Object }
-    Mock Setup-BoxstarterModuleAndLocalRepo -ParameterFilter{$session -eq $null}
-    Mock Invoke-Remotely -ParameterFilter{$session -eq $null}
-    Mock New-PSSession -ParameterFilter{$ComputerName -ne "localhost" -and $computerName -ne $null -and $ComputerName -ne "." -and $ComputerName -ne "$env:COMPUTERNAME"}
+    Mock Setup-BoxstarterModuleAndLocalRepo -ParameterFilter{$session.ComputerName -eq $null }
+    Mock Invoke-Remotely -ParameterFilter{$session.ComputerName -eq $null}
+    Mock New-PSSession {@{Availability="Available"}} -ParameterFilter{$ComputerName -ne "localhost" -and $computerName -ne $null -and $ComputerName -ne "." -and $ComputerName -ne "$env:COMPUTERNAME"}
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
@@ -378,8 +378,9 @@ Describe "Install-BoxstarterPackage" {
         Mock Enable-RemotingOnRemote
         Mock Test-WSMan
         Mock Setup-BoxstarterModuleAndLocalRepo
-        Mock Invoke-Command { return @{Result="Completed"} } 
-        Mock Invoke-Command { Remove-PSSession -Name "testSession" } -ParameterFilter {$Session.Name -eq "testSession" }
+        Mock Invoke-Command { return @{Result="Completed"} } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*ChocolateyBoxstarter*"}
+        Mock Invoke-Command { Remove-PSSession -Name "testSession" } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*ChocolateyBoxstarter*" -and $Session.Name -eq "testSession" }
+        Mock Invoke-Command -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*PSSenderInfo*"}
         Mock New-PSSession { return Microsoft.PowerShell.Core\New-PSSession localhost }
 
         Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
@@ -393,10 +394,13 @@ Describe "Install-BoxstarterPackage" {
         $session = New-PSSession localhost
         Remove-PSSession $session
 
-        $result = Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots 2>&1
+        try{
+            Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
+        }
+        catch{$err=$_}
 
-        It "Should write a validation error"{
-            $result | should match "not Available"
+        It "Should throw a validation error"{
+            $err.CategoryInfo.Reason | should be "ArgumentException"
         }
     }
 }

@@ -172,7 +172,7 @@ about_boxstarter_chocolatey
         [switch]$KeepWindowOpen,
         [string]$LocalRepo        
     )
-    
+#TODO: Fix test-wsman with connectionuri, return object per remote with exception info, handle * trusted host, do not set autologon when remote, pipeline     
     #If no psremoting based params are present, we just run locally
     if($PsCmdlet.ParameterSetName -eq "Package"){
         Invoke-Locally @PSBoundParameters
@@ -194,11 +194,6 @@ about_boxstarter_chocolatey
     #and dont need to test, configure and tear down
     if($Session -ne $null){
         $Session | %{
-            if($_.Availability -ne "Available"){
-                Write-Error "The Session with $($_.ComputerName) is not Available"
-                return
-            }
-
             Set-SessionArgs $_ $sessionArgs
             Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs
         }
@@ -249,10 +244,14 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
 
 function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReboots, $sessionArgs, $enableCredSSP) {
     try{
+        if($session.Availability -ne "Available"){
+            throw New-Object -TypeName ArgumentException -ArgumentList "The Session is not Available"
+        }
+
         Setup-BoxstarterModuleAndLocalRepo $session
 
         if($enableCredSSP){
-            if($session){Remove-PSSession $session}
+            if($session){ Remove-PSSession $session -ErrorAction SilentlyContinue }
             $session = Enable-RemoteCredSSP $sessionArgs
         }
         
@@ -402,7 +401,7 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
 }
 
 function Set-SessionArgs($session, $sessionArgs) {
-    $uri = Invoke-Command $session {return $PSSenderInfo.ConnectionString}
+    $uri = try { Invoke-Command $session {return $PSSenderInfo.ConnectionString} -ErrorAction SilentlyContinue } catch{}
     if($uri){
         $sessionArgs.ConnectionURI=$uri
     }
@@ -413,7 +412,7 @@ function Set-SessionArgs($session, $sessionArgs) {
 
 function Should-EnableCredSSP($sessionArgs, $computerName) {
     if($sessionArgs.Credential){
-        try {$credsspEnabled = Test-WsMan @sessionArgs -Authentication CredSSP -ErrorAction SilentlyContinue } catch {}
+        try {$credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue } catch {}
         if($credsspEnabled -eq $null){
             return $True
         }
