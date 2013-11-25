@@ -24,7 +24,7 @@ Describe "Install-BoxstarterPackage" {
     Mock Invoke-WmiMethod { New-Object System.Object }
     Mock Setup-BoxstarterModuleAndLocalRepo -ParameterFilter{$session -eq $null}
     Mock Invoke-Remotely -ParameterFilter{$session -eq $null}
-    Mock New-PSSession -ParameterFilter{$ComputerName -ne "localhost" -and $computerName -ne $null -and $ComputerName -ne "."}
+    Mock New-PSSession -ParameterFilter{$ComputerName -ne "localhost" -and $computerName -ne $null -and $ComputerName -ne "." -and $ComputerName -ne "$env:COMPUTERNAME"}
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
@@ -93,6 +93,9 @@ Describe "Install-BoxstarterPackage" {
 
         Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds
 
+        It "will enable credssp for unenabled computer"{
+            Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$Role -eq "client" -and $DelegateComputer -eq "blah"}
+        }
         It "will enable credssp when done for current computer"{
             Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$Role -eq "client" -and $DelegateComputer -eq "blah2"}
         }
@@ -131,6 +134,9 @@ Describe "Install-BoxstarterPackage" {
 
         Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds
 
+        It "will add computer"{
+            Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq "bler,blur,blor,blah,blah2"}
+        }
         It "will clear computer when done"{
             Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq "bler,blur,blor"}
         }
@@ -235,9 +241,11 @@ Describe "Install-BoxstarterPackage" {
 
     Context "When using a session and remoting enabled on remote and local computer" {
         $session = New-PSSession localhost
+        $session2 = New-PSSession .
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-    
-        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
+        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
+
+        Install-BoxstarterPackage -session $session,$session2 -PackageName test-package -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -251,7 +259,7 @@ Describe "Install-BoxstarterPackage" {
             }
         }
         It "will execute package"{
-            Get-Content "$env:temp\testpackage.txt" | should be "test-package"
+            ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package,test-package"
         }
         Remove-PSSession $session
     }
@@ -262,6 +270,7 @@ Describe "Install-BoxstarterPackage" {
         Copy-Item "$($Boxstarter.LocalRepo)\example.*.nupkg" "$repo\mylocalrepo.nupkg"
         $session = New-PSSession localhost
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
+        $currentRepo=$Boxstarter.LocalRepo
     
         Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots -LocalRepo $repo
 
@@ -269,14 +278,16 @@ Describe "Install-BoxstarterPackage" {
             "$env:temp\boxstarter\buildpackages\mylocalrepo.nupkg" | should exist
         }
         Remove-PSSession $session
+        $Boxstarter.LocalRepo=$currentRepo
     }
 
     Context "When using a computer name and remoting enabled on remote and local computer" {
         Mock Enable-RemotingOnRemote { return $true }
         Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-    
-        Install-BoxstarterPackage -computerName localhost -PackageName test-package -DisableReboots
+        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
+
+        Install-BoxstarterPackage -computerName localhost,$env:COMPUTERNAME -PackageName test-package -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -290,7 +301,7 @@ Describe "Install-BoxstarterPackage" {
             }
         }
         It "will execute package"{
-            Get-Content "$env:temp\testpackage.txt" | should be "test-package"
+            ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package,test-package"
         }
     }
 
@@ -298,8 +309,9 @@ Describe "Install-BoxstarterPackage" {
         Mock Enable-RemotingOnRemote { return $true }
         Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-    
-        Install-BoxstarterPackage -ConnectionURI "http://localhost:5985/wsman" -PackageName test-package -DisableReboots
+        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
+
+        Install-BoxstarterPackage -ConnectionURI "http://localhost:5985/wsman","http://$($env:computername):5985/wsman" -PackageName test-package -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -313,7 +325,7 @@ Describe "Install-BoxstarterPackage" {
             }
         }
         It "will execute package"{
-            Get-Content "$env:temp\testpackage.txt" | should be "test-package"
+            ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package,test-package"
         }
     }
 
