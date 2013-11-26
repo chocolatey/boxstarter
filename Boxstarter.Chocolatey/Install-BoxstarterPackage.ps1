@@ -351,7 +351,7 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
 
 function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
     while($session.Availability -eq "Available") {
-        $remoteResult = Invoke-Command $session {
+        $remoteResult = Invoke-Command -session $session {
             param($possibleResult,$SuppressLogging,$pkg,$password,$DisableReboots)
             Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
             $Boxstarter.SuppressLogging=$SuppressLogging
@@ -412,13 +412,17 @@ function Set-SessionArgs($session, $sessionArgs) {
 
 function Should-EnableCredSSP($sessionArgs, $computerName) {
     if($sessionArgs.Credential){
-        try {$credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue } catch {}
+        $uriArgs=@{}
+        if($sessionArgs.ConnectionURI){
+            $uri = [URI]$sessionArgs.ConnectionURI
+            $uriArgs = @{Port=$uri.port;UseSSL=($uri.schemE -eq "https")}
+        }
+        try {$credsspEnabled = Test-WsMan -ComputerName $ComputerName @uriArgs -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue } catch {}
         if($credsspEnabled -eq $null){
             return $True
         }
-        else{
-            $credsspEnabled = Test-WsMan -ComputerName $ComputerName -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue
-            if($credsspEnabled -ne $null){ $sessionArgs.Authentication="CredSSP" }
+        elseif($credsspEnabled -ne $null){
+            $sessionArgs.Authentication="CredSSP"
         }
     }
     return $false

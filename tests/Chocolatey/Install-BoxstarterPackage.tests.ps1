@@ -239,6 +239,22 @@ Describe "Install-BoxstarterPackage" {
         }        
     }
 
+    Context "When using a https ConnectionURI and testing CredSSP" {
+        Mock Enable-RemotePSRemoting { return New-Object PSObject }
+        Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
+        Mock Invoke-Command
+         Mock New-PSSession {@{Availability="Available"}}
+
+        Install-BoxstarterPackage -ConnectionURI "https://server:5678/wsman" -PackageName test -Credential $mycreds -Force
+
+        It "will use https"{
+            Assert-MockCalled Test-WSMan -ParameterFilter {$UseSSL -eq $true}
+        }
+        It "will specify port"{
+            Assert-MockCalled Test-WSMan -ParameterFilter {$Port -eq 5678}
+        }        
+    }
+
     Context "When using a session and remoting enabled on remote and local computer" {
         $session = New-PSSession localhost
         $session2 = New-PSSession .
