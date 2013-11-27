@@ -35,7 +35,7 @@ function Cleanup-Boxstarter {
             New-Item "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" -type file | Out-Null
         }
     }
-    if($BoxstarterPassword.Length -gt 0) {
+    if(!(Get-IsRemote) -and $BoxstarterPassword.Length -gt 0) {
         Write-BoxstarterMessage "Securely Storing $($env:userdomain)\$($Boxstarter.BoxstarterUser) credentials for automatic logon"
         Set-SecureAutoLogon $Boxstarter.BoxstarterUser $BoxstarterPassword $env:userdomain
         Write-BoxstarterMessage "Logon Set"

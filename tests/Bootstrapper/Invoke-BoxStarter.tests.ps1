@@ -307,7 +307,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When rebooting and a Password is set" {
-        Mock Set-SecureAutoLogon
         Mock Stop-UpdateServices
         Mock RestartNow
         Mock Read-AuthenticatedPassword
@@ -320,8 +319,22 @@ Describe "Invoke-Boxstarter" {
         }
     }
 
-    Context "When rebooting and UAC is Enabled and password is set" {
+    Context "When rebooting and a Password is set and in remote session" {
+        Mock Stop-UpdateServices
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
         Mock Set-SecureAutoLogon
+        Mock Get-IsRemote {return $true}
+        Mock Create-BoxstarterTask
+
+        Invoke-Boxstarter {$Boxstarter.IsRebooting=$true} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
+
+        it "will Not Set AutoLogin" {
+            Assert-MockCalled Set-SecureAutoLogon -times 0
+        }
+    }
+
+    Context "When rebooting and UAC is Enabled and password is set" {
         Mock Stop-UpdateServices
         Mock RestartNow
         Mock Read-AuthenticatedPassword
@@ -340,7 +353,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When rebooting and UAC is Enabled and user has been auto loged on" {
-        Mock Set-SecureAutoLogon
         Mock Stop-UpdateServices
         Mock RestartNow
         Mock Read-AuthenticatedPassword
@@ -361,7 +373,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When rebooting UAC is enabled and password is not set" {
-        Mock Set-SecureAutoLogon
         Mock Stop-UpdateServices
         Mock RestartNow
         Mock Read-AuthenticatedPassword
@@ -381,7 +392,6 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When rebooting and UAC is disabled" {
-        Mock Set-SecureAutoLogon
         Mock Stop-UpdateServices
         Mock RestartNow
         Mock Read-AuthenticatedPassword
