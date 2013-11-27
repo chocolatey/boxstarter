@@ -30,10 +30,16 @@ Describe "Install-BoxstarterPackage" {
 
     Context "When calling locally" {
         
-        Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen -LocalRepo "myRepo" | Out-Null
+        $result = Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen -LocalRepo "myRepo"
 
         It "will call InvokeChocolateyBoxstarter with parameters"{
             Assert-MockCalled Invoke-ChocolateyBoxstarter -ParameterFilter {$BootstrapPackage -eq "test" -and $DisableReboots -eq $True -and $KeepWindowOpen -eq $True -and $LocalRepo -eq "myRepo"}
+        }
+        It "will output correct computers in results"{
+            $result.ComputerName | should be "localhost"
+        }
+        It "will report success in results" {
+            $result.Completed | should be $true
         }
     }
 
@@ -167,6 +173,17 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will set to original when done"{
             Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq "bler,blah,blor"}
+        }
+    }    
+
+    Context "When entries in trusted hosts contain global wildcard" {
+        Mock Get-Item {@{Value="*"}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
+        Mock Invoke-Command { New-Object System.Object }
+
+        Install-BoxstarterPackage -computerName blah,blor -PackageName test -Credential $mycreds | Out-Null
+
+        It "will not set hosts"{
+            Assert-MockCalled Set-Item -Times 0
         }
     }    
 

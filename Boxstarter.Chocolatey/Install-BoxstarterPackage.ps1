@@ -172,7 +172,7 @@ about_boxstarter_chocolatey
         [switch]$KeepWindowOpen,
         [string]$LocalRepo        
     )
-#TODO: return object per remote with exception info, handle * trusted host, do not set autologon when remote, pipeline     
+#TODO: do not set autologon when remote, pipeline     
     #If no psremoting based params are present, we just run locally
     if($PsCmdlet.ParameterSetName -eq "Package"){
         Invoke-Locally @PSBoundParameters
@@ -330,7 +330,17 @@ function Invoke-Locally {
     $PSBoundParameters.Add("BootstrapPackage", $PSBoundParameters.PackageName)
     $PSBoundParameters.Remove("PackageName") | out-Null
 
-    Invoke-ChocolateyBoxstarter @PSBoundParameters
+    $record = Start-Record 'localhost'
+    try {
+        Invoke-ChocolateyBoxstarter @PSBoundParameters
+    }
+    catch {
+        $record.Completed=$false
+        throw
+    }
+    finally{
+        Finish-Record $record
+    }
 }
 
 function Enable-RemotingOnRemote ($ComputerName, $Credential){

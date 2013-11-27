@@ -46,14 +46,19 @@ function Enable-BoxstarterClientRemoting ([string[]] $RemoteHostsToTrust) {
     $newHosts = @()
     $Result.PreviousTrustedHosts=(Get-Item "wsman:\localhost\client\trustedhosts").Value
     $hostArray=$Result.PreviousTrustedHosts.Split(",")
-    $RemoteHostsToTrust | ? { $hostArray -NotContains $_ } | % { $newHosts += $_ }
-    if($newHosts.Count -gt 0) {
-        $strNewHosts = $newHosts -join ","
-        if($Result.PreviousTrustedHosts.Length -gt 0){
-            $strNewHosts = $Result.PreviousTrustedHosts + "," + $strNewHosts
+    if($hostArray -contains "*") {
+        $Result.PreviousTrustedHosts = $null
+    }
+    else {
+        $RemoteHostsToTrust | ? { $hostArray -NotContains $_ } | % { $newHosts += $_ }
+        if($newHosts.Count -gt 0) {
+            $strNewHosts = $newHosts -join ","
+            if($Result.PreviousTrustedHosts.Length -gt 0){
+                $strNewHosts = $Result.PreviousTrustedHosts + "," + $strNewHosts
+            }
+            Write-BoxstarterMessage "Adding $strNewHosts to allowed wsman hosts"
+            Set-Item "wsman:\localhost\client\trustedhosts" -Value $strNewHosts -Force
         }
-        Write-BoxstarterMessage "Adding $strNewHosts to allowed wsman hosts"
-        Set-Item "wsman:\localhost\client\trustedhosts" -Value $strNewHosts -Force
     }
 
     $key = Get-CredentialDelegationKey
