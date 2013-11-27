@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>exception-package</id>
+    <version>1.0.0</version>
+    <authors>mwrock</authors>
+    <owners>mwrock</owners>
+    <description>test package</description>
+    <tags>test</tags>
+  </metadata>
+  <files>
+    <file src="tools\**\*.*" target="tools"/>
+  </files>
+</package>

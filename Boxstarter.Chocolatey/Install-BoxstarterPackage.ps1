@@ -172,7 +172,7 @@ about_boxstarter_chocolatey
         [switch]$KeepWindowOpen,
         [string]$LocalRepo        
     )
-#TODO: Fix test-wsman with connectionuri, return object per remote with exception info, handle * trusted host, do not set autologon when remote, pipeline     
+#TODO: return object per remote with exception info, handle * trusted host, do not set autologon when remote, pipeline     
     #If no psremoting based params are present, we just run locally
     if($PsCmdlet.ParameterSetName -eq "Package"){
         Invoke-Locally @PSBoundParameters
@@ -195,7 +195,16 @@ about_boxstarter_chocolatey
     if($Session -ne $null){
         $Session | %{
             Set-SessionArgs $_ $sessionArgs
-            Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs
+            $record = Start-Record $_.ComputerName
+            try {
+                Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs
+            }
+            catch {
+                $record.Completed=$false
+            }
+            finally{
+                Finish-Record $record
+            }
         }
         return
     }
@@ -233,13 +242,42 @@ about_boxstarter_chocolatey
     }
 }
 
+function Start-Record($computerName) {
+    $global:error.Clear()
+    $props = @{
+        StartTime = Get-Date
+        Completed = $true
+        ComputerName = $computerName
+        Errors = @()
+        FinishTime = $null
+    }
+    return (New-Object PSObject –Prop $props)
+}
+
+function Finish-Record($obj) {
+    $obj.FinishTime = Get-Date
+    $global:error | %{
+        $obj.Errors += $_
+    }
+    Write-Output $obj
+}
+
 function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots){
-    if(!(Enable-RemotingOnRemote $ComputerName $sessionArgs.Credential)){return}
-    $enableCredSSP = Should-EnableCredSSP $sessionArgs $computerName
+    $record = Start-Record $ComputerName
+    try {
+        if(!(Enable-RemotingOnRemote $ComputerName $sessionArgs.Credential)){return}
+        $enableCredSSP = Should-EnableCredSSP $sessionArgs $computerName
 
-    $session = New-PSSession @sessionArgs -Name Boxstarter
+        $session = New-PSSession @sessionArgs -Name Boxstarter
 
-    Install-BoxstarterPackageForSession $session $PackageName $DisableReboots $sessionArgs $enableCredSSP
+        Install-BoxstarterPackageForSession $session $PackageName $DisableReboots $sessionArgs $enableCredSSP
+    }
+    catch {
+        $record.Completed=$false
+    }
+    finally{
+        Finish-Record $record
+    }
 }
 
 function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReboots, $sessionArgs, $enableCredSSP) {
@@ -415,7 +453,7 @@ function Should-EnableCredSSP($sessionArgs, $computerName) {
         $uriArgs=@{}
         if($sessionArgs.ConnectionURI){
             $uri = [URI]$sessionArgs.ConnectionURI
-            $uriArgs = @{Port=$uri.port;UseSSL=($uri.schemE -eq "https")}
+            $uriArgs = @{Port=$uri.port;UseSSL=($uri.scheme -eq "https")}
         }
         try {$credsspEnabled = Test-WsMan -ComputerName $ComputerName @uriArgs -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue } catch {}
         if($credsspEnabled -eq $null){

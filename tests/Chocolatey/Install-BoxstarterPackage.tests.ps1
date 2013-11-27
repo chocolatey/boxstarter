@@ -30,7 +30,7 @@ Describe "Install-BoxstarterPackage" {
 
     Context "When calling locally" {
         
-        Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen -LocalRepo "myRepo"
+        Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen -LocalRepo "myRepo" | Out-Null
 
         It "will call InvokeChocolateyBoxstarter with parameters"{
             Assert-MockCalled Invoke-ChocolateyBoxstarter -ParameterFilter {$BootstrapPackage -eq "test" -and $DisableReboots -eq $True -and $KeepWindowOpen -eq $True -and $LocalRepo -eq "myRepo"}
@@ -41,7 +41,7 @@ Describe "Install-BoxstarterPackage" {
         $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
         $cred = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
-        Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen
+        Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen | Out-Null
 
         It "will not InvokeChocolateyBoxstarter with password"{
             Assert-MockCalled Invoke-ChocolateyBoxstarter -ParameterFilter {$NoPassword -eq $True -and $Password -eq $null}
@@ -52,7 +52,7 @@ Describe "Install-BoxstarterPackage" {
         $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
         $cred = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
-        Install-BoxstarterPackage -PackageName test -DisableReboots -Credential $cred -KeepWindowOpen
+        Install-BoxstarterPackage -PackageName test -DisableReboots -Credential $cred -KeepWindowOpen | Out-Null
 
         It "will call InvokeChocolateyBoxstarter with password"{
             Assert-MockCalled Invoke-ChocolateyBoxstarter -ParameterFilter {$Password -eq $cred.Password}
@@ -64,7 +64,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Confirm-Choice {return $False}
         Mock Invoke-Command { New-Object System.Object }
 
-        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds
+        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
 
         It "will disable credssp when done"{
             Assert-MockCalled Disable-WSManCredSSP -ParameterFilter {$Role -eq "client"}
@@ -76,7 +76,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Confirm-Choice {return $False}
         Mock Invoke-Command { New-Object System.Object }
 
-        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds
+        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
 
         It "will enable credssp when done for current computer"{
             Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$Role -eq "client" -and $DelegateComputer -eq "blahblah"}
@@ -91,7 +91,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Confirm-Choice {return $False}
         Mock Invoke-Command { New-Object System.Object }
 
-        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds
+        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
 
         It "will enable credssp for unenabled computer"{
             Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$Role -eq "client" -and $DelegateComputer -eq "blah"}
@@ -110,7 +110,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Confirm-Choice {return $False}
         Mock Invoke-Command { New-Object System.Object }
 
-        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
+        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds | Out-Null
 
         It "will remove computer when done"{
             (Get-Item -Path "$regRoot\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly").Property.Length | should be 0
@@ -121,7 +121,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Get-Item {@{Value=""}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
         Mock Invoke-Command { New-Object System.Object }
 
-        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds
+        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
 
         It "will clear computer when done"{
             Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq ""}
@@ -132,7 +132,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Get-Item {@{Value="bler,blur,blor"}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
         Mock Invoke-Command { New-Object System.Object }
 
-        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds
+        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
 
         It "will add computer"{
             Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq "bler,blur,blor,blah,blah2"}
@@ -146,7 +146,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Get-Item {@{Value="bler,blah,blor"}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
         Mock Invoke-Command { New-Object System.Object }
 
-        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds
+        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
 
         It "will add computer not in list"{
             Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq "bler,blah,blor,blah2"}
@@ -160,7 +160,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Get-Item {@{Value="bler,blah,blor"}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
         Mock Invoke-Command { New-Object System.Object }
 
-        Install-BoxstarterPackage -computerName blah,blor -PackageName test -Credential $mycreds
+        Install-BoxstarterPackage -computerName blah,blor -PackageName test -Credential $mycreds | Out-Null
 
         It "will only set hosts once (at the end)"{
             Assert-MockCalled Set-Item -Times 1
@@ -175,10 +175,13 @@ Describe "Install-BoxstarterPackage" {
         Mock Invoke-WmiMethod
         Mock Invoke-Command { New-Object System.Object }
 
-        try {Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds} catch {$err=$_}
+        $result = Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
 
         It "will throw"{
-            $err | should not be $null
+            $result.Errors.Count | should be 1
+        }
+        It "will report failure in results" {
+            $result.Completed | should be $false
         }
     }
 
@@ -187,7 +190,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Confirm-Choice
         Mock Invoke-Command { New-Object System.Object }
 
-        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
+        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds | Out-Null
 
         It "will Confirm ok to enable remoting"{
             Assert-MockCalled Confirm-Choice -ParameterFilter {$message -like "*Remoting is not enabled on Remote computer*"}
@@ -199,7 +202,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Confirm-Choice
         Mock Invoke-Command { New-Object System.Object }
 
-        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force
+        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force | Out-Null
 
         It "will not Confirm ok to enable remoting"{
             Assert-MockCalled Confirm-Choice -Times 0
@@ -214,7 +217,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Test-WSMan { New-Object PSObject }
         Mock Invoke-Command
 
-        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force
+        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force | Out-Null
 
         It "will Enable CredSSP on Remote"{
             Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"} -Times 0
@@ -229,7 +232,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
         Mock Invoke-Command
 
-        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds -Force
+        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds -Force | Out-Null
 
         It "will Enable CredSSP on Remote on both computers"{
             Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"} -Times 2
@@ -245,10 +248,26 @@ Describe "Install-BoxstarterPackage" {
         Mock Invoke-Command
          Mock New-PSSession {@{Availability="Available"}}
 
-        Install-BoxstarterPackage -ConnectionURI "https://server:5678/wsman" -PackageName test -Credential $mycreds -Force
+        Install-BoxstarterPackage -ConnectionURI "https://server:5678/wsman" -PackageName test -Credential $mycreds -Force | Out-Null
 
         It "will use https"{
             Assert-MockCalled Test-WSMan -ParameterFilter {$UseSSL -eq $true}
+        }
+        It "will specify port"{
+            Assert-MockCalled Test-WSMan -ParameterFilter {$Port -eq 5678}
+        }        
+    }
+
+    Context "When using a http ConnectionURI and testing CredSSP" {
+        Mock Enable-RemotePSRemoting { return New-Object PSObject }
+        Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
+        Mock Invoke-Command
+        Mock New-PSSession {@{Availability="Available"}}
+
+        Install-BoxstarterPackage -ConnectionURI "http://server:5678/wsman" -PackageName test -Credential $mycreds -Force | Out-Null
+
+        It "will use http"{
+            Assert-MockCalled Test-WSMan -ParameterFilter {$UseSSL -eq $false}
         }
         It "will specify port"{
             Assert-MockCalled Test-WSMan -ParameterFilter {$Port -eq 5678}
@@ -261,7 +280,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        Install-BoxstarterPackage -session $session,$session2 -PackageName test-package -DisableReboots
+        $result = Install-BoxstarterPackage -session $session,$session2 -PackageName test-package -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -277,6 +296,14 @@ Describe "Install-BoxstarterPackage" {
         It "will execute package"{
             ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package,test-package"
         }
+        It "will output correct computers in results"{
+            $result[0].ComputerName | should be "localhost"
+            $result[1].ComputerName | should be "localhost"
+        }
+        It "will report success in results" {
+            $result[0].Completed | should be $true
+            $result[1].Completed | should be $true
+        }
         Remove-PSSession $session
     }
 
@@ -288,7 +315,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         $currentRepo=$Boxstarter.LocalRepo
     
-        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots -LocalRepo $repo
+        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots -LocalRepo $repo | Out-Null
 
         It "will copy boxstarter build packages"{
             "$env:temp\boxstarter\buildpackages\mylocalrepo.nupkg" | should exist
@@ -303,7 +330,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        Install-BoxstarterPackage -computerName localhost,$env:COMPUTERNAME -PackageName test-package -DisableReboots
+        $result = Install-BoxstarterPackage -computerName localhost,$env:COMPUTERNAME -PackageName test-package -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -318,6 +345,33 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will execute package"{
             ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package,test-package"
+        }
+        It "will output 2 results"{
+            $result.Count | Should be 2
+        }
+        It "will output correct computers in results"{
+            $result[0].ComputerName | should be "localhost"
+            $result[1].ComputerName | should be $env:COMPUTERNAME
+        }
+        It "will report success in results" {
+            $result[0].Completed | should be $true
+            $result[1].Completed | should be $true
+        }
+    }
+
+    Context "When installing a package that throws an error" {
+        Mock Enable-RemotingOnRemote { return $true }
+        Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
+        Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
+
+        $result = Install-BoxstarterPackage -computerName localhost -PackageName exception-package -DisableReboots
+
+        It "will include exceptions"{
+            $result.Errors.Count | should be 2
+        }
+        It "will report success in results" {
+            $result.Completed | should be $true
         }
     }
 
@@ -327,7 +381,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        Install-BoxstarterPackage -ConnectionURI "http://localhost:5985/wsman","http://$($env:computername):5985/wsman" -PackageName test-package -DisableReboots
+        $result = Install-BoxstarterPackage -ConnectionURI "http://localhost:5985/wsman","http://$($env:computername):5985/wsman" -PackageName test-package -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -342,6 +396,14 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will execute package"{
             ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package,test-package"
+        }
+        It "will output correct computers in results"{
+            $result[0].ComputerName | should be "localhost"
+            $result[1].ComputerName | should be $env:COMPUTERNAME
+        }
+        It "will report success in results" {
+            $result[0].Completed | should be $true
+            $result[1].Completed | should be $true
         }
     }
 
@@ -352,7 +414,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Setup-BoxstarterModuleAndLocalRepo
         Mock Invoke-Remotely
 
-        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
+        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots | Out-Null
 
         It "will not try to enable local side remoting"{
             Assert-MockCalled Enable-BoxstarterClientRemoting -Times 0
@@ -375,7 +437,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Invoke-Command { Remove-PSSession -Name "testSession" } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*ChocolateyBoxstarter*" -and $Session.Name -eq "testSession" }
         Mock New-PSSession { return Microsoft.PowerShell.Core\New-PSSession localhost }
 
-        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
+        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots | Out-Null
 
         It "will not try to enable local side remoting"{
             Assert-MockCalled Enable-BoxstarterClientRemoting -Times 0
@@ -399,7 +461,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Invoke-Command -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*PSSenderInfo*"}
         Mock New-PSSession { return Microsoft.PowerShell.Core\New-PSSession localhost }
 
-        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
+        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots | Out-Null
 
         It "will reconnect with the computer name"{
             Assert-MockCalled New-PSSession -ParameterFilter {$computerName -eq "localhost"}
@@ -410,13 +472,13 @@ Describe "Install-BoxstarterPackage" {
         $session = New-PSSession localhost
         Remove-PSSession $session
 
-        try{
-            Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
-        }
-        catch{$err=$_}
+        $result = Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
 
         It "Should throw a validation error"{
-            $err.CategoryInfo.Reason | should be "ArgumentException"
+            $result.Errors[0].CategoryInfo.Reason | should be "ArgumentException"
+        }
+        It "will report failure in results" {
+            $result.Completed | should be $false
         }
     }
 }
