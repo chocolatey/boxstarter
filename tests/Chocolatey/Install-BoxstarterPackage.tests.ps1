@@ -281,7 +281,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Invoke-Command
         Mock New-PSSession {@{Availability="Available"}}
 
-        Install-BoxstarterPackage -ConnectionURI "http://server:5678/wsman" -PackageName test -Credential $mycreds -Force | Out-Null
+        [uri]"http://server:5678/wsman" | Install-BoxstarterPackage -PackageName test -Credential $mycreds -Force | Out-Null
 
         It "will use http"{
             Assert-MockCalled Test-WSMan -ParameterFilter {$UseSSL -eq $false}
@@ -297,7 +297,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        $result = Install-BoxstarterPackage -session $session,$session2 -PackageName test-package -DisableReboots
+        $result = ($session,$session2) | Install-BoxstarterPackage -PackageName test-package -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -347,7 +347,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        $result = Install-BoxstarterPackage -computerName localhost,$env:COMPUTERNAME -PackageName test-package -DisableReboots
+        $result = ("localhost",$env:COMPUTERNAME) | Install-BoxstarterPackage -PackageName test-package -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -398,7 +398,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        $result = Install-BoxstarterPackage -ConnectionURI "http://localhost:5985/wsman","http://$($env:computername):5985/wsman" -PackageName test-package -DisableReboots
+        $result = ([URI]"http://localhost:5985/wsman",[URI]"http://$($env:computername):5985/wsman") | Install-BoxstarterPackage -PackageName test-package -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist

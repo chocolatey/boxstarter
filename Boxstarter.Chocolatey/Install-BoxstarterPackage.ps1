@@ -154,15 +154,15 @@ about_boxstarter_chocolatey
 #>
     [CmdletBinding(DefaultParameterSetName="Package")]
 	param(
-        [parameter(Mandatory=$true, Position=0, ParameterSetName="ComputerName")]
+        [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="ComputerName")]
         [string[]]$ComputerName,
-        [parameter(Mandatory=$true, Position=0, ParameterSetName="Uri")]
+        [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="ConnectionUri")]
         [Uri[]]$ConnectionUri,
-        [parameter(Mandatory=$true, Position=0, ParameterSetName="Session")]
+        [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="Session")]
         [System.Management.Automation.Runspaces.PSSession[]]$Session,
         [parameter(Mandatory=$true, Position=0, ParameterSetName="Package")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="ComputerName")]
-        [parameter(Mandatory=$true, Position=1, ParameterSetName="Uri")]
+        [parameter(Mandatory=$true, Position=1, ParameterSetName="ConnectionUri")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="Session")]
         [string]$PackageName,
         [Management.Automation.PsCredential]$Credential,
@@ -172,11 +172,17 @@ about_boxstarter_chocolatey
         [switch]$KeepWindowOpen,
         [string]$LocalRepo        
     )
-#TODO: do not set autologon when remote, pipeline     
+
     #If no psremoting based params are present, we just run locally
     if($PsCmdlet.ParameterSetName -eq "Package"){
         Invoke-Locally @PSBoundParameters
         return
+    }
+
+    #Convert pipeline to array
+    $list=@($input)
+    if($list.Count){
+        Set-Variable -Name $PsCmdlet.ParameterSetName -Value $list
     }
 
     ##Cannot run remotely unelevated. Look into self elevating

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{d63439cd-1975-444d-94ea-ec0948179464}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MyApplication</RootNamespace>
+    <AssemblyName>MyApplication</AssemblyName>
+    <Name>Boxstarter.WinConfig</Name>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="boxstarter.WinConfig.psd1" />
+    <Compile Include="Boxstarter.WinConfig.psm1" />
+    <Compile Include="Disable-InternetExplorerESC.ps1" />
+    <Compile Include="Disable-UAC.ps1" />
+    <Compile Include="Enable-RemoteDesktop.ps1" />
+    <Compile Include="Enable-UAC.ps1" />
+    <Compile Include="Get-LibraryNames.ps1" />
+    <Compile Include="Get-UAC.ps1" />
+    <Compile Include="Install-WindowsUpdate.ps1" />
+    <Compile Include="Move-LibraryDirectory.ps1" />
+    <Compile Include="Restart-Explorer.ps1" />
+    <Compile Include="Set-ExplorerOptions.ps1" />
+    <Compile Include="Set-TaskbarSmall.ps1" />
+    <Compile Include="Update-ExecutionPolicy.ps1" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Target Name="Build" />
+</Project>
