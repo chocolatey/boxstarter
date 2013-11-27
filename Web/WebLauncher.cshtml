@@ -4,7 +4,7 @@
 
 @section headerBody {
 <h1>Quickly setup any machine with one simple URL</h1>
-<p class="lead">Perhaps you have a common collection of apps and settings that you would like to install on any machine you have to work on. You don't want to have to always carry thumb drives or memorize complicated commands and URLs.</p>
+<p class="lead">Perhaps you have a common collection of applications and settings that you would like to install on any machine you have to work on. You don't want to have to always carry thumb drives or memorize complicated commands and URLs.</p>
 <p class="lead"><span class="text-primary">Boxstarter makes this process a snap!</span></p>
 }
 
@@ -25,9 +25,9 @@ cinst Microsoft-Hyper-V-All -source windowsFeatures
 cinst IIS-WebServerRole -source windowsfeatures
 </pre>
 <h4><span class="text-primary">Its Simply Chocolatey</span></h4>
-<p>If you are already familiar with Chocolatey, you will recognize the syntax. this is going to configure Windows Explorer in a way that wont drive you crazy, allow you to use remote desktop to connect to the machine, install a handfull of apps that you commonly use and install Hyper-V's virtualization host and the IIS web server.</p>
+<p>If you are already familiar with Chocolatey, you will recognize the syntax.  This is going to configure Windows Explorer in a way that won't drive you crazy, allow you to use Remote Desktop to connect to the machine, install a handful of applications that you commonly use and install Hyper-V's virtualization host and the IIS Web Server.</p>
 
-<p>Boxstarter can run any <a href="https://github.com/chocolatey/chocolatey/wiki/CreatePackagesQuickStart">Chocolatey package</a>. The only difference as far as the script is concerned is that your script also has access to <a href="http://boxstarter.codeplex.com/documentation?referringTitle=Quickly%20setup%20any%20machine%20with%20one%20easy%20to%20remember%20command">Boxstarter's API</a> for configuring windows, running updates as well as logging and reboot control.</p>
+<p>Boxstarter can run any <a href="https://github.com/chocolatey/chocolatey/wiki/CreatePackagesQuickStart">Chocolatey package</a>. The only difference as far as the script is concerned is that your script also has access to <a href="http://boxstarter.codeplex.com/documentation?referringTitle=Quickly%20setup%20any%20machine%20with%20one%20easy%20to%20remember%20command">Boxstarter's API</a> for configuring Windows, running updates as well as logging and reboot control.</p>
 
 <h3>Step 2</h3>
 <h4><span class="text-primary">Save your script</span></h4>
@@ -35,14 +35,14 @@ cinst IIS-WebServerRole -source windowsfeatures
 <ul>
 <li>Saving to as a package on any Nuget feed.</li>
 <li>Saving a package to a Network share or any local media such as a thumb drive.</li>
-<li>Saving to a single text file or any text based HTTP resource (like a <a href="https://gist.github.com/">github gist</a>)</li>
+<li>Saving to a single text file or any text based HTTP resource (like a <a href="https://gist.github.com/">Github Gist</a>)</li>
 </ul>
 
 <p>We'll stay simple here and save to a Github Gist.</p>
 <img src="images\gist1.png"/>
 
 <p/><p/>
-<p>After saving the gist, we'll click the "View Raw" link</p>
+<p>After saving the Gist, we'll click the "View Raw" link</p>
 <img src="images\gist2.png"/>
 
 <p/><p/>
@@ -51,21 +51,21 @@ cinst IIS-WebServerRole -source windowsfeatures
 
 <h3>Step 3</h3>
 <h4><span class="text-primary">Run the script</span></h4>
-<p>In either Internet Explorer (other browsers likely will not work) or from a console (CMD or Powershell), invoke the Boxstarter launcher:</p>
+<p>In either Internet Explorer (other browsers likely will not work) or from a console (CMD or PowerShell), invoke the Boxstarter launcher:</p>
 <pre>
 START http://boxstarter.org/package/nr/url?https://gist.github.com/mwrock/7382880/raw/f6525387b4b524b8eccef6ed4d5ec219c82c0ac7/gistfile1.txt        
 </pre>
-<p>Note this URL is a simple Boxstarter url: http://boxstarter.org/package/nr/url. The /nr/ tells boxstarter not to reboot the machine. Depending on what you are installing, you may not want to include that. Especially if you are including more heavy weight applications, frameworks or windows updates.</p>
+<p>Note this URL is a simple Boxstarter URL: http://boxstarter.org/package/nr/url. The /nr/ tells Boxstarter not to reboot the machine. Depending on what you are installing, you may not want to include that. Especially if you are including more heavy weight applications, frameworks or Windows Updates.</p>
 
-<p>We add our raw gist URL to the boxstarter url separated by a '?'.</p>
+<p>We add our raw Gist URL to the Boxstarter URL separated by a '?'.</p>
 
 <p>This invokes a Boxstarter installer that will install everything according to your script. </p>
 <img src="images\install.png"/>
 
-<p>If not already installed, this will install Chocolatey and any of its prerequisites. If you did not include /nr/ in the boxstarter url, it will manage reboots and automatically log the machine back in so you do not have to attend to it throughout the installation.</p>
+<p>If not already installed, this will install Chocolatey and any of its prerequisites. If you did not include /nr/ in the Boxstarter URL, it will manage reboots and automatically log the machine back in so you do not have to attend to it throughout the installation.</p>
 
 <h4>Other facts about the Boxstarter web installer:</h4>
 <ul>
 <li>You can also install any package on the public <a href="http://chocolatey.org/packages">chocolatey.org</a> feed as well as the <a href="https://www.myget.org/gallery/boxstarter">Boxstarter community feed</a> on <a hhref="http://muget.org">Myget.org</a>. To install these packages, use the package name instead of URL. So if you wanted to install FireFox, you would use http://boxstarter.org/package/nr/firefox.</li>
-<li>As briefly noted above, by default the web launch urls will not work outside of internet explorer or from the START command if IE is not your default browser. You need to install a "Click-Once" extension for <a href="https://chrome.google.com/webstore/detail/clickonce-for-google-chro/eeifaoomkminpbeebjdmdojbhmagnncl?hl=en">chrome</a> or <a href="https://addons.mozilla.org/en-us/firefox/addon/microsoft-net-framework-assist/">firefox</a> to invoke the launcher.</li>        
+<li>As briefly noted above, by default the web launch URLs will not work outside of Internet Explorer or from the START command if Internet Explorer is not your default browser. You need to install a "Click-Once" extension for <a href="https://chrome.google.com/webstore/detail/clickonce-for-google-chro/eeifaoomkminpbeebjdmdojbhmagnncl?hl=en">chrome</a> or <a href="https://addons.mozilla.org/en-us/firefox/addon/microsoft-net-framework-assist/">firefox</a> to invoke the launcher.</li>        
 </ul>

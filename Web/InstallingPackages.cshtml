@@ -4,7 +4,7 @@
 
 @section headerBody {
     <h1>Installing Packages</h1>
-    <p class="lead">Boxstarter can install packages either from a local Boxstarter Repo, a network share or external media, or it can "push" an installation to a remote machine.</p>
+    <p class="lead">Boxstarter can install packages either from a local Boxstarter Repository, a network share or external media, or it can "push" an installation to a remote machine.</p>
 }
 
 <h3>Install Packages with just a URL</h3>
@@ -17,22 +17,22 @@ $cred=Get-Credential domain\username
 Install-BoxstarterPackage -PackageName MyPackage -Credential $cred
 </pre>
 <p>This will install the MyPackage package locally and use the credentials given for any auto login needed after a reboot.</p>
-<p>There may be times when you either know that no reboot will be needed or you want to ensure that none takes place. To tell Boxstarter not to perform any reboots even if a pending reboot is detected, use the <code>-DisableReboots</code> argument.</p>
+<p>There may be times when you either know that no reboot will be needed or you want to ensure that none take place. To tell Boxstarter not to perform any reboots, even if a pending reboot is detected, use the <code>-DisableReboots</code> argument.</p>
 <pre>
 Install-BoxstarterPackage -PackageName MyPackage -DisableReboots
 </pre>
-<p>Since no reboot wil be performed, the credential is unnecesary.</p>
+<p>Since no reboot will be performed, the credential is unnecessary.</p>
 
 <h3>Running an Install from a network share or external media</h3>
 <p>You may want to place the Boxstarter modules and local repo on a network share so that others on your network can invoke Boxstarter installs with nothing installed. Or you may want to save them on a thumb drive, SD, or Micro SD card so you can always have Boxstarter and your packages handy. Boxstarter provides a batch file wrapper that can be called to facilitate these scenarios.</p>
 <pre>
-Copy-Item $Boxstarter.BaseDir G:\ -Recurse
-e:\BoxstarterDir\Boxstarter example
+Copy-Item $Boxstarter.BaseDir E:\ -Recurse
+E:\BoxstarterDir\Boxstarter example
 </pre>
 
 <p>Boxstarter's Base Directory (<code>$Boxstarter.BaseDir</code>) is copied to e:\BoxstarterDir, then Boxstarter.bat is called which will:</p>
 <ul>
-    <li>Bypass the user's execution policy nd ensure that Boxstarter scripts can run</li>
+    <li>Bypass the user's execution policy and ensure that Boxstarter scripts can run</li>
     <li>Import the Boxstarter Modules</li>
     <li>Invoke a Boxstarter installation of the example package</li>
     <li>Will prompt the user for their password to use during reboots</li>
@@ -40,7 +40,7 @@ e:\BoxstarterDir\Boxstarter example
 <img src="Images/console.png"/>
 
 <h3>Creating a Boxstarter Share</h3>
-<p>As stated already, Boxsarter and its local repo can exist on a network share. Boxstarter provides a command that will share the directory where Boxstarter exists.</p>
+<p>As stated already, Boxstarter and its local repository can exist on a network share. Boxstarter provides a command that will share the directory where Boxstarter exists.</p>
 <pre>
 Set-BoxstarterShare BoxShare
 </pre>
@@ -50,10 +50,10 @@ Set-BoxstarterShare BoxShare
 </pre>
 
 <h3 id="RemoteInstallations">Remote Installations</h3>
-<p>Maybe you dont want to share with others but would rather like to "push" installations to remote machines and VMs. Well that is now possible with Boxstarter! Boxstarter handles almost all of the remoting details so that installing a package remotely is practically no different from doing so locally.</p>
-<h4>Enabling Powershell remoting on the target machine</h4>
-<p>In some cases you may not have to do this. If your machine is on a domain where group policy settings automatically enable Powershell Remoting or even just WMI, Boxstarter may be able to do this for you. If you are unsure, enabling it manually will not cause any harm and it is easy.</p>
-<p>Open a Powershell window as administrator on the target machine and simply run:</p>
+<p>Maybe you don't want to share with others, but would rather like to "push" installations to remote machines and VMs. Well that is now possible with Boxstarter! Boxstarter handles almost all of the Remoting details so that installing a package remotely is practically no different from doing so locally.</p>
+<h4>Enabling PowerShell Remoting on the target machine</h4>
+<p>In some cases you may not have to do this. If your machine is on a domain where group policy settings automatically enable PowerShell Remoting or even just WMI, Boxstarter may be able to do this for you. If you are unsure, enabling it manually will not cause any harm and it is easy.</p>
+<p>Open a PowerShell window as administrator on the target machine and simply run:</p>
 <pre>
 Enable-PSRemoting -Force
 </pre>
@@ -68,13 +68,13 @@ Install-BoxstarterPackage -ComputerName MyTargetMachine -PackagNamee MyPackage -
 <img src="Images/amazon.png"/>
 <h3>Troubleshooting Remote Installations</h3>
 <h4>Establishing remote connections with servers not on the local subnet</h4>
-<p>By default,  server versions of Windows have a firewall rule restricting trafiic that is not on the local subnet. There ma y be circumstances where you might want to conect over the public internet to another machine. This can be done by manually enabling the "WINRM-HTTP-In-TCP-PUBLIC" firewall rule using the Powershell 3.o Set-NetFirewallRule or the commanndline netsh advfirewall command.</p>
-<p>Client version of Windows will only allow PSRemoting on Private and Domain networks. Clients on PS 3.0 and higher can provide the <code>-SkipNetorkProfileCheck</code> to Enable-PSRemoting to allow connections to public computers on the local subnet. Boxstarter uses this parameter when enabling remoting on clients. Like with server versions, you can enable a firewall rule to work around the local subnet restriction. </p>
-<p>Windows 7 OSs running PS 2.0 can not enable PSRemoting wen on a public network connection. You will need to change your connection type to a private or Domain based connection.</p>
+<p>By default,  server versions of Windows have a firewall rule restricting traffic that is not on the local subnet. There may be circumstances where you might want to connect over the public internet to another machine. This can be done by manually enabling the "WINRM-HTTP-In-TCP-PUBLIC" firewall rule using the Powershell 3.0 <code>Set-NetFirewallRule</code> or the commanndline <code>netsh advfirewall</code> command.</p>
+<p>Client versions of Windows will only allow PSRemoting on Private and Domain networks. Clients on PowerShell 3.0 and higher can provide the <code>-SkipNetorkProfileCheck</code> to Enable-PSRemoting to allow connections to public computers on the local subnet. Boxstarter uses this parameter when enabling Remoting on clients. Like with Server versions, you can enable a firewall rule to work around the local subnet restriction. </p>
+<p>Windows 7 OSs running PowerShell 2.0 can not enable PSRemoting when on a public network connection. You will need to change your connection type to a private or Domain based connection.</p>
 
 <h4>Installation Failures</h4>
-<p>Remote installations performed via Powershell remoting can sometimes fail. The symptoms of such failures can manifest themselves in a ariety of ways and do not fail in a consistent manner. Boxstarter makes great effort to enure the success of remote installs by leveraging scheduled tasks when it sees certain install activities. Boxstarter intercepts all calls to MSIEXEC, DISM (Installer for "Windows Features") and Windows Update. It is possible for more involved installation scripts to perform these operations in such a way that Boxstarter will not be able to intercept. If you suspect that your installation is failing due to using a remote session, you vcan use Boxstarter's <code>Invoke-FromTask</code> command to manually wrap your install in a scheduled task and thereby use a Local token.</p>
+<p>Remote installations performed via PowerShell Remoting can sometimes fail. The symptoms of such failures can manifest themselves in a variety of ways and do not fail in a consistent manner. Boxstarter makes great effort to ensure the success of remote installs by leveraging scheduled tasks when it sees certain install activities. Boxstarter intercepts all calls to MSIEXEC, DISM (Installer for "Windows Features") and Windows Update. It is possible for more involved installation scripts to perform these operations in such a way that Boxstarter will not be able to intercept. If you suspect that your installation is failing due to using a remote session, you can use Boxstarter's <code>Invoke-FromTask</code> command to manually wrap your install in a scheduled task and thereby use a Local token.</p>
 <pre>
 Invoke-FromTask "DISM /Online /NoRestart /Enable-Feature /Telnet-Client" -IdleTimeout 20
 </pre>
-<p>This will run the DISM cmmand to install the Telnet client in a scheduled task. and will kill the process if it becomes idle for at least 20 seconds. The scheduled task will always run with elevated privileges and be invoked immediately. If the same user whose credentials created the task is logged on to an active session, the scheduled task will run interactively on the remote machine. All console outpuf from the scheduled task will be intercepted by Boxstarter and rendered to the user's console.</p>
+<p>This will run the DISM command to install the Telnet client in a scheduled task, and will kill the process if it becomes idle for more than 20 seconds. The scheduled task will always run with elevated privileges and be invoked immediately. If the same user whose credentials created the task is logged on to an active session, the scheduled task will run interactively on the remote machine. All console output from the scheduled task will be intercepted by Boxstarter and rendered to the user's console.</p>
