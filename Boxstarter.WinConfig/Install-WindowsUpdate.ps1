@@ -40,13 +40,6 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         return
     }
 
-    if($getUpdatesFromMS) {
-        $auPath="HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"
-        if(Test-Path $auPath) {
-            $origAUVal=(Get-ItemProperty -Path $auPath -Name UseWuServer -ErrorAction SilentlyContinue)
-            Set-ItemProperty -Path $auPath -Name UseWuServer -Value 0 -ErrorAction SilentlyContinue
-        }
-    }
     try{
         $searchSession=Start-TimedSection "Checking for updates..."        
         $updateSession =new-object -comobject "Microsoft.Update.Session"
@@ -55,6 +48,9 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         $Downloader =$updateSession.CreateUpdateDownloader()
         $Installer =$updateSession.CreateUpdateInstaller()
         $Searcher =$updatesession.CreateUpdateSearcher()
+        if($getUpdatesFromMS) {
+            $Searcher.ServerSelection = 2 #2 is the Const for the Windows Update server
+        }
         $wus=Get-WmiObject -Class Win32_Service -Filter "Name='wuauserv'"
         $origStatus=$wus.State
         $origStartupType=$wus.StartMode
