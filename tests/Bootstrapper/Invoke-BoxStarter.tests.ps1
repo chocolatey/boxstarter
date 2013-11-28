@@ -240,7 +240,7 @@ Describe "Invoke-Boxstarter" {
     }
 
     Context "When ReEnableUAC File Exists" {
-        New-Item "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" -type file | Out-Null
+        New-Item "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" -type file -Force | Out-Null
 
         Invoke-Boxstarter {return} | Out-Null
 
@@ -334,32 +334,13 @@ Describe "Invoke-Boxstarter" {
         }
     }
 
-    Context "When rebooting and UAC is Enabled and password is set" {
+    Context "When rebooting and UAC is Enabled" {
         Mock Stop-UpdateServices
         Mock RestartNow
         Mock Read-AuthenticatedPassword
         Mock Get-UAC {return $true}
         Mock Set-SecureAutoLogon
         Mock New-Item
-
-        Invoke-Boxstarter {$Boxstarter.IsRebooting=$true} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
-
-        it "will Disable UAC" {
-            Assert-MockCalled Disable-UAC
-        }
-        it "will add ReEnableUac file" {
-            Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"}
-        }
-    }
-
-    Context "When rebooting and UAC is Enabled and user has been auto loged on" {
-        Mock Stop-UpdateServices
-        Mock RestartNow
-        Mock Read-AuthenticatedPassword
-        Mock Get-UAC {return $true}
-        Mock Set-SecureAutoLogon
-        Mock New-Item
-        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
 
         Invoke-Boxstarter {$Boxstarter.IsRebooting=$true} -RebootOk | Out-Null
 
@@ -369,10 +350,9 @@ Describe "Invoke-Boxstarter" {
         it "will add ReEnableUac file" {
             Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"}
         }
-        Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
     }
 
-    Context "When rebooting UAC is enabled and password is not set" {
+    Context "When rebooting UAC is enabled and in remote session" {
         Mock Stop-UpdateServices
         Mock RestartNow
         Mock Read-AuthenticatedPassword
@@ -380,7 +360,9 @@ Describe "Invoke-Boxstarter" {
         Mock Get-UAC {return $true}
         Mock Set-SecureAutoLogon
         Mock New-Item
-        
+        Mock Get-IsRemote {return $true}
+        Mock Create-BoxstarterTask
+
         Invoke-Boxstarter {return} -RebootOk | Out-Null
 
         it "will not Disable UAC" {

@@ -28,13 +28,12 @@ function Cleanup-Boxstarter {
         return
     } 
 
-    if($BoxstarterPassword.Length -gt 0 -or $Boxstarter.AutologedOn) {
-        if(Get-UAC){
-            Write-BoxstarterMessage "UAC Enabled. Disabling..."
-            Disable-UAC
-            New-Item "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" -type file | Out-Null
-        }
+    if(Get-UAC -and !(Get-IsRemote)){
+        Write-BoxstarterMessage "UAC Enabled. Disabling..."
+        Disable-UAC
+        New-Item "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" -type file | Out-Null
     }
+
     if(!(Get-IsRemote) -and $BoxstarterPassword.Length -gt 0) {
         Write-BoxstarterMessage "Securely Storing $($env:userdomain)\$($Boxstarter.BoxstarterUser) credentials for automatic logon"
         Set-SecureAutoLogon $Boxstarter.BoxstarterUser $BoxstarterPassword $env:userdomain
