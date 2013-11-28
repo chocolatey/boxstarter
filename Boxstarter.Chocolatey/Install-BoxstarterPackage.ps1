@@ -448,8 +448,11 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
             }
             $reconnected=$false
             Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
-            Remove-PSSession $session
             Do{
+                if($session -ne $null){
+                    Remove-PSSession $session
+                    $session= $null
+                }
                 $response=$null
                 start-sleep -seconds 2
                 $session = New-PSSession @sessionArgs -Name Boxstarter -ErrorAction SilentlyContinue
@@ -457,8 +460,11 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
                     $global:Error.RemoveAt(0)
                 }
                 elseif($session -ne $null -and $Session.Availability -eq "Available"){
-                    $response=Invoke-Command @sessionArgs { Get-WmiObject Win32_ComputerSystem } -ErrorAction SilentlyContinue
-                    if($response -ne $null){
+                    $response=Invoke-Command @sessionArgs { 
+                        Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 
+                        return Test-PendingReboot
+                    } -ErrorAction SilentlyContinue
+                    if($response -ne $null -and $response -eq $false){
                         $reconnected = $true
                     }
                 }
@@ -490,7 +496,7 @@ function Should-EnableCredSSP($sessionArgs, $computerName) {
         }
         try {$credsspEnabled = Test-WsMan -ComputerName $ComputerName @uriArgs -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue } catch {}
         if($credsspEnabled -eq $null){
-            $global:Error.RemoveAt(0)
+            if($global:Error.Count -gt 0){ $global:Error.RemoveAt(0) }
             return $True
         }
         elseif($credsspEnabled -ne $null){

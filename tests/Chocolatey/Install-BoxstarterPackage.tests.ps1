@@ -248,6 +248,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Enable-RemotePSRemoting { return New-Object PSObject }
         Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
         Mock Invoke-Command
+        Mock Invoke-Command { return $false } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*Test-PendingReboot"}
 
         Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds -Force | Out-Null
 
@@ -263,7 +264,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Enable-RemotePSRemoting { return New-Object PSObject }
         Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
         Mock Invoke-Command
-         Mock New-PSSession {@{Availability="Available"}}
+        Mock New-PSSession {@{Availability="Available"}}
 
         Install-BoxstarterPackage -ConnectionURI "https://server:5678/wsman" -PackageName test -Credential $mycreds -Force | Out-Null
 
