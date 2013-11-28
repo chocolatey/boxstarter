@@ -453,7 +453,10 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
                 $response=$null
                 start-sleep -seconds 2
                 $session = New-PSSession @sessionArgs -Name Boxstarter -ErrorAction SilentlyContinue
-                if($session -ne $null -and $Session.Availability -eq "Available"){
+                if($session -eq $null) {
+                    $global:Error.RemoveAt(0)
+                }
+                elseif($session -ne $null -and $Session.Availability -eq "Available"){
                     $response=Invoke-Command @sessionArgs { Get-WmiObject Win32_ComputerSystem } -ErrorAction SilentlyContinue
                     if($response -ne $null){
                         $reconnected = $true
@@ -487,6 +490,7 @@ function Should-EnableCredSSP($sessionArgs, $computerName) {
         }
         try {$credsspEnabled = Test-WsMan -ComputerName $ComputerName @uriArgs -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue } catch {}
         if($credsspEnabled -eq $null){
+            $global:Error.RemoveAt(0)
             return $True
         }
         elseif($credsspEnabled -ne $null){
