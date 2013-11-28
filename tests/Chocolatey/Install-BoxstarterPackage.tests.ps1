@@ -192,7 +192,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Invoke-WmiMethod
         Mock Invoke-Command { New-Object System.Object }
 
-        $result = Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds
+        $result = Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds 2> $Null
 
         It "will throw"{
             $result.Errors.Count | should be 1
@@ -207,7 +207,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Confirm-Choice
         Mock Invoke-Command { New-Object System.Object }
 
-        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds | Out-Null
+        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds 2>&1 | Out-Null
 
         It "will Confirm ok to enable remoting"{
             Assert-MockCalled Confirm-Choice -ParameterFilter {$message -like "*Remoting is not enabled on Remote computer*"}
@@ -489,10 +489,10 @@ Describe "Install-BoxstarterPackage" {
         $session = New-PSSession localhost
         Remove-PSSession $session
 
-        $result = Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots
+        $result = Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots 2> $null
 
         It "Should throw a validation error"{
-            $result.Errors[0].CategoryInfo.Reason | should be "ArgumentException"
+            $result.Errors[0].Exception.Message | should match "The Session is not Available"
         }
         It "will report failure in results" {
             $result.Completed | should be $false

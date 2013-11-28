@@ -213,7 +213,9 @@ about_boxstarter_chocolatey
             Set-SessionArgs $_ $sessionArgs
             $record = Start-Record $_.ComputerName
             try {
-                Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs
+                if(-not (Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs)){
+                    $record.Completed=$false
+                }
             }
             catch {
                 $record.Completed=$false
@@ -281,12 +283,18 @@ function Finish-Record($obj) {
 function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots){
     $record = Start-Record $ComputerName
     try {
-        if(!(Enable-RemotingOnRemote $ComputerName $sessionArgs.Credential)){return}
+        if(!(Enable-RemotingOnRemote $ComputerName $sessionArgs.Credential)){
+            Write-Error "Unable to access remote computer via Powershell Remoting or WMI. You can enable it by running: Enable-PSRemoting -Force from an Administrator Powershell console on the remote computer."
+            $record.Completed=$false
+            return
+        }
         $enableCredSSP = Should-EnableCredSSP $sessionArgs $computerName
 
         $session = New-PSSession @sessionArgs -Name Boxstarter
 
-        Install-BoxstarterPackageForSession $session $PackageName $DisableReboots $sessionArgs $enableCredSSP
+        if(-not (Install-BoxstarterPackageForSession $session $PackageName $DisableReboots $sessionArgs $enableCredSSP)){
+            $record.Completed=$false
+        }
     }
     catch {
         $record.Completed=$false
@@ -299,7 +307,8 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
 function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReboots, $sessionArgs, $enableCredSSP) {
     try{
         if($session.Availability -ne "Available"){
-            throw New-Object -TypeName ArgumentException -ArgumentList "The Session is not Available"
+            write-Error (New-Object -TypeName ArgumentException -ArgumentList "The Session is not Available")
+            return $false
         }
 
         Setup-BoxstarterModuleAndLocalRepo $session
@@ -310,6 +319,7 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
         }
         
         Invoke-Remotely $session $PackageName $DisableReboots $sessionArgs
+        return $true
     }
     finally {
         if($enableCredSSP){
@@ -371,13 +381,7 @@ function Enable-RemotingOnRemote ($ComputerName, $Credential){
         Write-BoxstarterMessage "Powershell Remoting is not enabled or accesible on $ComputerName"
         $wmiTest=Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
         if($wmiTest -eq $null){
-            Throw @"
-Unable at access remote computer via Powershell Remoting or WMI. 
-You can enable it by running:
- Enable-PSRemoting -Force 
-from an Administrator Powershell console on the remote computer.
-Original Exception: $ex
-"@
+            return $false
         }
         if($Force -or (Confirm-Choice "Powershell Remoting is not enabled on Remote computer. Should Boxstarter enable powershell remoting?")){
             Write-BoxstarterMessage "Enabling Powershell Remoting on $ComputerName"
