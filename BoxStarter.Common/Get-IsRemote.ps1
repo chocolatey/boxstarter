@@ -7,5 +7,6 @@ Returns $True if the current Powershell session is running remotely
 http://boxstarter.codeplex.com
 
 #>    
-	return $PSSenderInfo -ne $null
+    $res =  $PSSenderInfo -ne $null
+	return $res
 }

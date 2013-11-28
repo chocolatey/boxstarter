@@ -28,10 +28,12 @@ function Cleanup-Boxstarter {
         return
     } 
 
-    if(Get-UAC -and !(Get-IsRemote)){
-        Write-BoxstarterMessage "UAC Enabled. Disabling..."
-        Disable-UAC
-        New-Item "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" -type file | Out-Null
+    if(!(Get-IsRemote)){
+        if(Get-UAC){
+            Write-BoxstarterMessage "UAC Enabled. Disabling..."
+            Disable-UAC
+            New-Item "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" -type file | Out-Null
+        }
     }
 
     if(!(Get-IsRemote) -and $BoxstarterPassword.Length -gt 0) {
