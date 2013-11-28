@@ -93,9 +93,12 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
             Out-BoxstarterLog "This may take several minutes..."
                 $Installer.updates = $UpdatesToInstall
                 try { $result = $Installer.Install() } catch {
+                    if(!($SuppressReboots) -and (test-path function:\Invoke-Reboot)){
+                        if(Test-PendingReboot){Invoke-Reboot}
+                    }
                     # Check for WU_E_INSTALL_NOT_ALLOWED  
                     if($_.Exception.HResult -eq -2146233087) {
-                        Out-BoxstarterLog "You either do not have rights or there is a pending reboot blocking the install."
+                        Out-BoxstarterLog "There is either an update in progress or there is a pending reboot blocking the install."
                         Out-BoxstarterLog "If you are using the Bootstrapper or Chocolatey module, try using:"
                         Out-BoxstarterLog "if(Test-PendingReboot){Invoke-Reboot}"
                         Out-BoxstarterLog "This will perform a reboot if reboots are pending."
