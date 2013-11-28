@@ -32,7 +32,7 @@ about_boxstarter_bootstrapper
 }
 
 function IsCCMRebootPending {
-    try { $clientutils = [wmiclass]"\\.\root\ccm\clientsdk:CCM_ClientUtilities" } catch{}
+    try { $clientutils = [wmiclass]"\\.\root\ccm\clientsdk:CCM_ClientUtilities" } catch{$global:error.RemoveAt(0)}
     if($clientutils) {
         try {
             $determination=$clientutils.DetermineIfRebootPending()
