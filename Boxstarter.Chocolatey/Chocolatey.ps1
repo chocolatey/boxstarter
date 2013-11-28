@@ -68,8 +68,7 @@ Intercepts Chocolatey call to check for reboots
 #>  
     param([int[]]$RebootCodes=@())
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
-    $PSBoundParameters.Remove("RebootCodes")
-
+    $PSBoundParameters.Remove("RebootCodes") | Out-Null
     #backcompat for choco versions prior to 0.9.8.21
     if(!$packageNames){$packageNames=$packageName}
     
@@ -85,7 +84,6 @@ Intercepts Chocolatey call to check for reboots
                 $winFeature=$true
             }
         }
-
         if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
         try {
                 if($winFeature -eq $true -and (Get-IsRemote)){
