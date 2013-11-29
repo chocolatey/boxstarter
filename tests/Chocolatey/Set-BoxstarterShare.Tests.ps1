@@ -1,9 +1,18 @@
 ﻿$here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
 
+Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+    % { . $_.ProviderPath }
+Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 | 
+    % { . $_.ProviderPath }
+Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 | 
+    % { . $_.ProviderPath }
+Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 | 
+    % { . $_.ProviderPath }
+$Boxstarter.SuppressLogging=$true
+
 Describe "Set-BoxstarterShare" {
     $testRoot=(Get-PSDrive TestDrive).Root
-    Import-Module "$here\..\..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1"
 
     Context "When setting share with no parameters" {
         MkDir "$testRoot\boxstarter" | Out-Null
