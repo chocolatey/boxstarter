@@ -59,8 +59,8 @@ This function wraps a Chocolatey Install and provides these additional features
     - Clarify "Simply chocolatey" in docs
     - Clarify Package From script
     - Add docs about pipeline and output
-    - Test on win7 to 2 computers
-    - test from locl to 2 vms
+    - Mention Verbose/Silent
+    - Readme
 
 .PARAMETER DisableReboots
 If set, reboots are suppressed.

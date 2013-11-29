@@ -4,7 +4,7 @@ Description = 'Provides a robust environment capable of automatic reboots and se
 ModuleToProcess = './boxstarter.chocolatey.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.0.25'
+ModuleVersion = '2.0.55'
 
 # ID used to uniquely identify this module
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e51'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = '505200cb6cc97a39d6f5b8da12173dedebd3cc84'
+PrivateData = '89221357a5ec5409f3c5cdf93a3a5bf74fcb0306'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
