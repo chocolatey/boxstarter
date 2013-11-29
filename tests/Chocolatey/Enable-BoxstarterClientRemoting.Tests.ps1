@@ -23,7 +23,7 @@ Describe "Enable-BoxstarterClientRemoting" {
     Context "When Remoting is not enabled locally" {
         Mock Get-WSManCredSSP {throw "remoting not enabled"}
 
-        Enable-BoxstarterClientRemoting -RemoteHostToTrust blah | out-null
+        Enable-BoxstarterClientRemoting -RemoteHostsToTrust blah | out-null
 
         It "will confirm to enable remoting"{
             Assert-MockCalled Confirm-Choice -ParameterFilter {$message -like "*Remoting is not enabled locally*"}
@@ -34,7 +34,7 @@ Describe "Enable-BoxstarterClientRemoting" {
         Mock Get-WSManCredSSP {throw "remoting not enabled"}
         Mock Confirm-Choice {return $True}
 
-        Enable-BoxstarterClientRemoting -RemoteHostToTrust blah | out-null
+        Enable-BoxstarterClientRemoting -RemoteHostsToTrust blah | out-null
 
         It "will enable remoting"{
             Assert-MockCalled Enable-PSRemoting
@@ -45,7 +45,7 @@ Describe "Enable-BoxstarterClientRemoting" {
         Mock Get-WSManCredSSP {throw "remoting not enabled"}
         Mock Confirm-Choice {return $False}
 
-        Enable-BoxstarterClientRemoting -RemoteHostToTrust blah | out-null
+        Enable-BoxstarterClientRemoting -RemoteHostsToTrust blah | out-null
 
         It "will not enable remoting if user does not confirm"{
             Assert-MockCalled Enable-PSRemoting -Times 0
@@ -56,7 +56,7 @@ Describe "Enable-BoxstarterClientRemoting" {
         Mock Get-WSManCredSSP {return @("The machine is not","")}
         Mock Confirm-Choice {return $False}
 
-        Enable-BoxstarterClientRemoting -RemoteHostToTrust blah | out-null
+        Enable-BoxstarterClientRemoting -RemoteHostsToTrust blah | out-null
 
         It "will enable for computer"{
             Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$DelegateComputer -eq "blah"}
@@ -67,7 +67,7 @@ Describe "Enable-BoxstarterClientRemoting" {
         Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah","")}
         Mock Confirm-Choice {return $False}
 
-        Enable-BoxstarterClientRemoting -RemoteHostToTrust blah | out-null
+        Enable-BoxstarterClientRemoting -RemoteHostsToTrust blah | out-null
 
         It "will enable for computer"{
             Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$DelegateComputer -eq "blah"}
@@ -79,7 +79,7 @@ Describe "Enable-BoxstarterClientRemoting" {
         Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah","")}
         Mock Confirm-Choice {return $False}
 
-        Enable-BoxstarterClientRemoting -RemoteHostToTrust blah | out-null
+        Enable-BoxstarterClientRemoting -RemoteHostsToTrust blah | out-null
 
         It "will enable Allow Settings"{
             (Get-ItemProperty -Path "$regRoot\CredentialsDelegation" -Name AllowFreshCredentialsWhenNTLMOnly).AllowFreshCredentialsWhenNTLMOnly | should be 1
@@ -98,7 +98,7 @@ Describe "Enable-BoxstarterClientRemoting" {
         Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah","")}
         Mock Confirm-Choice {return $False}
 
-        Enable-BoxstarterClientRemoting -RemoteHostToTrust blah | out-null
+        Enable-BoxstarterClientRemoting -RemoteHostsToTrust blah | out-null
 
         It "will add computer to list"{
             (Get-ItemProperty -Path "$regRoot\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly" -Name 2).2 | should be "wsman/blah"
@@ -114,7 +114,7 @@ Describe "Enable-BoxstarterClientRemoting" {
         Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah","")}
         Mock Confirm-Choice {return $False}
 
-        Enable-BoxstarterClientRemoting -RemoteHostToTrust blah | out-null
+        Enable-BoxstarterClientRemoting -RemoteHostsToTrust blah | out-null
 
         It "will keep computer in list"{
             (Get-ItemProperty -Path "$regRoot\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly" -Name 1).1 | should be "wsman/blah"
@@ -128,7 +128,7 @@ Describe "Enable-BoxstarterClientRemoting" {
     Context "When no entries in trusted hosts" {
         Mock Get-Item {@{Value=""}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
 
-        Enable-BoxstarterClientRemoting -RemoteHostToTrust blah | out-null
+        Enable-BoxstarterClientRemoting -RemoteHostsToTrust blah | out-null
 
         It "will enable for computer"{
             Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq "blah"}
@@ -138,7 +138,7 @@ Describe "Enable-BoxstarterClientRemoting" {
     Context "When entries in trusted hosts do not contain computer" {
         Mock Get-Item {@{Value="bler,blur,blor"}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
 
-        Enable-BoxstarterClientRemoting -RemoteHostToTrust blah | out-null
+        Enable-BoxstarterClientRemoting -RemoteHostsToTrust blah | out-null
 
         It "will enable for computer"{
             Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq "bler,blur,blor,blah"}
