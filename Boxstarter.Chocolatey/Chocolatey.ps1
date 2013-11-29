@@ -34,7 +34,7 @@ param(
         }
         return;
     }
-    if(get-Command Write-Host -Module chocolateyInstaller){
+    if(get-Module chocolateyInstaller){
         chocolateyInstaller\Write-Host @PSBoundParameters
     }
     else {
