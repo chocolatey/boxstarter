@@ -12,5 +12,7 @@ Export-ModuleMember Invoke-ChocolateyBoxstarter,
                     Install-BoxstarterPackage,
                     New-PackageFromScript
 
-Export-ModuleMember Install-ChocolateyInstallPackageOverride
-Export-ModuleMember -alias Install-ChocolateyInstallPackage
+Export-ModuleMember Install-ChocolateyInstallPackageOverride,
+                    Write-HostOverride
+Export-ModuleMember -alias Install-ChocolateyInstallPackage,
+                           Write-Host

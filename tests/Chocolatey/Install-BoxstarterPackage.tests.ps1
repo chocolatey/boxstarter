@@ -383,7 +383,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        $result = Install-BoxstarterPackage -computerName localhost -PackageName exception-package -DisableReboots
+        $result = Install-BoxstarterPackage -computerName localhost -PackageName exception-package -DisableReboots 2> $null
 
         It "will include exceptions"{
             $result.Errors.Count | should be 2

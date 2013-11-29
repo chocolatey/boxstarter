@@ -18,7 +18,32 @@ Install-ChocolateyInstallPackage $(Expand-Splat $PSBoundParameters)
     }
 }
 
+function Write-HostOverride {
+param(
+  [Parameter(Position=0,Mandatory=$false,ValueFromPipeline=$true, ValueFromRemainingArguments=$true)][object] $Object,
+  [Parameter()][switch] $NoNewLine, 
+  [Parameter(Mandatory=$false)][ConsoleColor] $ForegroundColor, 
+  [Parameter(Mandatory=$false)][ConsoleColor] $BackgroundColor,
+  [Parameter(Mandatory=$false)][Object] $Separator
+)
+    Log-BoxStarterMessage $Object
+    if($Boxstarter.SuppressLogging){
+        $caller = (Get-Variable MyInvocation -Scope 1).Value.MyCommand.Name
+        if("Describe","Context","write-PesterResult" -contains $caller) {
+            Microsoft.PowerShell.Utility\Write-Host @PSBoundParameters
+        }
+        return;
+    }
+    if(get-Command Write-Host -Module chocolateyInstaller){
+        chocolateyInstaller\Write-Host @PSBoundParameters
+    }
+    else {
+        Microsoft.PowerShell.Utility\Write-Host @PSBoundParameters
+    }
+}
+
 new-alias Install-ChocolateyInstallPackage Install-ChocolateyInstallPackageOverride -force
+new-alias Write-Host Write-HostOverride -force
 
 function cinst {
 <#
