@@ -37,7 +37,7 @@ New-BoxstarterPackage
     try{
         if($name){
             $searchPath = join-path $name "$name.nuspec"
-            Write-BoxstarterMessage "Searching for $searchPath"
+            Write-BoxstarterMessage "Searching for $searchPath" -Verbose
             if(!(Test-Path $searchPath)){
                 throw "Cannot find $searchPath"
             }

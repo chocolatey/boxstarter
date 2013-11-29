@@ -64,6 +64,6 @@ about_boxstarter_logging
     $padCars="".PadLeft($boxstarterTimers.Count,"+")
     $script:boxstarterTimers.Remove($SectionId)
     $stopwatch = $timerEntry.stopwatch
-    Write-BoxstarterMessage "$padCars Boxstarter finished $($timerEntry.Title) $($stopwatch.Elapsed.ToString())" -NoLogo 
+    Write-BoxstarterMessage "$padCars Boxstarter finished $($timerEntry.Title) $($stopwatch.Elapsed.ToString())" -NoLogo -Verbose:$timerEntry.Verbose
     $stopwatch.Stop()
 }

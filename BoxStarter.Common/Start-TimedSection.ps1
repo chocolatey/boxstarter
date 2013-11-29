@@ -65,13 +65,15 @@ http://boxstarter.codeplex.com
 Stop-TimedSection
 about_boxstarter_logging
 #>
-    param([string]$sectionName)
+    param(
+        [string]$sectionName,
+        [switch]$Verbose)
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
     $guid = [guid]::NewGuid().ToString()
-    $timerEntry=@{title=$sectionName;stopwatch=$stopwatch}
+    $timerEntry=@{title=$sectionName;stopwatch=$stopwatch;verbose=$Verbose}
     if(!$script:boxstarterTimers) {$script:boxstarterTimers=@{}}
     $boxstarterTimers.$guid=$timerEntry
     $padCars="".PadLeft($boxstarterTimers.Count,"+")
-    Write-BoxstarterMessage "$padCars Boxstarter starting $sectionName" -NoLogo 
+    Write-BoxstarterMessage "$padCars Boxstarter starting $sectionName" -NoLogo -Verbose:$Verbose
     return $guid
 }

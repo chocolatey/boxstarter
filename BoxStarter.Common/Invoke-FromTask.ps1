@@ -44,7 +44,7 @@ Remove-BoxstarterTask
         $idleTimeout=60,
         $totalTimeout=3600
     )
-    Write-BoxstarterMessage "Invoking $command in scheduled task"
+    Write-BoxstarterMessage "Invoking $command in scheduled task" -Verbose
     Add-TaskFiles $command
 
     $taskProc = start-Task

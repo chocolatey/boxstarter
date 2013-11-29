@@ -148,7 +148,7 @@ function Resolve-LocalRepo([string]$localRepo) {
     if($localRepo){
         $localRepo = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($localRepo)
     } else {$Localrepo = $Boxstarter.Localrepo}
-    write-BoxstarterMessage "LocalRepo is at $localRepo"
+    write-BoxstarterMessage "LocalRepo is at $localRepo" -Verbose
     return $localRepo
 }
 
@@ -163,6 +163,6 @@ function Download-Package([string]$bootstrapPackage) {
     } else {
         $source = (Get-BoxstarterConfig).NugetSources
     }
-    write-BoxstarterMessage "Installing $bootstrapPackage package from $source"
+    write-BoxstarterMessage "Installing $bootstrapPackage package from $source" -Verbose
     Chocolatey install $bootstrapPackage -source $source -force
 }

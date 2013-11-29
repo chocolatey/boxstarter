@@ -5,13 +5,13 @@ function Enable-BoxstarterClientRemoting ([string[]] $RemoteHostsToTrust) {
         PreviousCSSPTrustedHosts=$null;
         PreviousFreshCredDelegationHostCount=0
     }
-
+    Write-BoxstarterMessage "Configuring local Powershell Remoting settings..."
     try { $credssp = Get-WSManCredSSP } catch { $credssp = $_}
     if($credssp.Exception -ne $null){
-        Write-BoxstarterMessage "Local Powershell Remoting is not enabled"
+        Write-BoxstarterMessage "Local Powershell Remoting is not enabled" -Verbose
         if($Force -or (Confirm-Choice "Powershell remoting is not enabled locally. Should Boxstarter enable powershell remoting?"))
         {
-            Write-BoxstarterMessage "Enabling local Powershell Remoting"
+            Write-BoxstarterMessage "Enabling Powershell Remoting on local machine"
             $enableArgs=@{Force=$true}
             $command=Get-Command Enable-PSRemoting
             if($command.Parameters.Keys -contains "skipnetworkprofilecheck"){
@@ -39,7 +39,7 @@ function Enable-BoxstarterClientRemoting ([string[]] $RemoteHostsToTrust) {
     }
 
     if($ComputersToAdd.Count -gt 0){
-        Write-BoxstarterMessage "Adding $($ComputersToAdd -join ',') to allowed credSSP hosts"
+        Write-BoxstarterMessage "Adding $($ComputersToAdd -join ',') to allowed credSSP hosts" -Verbose
         Enable-WSManCredSSP -DelegateComputer $ComputersToAdd -Role Client -Force | Out-Null
     }
 
@@ -56,7 +56,7 @@ function Enable-BoxstarterClientRemoting ([string[]] $RemoteHostsToTrust) {
             if($Result.PreviousTrustedHosts.Length -gt 0){
                 $strNewHosts = $Result.PreviousTrustedHosts + "," + $strNewHosts
             }
-            Write-BoxstarterMessage "Adding $strNewHosts to allowed wsman hosts"
+            Write-BoxstarterMessage "Adding $strNewHosts to allowed wsman hosts" -Verbose
             Set-Item "wsman:\localhost\client\trustedhosts" -Value $strNewHosts -Force
         }
     }

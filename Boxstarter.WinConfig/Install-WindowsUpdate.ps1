@@ -131,7 +131,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         if($origStatus -eq "Stopped")
         {
             Set-Service wuauserv -StartupType $origStartupType
-            stop-service wuauserv
+            stop-service wuauserv -ErrorAction SilentlyContinue
         }
     }
 }

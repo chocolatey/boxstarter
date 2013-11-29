@@ -34,6 +34,9 @@ param(
         }
         return;
     }
+    if($NoNewLine -eq $false){
+        Microsoft.PowerShell.Utility\Write-Host  "[Boxstarter:$env:Computername]" -NoNewLine
+    }
     if(get-Module chocolateyInstaller){
         chocolateyInstaller\Write-Host @PSBoundParameters
     }
@@ -153,7 +156,7 @@ Intercepts Chocolatey call to check for reboots
 }
 
 function Call-Chocolatey {
-    $session=Start-TimedSection "Calling Chocolatey to install $packageName"
+    $session=Start-TimedSection "Calling Chocolatey to install $packageName" -Verbose
     ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
     Stop-Timedsection $session
 }

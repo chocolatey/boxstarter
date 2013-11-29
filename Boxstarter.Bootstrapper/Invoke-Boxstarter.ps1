@@ -89,7 +89,7 @@ Invoke-Reboot
         $boxMod=(IEX (Get-Content (join-path $Boxstarter.Basedir Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1) | Out-String))
         write-BoxstarterMessage "Boxstarter Version $($boxMod.ModuleVersion)" -nologo -Color White
         write-BoxstarterMessage "$($boxMod.Copyright) http://boxstarter.org`r`n" -nologo -Color White
-        $session=Start-TimedSection "Installation session."
+        $session=Start-TimedSection "Installation session." -Verbose
         if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
         if($encryptedPassword){$password = ConvertTo-SecureString -string $encryptedPassword}
         if(!$NoPassword){
