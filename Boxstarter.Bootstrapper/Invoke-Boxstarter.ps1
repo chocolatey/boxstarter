@@ -142,7 +142,8 @@ function Read-AuthenticatedPassword {
 
 function InitAutologon([System.Security.SecureString]$password){
     $autologonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
-    $autoLogon=Get-ItemProperty -Path $autologonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue
+    $winlogonProps = Get-ItemProperty -Path $winLogonKey
+    if($winlogonProps.AutoAdminLogon){$autoLogon=Get-ItemProperty -Path $autologonKey -Name "AutoAdminLogon"}
     if($autoLogon) {
         $autoLogon = $autoLogon.AutoAdminLogon
         if($autoLogon -gt 0) {

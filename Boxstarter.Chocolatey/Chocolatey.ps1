@@ -267,7 +267,7 @@ function Resolve-SplatValue($val){
 
 function Wait-ForMSIEXEC{
     Do{
-        Get-Process "MSIEXEC" -ErrorAction SilentlyContinue | % {
+        Get-Process | ? {$_.Name -eq "MSIEXEC"} | % {
             if(!($_.HasExited)){
                 $proc=Get-WmiObject -Class Win32_Process -Filter "ProcessID=$($_.Id)"
                 if($proc.CommandLine -ne $null -and $proc.CommandLine.EndsWith(" /V")){ break }
@@ -275,5 +275,5 @@ function Wait-ForMSIEXEC{
                 $_.WaitForExit()
             }
         }
-    } Until ((Get-Process "MSIEXEC" -ErrorAction SilentlyContinue) -eq $null)
+    } Until ((Get-Process | ? {$_.Name -eq "MSIEXEC"} ) -eq $null)
 }
