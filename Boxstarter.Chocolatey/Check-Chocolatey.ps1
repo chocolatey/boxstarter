@@ -14,9 +14,9 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
             if($VerbosePreference -eq "SilentlyContinue"){$Boxstarter.Suppresslogging=$true}
             iex ($wc.DownloadString($config.ChocolateyRepo)) | Out-Null
             $Boxstarter.SuppressLogging = $currentLogging
-            Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
         }
     }
+    Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
     Enable-Net40
     if(!$BoxstarterIntrercepting)
     {
@@ -32,7 +32,10 @@ function Enable-Net40 {
     if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
         $session=Start-TimedSection "Download and install of .NET 4.5 Framework. This may take several minutes..."
         if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
+        $currentLogging=$Boxstarter.Suppresslogging
+        if($VerbosePreference -eq "SilentlyContinue"){$Boxstarter.Suppresslogging=$true}
         Install-ChocolateyPackage 'dotnet45' 'exe' "/Passive /NoRestart /Log $env:temp\net45.log" 'http://go.microsoft.com/?linkid=9816306' -validExitCodes @(0,3010)
+        $Boxstarter.SuppressLogging = $currentLogging
         Stop-TimedSection $session
     }
 }
