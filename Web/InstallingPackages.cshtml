@@ -52,7 +52,7 @@ Set-BoxstarterShare BoxShare
 <h3 id="RemoteInstallations">Remote Installations</h3>
 <p>Maybe you don't want to share with others, but would rather like to "push" installations to remote machines and VMs. Well that is now possible with Boxstarter! Boxstarter handles almost all of the Remoting details so that installing a package remotely is practically no different from doing so locally.</p>
 <h4>Enabling PowerShell Remoting on the target machine</h4>
-<p>In some cases you may not have to do this. If your machine is on a domain where group policy settings automatically enable PowerShell Remoting or even just WMI, Boxstarter may be able to do this for you. If you are unsure, enabling it manually will not cause any harm and it is easy.</p>
+<p>In many cases you may not have to do this. If your machine is on a domain where group policy settings automatically enable PowerShell Remoting or even just WMI, Boxstarter can do this for you. If you are unsure, enabling it manually will not cause any harm and it is easy.</p>
 <p>Open a PowerShell window as administrator on the target machine and simply run:</p>
 <pre>
 Enable-PSRemoting -Force
@@ -63,9 +63,27 @@ Enable-PSRemoting -Force
 $cred=Get-Credential=MyTargetMachine\myusername
 Install-BoxstarterPackage -ComputerName MyTargetMachine -PackagNamee MyPackage -Credential $cred
 </pre>
-<p>Boxstarter will use the credential to connect to MyTargetMachine and will copy the Boxstarter modules and your LocalRepo packages to its local storage. It will then run the package on that machine. Boxstarter will configure your local machine to be able to connect to the remote machine and it may prompt you for permission to change settings. You can always provide the -Force parameter to silence the prompts.</p>
+<p>Boxstarter will use the credential to connect to MyTargetMachine and will copy the Boxstarter modules and your Local Repository packages to its local storage. It will then run the package on that machine. Boxstarter will configure your local machine to be able to connect to the remote machine and it may prompt you for permission to change settings. You can always provide the -Force parameter to silence the prompts and allow boxstarter to freely enable remoting if it is not already enabled.</p>
 <p>Here is a screen shot of Boxstarter installing a Minecraft Server (bukkit) on a AWS EC2 instance:</p>
 <img src="Images/amazon.png"/>
+<p>You can pipe several computernames, URIs or Windows PowerShell sessions to <code>Install-BoxstarterPackage</code>. Boxstarter will attempt to install the package on each machine and return a PSObject result for each machine.</p>
+<pre>
+$cred=Get-Credential=MyTargetMachine\myusername
+$result = "thing1","thing2" | Install-BoxstarterPackage -PackagNamee MyPackage -Credential $cred
+$result
+
+Errors       : {}
+ComputerName : thing1
+Completed    : True
+FinishTime   : 11/30/2013 1:56:36 AM
+StartTime    : 11/30/2013 1:56:20 AM
+
+Errors       : {}
+ComputerName : thing2
+Completed    : True
+FinishTime   : 11/30/2013 1:56:58 AM
+StartTime    : 11/30/2013 1:56:36 AM
+</pre>
 <h3>Troubleshooting Remote Installations</h3>
 <h4>Establishing remote connections with servers not on the local subnet</h4>
 <p>By default,  server versions of Windows have a firewall rule restricting traffic that is not on the local subnet. There may be circumstances where you might want to connect over the public internet to another machine. This can be done by manually enabling the "WINRM-HTTP-In-TCP-PUBLIC" firewall rule using the Powershell 3.0 <code>Set-NetFirewallRule</code> or the commanndline <code>netsh advfirewall</code> command.</p>
