@@ -66,7 +66,7 @@ about_boxstarter_logging
         Write-Verbose $fmtTitle
     }
     else {
+        #Boxstarter has a Write-host proxy function and it ensures all is logged
         Write-Host $fmtTitle -ForeGroundColor $color
     }
-    Log-BoxStarterMessage $fmtTitle
 }
