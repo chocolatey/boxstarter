@@ -136,13 +136,13 @@ function Read-AuthenticatedPassword {
         }
         catch { }
     }
-    write-BoxstarterMessage "Unable to authenticate password. Proceeding with autologon disabled"
+    write-BoxstarterMessage "Unable to authenticate password for $env:UserDomain\$env:username. Proceeding with autologon disabled"
     return $null
 }
 
 function InitAutologon([System.Security.SecureString]$password){
     $autologonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
-    $winlogonProps = Get-ItemProperty -Path $winLogonKey
+    $winlogonProps = Get-ItemProperty -Path $autologonKey
     if($winlogonProps.AutoAdminLogon){$autoLogon=Get-ItemProperty -Path $autologonKey -Name "AutoAdminLogon"}
     if($autoLogon) {
         $autoLogon = $autoLogon.AutoAdminLogon

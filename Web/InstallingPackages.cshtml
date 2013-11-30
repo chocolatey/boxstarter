@@ -90,6 +90,13 @@ StartTime    : 11/30/2013 1:56:36 AM
 <p>Client versions of Windows will only allow PSRemoting on Private and Domain networks. Clients on PowerShell 3.0 and higher can provide the <code>-SkipNetorkProfileCheck</code> to Enable-PSRemoting to allow connections to public computers on the local subnet. Boxstarter uses this parameter when enabling Remoting on clients. Like with Server versions, you can enable a firewall rule to work around the local subnet restriction. </p>
 <p>Windows 7 OSs running PowerShell 2.0 can not enable PSRemoting when on a public network connection. You will need to change your connection type to a private or Domain based connection.</p>
 
+<h4>CredSSP and Access Exceptions when referencing network resources</h4>
+<p>
+When establishing a remote connection, Boxstarter uses CredSSP authentication so that the session can access any network resources normally accesible to the Credential. If necessary, Boxstarter configures CredSSP authentication on both the local and remote machines as well as the necessary Group Policy and WSMan settings for credential delegation. When the installation completes, Boxstarter rolls back all settings that it changed to their original state.
+
+When using a Windows PowerShell session instead of ComputerName or ConnectionURI, Boxstarter will use the authenticaion mechanism of the existing session and will not configure CredSSP if the session provided is not using CredSSP. If the session is not using CredSSP, it may be denied access to network resources normally accesble to the Credential being used. If you do need to access network resources external to the session, you should use CredSSP when establishing the connection.
+</p>
+
 <h4>Installation Failures</h4>
 <p>Remote installations performed via PowerShell Remoting can sometimes fail. The symptoms of such failures can manifest themselves in a variety of ways and do not fail in a consistent manner. Boxstarter makes great effort to ensure the success of remote installs by leveraging scheduled tasks when it sees certain install activities. Boxstarter intercepts all calls to MSIEXEC, DISM (Installer for "Windows Features") and Windows Update. It is possible for more involved installation scripts to perform these operations in such a way that Boxstarter will not be able to intercept. If you suspect that your installation is failing due to using a remote session, you can use Boxstarter's <code>Invoke-FromTask</code> command to manually wrap your install in a scheduled task and thereby use a Local token.</p>
 <pre>

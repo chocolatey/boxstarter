@@ -70,8 +70,6 @@ This function wraps a Chocolatey Install and provides these additional features
  - The boxstarter feed on myget
 
  #TODO:
-    - Clarify "Simply chocolatey" in docs
-    - Clarify Package From script
     - Add docs about pipeline and output
     - Mention Verbose/Silent
     - Readme
@@ -97,7 +95,7 @@ in the BuildPackages directory just under the root Boxstarter
 directory but can be changed with Set-BoxstarterConfig.
 
 .NOTES
-When establishing a remote connection, Boxstarter usses CredSSP 
+When establishing a remote connection, Boxstarter uses CredSSP 
 authentication so that the session can access any network resources 
 normally accesible to the Credential. If necessary, Boxstarter 
 configures CredSSP authentication on both the local and remote 
