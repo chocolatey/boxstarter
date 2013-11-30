@@ -11,20 +11,20 @@
 <ul>
     <li>Keep them in your local Boxstarter repository</li>
     <li>Push them to a public Nuget feed like <a href="http://chocolatey.org/packages">Chocolatey.org</a>, the <a href="https://www.myget.org/gallery/boxstarter">Boxstarter community MyGet.org feed</a> or any other public feed</li>
-    <li>Push to a private nuget feed</li>
+    <li>Push to a private Nuget feed</li>
     <li>Keep packages on a network share</li>
 </ul>
 
 <h3>Where does Boxstarter look for Packages</h3>
 <p>Boxstarter can be configured to look anywhere for packages. By default, Boxstarter checks the following locations in this order:</p>
 <ul>
-    <li>The Boxstarter Local Repo <code>$Boxstarter.LocalRepo</code> where packages are saved using <code>New-BoxstarterPackage</code></li>
+    <li>The Boxstarter Local Repository <code>$Boxstarter.LocalRepo</code> where packages are saved using <code>New-BoxstarterPackage</code></li>
     <li>The <a href="http://chocolatey.org/packages">Chocolatey.org</a> public feed</li>
-    <li>The <a href="https://www.myget.org/gallery/boxstarter">Boxstarter Community feed</a> hosted on <a href="http://myget.org">Myget.org</a></li>
+    <li>The <a href="https://www.myget.org/gallery/boxstarter">Boxstarter Community feed</a> hosted on <a href="http://myget.org">MyGet.org</a></li>
 </ul>
-<p>The first location that contains a package name that Boxstarter is looking for will be the last location Boxstarter probes. So, for example, if the local repo and the MyGet feed have a package with the same name, the package in the local repo will be chosen.</p>
+<p>The first location that contains a package name that Boxstarter is looking for will be the last location Boxstarter probes. So, for example, if the local repository and the MyGet feed have a package with the same name, the package in the local repository will be chosen.</p>
 <h3>Configuring where Boxstarter looks for packages</h3>
-<p>You can change the directory that Boxstarer considers the local repo or change the feeds that Boxstarter searches using the <code>Set-BoxstarterConfig</code> command.</p>
+<p>You can change the directory that Boxstarter considers the local repository or change the feeds that Boxstarter searches using the <code>Set-BoxstarterConfig</code> command.</p>
 <pre>
 Set-BoxstarterConfig -LocalRepo "\\server\share\myRepo"
 </pre>
@@ -32,18 +32,18 @@ Set-BoxstarterConfig -LocalRepo "\\server\share\myRepo"
 <pre>
 Set-BoxstarterConfig -NugetSources "http://www.myget.org/F/MyNugetFeed/api/v2"
 </pre>
-<p>This will cause Boxstarter to search for packages in the local repo and then in your MyNugetFeed hosted by MyGet.org. No other feed will be searched.</p>
+<p>This will cause Boxstarter to search for packages in the local repository and then in your MyNugetFeed hosted by MyGet.org. No other feed will be searched.</p>
 <pre>
 Set-BoxstarterConfig -NugetSources "http://www.myget.org/F/MyNugetFeed/api/v2;http://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
 </pre>
-<p>This will cause Boxstarter to search for packages in the local repo and then in your MyNugetFeed followed by the chocolatey.org feed and then the Boxstarter community feed on Myget.</p>
+<p>This will cause Boxstarter to search for packages in the local repository and then in your MyNugetFeed followed by the Chocolatey.org feed and then the Boxstarter community feed on MyGet.</p>
 
 <h3>Pushing packages to a feed</h3>
-<p>Boxstarter does not provide any functionality for publishing packages to a Nuget feed. However, Chocolatey comes with Nuget.exe which does provide this capability. Calling the Nuget command line with the <a href="http://docs.nuget.org/docs/reference/command-line-reference#Push_Command">Push</a> command and the feed Url will publish your package to that feed.</p>
+<p>Boxstarter does not provide any functionality for publishing packages to a Nuget feed. However, Chocolatey comes with Nuget.exe which does provide this capability. Calling the Nuget command line with the <a href="http://docs.nuget.org/docs/reference/command-line-reference#Push_Command">Push</a> command and the feed URL will publish your package to that feed.</p>
 <pre>
 ."$env:ChocolateyInstall\ChocolateyInstall\nuget" push MyPackage.1.0.0.nupkg &lt;Your MyGet API Key&gt; -Source https://www.myget.org/F/boxstarter/api/v2/package
 </pre>
-<p>If you want to publish to the Chocolatey feed, Chocolatey has a command, <a href="https://github.com/chocolatey/chocolatey/wiki/CommandsPush">cpush</a>, which will publish your package to chocolatey without needing to specify the feed Url.</p>
+<p>If you want to publish to the Chocolatey feed, Chocolatey has a command, <a href="https://github.com/chocolatey/chocolatey/wiki/CommandsPush">cpush</a>, which will publish your package to Chocolatey without needing to specify the feed URL.</p>
 <pre>
 cpush MyPackage.1.0.0.nupkg &lt;Your Chocolatey API Key&gt;
 </pre>
