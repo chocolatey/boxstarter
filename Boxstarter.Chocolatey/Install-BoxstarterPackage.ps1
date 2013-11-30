@@ -434,7 +434,7 @@ function Invoke-Locally {
 
     $record = Start-Record 'localhost'
     try {
-        Invoke-ChocolateyBoxstarter @PSBoundParameters
+        Invoke-ChocolateyBoxstarter @PSBoundParameters | Out-Null
     }
     catch {
         $record.Completed=$false
