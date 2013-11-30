@@ -99,7 +99,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="App_Code\Helper.cshtml" />
-    <Content Include="downloads\Boxstarter.2.0.25.zip" />
     <Content Include="Launch\Application Files\Boxstarter.WebLaunch_2_0_25_0\boxLogo_sm.ico.deploy" />
     <Content Include="Launch\Application Files\Boxstarter.WebLaunch_2_0_25_0\BoxStarter.bat.deploy" />
     <Content Include="Launch\Application Files\Boxstarter.WebLaunch_2_0_25_0\Boxstarter.Bootstrapper\Boxstarter.bootstrapper.psd1.deploy" />
@@ -170,6 +169,8 @@
     <Content Include="Launch\Application Files\Boxstarter.WebLaunch_2_0_25_0\Boxstarter.WinConfig\Update-ExecutionPolicy.ps1.deploy" />
     <Content Include="Launch\Application Files\Boxstarter.WebLaunch_2_0_25_0\LICENSE.txt.deploy" />
     <Content Include="Launch\Boxstarter.WebLaunch.application" />
+    <Content Include="downloads\Boxstarter.2.1.0.zip" />
+    <None Include="Properties\PublishProfiles\boxstarter %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\boxstarter.pubxml" />
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
