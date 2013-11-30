@@ -17,14 +17,17 @@
       <dependency id="Boxstarter.Bootstrapper" version="$version$" />  
     </dependencies>
     <releaseNotes>
-      - Support Remote Installs using Install-BoxstarterPackage -ComputerName or -ConnectionURI or -Session
-      - Use a simple url or file to hols install script: http://boxstarter.org/package/url?https://gist.github.com/mwrock/7071154/raw/bbf13791ea07fcaaebe5e5b301dc14f5a0438f34/gistfile1.txt
-      - Make compatible with Chocolatey 0.9.8.21
-      - Suspend Bitlocker on reboot
-      - Install .net 4.5 instead of 4.o when missing .net 4 before chocolatey install
-      - No longer stop the windows update service. Now we disable the policy to check for updates so installers that need windows update services succeed.
-      - Improve multiple MSIEXEC interference detection
-      - Add NoPassword parameter to Invoke-ChocolateyBoxstarter for when there is no need to preserve password
+      - Support installing to multiple machines in one command. ComputerName, ConnectionURI and Session parameters are now Arrays.
+      - Support Pipeline input of ComputerNames, ConnectionURIs and Sessions.
+      - Output installation results to a PSObject for each installed machine.
+      - Move most "Tracing" output to the Verbose stream.
+      - Add the ability to silence and log chocolatey output to Boxstarter.log.
+      - Dont touch UAC or AutoLogon registry keys on remote installs.
+      - Improve Remote Reboot detection and suppressing reapeted connection creations while remote machine is installing windows updates.
+      - Fix overriding organization update servers ith the public Windows Update server.
+      - Fix remoting configuration when client has assigned Trusted Hosts to a global wildcard.
+      - Improve reliability of .net 4.5 installation as Chocolatey prerequisite particularly when running on a newly installed OS.
+      - Fixed alot of typos and proably added some new ones.
     </releaseNotes>
   </metadata>
   <files>

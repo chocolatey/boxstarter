@@ -15,6 +15,19 @@
       <dependency id="Boxstarter.Common" version="$version$" />
       <dependency id="Boxstarter.WinConfig" version="$version$" />      
     </dependencies>
+    <releaseNotes>
+      - Support installing to multiple machines in one command. ComputerName, ConnectionURI and Session parameters are now Arrays.
+      - Support Pipeline input of ComputerNames, ConnectionURIs and Sessions.
+      - Output installation results to a PSObject for each installed machine.
+      - Move most "Tracing" output to the Verbose stream.
+      - Add the ability to silence and log chocolatey output to Boxstarter.log.
+      - Dont touch UAC or AutoLogon registry keys on remote installs.
+      - Improve Remote Reboot detection and suppressing reapeted connection creations while remote machine is installing windows updates.
+      - Fix overriding organization update servers ith the public Windows Update server.
+      - Fix remoting configuration when client has assigned Trusted Hosts to a global wildcard.
+      - Improve reliability of .net 4.5 installation as Chocolatey prerequisite particularly when running on a newly installed OS.
+      - Fixed alot of typos and proably added some new ones.
+    </releaseNotes>
   </metadata>
   <files>
     <file src="..\..\LICENSE.txt" target="tools"/>
