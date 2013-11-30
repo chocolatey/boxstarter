@@ -24,7 +24,7 @@ about_boxstarter_bootstrapper
 #>
     $rebootPending = Get-PendingReboot -ErrorLog $BoxStarter.Log
     if($rebootPending.RebootPending) {
-        Write-BoxstarterMessage "Detected Pending reboot"
+        Write-BoxstarterMessage "Detected Pending reboot" -Verbose
         Log-BoxstarterMessage "$rebootPending"
         return $true
     }
@@ -37,7 +37,7 @@ function IsCCMRebootPending {
         try {
             $determination=$clientutils.DetermineIfRebootPending()
             $isPending=$determination.RebootPending
-            if($isPending){Write-BoxstarterMessage "Configuration manager is pending reboot"}
+            if($isPending){Write-BoxstarterMessage "Configuration manager is pending reboot" -Verbose}
             return $isPending
             } catch {}
     }

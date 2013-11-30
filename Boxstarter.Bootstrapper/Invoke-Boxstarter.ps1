@@ -122,7 +122,7 @@ Invoke-Reboot
 }
 
 function RestartNow {
-    Write-BoxstarterMessage "Restarting..."
+    Write-BoxstarterMessage "Restart Required. Restarting now..."
     Restart-Computer -force -ErrorAction SilentlyContinue
 }
 
