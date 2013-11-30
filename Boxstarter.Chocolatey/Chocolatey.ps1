@@ -110,11 +110,16 @@ Intercepts Chocolatey call to check for reboots
             }
         }
         if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
+        $session=Start-TimedSection "Calling Chocolatey to install $packageName. This may take several minutes to complete..."
         try {
                 if($winFeature -eq $true -and (Get-IsRemote)){
+                    #DISM Output is more confusing than helpful.
+                    $currentLogging=$Boxstarter.Suppresslogging
+                    if($VerbosePreference -eq "SilentlyContinue"){$Boxstarter.Suppresslogging=$true}
                     Invoke-FromTask @"
 ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" $(Expand-Splat $PSBoundParameters)
 "@
+                    $Boxstarter.SuppressLogging = $currentLogging
                 }
                 else{
                     Call-Chocolatey @PSBoundParameters
@@ -134,6 +139,7 @@ Intercepts Chocolatey call to check for reboots
                     Write-Error $_
                 }
             }
+        Stop-Timedsection $session
         if(!$Boxstarter.rebootOk) {return}
         if($Boxstarter.IsRebooting){
             Remove-ChocolateyPackageInProgress $packageName
@@ -153,9 +159,7 @@ Intercepts Chocolatey call to check for reboots
 }
 
 function Call-Chocolatey {
-    $session=Start-TimedSection "Calling Chocolatey to install $packageName"
     ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
-    Stop-Timedsection $session
 }
 
 function Intercept-Command {
