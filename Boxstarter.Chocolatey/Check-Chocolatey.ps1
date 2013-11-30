@@ -15,9 +15,9 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
             iex ($wc.DownloadString($config.ChocolateyRepo)) | Out-Null
             $Boxstarter.SuppressLogging = $currentLogging
             Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
-            Enable-Net40
         }
     }
+    Enable-Net40
     if(!$BoxstarterIntrercepting)
     {
         Write-BoxstarterMessage "Chocolatey installed, setting up interception of Chocolatey methods." -Verbose
@@ -31,19 +31,8 @@ function Enable-Net40 {
     if(Is64Bit) {$fx="framework64"} else {$fx="framework"}
     if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
         $session=Start-TimedSection "Download and install of .NET 4.5 Framework. This may take several minutes..."
-        $downloader=new-object net.webclient
-        $wp=[system.net.WebProxy]::GetDefaultProxy()
-        $wp.UseDefaultCredentials=$true
-        $downloader.Proxy=$wp
-        $downloader.DownloadFile("http://go.microsoft.com/?linkid=9816306", "$env:temp\net45.exe")
-        if(Get-IsRemote){
-            Invoke-FromTask @"
-Start-Process "$env:temp\net45.exe" -verb runas -wait -argumentList "/quiet /norestart /log $env:temp\net45.log"
-"@
-        }
-        else{
-            Start-Process "$env:temp\net45.exe" -verb runas -wait -argumentList "/quiet /norestart /log $env:temp\net45.log"
-        }
+        if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
+        Install-ChocolateyPackage 'dotnet45' 'exe' "/Passive /NoRestart /Log $env:temp\net45.log" 'http://go.microsoft.com/?linkid=9816306' -validExitCodes @(0,3010)
         Stop-TimedSection $session
     }
 }
