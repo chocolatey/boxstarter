@@ -10,7 +10,7 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
             $wp=[system.net.WebProxy]::GetDefaultProxy()
             $wp.UseDefaultCredentials=$true
             $wc.Proxy=$wp
-            iex ($wc.DownloadString($config.ChocolateyRepo))            
+            iex ($wc.DownloadString($config.ChocolateyRepo)) | Out-Null
             Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
             Enable-Net40
         }

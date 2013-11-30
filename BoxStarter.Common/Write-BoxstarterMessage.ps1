@@ -43,7 +43,7 @@ about_boxstarter_logging
         [switch]$Verbose
     )
     if($Boxstarter.SuppressLogging){return}
-    if(!$nologo){$message = "$message"}
+    if(!$nologo){$message = "Boxstarter: $message"}
     $fmtTitle = Format-BoxStarterMessage $message
     if($Verbose){
         Write-Verbose $fmtTitle
