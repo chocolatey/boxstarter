@@ -182,7 +182,6 @@ about_boxstarter_chocolatey
         [switch]$KeepWindowOpen,
         [string]$LocalRepo        
     )
-
     $CurrentVerbosity=$global:VerbosePreference
 
     try {
@@ -196,6 +195,8 @@ about_boxstarter_chocolatey
             return
         }
 
+        Write-BoxstarterLogo
+        
         #Convert pipeline to array
         $list=@($input)
         if($list.Count){

@@ -12,7 +12,8 @@ Export-ModuleMember     Write-BoxstarterMessage,
                         Get-IsRemote,
                         Confirm-Choice,
                         Create-BoxstarterTask,
-                        Remove-BoxstarterTask
+                        Remove-BoxstarterTask,
+                        Write-BoxstarterLogo
                         
 Export-ModuleMember -Variable Boxstarter
 
