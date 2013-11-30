@@ -16,6 +16,13 @@ section when stopping it.
 The Title or Label of the section being timed. This string 
 is used in the logging to identify the section.
 
+.PARAMETER Verbose
+Instructs Start-TimedSection to write to the Verbose stream. Although 
+this will always log messages to the Boxstrter log, it will only log 
+to the console if the session's VerbosePreference is set to capture 
+the Verbose stream or the -Verbose switch was set when calling
+Install-BoxstarterPackage.
+
 .EXAMPLE
 $session=Start-TimedSection "My First Section"
 Stop-TimedSection $session
@@ -54,6 +61,15 @@ Some more stuff happens here.
 + Boxstarter finished My First Section 00:00:00.2074282
 
 Note that the number of '+' chars indicate nesting level.
+
+.EXAMPLE
+$session=Start-TimedSection "My First Section" -Verbose
+Stop-TimedSection $session
+
+This will write the start and inish messages to the 
+Boxstarter log but will not write to the console unless the 
+user has the the VerbosePreference variable or used the 
+Verbose switch of Install-BoxstarterPackage.
 
 .NOTES
 If the SuppressLogging setting of the $Boxstarter variable is true, 
