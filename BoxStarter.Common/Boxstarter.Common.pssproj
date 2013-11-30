@@ -43,6 +43,9 @@
     <Compile Include="Test-Admin.ps1" />
     <Compile Include="Write-BoxstarterMessage.ps1" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Write-BoxstarterLogo.ps1" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
 </Project>

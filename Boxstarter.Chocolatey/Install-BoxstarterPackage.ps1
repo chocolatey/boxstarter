@@ -43,6 +43,23 @@ This function wraps a Chocolatey Install and provides these additional features
 
  In an administrative powershell console on the remote machine.
  
+ .PARAMETER ComputerName
+ If provided, Boxstarter will install the specified package name on all computers.
+ Boxstarter will create a Remote Session on each computer using the Credentials 
+ given in the Credential parameter.
+
+ .PARAMETER ConnectionURI
+ Specifies one or more Uniform Resource Identifiers (URI) that Boxstarter will use 
+ to establish a connection with the remote computers upon which the pakage should 
+ be installed. Use this parameter if you need to use a non default PORT or SSL.
+
+ .PARAMETER Session
+ If provided, Boxstarter will install the specified package in all given Windows 
+ PowerShell sessions. Note that these sessions may be closed by the time 
+ Install-BoxstarterPackage finishes. If Boxstarter needs to restart the remote 
+ computer, the session will be discarded and a new session will be created using 
+ the ConnectionURI of the original sesion.
+
  .PARAMETER PackageName
  The name of a NugetPackage to be installed or a URI or 
  file path pointing to a chocolatey script. If using a package name,
@@ -53,9 +70,6 @@ This function wraps a Chocolatey Install and provides these additional features
  - The boxstarter feed on myget
 
  #TODO:
-    - Add help docs for remote parameters
-    - add an example or two
-    - A notes about psobject output
     - Clarify "Simply chocolatey" in docs
     - Clarify Package From script
     - Add docs about pipeline and output
@@ -81,6 +95,49 @@ This is the path to the local boxstarter repository where boxstarter
 should look for .nupkg files to install. By default this is located 
 in the BuildPackages directory just under the root Boxstarter 
 directory but can be changed with Set-BoxstarterConfig.
+
+.NOTES
+When establishing a remote connection, Boxstarter usses CredSSP 
+authentication so that the session can access any network resources 
+normally accesible to the Credential. If necessary, Boxstarter 
+configures CredSSP authentication on both the local and remote 
+machines as well as the necessary Group Policy and WSMan settings 
+for credential delegation. When the installation completes, 
+Boxstarter rolls back all settings that it changed to their original 
+state.
+
+When using a Windows PowerShell session instead of ComputerName or 
+ConnectionURI, Boxstarter will use the authenticaion mechanism of the 
+existing session and will not configure CredSSP if the session provided 
+is not using CredSSP. If the session is not using CredSSP, it may be 
+denied access to network resources normally accesble to the Credential 
+being used. If you do need to access network resources external to the 
+session, you should use CredSSP when establishing the connection.
+
+.INPUTS
+ComputerName, ConnrectionURI and Session may all be specified on the 
+pipeline.
+
+.OUTPUTS
+Returns a PSObject for each session, ComputerName or ConnectionURI or a 
+single PSObject for local installations. The PSObject has the following 
+properties:
+
+ComputerName: The name of the computer where the packag was installed
+
+StartTime: The time that the installation began
+
+FinishTime: The time that Boxstarter finished the installation
+
+Completed: True or False indicating if Boxstarter was able to complete 
+the installation without a terminating exception interrupting the install. 
+Even if this value is True, it does not mean that all componebts installed 
+in the package succeeded. Boxstarter will not terminate an installation if 
+individual Chocolatey packages fail. Use the Errors property to discover 
+errors that were raised throughout the installation.
+
+Errors: An array of all errors encountered during the duration of the 
+installaion.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter example
@@ -134,6 +191,20 @@ This installs the MyPackage package on MyOtherComputer.mydomain.com.
 Becauce the -Force parameter is used, Boxstarter will not prompt the
 user to confirm that it is ok to enable Powershell remoting if it is 
 not already enabled. It will attempt to enable it without prompts.
+
+.EXAMPLE
+$cred=Get-Credential mwrock
+"computer1","computer2" | Install-BoxstarterPackage -Package MyPackage -Credential $cred -Force
+
+This installs the MyPackage package on computer1 and computer2
+Becauce the -Force parameter is used, Boxstarter will not prompt the
+user to confirm that it is ok to enable Powershell remoting if it is 
+not already enabled. It will attempt to enable it without prompts.
+
+Using -Force is especially advisable when installing packages on multiple 
+computers because otherwise, if one computer is not accesible, the command 
+will prompt the user if it is ok to try and confiure the computer before 
+proceeding to the other computers.
 
 .EXAMPLE
 $cred=Get-Credential mwrock

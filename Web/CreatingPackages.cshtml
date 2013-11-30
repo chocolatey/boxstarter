@@ -7,7 +7,11 @@
     <p class="lead">Boxstarter includes some commands that can automate a lot of the "grunt" work involved with creating and packing Nuget packages.</p>
 }
 <h3>New-PackageFromScript</h3>
-<p>The simplest way to create a Nuget package is using the <code>New-PackageFromScript</code> command. This command takes either a file or http URL (like a <a href="http://gist.github.com">Github Gist</a>) that represents the install script. The <code>New-PackageFromScript</code> command will create a Chocolatey Nuget package with the contents of the script moved to the ChocolateyInstall.ps1 file. While this is an incredibly simple way to create a package for your Boxstarter installations, it does not provide much flexibility in customizing the nuspec manifest or adding other files to your install package.</p>
+<p>The simplest way to create a Nuget package is using the <code>New-PackageFromScript</code> command.</p> 
+<pre>
+New-PackageFromScript MyScript.ps1 MyPackage
+</pre>
+<p>This command takes either a file or http URL (like a <a href="http://gist.github.com">Github Gist</a>) that represents the install script. The <code>New-PackageFromScript</code> command will create a Chocolatey Nuget package with the contents of the script moved to the ChocolateyInstall.ps1 file. While this is an incredibly simple way to create a package for your Boxstarter installations, it does not provide much flexibility in customizing the nuspec manifest or adding other files to your install package.</p>
 
 <h3>New-BoxstarterPackage</h3>
 <p>The New-BoxstarterPackage command creates a skeletal package with a minimal *.nuspec file and ChocolateyInstall.ps1 file.</p>
