@@ -69,11 +69,6 @@ This function wraps a Chocolatey Install and provides these additional features
  - The chocolatey feed
  - The boxstarter feed on myget
 
- #TODO:
-    - Add docs about pipeline and output
-    - Mention Verbose/Silent
-    - Readme
-
 .PARAMETER DisableReboots
 If set, reboots are suppressed.
 
@@ -121,7 +116,7 @@ Returns a PSObject for each session, ComputerName or ConnectionURI or a
 single PSObject for local installations. The PSObject has the following 
 properties:
 
-ComputerName: The name of the computer where the packag was installed
+ComputerName: The name of the computer where the package was installed
 
 StartTime: The time that the installation began
 

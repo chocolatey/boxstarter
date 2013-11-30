@@ -23,6 +23,51 @@ Install-BoxstarterPackage -PackageName MyPackage -DisableReboots
 </pre>
 <p>Since no reboot will be performed, the credential is unnecessary.</p>
 
+<h3>Understanding and controling installation output</h3>
+<h4>Pipeline Output</h4>
+<p>For each machine that boxstarter installs (see <a href="#RemoteInstallations">below</a> for remote installation details) an object is emited to the PowerShell pipeline containing details about the install:</p>
+<pre>
+Errors       : {}
+ComputerName : localhost
+Completed    : True
+FinishTime   : 11/30/2013 1:56:36 AM
+StartTime    : 11/30/2013 1:56:20 AM
+</pre>
+<p>The properties included in the pipeline output are:</p>
+<ul>
+    <li><b>ComputerName:</b> The name of the computer where the package was installed</li>
+
+    <li><b>StartTime:</b> The time that the installation began</li>
+
+    <li><b>FinishTime:</b> The time that Boxstarter finished the installation</li>
+
+    <li><b>Completed:</b> True or False indicating if Boxstarter was able to complete the installation without a terminating exception interrupting the install. Even if this value is True, it does not mean that all componebts installed in the package succeeded. Boxstarter will not terminate an installation if individual Chocolatey packages fail. Use the Errors property to discover errors that were raised throughout the installation.</li>
+
+    <li><b>Errors:</b> An array of all errors encountered during the duration of the installaion.</li>
+</ul>
+<h4>Increasing Console Output Verbosity</h4>
+<p>Boxstarter tries to strike the right balance of information provided to the command console. However if you want more detailed output, use the <code>-Verbose</code> parameter of <code>Install-BoxstarterPackage</code> command.</p>
+<h4>Silencing Console Output</h4>
+<p>You can completely silense all console host output by setting Boxstarter's SuppressLogging property to true.</p>
+<pre>
+$Boxstarter.SuppressLogging=$True
+Install-BoxstarterPackage -PackageName MyPackage -DisableReboots
+Errors       : {}
+ComputerName : localhost
+Completed    : True
+FinishTime   : 11/30/2013 1:56:36 AM
+StartTime    : 11/30/2013 1:56:20 AM
+</pre>
+<p>The only output now is what is sent to the pipeline. Yould can hide this by capturing it in a variable</p>
+<pre>
+$result=Install-BoxstarterPackage -PackageName MyPackage -DisableReboots
+</pre>
+<p>or piping it to $null.</p>
+<pre>
+Install-BoxstarterPackage -PackageName MyPackage -DisableReboots | Out-Null
+</pre>
+<h4>Boxstarter Log File</h4>
+<p>Boxstarter always logs verbose output to <code>$Boxstarter.Log</code>.</p>
 <h3>Running an Install from a network share or external media</h3>
 <p>You may want to place the Boxstarter modules and local repo on a network share so that others on your network can invoke Boxstarter installs with nothing installed. Or you may want to save them on a thumb drive, SD, or Micro SD card so you can always have Boxstarter and your packages handy. Boxstarter provides a batch file wrapper that can be called to facilitate these scenarios.</p>
 <pre>
