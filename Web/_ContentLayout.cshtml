@@ -3,12 +3,17 @@
     Layout = "~/_SiteLayout.cshtml";
     var thisPage = Request.Url.AbsolutePath.ToLower().Substring(1);
     PageData[thisPage + "Style"] = "active";
+    PageData["Documentation"] = "active";
 }
+
+@section styles {
+    @RenderSection("styles", required: false)
+}
+
 
 <div class="row">
     <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
         <div class="list-group">
-            <a href="/" class="list-group-item">Home</a>
             <a href="WhyBoxstarter" class="list-group-item @PageData["whyBoxstarterStyle"]">Why Boxstarter?</a>
             <a href="WebLauncher" class="list-group-item @PageData["weblauncherStyle"]">Launch from the Web</a>
             <a href="InstallBoxstarter" class="list-group-item @PageData["installboxstarterStyle"]">Installing Boxstarter</a>

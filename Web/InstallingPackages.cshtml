@@ -41,9 +41,9 @@ StartTime    : 11/30/2013 1:56:20 AM
 
     <li><b>FinishTime:</b> The time that Boxstarter finished the installation</li>
 
-    <li><b>Completed:</b> True or False indicating if Boxstarter was able to complete the installation without a terminating exception interrupting the install. Even if this value is True, it does not mean that all componebts installed in the package succeeded. Boxstarter will not terminate an installation if individual Chocolatey packages fail. Use the Errors property to discover errors that were raised throughout the installation.</li>
+    <li><b>Completed:</b> True or False indicating if Boxstarter was able to complete the installation without a terminating exception interrupting the install. Even if this value is True, it does not mean that all components installed in the package succeeded. Boxstarter will not terminate an installation if individual Chocolatey packages fail. Use the Errors property to discover errors that were raised throughout the installation.</li>
 
-    <li><b>Errors:</b> An array of all errors encountered during the duration of the installaion.</li>
+    <li><b>Errors:</b> An array of all errors encountered during the duration of the installation.</li>
 </ul>
 <h4>Increasing Console Output Verbosity</h4>
 <p>Boxstarter tries to strike the right balance of information provided to the command console. However if you want more detailed output, use the <code>-Verbose</code> parameter of <code>Install-BoxstarterPackage</code> command.</p>

@@ -25,12 +25,15 @@
         }
 
         .btn-navbar {
-            margin-top: 8px
+            margin-top: 8px;
+            margin-left:20px;
         }
 
         .twitter-follow-button {
             margin-top: 8px;
         }
+
+        @RenderSection("styles", required: false)
     </style>    
   </head>
 
@@ -45,15 +48,16 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">Boxstarter</a>
+            <a class="navbar-brand" href="/">Boxstarter</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li><a href="/WhyBoxstarter">Documentation</a></li>
+                <li class="@PageData["Documentation"]"><a href="/WhyBoxstarter">Documentation</a></li>
                 <li><a href="https://boxstarter.codeplex.com/workitem/list/basic">Issues</a></li>
                 <li><a href="https://boxstarter.codeplex.com/discussions">Discussion</a></li>
                 <li><a href="http://boxstarter.codeplex.com/SourceControl/latest">Source Code</a></li>
-                <li><a href="/license">License</a></li>
+                <li class="@PageData["Blog"]"><a href="/blog">Blog</a></li>
+                <li class="@PageData["License"]"><a href="/license">License</a></li>
             </ul>
             <a class="btn btn-primary btn-navbar" role="button" href="downloads/Boxstarter.@( Helper.Version() ).zip"><span class="glyphicon glyphicon-cloud-download"></span> Download v@(Helper.Version())</a>
             <ul class="nav navbar-nav navbar-right">
