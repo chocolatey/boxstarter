@@ -10,14 +10,13 @@ function Enable-BoxstarterVM {
         if($PSBoundParameters['Verbose']) {
             $global:VerbosePreference="Continue"
         }
-
+        $vm=Get-VM $vmName -ErrorAction SilentlyContinue
         if($vm -eq $null){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not fine VM: $vmName"
         }
         if($vmCheckpoint -ne $null){
-            Restore-VMSnapshot $vm -Name $vm.ParentSnapshotName -Confirm:$false
+            Restore-VMSnapshot $vm -Name $vmCheckpoint -Confirm:$false
         }
-        $vm=Get-VM $vmName -ErrorAction SilentlyContinue
         if($vm.State -eq "saved"){
             Remove-VMSavedState $vmName
         }
@@ -69,7 +68,8 @@ function Enable-BoxstarterVM {
             Write-BoxstarterMessage "VHD Dismounted"
         }
         Start-VM $VmName
-        $result = Wait-Port $computerName 135 45000
+        do {Start-Sleep -milliseconds 100} 
+        until ((Get-VMIntegrationService $vm | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
         return "$computerName"
     }
     finally{
