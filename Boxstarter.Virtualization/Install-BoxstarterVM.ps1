@@ -1,8 +1,8 @@
 function Enable-BoxstarterVM {
     [CmdletBinding()]
     param(
-        [string]$vmName,
-        [string]$vmCheckpoint
+        [string]$VMName,
+        [string]$VMCheckpoint
     )
     $CurrentVerbosity=$global:VerbosePreference
 
@@ -13,6 +13,9 @@ function Enable-BoxstarterVM {
 
         if($vm -eq $null){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not fine VM: $vmName"
+        }
+        if($vmCheckpoint -ne $null){
+            Restore-VMSnapshot $vm -Name $vm.ParentSnapshotName -Confirm:$false
         }
         $vm=Get-VM $vmName -ErrorAction SilentlyContinue
         if($vm.State -eq "saved"){
