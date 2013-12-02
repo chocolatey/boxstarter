@@ -452,6 +452,7 @@ function Enable-RemotingOnRemote ($ComputerName, $Credential){
     }
     catch {
         $ex=$_
+        $global:error.RemoveAt(0)
     }
     if($remotingTest -eq $null){
         Write-BoxstarterMessage "Powershell Remoting is not enabled or accesible on $ComputerName" -Verbose
