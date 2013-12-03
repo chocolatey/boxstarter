@@ -246,13 +246,7 @@ about_boxstarter_chocolatey
         [switch]$KeepWindowOpen,
         [string]$LocalRepo        
     )
-    $CurrentVerbosity=$global:VerbosePreference
-
-    try {
-        if($PSBoundParameters['Verbose']) {
-            $global:VerbosePreference="Continue"
-        }
-
+    Invoke-Verbosely -Verbose:($PSBoundParameters['Verbose'] -eq $true) {
         #If no psremoting based params are present, we just run locally
         if($PsCmdlet.ParameterSetName -eq "Package"){
             Invoke-Locally @PSBoundParameters
@@ -330,9 +324,6 @@ about_boxstarter_chocolatey
             #Client settings should be as they were when we started
             Rollback-ClientRemoting $ClientRemotingStatus
         }
-    }
-    finally{
-        $global:VerbosePreference=$CurrentVerbosity
     }
 }
 

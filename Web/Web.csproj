@@ -170,6 +170,7 @@
     <Content Include="Launch\Application Files\Boxstarter.WebLaunch_2_0_25_0\LICENSE.txt.deploy" />
     <Content Include="Launch\Boxstarter.WebLaunch.application" />
     <Content Include="downloads\Boxstarter.2.1.0.zip" />
+    <Content Include="Blog.cshtml" />
     <None Include="Properties\PublishProfiles\boxstarter %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\boxstarter.pubxml" />
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />

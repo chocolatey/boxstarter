@@ -4,12 +4,7 @@ function Enable-BoxstarterVM {
         [string]$VMName,
         [string]$VMCheckpoint
     )
-    $CurrentVerbosity=$global:VerbosePreference
-
-    try {
-        if($PSBoundParameters['Verbose']) {
-            $global:VerbosePreference="Continue"
-        }
+    Invoke-Verbosely -Verbose:($PSBoundParameters['Verbose'] -eq $true) {
         $vm=Get-VM $vmName -ErrorAction SilentlyContinue
         if($vm -eq $null){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not fine VM: $vmName"
@@ -21,6 +16,7 @@ function Enable-BoxstarterVM {
             Remove-VMSavedState $vmName
         }
         else {
+            Write-BoxstarterMessage "Stopping $VMName"
             Stop-VM $VmName -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
         }
         $vhd=Get-VMHardDiskDrive -VMName $vmName
@@ -63,16 +59,14 @@ function Enable-BoxstarterVM {
             [GC]::Collect() # The next line will fail without this since handles to the loaded hive have not yet been collected
             reg unload HKLM\VHDSOFTWARE 2>&1 | out-null
             reg unload HKLM\VHDSYS 2>&1 | out-null
-            Write-BoxstarterMessage "VHD Registry Unloaded"
+            Write-BoxstarterMessage "VHD Registry Unloaded" -Verbose
             Dismount-VHD $VHDPath
-            Write-BoxstarterMessage "VHD Dismounted"
+            Write-BoxstarterMessage "VHD Dismounted" -Verbose
         }
         Start-VM $VmName
+        Write-BoxstarterMessage "Started $VMName. Waiting for Heartbeat..."
         do {Start-Sleep -milliseconds 100} 
         until ((Get-VMIntegrationService $vm | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
         return "$computerName"
-    }
-    finally{
-        $global:VerbosePreference=$CurrentVerbosity
     }
 }
