@@ -28,6 +28,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Common\Invoke-Verbosely.tests.ps1" />
+    <Content Include="Virtualization\Enable-BoxstarterVHD.Tests.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Virtualization\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />

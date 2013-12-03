@@ -71,6 +71,15 @@ function Enable-FireWallRule($ruleName){
     Write-BoxstarterMessage "Changed $ruleName firewall rule to: $newVal" -Verbose
 }
 
+function Disable-FireWallRule($ruleName){
+    $key=Get-FirewallKey
+    $rules = Get-ItemProperty $key
+    $rule=$rules.$ruleName
+    $newVal = $rule.Replace("|Active=TRUE|","|Active=FALSE|")
+    Set-ItemProperty $key -Name $ruleName -Value $newVal
+    Write-BoxstarterMessage "Changed $ruleName firewall rule to: $newVal" -Verbose
+}
+
 function Get-FireWallKey{
     $current = Get-CurrentControlSet
     return "HKLM:\VHDSYS\ControlSet00$current\Services\SharedAccess\Parameters\FirewallPolicy\FirewallRules"
