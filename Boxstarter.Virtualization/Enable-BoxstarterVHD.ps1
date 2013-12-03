@@ -1,4 +1,26 @@
 function Enable-BoxstarterVHD {
+<#
+.SYNOPSIS
+Enables WMI and LocalAccountTokenFilterPolicy in a VHD's Windows Registry
+
+.DESCRIPTION
+Prepares a VHD for Boxstarter Installation. Opening WMI ports and enabling 
+LocalAccountTokenFilterPolicy so that Boxstarter can later enable 
+PowerShell Remoting.
+
+.PARAMETER VHDPath
+The path to ther VHD file
+
+.OUTPUTS
+The computer name stored in the VHD's Windows Registry
+
+.EXAMPLE
+$ComputerName = Enable-BoxstarterVHD $pathToVHD
+
+.LINK
+http://boxstarter.codeplex.com
+
+#>
     [CmdletBinding()]
     param([string]$VHDPath)
     Invoke-Verbosely -Verbose:($PSBoundParameters['Verbose'] -eq $true) {
