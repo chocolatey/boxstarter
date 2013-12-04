@@ -2,6 +2,7 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 function Mount-TestVHD {
     $testRoot="$env:temp\Boxstarter.tests"
+    Get-PSDrive | Out-Null
     $before = (Get-Volume).DriveLetter
     Mount-VHD $testRoot\test.vhdx
     $after = (Get-Volume).DriveLetter
@@ -56,15 +57,17 @@ Describe "Enable-BoxstarterVHD" {
             reg unload HKLM\VHDSYS | out-null
             reg unload HKLM\VHDSOFTWARE | out-null
             Dismount-VHD $testRoot\test.vhdx
+            #exit
 
             $result = Enable-BoxstarterVHD $testRoot\test.vhdx
 
             Mount-TestVHD
+            #exit
             It "Should set LocalAccountTokenFilterPolicy"{
-                (Get-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy) | should be 1
+                (Get-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy).LocalAccountTokenFilterPolicy | should be 1
             }
             It "Should Get ComputerName" {
-                $result| should be $computerName
+                $result | should be $computerName
             }
             It "Should set WMI-RPCSS-In-TCP Rule"{
                 $rules = Get-ItemProperty -path (Get-FirewallKey)
@@ -76,6 +79,74 @@ Describe "Enable-BoxstarterVHD" {
             }
             Clean-VHD
         }
+
+        Context "When providing a nonexistent vhd path" {
+
+            try {
+                Enable-BoxstarterVHD $testRoot\test.blahargh | Out-Null
+            }
+            catch{
+                $err = $_
+            }
+
+            It "Should throw a validation error"{
+                $err.CategoryInfo.Category | should be "InvalidData"
+            }
+        }
+
+        Context "When providing a path to a non vhd" {
+
+            try {
+                Enable-BoxstarterVHD $env:SystemRoot
+            }
+            catch{
+                $err = $_
+            }
+
+            It "Should throw a validation error"{
+                $err.CategoryInfo.Category | should be "InvalidData"
+            }
+        }
+
+        Context "When the vhd is read only" {
+            Set-ItemProperty $testRoot\test.vhdx -name IsReadOnly -Value $true
+
+            try {
+                Enable-BoxstarterVHD $testRoot\test.vhdx | Out-Null
+            }
+            catch{
+                $err = $_
+            }
+            finally{
+                Set-ItemProperty $testRoot\test.vhdx -name IsReadOnly -Value $false
+            }
+
+            It "Should throw a InvalidOperation Exception"{
+                $err.CategoryInfo.Reason | should be "InvalidOperationException"
+            }
+        }
+
+        Context "When the vhd is not a system volume" {
+            $testRoot="$env:temp\Boxstarter.tests"
+            Get-PSDrive | Out-Null
+            $before = (Get-Volume).DriveLetter
+            Mount-VHD $testRoot\test.vhdx
+            $after = (Get-Volume).DriveLetter
+            $winVolume = compare $before $after -Passthru
+            Remove-Item "$($winVolume):\Windows\System32\config" -recurse -Force
+            Dismount-VHD $testRoot\test.vhdx
+
+            try {
+                Enable-BoxstarterVHD $testRoot\test.vhdx | Out-Null
+            }
+            catch{
+                $err = $_
+            }
+
+            It "Should throw a InvalidOperation Exception"{
+                $err.CategoryInfo.Reason | should be "InvalidOperationException"
+            }
+        }        
     }
     finally{
         [GC]::Collect()
@@ -86,5 +157,6 @@ Describe "Enable-BoxstarterVHD" {
             Remove-Item $testRoot\test.vhdx
         }
         del $env:temp\Boxstarter.tests -recurse -force
+        Get-Process Explorer | Stop-Process
     }
 }

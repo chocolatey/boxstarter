@@ -22,7 +22,12 @@ http://boxstarter.codeplex.com
 
 #>
     [CmdletBinding()]
-    param([string]$VHDPath)
+    param(
+        [Parameter(Position=0,Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [ValidatePattern("\.(a)?vhd(x)?$")]
+        [string]$VHDPath
+    )
     Invoke-Verbosely -Verbose:($PSBoundParameters['Verbose'] -eq $true) {
         if((Get-ItemProperty $VHDPath -Name IsReadOnly).IsReadOnly){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD is Read-Only"
