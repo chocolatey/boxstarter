@@ -9,6 +9,12 @@ function Enable-BoxstarterVM {
         if($vm -eq $null){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $vmName"
         }
+
+        #Get Computername from key/value pair
+        #Check for client remoting enabled
+        #Test remoting
+        #Test WMI
+
         if($vmCheckpoint -ne $null -and $vmCheckpoint.Length -gt 0){
             $point = Get-VMSnapshot -VMName $vmName -Name $vmCheckpoint -ErrorAction SilentlyContinue
             if($point -ne $null) {
