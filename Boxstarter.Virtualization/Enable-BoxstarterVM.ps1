@@ -82,7 +82,7 @@ http://boxstarter.codeplex.com
         if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
             $point = Get-VMSnapshot -VMName $vmName -Name $CheckpointName -ErrorAction SilentlyContinue
             if($point -ne $null) {
-                Restore-VMSnapshot $vm -Name $CheckpointName -Confirm:$false
+                Restore-VMSnapshot -VMName $vmName -Name $CheckpointName -Confirm:$false
                 $restored=$true
             }
         }
@@ -99,8 +99,8 @@ http://boxstarter.codeplex.com
         Start-VM $VmName
         Write-BoxstarterMessage "Started $VMName. Waiting for Heartbeat..."
         do {Start-Sleep -milliseconds 100} 
-        until ((Get-VMIntegrationService $vm | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
-        if(!$restored) {
+        until ((Get-VMIntegrationService -VMName $vmName | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
+        if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
             Write-BoxstarterMessage "Creating Checkpoint $vmCheckpoint"
             Checkpoint-VM -Name $vmName -SnapshotName $CheckpointName
         }
