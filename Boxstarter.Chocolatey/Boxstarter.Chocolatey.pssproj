@@ -48,7 +48,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Enable-BoxstarterCredSSP.ps1" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="Boxstarter.Chocolatey.psd1" />
     <Compile Include="Boxstarter.Chocolatey.psm1" />

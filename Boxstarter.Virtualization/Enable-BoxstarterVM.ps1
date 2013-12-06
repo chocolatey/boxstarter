@@ -68,7 +68,19 @@ http://boxstarter.codeplex.com
         [Management.Automation.PsCredential]$Credential,
         [string]$CheckpointName
     )
-    Invoke-Verbosely -Verbose:($PSBoundParameters['Verbose'] -eq $true) {
+    ##Cannot run remotely unelevated. Look into self elevating
+    if(!(Test-Admin)) {
+        Write-Error "You must be running as an administrator. Please open a Powershell console as Administrator and rerun Install-BoxstarperPackage."
+        return
+    }
+
+    $CurrentVerbosity=$global:VerbosePreference
+    try {
+
+        if($PSBoundParameters["Verbose"] -eq $true) {
+            $global:VerbosePreference="Continue"
+        }
+
         $vm=Get-VM $vmName -ErrorAction SilentlyContinue
         if($vm -eq $null){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $vmName"
@@ -105,5 +117,8 @@ http://boxstarter.codeplex.com
             Checkpoint-VM -Name $vmName -SnapshotName $CheckpointName
         }
         return "$computerName"
+    }
+    finally{
+        $global:VerbosePreference=$CurrentVerbosity
     }
 }

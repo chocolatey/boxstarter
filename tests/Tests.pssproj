@@ -27,8 +27,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Chocolatey\Enable-BoxstarterCredSSP.Tests.ps1" />
     <Content Include="Common\Invoke-Verbosely.tests.ps1" />
     <Content Include="Virtualization\Enable-BoxstarterVHD.Tests.ps1" />
+    <Content Include="Virtualization\Enable-BoxstarterVM.Tests.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Virtualization\" />

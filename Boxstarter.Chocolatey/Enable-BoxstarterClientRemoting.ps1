@@ -1,12 +1,39 @@
-function Enable-BoxstarterClientRemoting ([string[]] $RemoteHostsToTrust) {
+function Enable-BoxstarterClientRemoting {
+<#
+.SYNOPSIS
+Enables and configures Powershell remoting from the client
+
+.DESCRIPTION
+Enable-BoxstarterClientRemoting will check if Powershell Remoting is enabled on the local 
+machine. If not, it will enable it and it will also add all remote hosts to trust to the 
+WSMAN trusted hosts list. The original trusted host list will be returned. When running 
+Install-BoxstarterPackage, Boxstarter will roll back to the original trusted hosts when 
+the package install is complete.
+
+.PARAMETER RemoteHostsToTrust
+A list of ComputerNames to add to the WSMAN Trusted hosrs list.
+
+.OUTPUTS
+A list of the original trusted hosts on the local machine as well as a bool indicating 
+if Powershell Remoting was sucessfully completed.
+
+.EXAMPLE
+Enable-BoxstarterClientRemoting box1,box2
+
+.LINK
+http://boxstarter.codeplex.com
+Install-BoxstarterPackage
+
+#>
+    param(
+    [string[]] $RemoteHostsToTrust
+    )
     $Result=@{    
         Success=$False;
         PreviousTrustedHosts=$null;
-        PreviousCSSPTrustedHosts=$null;
-        PreviousFreshCredDelegationHostCount=0
     }
     Write-BoxstarterMessage "Configuring local Powershell Remoting settings..."
-    try { $credssp = Get-WSManCredSSP } catch { $credssp = $_}
+    try { $wsman = Test-WSMan } catch { $credssp = $_}
     if($credssp.Exception -ne $null){
         Write-BoxstarterMessage "Local Powershell Remoting is not enabled" -Verbose
         if($Force -or (Confirm-Choice "Powershell remoting is not enabled locally. Should Boxstarter enable powershell remoting?"))
@@ -22,25 +49,6 @@ function Enable-BoxstarterClientRemoting ([string[]] $RemoteHostsToTrust) {
             Write-BoxstarterMessage "Not enabling local Powershell Remoting aborting package install"
             return $Result
         }
-    }
-
-    $ComputersToAdd = @()
-    if($credssp -is [Object[]]){
-        $idxHosts=$credssp[0].IndexOf(": ")
-        if($idxHosts -gt -1){
-            $credsspEnabled=$True
-            $Result.PreviousCSSPTrustedHosts=$credssp[0].substring($idxHosts+2)
-            $hostArray=$Result.PreviousCSSPTrustedHosts.Split(",")
-            $RemoteHostsToTrust | ? { $hostArray -notcontains "wsman/$_" } | % { $ComputersToAdd += $_ }
-        }
-        else {
-            $ComputersToAdd = $RemoteHostsToTrust
-        }
-    }
-
-    if($ComputersToAdd.Count -gt 0){
-        Write-BoxstarterMessage "Adding $($ComputersToAdd -join ',') to allowed credSSP hosts" -Verbose
-        Enable-WSManCredSSP -DelegateComputer $ComputersToAdd -Role Client -Force | Out-Null
     }
 
     $newHosts = @()
@@ -61,41 +69,6 @@ function Enable-BoxstarterClientRemoting ([string[]] $RemoteHostsToTrust) {
         }
     }
 
-    $key = Get-CredentialDelegationKey
-    if (!(Test-Path "$key\CredentialsDelegation")) {
-        New-Item $key -Name CredentialsDelegation | Out-Null
-    }
-    $key = Join-Path $key "CredentialsDelegation"
-    New-ItemProperty -Path "$key" -Name "ConcatenateDefaults_AllowFresh" -Value 1 -PropertyType Dword -Force | Out-Null
-    New-ItemProperty -Path "$key" -Name "ConcatenateDefaults_AllowFreshNTLMOnly" -Value 1 -PropertyType Dword -Force | Out-Null
-
-    $result.PreviousFreshNTLMCredDelegationHostCount = Set-CredentialDelegation $key 'AllowFreshCredentialsWhenNTLMOnly' $RemoteHostsToTrust
-    $result.PreviousFreshCredDelegationHostCount = Set-CredentialDelegation $key 'AllowFreshCredentials' $RemoteHostsToTrust
-
     $Result.Success=$True
     return $Result
-}
-
-function Set-CredentialDelegation($key, $subKey, $allowed){
-    New-ItemProperty -Path "$key" -Name $subKey -Value 1 -PropertyType Dword -Force | Out-Null
-    $policyNode = Join-Path $key $subKey
-    if (!(Test-Path $policyNode)) {
-        md $policyNode | Out-Null
-    }
-    $currentHostProps=@()
-    (Get-Item $policyNode).Property | % {
-        $currentHostProps += (Get-ItemProperty -Path $policyNode -Name $_).($_)
-    }
-    $currentLength = $currentHostProps.Length
-    $idx=$currentLength
-    $allowed | ? { $currentHostProps -notcontains "wsman/$_"} | % {
-        ++$idx
-        New-ItemProperty -Path $policyNode -Name "$idx" -Value "wsman/$_" -PropertyType String -Force | Out-Null
-    }
-
-    return $currentLength
-}
-
-function Get-CredentialDelegationKey {
-    return "HKLM:\SOFTWARE\Policies\Microsoft\Windows"
 }

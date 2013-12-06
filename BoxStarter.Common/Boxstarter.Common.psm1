@@ -13,8 +13,7 @@ Export-ModuleMember     Write-BoxstarterMessage,
                         Confirm-Choice,
                         Create-BoxstarterTask,
                         Remove-BoxstarterTask,
-                        Write-BoxstarterLogo,
-                        Invoke-Verbosely
+                        Write-BoxstarterLogo
                         
 Export-ModuleMember -Variable Boxstarter
 

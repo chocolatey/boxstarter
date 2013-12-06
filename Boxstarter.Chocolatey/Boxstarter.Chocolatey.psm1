@@ -10,7 +10,9 @@ Export-ModuleMember Invoke-ChocolateyBoxstarter,
                     Get-BoxstarterConfig,
                     Set-BoxstarterConfig,
                     Install-BoxstarterPackage,
-                    New-PackageFromScript
+                    New-PackageFromScript,
+                    Enable-BoxstarterClientRemoting,
+                    Enable-BoxstarterCredSSP
 
 Export-ModuleMember Install-ChocolateyInstallPackageOverride,
                     Write-HostOverride

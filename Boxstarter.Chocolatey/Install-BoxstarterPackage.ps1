@@ -246,13 +246,20 @@ about_boxstarter_chocolatey
         [switch]$KeepWindowOpen,
         [string]$LocalRepo        
     )
-    Invoke-Verbosely -Verbose:($PSBoundParameters['Verbose'] -eq $true) {
+    $CurrentVerbosity=$global:VerbosePreference
+    try {
+
+        if($PSBoundParameters["Verbose"] -eq $true) {
+            $global:VerbosePreference="Continue"
+        }
+
         #If no psremoting based params are present, we just run locally
         if($PsCmdlet.ParameterSetName -eq "Package"){
             Invoke-Locally @PSBoundParameters
             return
         }
 
+        #me me me!
         Write-BoxstarterLogo
         
         #Convert pipeline to array
@@ -307,6 +314,8 @@ about_boxstarter_chocolatey
             #If unable to enable remoting on the client, abort
             if(!$ClientRemotingStatus.Success){return}
 
+            $CredSSPStatus=Enable-BoxstarterCredSSP $ComputerName
+
             if($ConnectionURI){
                 $ConnectionUri | %{
                     $sessionArgs.ConnectionURI = $_
@@ -322,8 +331,11 @@ about_boxstarter_chocolatey
         }
         finally{
             #Client settings should be as they were when we started
-            Rollback-ClientRemoting $ClientRemotingStatus
+            Rollback-ClientRemoting $ClientRemotingStatus $CredSSPStatus
         }
+    }
+    finally{
+        $global:VerbosePreference=$CurrentVerbosity
     }
 }
 
@@ -597,30 +609,33 @@ function Disable-RemoteCredSSP ($sessionArgs){
     } -ArgumentList $sessionArgs.Credential
 }
 
-function Rollback-ClientRemoting($ClientRemotingStatus) {
+function Rollback-ClientRemoting($ClientRemotingStatus, $CredSSPStatus) {
     Write-BoxstarterMessage "Rolling back remoting settings changed by Boxstarter..."
-    if($ClientRemotingStatus -ne $null -and $ClientRemotingStatus.Success){
+    if($ClientRemotingStatus.PreviousTrustedHosts -ne $null){
+        Write-BoxstarterMessage "Reseting wsman Trusted Hosts to $($ClientRemotingStatus.PreviousTrustedHosts)" -Verbose
+        Set-Item "wsman:\localhost\client\trustedhosts" -Value "$($ClientRemotingStatus.PreviousTrustedHosts)" -Force
+    }
+    if($CredSSPStatus -ne $null -and $CredSSPStatus.Success){
         Disable-WSManCredSSP -Role Client
-        if($ClientRemotingStatus.PreviousCSSPTrustedHosts -ne $null){
+        if($CredSSPStatus.PreviousCSSPTrustedHosts -ne $null){
             try{
-                Write-BoxstarterMessage "Reseting CredSSP Trusted Hosts to $($ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace('wsman/',''))" -Verbose
-                Enable-WSManCredSSP -DelegateComputer $ClientRemotingStatus.PreviousCSSPTrustedHosts.Replace("wsman/","") -Role Client -Force | Out-Null
+                Write-BoxstarterMessage "Reseting CredSSP Trusted Hosts to $($CredSSPStatus.PreviousCSSPTrustedHosts.Replace('wsman/',''))" -Verbose
+                Enable-WSManCredSSP -DelegateComputer $CredSSPStatus.PreviousCSSPTrustedHosts.Replace("wsman/","") -Role Client -Force | Out-Null
             }
             catch{}
         }
-        if($ClientRemotingStatus.PreviousTrustedHosts -ne $null){
-            Write-BoxstarterMessage "Reseting wsman Trusted Hosts to $($ClientRemotingStatus.PreviousTrustedHosts)" -Verbose
-            Set-Item "wsman:\localhost\client\trustedhosts" -Value "$($ClientRemotingStatus.PreviousTrustedHosts)" -Force
-        }
         Write-BoxstarterMessage "Reseting GroupPolicy for Credentials Delegation" -Verbose
-        (Get-Item "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly").Property | % {
-            if([int]$_ -gt $ClientRemotingStatus["PreviousFreshNTLMCredDelegationHostCount"]) {
-                Remove-ItemProperty "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly" -Name $_
+        if(Test-Path "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly") {
+            (Get-Item "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly").Property | % {
+                if([int]$_ -gt $CredSSPStatus["PreviousFreshNTLMCredDelegationHostCount"]) {
+                    Remove-ItemProperty "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly" -Name $_
+                }
             }
         }
+
         if(Test-Path "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentials") {
             (Get-Item "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentials").Property | % {
-                if([int]$_ -gt $ClientRemotingStatus["PreviousFreshCredDelegationHostCount"]) {
+                if([int]$_ -gt $CredSSPStatus["PreviousFreshCredDelegationHostCount"]) {
                     Remove-ItemProperty "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentials" -Name $_
                 }
             }

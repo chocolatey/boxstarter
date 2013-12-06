@@ -29,7 +29,7 @@ Describe "Install-BoxstarterPackage" {
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
     Context "When calling locally" {
-        
+
         $result = Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen -LocalRepo "myRepo"
 
         It "will call InvokeChocolateyBoxstarter with parameters"{
@@ -345,6 +345,8 @@ Describe "Install-BoxstarterPackage" {
     Context "When using a computer name and remoting enabled on remote and local computer" {
         Mock Enable-RemotingOnRemote { return $true }
         Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
+        Mock Enable-BoxstarterCredSSP {@{Success=$true}}
+
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
@@ -380,6 +382,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When installing a package that throws an error" {
         Mock Enable-RemotingOnRemote { return $true }
         Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
+        Mock Enable-BoxstarterCredSSP {@{Success=$true}}
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
@@ -396,6 +399,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When using a connectionURI and remoting enabled on remote and local computer" {
         Mock Enable-RemotingOnRemote { return $true }
         Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
+        Mock Enable-BoxstarterCredSSP {@{Success=$true}}
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
@@ -428,6 +432,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When passing in a session and no reboots" {
         $session = New-PSSession localhost
         Mock Enable-BoxstarterClientRemoting
+        Mock Enable-BoxstarterCredSSP
         Mock Enable-RemotingOnRemote
         Mock Setup-BoxstarterModuleAndLocalRepo
         Mock Invoke-Remotely
@@ -449,6 +454,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When passing in a session that reboots" {
         $session = New-PSSession -ComputerName localhost -Name "testSession"
         Mock Enable-BoxstarterClientRemoting
+        Mock Enable-BoxstarterCredSSP
         Mock Enable-RemotingOnRemote
         Mock Setup-BoxstarterModuleAndLocalRepo
         Mock Invoke-Command { return @{Result="Completed"} } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*ChocolateyBoxstarter*"}
@@ -471,6 +477,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When passing in a session that reboots and cant find port" {
         $session = New-PSSession -ComputerName localhost -Name "testSession"
         Mock Enable-BoxstarterClientRemoting
+        Mock Enable-BoxstarterCredSSP
         Mock Enable-RemotingOnRemote
         Mock Test-WSMan
         Mock Setup-BoxstarterModuleAndLocalRepo
