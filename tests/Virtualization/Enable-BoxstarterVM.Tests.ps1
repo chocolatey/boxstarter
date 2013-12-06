@@ -14,7 +14,7 @@ Describe "Enable-BoxstarterVM" {
     Mock Remove-VMSavedState
     Mock Stop-VM
     Mock Get-VMHardDiskDrive { return @{Path="$env:temp\boxstarter.vhd"} }
-    New-Item $env:temp\boxstarter.vhd -ItemType File -Force
+    New-Item $env:temp\boxstarter.vhd -ItemType File -Force | out-Null
     Mock Enable-BoxstarterVHD
     Mock Start-VM
     Mock Checkpoint-VM
