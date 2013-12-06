@@ -13,9 +13,10 @@ $Boxstarter.SuppressLogging=$true
 
 Describe "Set-BoxstarterShare" {
     $testRoot=(Get-PSDrive TestDrive).Root
+    $identity  = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 
     Context "When setting share with no parameters" {
-        MkDir "$testRoot\boxstarter" | Out-Null
+        MkDir "$testRoot\boxstarter" -ErrorAction SilentlyContinue | Out-Null
         $Boxstarter.BaseDir="$testRoot\Boxstarter"
 
         Set-BoxstarterShare | Out-Null
@@ -48,13 +49,13 @@ Describe "Set-BoxstarterShare" {
         MkDir "$testRoot\boxstarter" | Out-Null
         $Boxstarter.BaseDir="$testRoot\Boxstarter"
 
-        Set-BoxstarterShare "ShareName" -Accounts "$env:UserDomain\$env:UserName" | Out-Null
+        Set-BoxstarterShare "ShareName" -Accounts "$($identity.Name)" | Out-Null
 
         It "Should create Share"{
             Test-Path "\\$env:Computername\ShareName" | should be $true
         }
         It "Should give read access to account"{
-            (net share ShareName) | ? { $_.StartsWith("Permission")} | % { return $_.Replace("Permission","").Trim() | should be "$env:UserDomain\$env:UserName, read" }
+            (net share ShareName) | ? { $_.StartsWith("Permission")} | % { return $_.Replace("Permission","").Trim() | should be "$($identity.Name), read" }
         }
         net share ShareName /delete | Out-Null
     }
@@ -75,7 +76,7 @@ Describe "Set-BoxstarterShare" {
     Context "When sharing with multiple accounts" {
         MkDir "$testRoot\boxstarter" | Out-Null
         $Boxstarter.BaseDir="$testRoot\Boxstarter"
-        $expectedAccounts=@("Everyone","$env:UserDomain\$env:UserName")
+        $expectedAccounts=@("Everyone","$($identity.Name)")
         
         Set-BoxstarterShare -Accounts $expectedAccounts | Out-Null
 

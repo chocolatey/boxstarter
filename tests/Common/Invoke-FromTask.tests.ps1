@@ -1,7 +1,8 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
+$identity  = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 
 schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
-        /RU "$env:userdomain\$($Boxstarter.BoxstarterUser)" /IT `
+        /RU "$($identity.Name)" /IT `
 /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
         Out-Null
 

@@ -28,7 +28,13 @@ http://boxstarter.codeplex.com
         [ValidatePattern("\.(a)?vhd(x)?$")]
         [string]$VHDPath
     )
-    Invoke-Verbosely -Verbose:($PSBoundParameters['Verbose'] -eq $true) {
+    $CurrentVerbosity=$global:VerbosePreference
+    try {
+
+        if($PSBoundParameters["Verbose"] -eq $true) {
+            $global:VerbosePreference="Continue"
+        }
+
         if((Get-ItemProperty $VHDPath -Name IsReadOnly).IsReadOnly){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD is Read-Only"
         }    
@@ -64,6 +70,9 @@ http://boxstarter.codeplex.com
             Dismount-VHD $VHDPath
             Write-BoxstarterMessage "VHD Dismounted" -Verbose
         }
+    }
+    finally{
+        $global:VerbosePreference=$CurrentVerbosity
     }
 }
 
