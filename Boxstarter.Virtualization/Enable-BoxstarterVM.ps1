@@ -35,7 +35,7 @@ For Non-HyperV VMs, use Enable-BoxstarterVHD to perform these adjustments on the
 the VM. The VM must be powered off and accesible.
 
 .OUTPUTS
-A BoxstarterConnectionTokens object that contains the DNS Name of the VM Computer and 
+An object that contains the DNS Name of the VM Computer and 
 the PSCredential needed to authenticate.
 
 .EXAMPLE
@@ -64,7 +64,9 @@ http://boxstarter.codeplex.com
 #>
     [CmdletBinding()]
     param(
+        [parameter(Mandatory=$true, Position=0)]
         [string]$VMName,
+        [parameter(Mandatory=$true, Position=1)]
         [Management.Automation.PsCredential]$Credential,
         [string]$CheckpointName
     )
@@ -86,11 +88,6 @@ http://boxstarter.codeplex.com
             throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $vmName"
         }
 
-        #Get Computername from key/value pair
-        #Check for client remoting enabled
-        #Test remoting
-        #Test WMI
-
         if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
             $point = Get-VMSnapshot -VMName $vmName -Name $CheckpointName -ErrorAction SilentlyContinue
             if($point -ne $null) {
@@ -98,27 +95,69 @@ http://boxstarter.codeplex.com
                 $restored=$true
             }
         }
+
         if($vm.State -eq "saved"){
             Remove-VMSavedState $vmName
         }
+
+        if($vm.State -eq "running"){
+            $ComputerName=Get-VMGuestComputerName $VMName
+            $clientRemoting = Enable-BoxstarterClientRemoting $ComputerName
+            Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
+            $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
+        }
         else {
+            if($vm.Notes -match "--Boxstarter Remoting Enabled Box:(.*)--"){
+                $remotingTest=$true
+                $ComputerName=$matches[1]
+            }
+        }
+        
+        #Test WMI
+
+        if(!$remotingTest -and$vm.State -ne "Stopped") { 
             Write-BoxstarterMessage "Stopping $VMName"
             Stop-VM $VmName -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
         }
-        $vhd=Get-VMHardDiskDrive -VMName $vmName
 
-        $computerName = Enable-BoxstarterVHD $vhd.Path
-        Start-VM $VmName
-        Write-BoxstarterMessage "Started $VMName. Waiting for Heartbeat..."
-        do {Start-Sleep -milliseconds 100} 
-        until ((Get-VMIntegrationService -VMName $vmName | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
+        if(!$remotingTest) { 
+            $vhd=Get-VMHardDiskDrive -VMName $vmName
+            $computerName = Enable-BoxstarterVHD $vhd.Path
+        }
+
+        if($vm.State -ne"Running" ) {
+            Start-VM $VmName
+            Write-BoxstarterMessage "Started $VMName. Waiting for Heartbeat..."
+            do {Start-Sleep -milliseconds 100} 
+            until ((Get-VMIntegrationService -VMName $vmName | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
+        }
+
         if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
             Write-BoxstarterMessage "Creating Checkpoint $vmCheckpoint"
             Checkpoint-VM -Name $vmName -SnapshotName $CheckpointName
         }
-        return "$computerName"
+        Add-VMNotes $vm $ComputerName
+        $res=@{ComputerName="$computerName";Credential=$Credential}
+        return $res
     }
     finally{
         $global:VerbosePreference=$CurrentVerbosity
     }
+}
+
+function Get-VMGuestComputerName($vmName) {
+    $vm = Get-WmiObject -Namespace root\virtualization\v2 -Class Msvm_ComputerSystem -Filter "ElementName='$vmName'"
+    $vm.GetRelated("Msvm_KvpExchangeComponent").GuestIntrinsicExchangeItems | % {
+        $GuestExchangeItemXml = ([XML]$_).SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Name']/VALUE[child::text()='FullyQualifiedDomainName']") 
+        
+        if ($GuestExchangeItemXml -ne $null) { 
+            $GuestExchangeItemXml.SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Data']/VALUE/child::text()").Value 
+        }    
+    }    
+}
+
+function Add-VMNotes ($VM, $ComputerName) {
+    $notes = $VM.Notes
+    if ($Notes -match "Boxstarter Remoting Enabled") { return }
+    Set-VM -Name $VM.Name -Notes ($notes += "--Boxstarter Remoting Enabled Box:$ComputerName--")
 }
