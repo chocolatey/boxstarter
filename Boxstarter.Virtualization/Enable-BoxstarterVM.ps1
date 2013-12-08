@@ -130,12 +130,15 @@ http://boxstarter.codeplex.com
                 }
             }
             $credParts = $Credential.UserName.Split("\\")
-            if($credParts.Count -eq 1 -and $credParts[0] -eq "administrator"){
+            if(($credParts.Count -eq 1 -and $credParts[0] -eq "administrator") -or `
+              ($credParts.Count -eq 2 -and $credParts[0] -eq $ComputerName -and $credParts[1] -eq "administrator") -or`
+              ($credParts.Count -eq 2 -and $credParts[0] -ne $ComputerName)){
                 $params["IgnoreLocalAccountTokenFilterPolicy"]=$true
             }
             if($credParts.Count -eq 2 -and $credParts[0] -eq $ComputerName -and $credParts[1] -eq "administrator"){
                 $params["IgnoreLocalAccountTokenFilterPolicy"]=$true
             }
+
         }
 
         if(!$remotingTest -and$vm.State -ne "Stopped") {

@@ -100,7 +100,7 @@ Describe "Enable-BoxstarterVM" {
         Enable-BoxstarterVM Me -Credential $mycreds | Out-Null
 
         It "Should Edit VHD"{
-            Assert-MockCalled Enable-BoxstarterVHD
+            Assert-MockCalled Enable-BoxstarterVHD -parameterFilter { $IgnoreWMI -eq $false -and $IgnoreLocalAccountTokenFilterPolicy -eq $false}
         }
     }
 
@@ -152,6 +152,20 @@ Describe "Enable-BoxstarterVM" {
         Mock Invoke-Command
         Mock Get-VMGuestComputerName { "SomeComputer" }
         $admincreds = New-Object System.Management.Automation.PSCredential ("SomeComputer\administrator", $secpasswd)
+        
+        Enable-BoxstarterVM Me -Credential $admincreds | Out-Null
+
+        It "Should Edit VHD but ignore IgnoreLocalAccountTokenFilterPolicy"{
+            Assert-MockCalled Enable-BoxstarterVHD -parameterFilter { $IgnoreLocalAccountTokenFilterPolicy -eq $true }
+        }
+    }
+
+    Context "When remoting is not enabled and using domain account"{
+        Mock Get-VM { return @{State="Running";Name="me"} }
+        Mock Enable-BoxstarterClientRemoting {return $True}
+        Mock Invoke-Command
+        Mock Get-VMGuestComputerName { "SomeComputer" }
+        $admincreds = New-Object System.Management.Automation.PSCredential ("SomeDomain\administrator", $secpasswd)
         
         Enable-BoxstarterVM Me -Credential $admincreds | Out-Null
 
