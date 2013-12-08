@@ -93,6 +93,7 @@ http://boxstarter.codeplex.com
             $point = Get-VMSnapshot -VMName $vmName -Name $CheckpointName -ErrorAction SilentlyContinue
             if($point -ne $null) {
                 Restore-VMSnapshot -VMName $vmName -Name $CheckpointName -Confirm:$false
+                Write-BoxstarterMessage "$checkpointName restored on $vmName"
                 $restored=$true
             }
         }
@@ -114,9 +115,6 @@ http://boxstarter.codeplex.com
             }
         }
         
-        #If the credential is a domain credential or Built in Administrator, dont change 
-        #LocalAccountTokenFilterPolicy
-
         $params=@{}
         if(!$remotingTest -and $vm.State -eq "Running") {
             $WSManResponse = Test-WSMan $ComputerName -ErrorAction SilentlyContinue

@@ -71,11 +71,11 @@ http://boxstarter.codeplex.com
             if($winVolume -eq $null){
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD does not contain system volume"
             }    
-            Write-BoxstarterMessage "Mounted VHD with system volume to Drive $($winVolume)" -Verbose
+            Write-BoxstarterMessage "Mounted $VHDPath with system volume to Drive $($winVolume)"
             if(!$IgnoreLocalAccountTokenFilterPolicy) {
                 reg load HKLM\VHDSOFTWARE "$($winVolume):\windows\system32\config\software" | out-null
                 $policyResult = reg add HKLM\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1 /f
-                Write-BoxstarterMessage "Enabled LocalAccountTokenFilterPolicy with result: $policyResult" -Verbose
+                Write-BoxstarterMessage "Enabled LocalAccountTokenFilterPolicy with result: $policyResult"
             }
 
             reg load HKLM\VHDSYS "$($winVolume):\windows\system32\config\system" | out-null
@@ -85,6 +85,7 @@ http://boxstarter.codeplex.com
             if(!$IgnoreWMI){
                 Enable-FireWallRule WMI-RPCSS-In-TCP
                 Enable-FireWallRule WMI-WINMGMT-In-TCP
+                Write-BoxstarterMessage "Enabled WMI Firewall Rules."
             }
 
             return "$computerName"
@@ -95,7 +96,7 @@ http://boxstarter.codeplex.com
             reg unload HKLM\VHDSYS 2>&1 | out-null
             Write-BoxstarterMessage "VHD Registry Unloaded" -Verbose
             Dismount-VHD $VHDPath
-            Write-BoxstarterMessage "VHD Dismounted" -Verbose
+            Write-BoxstarterMessage "VHD Dismounted"
         }
     }
     finally{
