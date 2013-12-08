@@ -35,7 +35,7 @@ For Non-HyperV VMs, use Enable-BoxstarterVHD to perform these adjustments on the
 the VM. The VM must be powered off and accesible.
 
 .OUTPUTS
-An object that contains the DNS Name of the VM Computer and 
+A BoxstarterConnectionConfig that contains the DNS Name of the VM Computer and 
 the PSCredential needed to authenticate.
 
 .EXAMPLE
@@ -63,6 +63,7 @@ http://boxstarter.codeplex.com
 
 #>
     [CmdletBinding()]
+    [OutputType([BoxstarterConnectionConfig])]
     param(
         [parameter(Mandatory=$true, Position=0)]
         [string]$VMName,
@@ -113,7 +114,10 @@ http://boxstarter.codeplex.com
             }
         }
         
-        #Test WMI
+        #Limit what vhd setting does based on status of WSMAN, WMI, Domain Joined
+        #If wsman or wmi are on, dont enable wmi in the vhd
+        #If the credential is a domain credential or Built in Administrator, dont change 
+        #LocalAccountTokenFilterPolicy
 
         if(!$remotingTest -and$vm.State -ne "Stopped") { 
             Write-BoxstarterMessage "Stopping $VMName"
@@ -137,7 +141,7 @@ http://boxstarter.codeplex.com
             Checkpoint-VM -Name $vmName -SnapshotName $CheckpointName
         }
         Add-VMNotes $vm $ComputerName
-        $res=@{ComputerName="$computerName";Credential=$Credential}
+        $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $computerName,$Credential
         return $res
     }
     finally{

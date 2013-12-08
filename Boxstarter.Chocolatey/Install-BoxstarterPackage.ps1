@@ -60,6 +60,12 @@ This function wraps a Chocolatey Install and provides these additional features
  computer, the session will be discarded and a new session will be created using 
  the ConnectionURI of the original sesion.
 
+ .PARAMETER BoxstarterConnectionConfig
+ If provided, Boxstarter will install the specified package name on all computers
+ inclused in the BoxstarterConnectionConfig. This object contains a ComputerName
+ and a PSCredential. Use this objsct if you need to pass different computers
+ requiring different credentials.
+
  .PARAMETER PackageName
  The name of a NugetPackage to be installed or a URI or 
  file path pointing to a chocolatey script. If using a package name,
@@ -200,6 +206,16 @@ will prompt the user if it is ok to try and confiure the computer before
 proceeding to the other computers.
 
 .EXAMPLE
+$cred1=Get-Credential mwrock
+$cred2=Get-Credential domain\mwrock
+(New-Object -TypeName BoxstarterConnectionConfig -ArgumentList "computer1",$cred1), `
+(New-Object -TypeName BoxstarterConnectionConfig -ArgumentList "computer2",$cred2) |
+Install-BoxstarterPackage -Package MyPackage
+
+This installs the MyPackage package on computer1 and computer2 and uses
+different credentials for each computer.
+
+.EXAMPLE
 $cred=Get-Credential mwrock
 Install-BoxstarterPackage script.ps1 -Credential $cred
 
@@ -228,6 +244,8 @@ about_boxstarter_chocolatey
 #>
     [CmdletBinding(DefaultParameterSetName="Package")]
 	param(
+        [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="BoxstarterConnectionConfig")]
+        [BoxstarterConnectionConfig[]]$BoxstarterConnectionConfig,
         [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="ComputerName")]
         [string[]]$ComputerName,
         [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="ConnectionUri")]
@@ -238,6 +256,7 @@ about_boxstarter_chocolatey
         [parameter(Mandatory=$true, Position=1, ParameterSetName="ComputerName")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="ConnectionUri")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="Session")]
+        [parameter(Mandatory=$true, Position=1, ParameterSetName="BoxstarterConnectionConfig")]
         [string]$PackageName,
         [Management.Automation.PsCredential]$Credential,
         [switch]$Force,
@@ -307,6 +326,12 @@ about_boxstarter_chocolatey
             }
         }
 
+        if($BoxstarterConnectionConfig){
+            $BoxstarterConnectionConfig | %{
+                $computerName+=$_.ComputerName
+            }
+        }
+
         try{
             #Enable remoting settings if necessary on client
             $ClientRemotingStatus=Enable-BoxstarterClientRemoting $ComputerName
@@ -320,6 +345,15 @@ about_boxstarter_chocolatey
                 $ConnectionUri | %{
                     $sessionArgs.ConnectionURI = $_
                     Install-BoxstarterPackageOnComputer $_.Host $sessionArgs $PackageName $DisableReboots
+                }
+            }
+            elseif($BoxstarterConnectionConfig) {
+                $BoxstarterConnectionConfig | %{
+                    $sessionArgs.ComputerName = $_.ComputerName
+                    if($_.Credential){
+                        $sessionArgs.Credential = $_.Credential
+                    }
+                    Install-BoxstarterPackageOnComputer $_.ComputerName $sessionArgs $PackageName $DisableReboots
                 }
             }
             else {
