@@ -11,11 +11,32 @@ PowerShell Remoting.
 .PARAMETER VHDPath
 The path to ther VHD file
 
+.PARAMETER IgnoreWMI
+If specified, WMI ports will not be enabled
+
+.PARAMETER IgnoreLocalAccountTokenFilterPolicy
+If specified, IgnoreLocalAccountTokenFilterPolicy will not be enabled
+
+.NOTES
+The VHD must be accesible, writable and contain a system drive.
+
 .OUTPUTS
 The computer name stored in the VHD's Windows Registry
 
 .EXAMPLE
 $ComputerName = Enable-BoxstarterVHD $pathToVHD
+
+Enables IgnoreLocalAccountTokenFilterPolicy and WMI ports in the Windows registry
+
+.EXAMPLE
+$ComputerName = Enable-BoxstarterVHD $pathToVHD -IgnoreWMI
+
+Enables IgnoreLocalAccountTokenFilterPolicy in the Windows registry
+
+.EXAMPLE
+$ComputerName = Enable-BoxstarterVHD $pathToVHD -IgnoreLocalAccountTokenFilterPolicy
+
+Enables WMI ports in the Windows registry
 
 .LINK
 http://boxstarter.codeplex.com
@@ -26,7 +47,9 @@ http://boxstarter.codeplex.com
         [Parameter(Position=0,Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [ValidatePattern("\.(a)?vhd(x)?$")]
-        [string]$VHDPath
+        [string]$VHDPath,
+        [switch]$IgnoreWMI,
+        [switch]$IgnoreLocalAccountTokenFilterPolicy
     )
     $CurrentVerbosity=$global:VerbosePreference
     try {
@@ -49,16 +72,20 @@ http://boxstarter.codeplex.com
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD does not contain system volume"
             }    
             Write-BoxstarterMessage "Mounted VHD with system volume to Drive $($winVolume)" -Verbose
-            reg load HKLM\VHDSOFTWARE "$($winVolume):\windows\system32\config\software" | out-null
-            $policyResult = reg add HKLM\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1 /f
-            Write-BoxstarterMessage "Enabled LocalAccountTokenFilterPolicy with result: $policyResult" -Verbose
+            if(!$IgnoreLocalAccountTokenFilterPolicy) {
+                reg load HKLM\VHDSOFTWARE "$($winVolume):\windows\system32\config\software" | out-null
+                $policyResult = reg add HKLM\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1 /f
+                Write-BoxstarterMessage "Enabled LocalAccountTokenFilterPolicy with result: $policyResult" -Verbose
+            }
 
             reg load HKLM\VHDSYS "$($winVolume):\windows\system32\config\system" | out-null
             $current=Get-CurrentControlSet
             $computerName = (Get-ItemProperty "HKLM:\VHDSYS\ControlSet00$current\Control\ComputerName\ComputerName" -Name ComputerName).ComputerName
 
-            Enable-FireWallRule WMI-RPCSS-In-TCP
-            Enable-FireWallRule WMI-WINMGMT-In-TCP
+            if(!$IgnoreWMI){
+                Enable-FireWallRule WMI-RPCSS-In-TCP
+                Enable-FireWallRule WMI-WINMGMT-In-TCP
+            }
 
             return "$computerName"
         }

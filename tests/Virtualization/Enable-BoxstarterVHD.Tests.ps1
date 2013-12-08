@@ -57,12 +57,11 @@ Describe "Enable-BoxstarterVHD" {
             reg unload HKLM\VHDSYS | out-null
             reg unload HKLM\VHDSOFTWARE | out-null
             Dismount-VHD $testRoot\test.vhdx
-            #exit
+            Get-PSDrive | Out-Null
 
             $result = Enable-BoxstarterVHD $testRoot\test.vhdx
 
             Mount-TestVHD
-            #exit
             It "Should set LocalAccountTokenFilterPolicy"{
                 (Get-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy).LocalAccountTokenFilterPolicy | should be 1
             }
@@ -71,11 +70,80 @@ Describe "Enable-BoxstarterVHD" {
             }
             It "Should set WMI-RPCSS-In-TCP Rule"{
                 $rules = Get-ItemProperty -path (Get-FirewallKey)
-                $rules.'WMI-RPCSS-In-TCP' | Should Match "|Active=TRUE|"
+                $rules.'WMI-RPCSS-In-TCP' | Should Match "Active=TRUE"
             }
             It "Should set WMI-WINMGMT-In-TCP Rule"{
                 $rules = Get-ItemProperty -path (Get-FirewallKey)
-                $rules.'WMI-WINMGMT-In-TCP' | Should Match "|Active=TRUE|"
+                $rules.'WMI-WINMGMT-In-TCP' | Should Match "Active=TRUE"
+            }
+            Clean-VHD
+        }
+
+        Context "When enabling a vhd with disabled firewall and LocalAccountTokenFilterPolicy and ignores LocalAccountTokenFilterPolicy" {
+            Mount-TestVHD
+            $computerName="SomeComputer"
+            $current=Get-CurrentControlSet
+            Disable-FireWallRule WMI-RPCSS-In-TCP
+            Disable-FireWallRule WMI-WINMGMT-In-TCP
+            Remove-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy
+            Set-ItemProperty -path "HKLM:\VHDSYS\ControlSet00$current\Control\ComputerName\ComputerName" -Name ComputerName -value "$computerName"
+            [GC]::Collect()
+            reg unload HKLM\VHDSYS | out-null
+            reg unload HKLM\VHDSOFTWARE | out-null
+            Dismount-VHD $testRoot\test.vhdx
+            Get-PSDrive | Out-Null
+
+            $result = Enable-BoxstarterVHD $testRoot\test.vhdx -IgnoreLocalAccountTokenFilterPolicy
+
+            Mount-TestVHD
+            It "Should not set LocalAccountTokenFilterPolicy"{
+                (Get-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy -ErrorAction SilentlyContinue) | should be $null
+            }
+            It "Should Get ComputerName" {
+                $result | should be $computerName
+            }
+            It "Should set WMI-RPCSS-In-TCP Rule"{
+                $rules = Get-ItemProperty -path (Get-FirewallKey)
+                $rules.'WMI-RPCSS-In-TCP' | Should Match "Active=TRUE"
+            }
+            It "Should set WMI-WINMGMT-In-TCP Rule"{
+                $rules = Get-ItemProperty -path (Get-FirewallKey)
+                $rules.'WMI-WINMGMT-In-TCP' | Should Match "Active=TRUE"
+            }
+            Clean-VHD
+        }
+
+        Context "When enabling a vhd with disabled firewall and LocalAccountTokenFilterPolicy and Ignores WMI" {
+            Mount-TestVHD
+            $computerName="SomeComputer"
+            $current=Get-CurrentControlSet
+            Disable-FireWallRule WMI-RPCSS-In-TCP
+            Disable-FireWallRule WMI-WINMGMT-In-TCP
+            Remove-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy -ErrorAction SilentlyContinue
+            Set-ItemProperty -path "HKLM:\VHDSYS\ControlSet00$current\Control\ComputerName\ComputerName" -Name ComputerName -value "$computerName"
+            [GC]::Collect()
+            reg unload HKLM\VHDSYS | out-null
+            reg unload HKLM\VHDSOFTWARE | out-null
+            Dismount-VHD $testRoot\test.vhdx
+            Get-PSDrive | Out-Null
+
+            $result = Enable-BoxstarterVHD $testRoot\test.vhdx -IgnoreWMI
+
+            Mount-TestVHD
+            It "Should set LocalAccountTokenFilterPolicy"{
+                (Get-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy).LocalAccountTokenFilterPolicy | should be 1
+            }
+            It "Should Get ComputerName" {
+                $result | should be $computerName
+            }
+            It "Should not set WMI-RPCSS-In-TCP Rule"{
+                $rules = Get-ItemProperty -path (Get-FirewallKey)
+
+                $rules.'WMI-RPCSS-In-TCP' | Should Match "Active=FALSE"
+            }
+            It "Should not set WMI-WINMGMT-In-TCP Rule"{
+                $rules = Get-ItemProperty -path (Get-FirewallKey)
+                $rules.'WMI-WINMGMT-In-TCP' | Should Match "Active=FALSE"
             }
             Clean-VHD
         }
