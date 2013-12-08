@@ -118,16 +118,23 @@ http://boxstarter.codeplex.com
         #LocalAccountTokenFilterPolicy
 
         $params=@{}
-        if(!$remotingTest -and$vm.State -eq "Running") {
+        if(!$remotingTest -and $vm.State -eq "Running") {
             $WSManResponse = Test-WSMan $ComputerName -ErrorAction SilentlyContinue
             if($WSManResponse) { 
-                $params = @{IgnoreWMI=$true} 
+                $params["IgnoreWMI"]=$true
             }
             else {
                 $wmiTest=Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
                 if($wmiTest) { 
-                    $params = @{IgnoreWMI=$true} 
+                    $params["IgnoreWMI"]=$true
                 }
+            }
+            $credParts = $Credential.UserName.Split("\\")
+            if($credParts.Count -eq 1 -and $credParts[0] -eq "administrator"){
+                $params["IgnoreLocalAccountTokenFilterPolicy"]=$true
+            }
+            if($credParts.Count -eq 2 -and $credParts[0] -eq $ComputerName -and $credParts[1] -eq "administrator"){
+                $params["IgnoreLocalAccountTokenFilterPolicy"]=$true
             }
         }
 
