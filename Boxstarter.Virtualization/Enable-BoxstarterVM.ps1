@@ -114,19 +114,31 @@ http://boxstarter.codeplex.com
             }
         }
         
-        #Limit what vhd setting does based on status of WSMAN, WMI, Domain Joined
-        #If wsman or wmi are on, dont enable wmi in the vhd
         #If the credential is a domain credential or Built in Administrator, dont change 
         #LocalAccountTokenFilterPolicy
 
-        if(!$remotingTest -and$vm.State -ne "Stopped") { 
+        $params=@{}
+        if(!$remotingTest -and$vm.State -eq "Running") {
+            $WSManResponse = Test-WSMan $ComputerName -ErrorAction SilentlyContinue
+            if($WSManResponse) { 
+                $params = @{IgnoreWMI=$true} 
+            }
+            else {
+                $wmiTest=Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
+                if($wmiTest) { 
+                    $params = @{IgnoreWMI=$true} 
+                }
+            }
+        }
+
+        if(!$remotingTest -and$vm.State -ne "Stopped") {
             Write-BoxstarterMessage "Stopping $VMName"
             Stop-VM $VmName -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
         }
 
         if(!$remotingTest) { 
             $vhd=Get-VMHardDiskDrive -VMName $vmName
-            $computerName = Enable-BoxstarterVHD $vhd.Path
+            $computerName = Enable-BoxstarterVHD $vhd.Path @params
         }
 
         if($vm.State -ne"Running" ) {

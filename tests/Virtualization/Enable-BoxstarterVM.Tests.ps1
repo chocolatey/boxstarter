@@ -25,6 +25,8 @@ Describe "Enable-BoxstarterVM" {
     Mock Set-VM
     Mock Get-VMIntegrationService { return @{ Name="Heartbeat";PrimaryStatusDescription="OK"} }
     Mock Get-VMGuestComputerName { "SomeComputer" }
+    Mock Test-WSMan
+    Mock Invoke-WmiMethod
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
@@ -99,6 +101,34 @@ Describe "Enable-BoxstarterVM" {
 
         It "Should Edit VHD"{
             Assert-MockCalled Enable-BoxstarterVHD
+        }
+    }
+
+    Context "When remoting is not enabled but wsman is responding"{
+        Mock Get-VM { return @{State="Running";Name="me"} }
+        Mock Enable-BoxstarterClientRemoting {return $True}
+        Mock Invoke-Command
+        Mock Test-WSMan { return New-Object -TypeName PSObject }
+        Mock Get-VMGuestComputerName { "SomeComputer" }
+        
+        Enable-BoxstarterVM Me -Credential $mycreds | Out-Null
+
+        It "Should Edit VHD but ignore wmi"{
+            Assert-MockCalled Enable-BoxstarterVHD -parameterFilter { $IgnoreWMI -eq $true }
+        }
+    }
+
+    Context "When remoting is not enabled but wmi is responding"{
+        Mock Get-VM { return @{State="Running";Name="me"} }
+        Mock Enable-BoxstarterClientRemoting {return $True}
+        Mock Invoke-Command
+        Mock Invoke-WmiMethod { return New-Object -TypeName PSObject }
+        Mock Get-VMGuestComputerName { "SomeComputer" }
+        
+        Enable-BoxstarterVM Me -Credential $mycreds | Out-Null
+
+        It "Should Edit VHD but ignore wmi"{
+            Assert-MockCalled Enable-BoxstarterVHD -parameterFilter { $IgnoreWMI -eq $true }
         }
     }
 
