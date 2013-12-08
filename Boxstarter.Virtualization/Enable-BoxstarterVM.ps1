@@ -91,9 +91,11 @@ http://boxstarter.codeplex.com
 
         if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
             $point = Get-VMSnapshot -VMName $vmName -Name $CheckpointName -ErrorAction SilentlyContinue
+            $origState=$vm.State
             if($point -ne $null) {
                 Restore-VMSnapshot -VMName $vmName -Name $CheckpointName -Confirm:$false
-                Write-BoxstarterMessage "$checkpointName restored on $vmName"
+                Write-BoxstarterMessage "$checkpointName restored on $vmName waiting to complete..."
+                if($origState -eq "Running"){Wait-HeartBeat $VMName}
                 $restored=$true
             }
         }
@@ -117,13 +119,17 @@ http://boxstarter.codeplex.com
         
         $params=@{}
         if(!$remotingTest -and $vm.State -eq "Running") {
+            write-BoxstarterMessage "Testing WSMAN..."
             $WSManResponse = Test-WSMan $ComputerName -ErrorAction SilentlyContinue
             if($WSManResponse) { 
+                Write-BoxstarterMessage "WSMAN responded. Will not enable WMI." -verbose
                 $params["IgnoreWMI"]=$true
             }
             else {
+                write-BoxstarterMessage "Testing WMI..."
                 $wmiTest=Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
                 if($wmiTest) { 
+                    Write-BoxstarterMessage "WMI responded. Will not enable WMI." -verbose
                     $params["IgnoreWMI"]=$true
                 }
             }
@@ -149,11 +155,10 @@ http://boxstarter.codeplex.com
             $computerName = Enable-BoxstarterVHD $vhd.Path @params
         }
 
-        if($vm.State -ne"Running" ) {
+        if($vm.State -ne "Running" ) {
             Start-VM $VmName
             Write-BoxstarterMessage "Started $VMName. Waiting for Heartbeat..."
-            do {Start-Sleep -milliseconds 100} 
-            until ((Get-VMIntegrationService -VMName $vmName | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
+            Wait-HeartBeat $VMName
         }
 
         if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
@@ -184,4 +189,9 @@ function Add-VMNotes ($VM, $ComputerName) {
     $notes = $VM.Notes
     if ($Notes -match "Boxstarter Remoting Enabled") { return }
     Set-VM -Name $VM.Name -Notes ($notes += "--Boxstarter Remoting Enabled Box:$ComputerName--")
+}
+
+function Wait-HeartBeat($vmName) {
+    do {Start-Sleep -milliseconds 100} 
+    until ((Get-VMIntegrationService -VMName $vmName | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
 }
