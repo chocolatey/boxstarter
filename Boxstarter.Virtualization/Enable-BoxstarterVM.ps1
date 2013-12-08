@@ -150,7 +150,7 @@ http://boxstarter.codeplex.com
             Stop-VM $VmName -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
         }
 
-        if(!$remotingTest) { 
+        if(!$remotingTest -and ($params.Count -lt 2)) { 
             $vhd=Get-VMHardDiskDrive -VMName $vmName
             $computerName = Enable-BoxstarterVHD $vhd.Path @params
         }
