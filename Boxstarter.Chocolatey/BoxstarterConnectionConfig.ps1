@@ -4,8 +4,8 @@ public class BoxstarterConnectionConfig {
         ComputerName=computerName;
         Credential=credential;
     }
-    public string ComputerName { get; set; }
-    public System.Management.Automation.PSCredential Credential { get; set; }
+    public string ComputerName;
+    public System.Management.Automation.PSCredential Credential;
 }
 "@
 Add-Type -TypeDefinition $source
