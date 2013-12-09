@@ -1,0 +1,52 @@
+﻿@{
+    Layout = "~/_ContentLayout.cshtml";
+}
+
+@section headerBody {
+    <h1>Installing packages on a Virtual Machine</h1>
+    <p class="lead">Boxstarter can install packages on Hyper-V Virtual Machines with support for setting and restoring checkpoints. No VM configuration needed. 
+}
+
+<h3>Limitations and Prerequisites</h3>
+<p>Boxstarter's Hyper-V support is limited to:</p>
+<ul>
+    <li>Powershell Version 3 Hyper-V Hosts and above. This is automatically installed on Windows 8, 8.1 and Server 2012 and 2012 R2. Windows Server 2008 R2 can be upgraded to Version 3 (or 4) by installing version 3 or 4 of the <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34595">Windows Management Framework</a>.</li>
+    <li>Microsoft's Hyper-V virtualization technology comes with Windows Server and also the Windows client operating systems 8 and 8.1 professional and enterprise. It cannot be installed on Home editions of Windows 8 or on any version of Windows 7.</li>
+    <li>If Boxstarter determines that configuration is necessary for PowerShell remoting, the VHD file of the VM must be accesible and writable to the user issuing the <code>Enable-BoxstarterVM</code> command.</li>
+    <li>Boxstarter's HyperV commands must be run on the Hyper-V host machine.</li>
+    <li>HyperV Guests are subject to the same limitations as any other Boxstarter installation environment: Powershel v2 .net 4 and OSs Windows 7/Server 2008 R2 and higher.</li>
+</ul>
+
+<h3>Automatic configuration of Hyper-V guest instances</h3>
+<p>Boxstarter will configure remoting on the Hyper-V guest if it finds that it is not enabled already. The amount of configuration depends on the environment. If web services management (WSMAN) or WMI ports are already enabled and a built in admin or domain credential is being used, Boxstarter should not need to perform any special configuration above that done by <code>Install-BoxstarterPackage</code>. Boxstrter can enable Powershell Remoing from a WMI method call. If WSMAN or WMI are not open (by default they are not enabled on client versions of windows) or if the credential being used is a local user other than the builtin administrator, Boxstarter will shut down the VM, mount its VHD, and make a couple small changes to the Windows registry to either enable WMI, enable the LocalAccountTokenFilterPolicy or both.</p>
+<pre>
+$cred=Get-Credential domain\username
+Enable-BoxstarterVM -VMName myVM -Credential $cred
+</pre>
+<p>This will perform any of the configuration mentioned above if necessary and return a <code>BoxstarterConnectionConfig</code> object holding the DNS name of the guest machine and the Credential pased to the command.</p> 
+<p>This object can be piped to Boxstarter's Install-BoxstarterPackage command.</p>
+<pre>
+$cred=Get-Credential domain\username
+(Enable-BoxstarterVM -VMName myVM1 -Credential $cred),`
+    (Enable-BoxstarterVM -VMName myVM2 -Credential $cred) | 
+    Install-BoxstarterPackage -PackageName myPackage
+</pre>
+<p>This installs myPackage on myVM1 and myVM2 after ensuring that both are propperly configured for a remote install.</p>
+
+<h3>Checkpoints</h3>
+<p>The <code>Enable-BoxstarterVM</code> command can take a CheckpointName parameter. If this checkpoint exists, Boxstarter will restore the VM to this checkpoint before performing any action. If the checkpoint does not exist, Boxstarter will create a new Checkpoint after any configurations have been made.</p>
+<p>This is particularly useful when you want to restore a machine to a known state before perfoming an installation.</p>
+<pre>
+$cred=Get-Credential domain\username
+Enable-BoxstarterVM -VMName myVM1 -Credential $cred -CheckPointName BareOS | 
+    Install-BoxstarterPackage -PackageName myPackage
+</pre>
+<p>This resets the VM to its BareOS state before Installing the myPackage package.</p>
+
+<h3>Working with remote Hyper-V hosts or other virtualization technologies</h3>
+<p>Boxstarter will very soon provide support for Azure and AWS VMs. However, if you are working with any virtualization technologies that support the VHD file format, you can use the <code>Enable-BoxstarterVHD</code> command to enable WMI, LocalAccountTokenFilterPolicy and retrieve the computer name of the VM running the VHD. The VHD must be accesible and writable to the user issuing the command and it must contain the system volume (the drive with the Windows folder) of the VM.</p>
+<pre>
+Enable-BoxstarterVHD -VHDPath "C:\Virtual hard disks\win81diff_F2AE6535-2532-455F-8E5A-0211595221F8.avhdx"
+</pre>
+<p>This will mount The VHD provided in the VHDPath, enable the WMI Firewall ports and enable LocalAccountTokenFilterPolicy in the Windows registry stored in the VHD.</p>
+<p>NOTE: Although The parameter is explicitly referred to as <code>VHDPath</code>, any valid VHD file extension is accepted. The above example uses a differencing disk but is valid since that is the primary hard drive of a guest VM.</p>
