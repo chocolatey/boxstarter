@@ -118,7 +118,35 @@ Describe "Enable-BoxstarterVM" {
         }
     }
 
-    Context "When remoting is not enabled but wmi is responding and no need to enable LocalAccountTokenFilterPolicy"{
+    Context "When remoting is not enabled but wmi is responding"{
+        Mock Get-VM { return @{State="Running";Name="me"} }
+        Mock Enable-BoxstarterClientRemoting {return $True}
+        Mock Invoke-Command
+        Mock Invoke-WmiMethod { return New-Object -TypeName PSObject }
+        Mock Get-VMGuestComputerName { "SomeComputer" }
+        
+        Enable-BoxstarterVM Me -Credential $mycreds | Out-Null
+
+        It "Should Edit VHD but ignore wmi"{
+            Assert-MockCalled Enable-BoxstarterVHD -parameterFilter { $IgnoreWMI -eq $true }
+        }
+    }
+
+    Context "When remoting is not enabled and WMI fails with an access exception"{
+        Mock Get-VM { return @{State="Running";Name="me"} }
+        Mock Enable-BoxstarterClientRemoting {return $True}
+        Mock Invoke-Command
+        Mock Invoke-WmiMethod { throw New-Object -TypeName UnauthorizedAccessException  }
+        Mock Get-VMGuestComputerName { "SomeComputer" }
+        
+        try{Enable-BoxstarterVM Me -Credential $mycreds | Out-Null} catch{}
+
+        It "Should Edit VHD but ignore wmi"{
+            Assert-MockCalled Enable-BoxstarterVHD -parameterFilter { $IgnoreWMI -eq $true }
+        }
+    }
+
+    Context "When remoting is not enabled but wsman is responding and no need to enable LocalAccountTokenFilterPolicy"{
         Mock Get-VM { return @{State="Running";Name="me"} }
         Mock Enable-BoxstarterClientRemoting {return $True}
         Mock Invoke-Command

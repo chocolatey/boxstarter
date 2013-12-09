@@ -127,8 +127,8 @@ http://boxstarter.codeplex.com
             }
             else {
                 write-BoxstarterMessage "Testing WMI..."
-                $wmiTest=Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
-                if($wmiTest) { 
+                $wmiTest=try { Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue } catch {$ex=$_}
+                if($wmiTest -or ($ex -ne $null -and $ex.CategoryInfo.Reason -eq "UnauthorizedAccessException")) { 
                     Write-BoxstarterMessage "WMI responded. Will not enable WMI." -verbose
                     $params["IgnoreWMI"]=$true
                 }
