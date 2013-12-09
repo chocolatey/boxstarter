@@ -145,12 +145,11 @@ http://boxstarter.codeplex.com
 
         }
 
-        if(!$remotingTest -and$vm.State -ne "Stopped") {
-            Write-BoxstarterMessage "Stopping $VMName"
-            Stop-VM $VmName -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
-        }
-
         if(!$remotingTest -and ($params.Count -lt 2)) { 
+            if($vm.State -ne "Stopped") {
+                Write-BoxstarterMessage "Stopping $VMName"
+                Stop-VM $VmName -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+            }
             $vhd=Get-VMHardDiskDrive -VMName $vmName
             $computerName = Enable-BoxstarterVHD $vhd.Path @params
         }

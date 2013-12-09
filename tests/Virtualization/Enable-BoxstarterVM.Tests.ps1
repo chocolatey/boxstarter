@@ -131,6 +131,9 @@ Describe "Enable-BoxstarterVM" {
         It "Should not Edit VHD"{
             Assert-MockCalled Enable-BoxstarterVHD -times 0
         }
+        It "Should not stop VM"{
+            Assert-MockCalled Stop-VM -times 0
+        }
     }
 
     Context "When remoting is not enabled and using administrator account"{
