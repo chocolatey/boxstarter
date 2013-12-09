@@ -28,11 +28,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Chocolatey\Enable-BoxstarterCredSSP.Tests.ps1" />
-    <Content Include="Virtualization\Enable-BoxstarterVHD.Tests.ps1" />
-    <Content Include="Virtualization\Enable-BoxstarterVM.Tests.ps1" />
+    <Content Include="HyperV\Enable-BoxstarterVHD.Tests.ps1" />
+    <Content Include="HyperV\Enable-BoxstarterVM.Tests.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Virtualization\" />
+    <Folder Include="Chocolatey\" />
+    <Folder Include="HyperV\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />

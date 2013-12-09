@@ -29,7 +29,7 @@ Describe "Enable-BoxstarterVHD" {
         Remove-Module boxstarter.*
         Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
         % { . $_.ProviderPath }
-        Resolve-Path $here\..\..\boxstarter.virtualization\*.ps1 | 
+        Resolve-Path $here\..\..\boxstarter.HyperV\*.ps1 | 
         % { . $_.ProviderPath }
         $Boxstarter.SuppressLogging=$true
         mkdir $env:temp\Boxstarter.tests -force | Out-Null

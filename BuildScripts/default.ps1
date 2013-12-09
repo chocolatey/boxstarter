@@ -164,26 +164,6 @@ task Update-Homepage {
      (Get-Content $filename) | % {$_ -replace $versionPattern, ($version) } | Set-Content $filename
 }
 
-task Test-VM -requiredVariables "VmName","package"{
-    $vm = Get-VM $VmName
-    Restore-VMSnapshot $vm -Name $vm.ParentSnapshotName -Confirm:$false
-    Start-VM $VmName
-    $creds = Get-Credential -Message "$vmName credentials" -UserName "$env:UserDomain\$env:username"
-    $me=$env:computername
-    $remoteDir = $baseDir.replace(':','$')
-    $encryptedPass = convertfrom-securestring -securestring $creds.password
-    $modPath="\\$me\$remoteDir\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1"
-    $script = {
-        Import-Module $args[0]
-        Invoke-ChocolateyBoxstarter $args[1] -Password $args[2]
-    }
-    Write-Host "Waiting for $vmName to start..."
-    do {Start-Sleep -milliseconds 100} 
-    until ((Get-VMIntegrationService $vm | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
-    Write-Host "Importing Module at $modPath"
-    Invoke-Command -ComputerName $vmName -Credential $creds -Authentication Credssp -ScriptBlock $script -Argumentlist $modPath,$package,$creds.Password
-}
-
 task Get-ClickOnceStats {
     $creds = Get-Credential
     mkdir "$basedir\sitelogs"

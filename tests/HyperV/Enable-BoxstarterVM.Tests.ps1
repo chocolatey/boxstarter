@@ -4,7 +4,7 @@ Describe "Enable-BoxstarterVM" {
     Remove-Module boxstarter.*
     Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
     % { . $_.ProviderPath }
-    Resolve-Path $here\..\..\boxstarter.virtualization\*.ps1 | 
+    Resolve-Path $here\..\..\boxstarter.HyperV\*.ps1 | 
     % { . $_.ProviderPath }
     Resolve-Path $here\..\..\boxstarter.Chocolatey\*.ps1 | 
     % { . $_.ProviderPath }

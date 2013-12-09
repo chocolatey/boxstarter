@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Boxstarter.HyperV</id>
+    <version>$version$</version>
+    <authors>Matt Wrock</authors>
+    <owners>Matt Wrock</owners>
+    <title>BoxStarter HyperV Module</title>
+    <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=boxstarter&amp;DownloadId=635599&amp;Build=20006</iconUrl>
+    <projectUrl>http://BoxStarter.org</projectUrl>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <description>Boxstarter's HyperV module includes functionality for targeting Hyper-V guest VMs with the ability to automatically configure them for remote installation and to create or restore snapshots at installation time.</description>
+    <tags>boxstarter bootstrapper environment setup VM virtualization HyperV</tags>
+    <dependencies>
+      <dependency id="Boxstarter.Chocolatey" version="$version$" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\..\LICENSE.txt" target="tools"/>
+    <file src="..\chocolateyinstall.ps1" target="tools"/>
+    <file src="..\Setup.ps1" target="tools"/>    
+    <file src="..\..\Boxstarter.HyperV\**\*.*" target="tools\Boxstarter.HyperV"/>
+  </files>
+</package>

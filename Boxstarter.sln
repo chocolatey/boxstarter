@@ -38,6 +38,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{87B9154F
 		BuildScripts\nuget\boxstarter.bootstrapper.nuspec = BuildScripts\nuget\boxstarter.bootstrapper.nuspec
 		BuildScripts\nuget\boxstarter.chocolatey.nuspec = BuildScripts\nuget\boxstarter.chocolatey.nuspec
 		BuildScripts\nuget\BoxStarter.Common.nuspec = BuildScripts\nuget\BoxStarter.Common.nuspec
+		BuildScripts\nuget\Boxstarter.HyperV.nuspec = BuildScripts\nuget\Boxstarter.HyperV.nuspec
 		BuildScripts\nuget\boxstarter.nuspec = BuildScripts\nuget\boxstarter.nuspec
 		BuildScripts\nuget\BoxStarter.WinConfig.nuspec = BuildScripts\nuget\BoxStarter.WinConfig.nuspec
 	EndProjectSection
@@ -56,7 +57,7 @@ Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.Common", "Boxsta
 EndProject
 Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "BuildPackages", "BuildPackages\BuildPackages.pssproj", "{E70B5066-8334-412E-9F1D-6D60FFC9A635}"
 EndProject
-Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.Virtualization", "Boxstarter.Virtualization\Boxstarter.Virtualization.pssproj", "{00AD20D0-9FF8-4E4B-9B9A-006D06430FD0}"
+Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.HyperV", "Boxstarter.HyperV\Boxstarter.HyperV.pssproj", "{00AD20D0-9FF8-4E4B-9B9A-006D06430FD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

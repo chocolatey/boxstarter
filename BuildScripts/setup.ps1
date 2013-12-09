@@ -17,7 +17,7 @@ function Install-Boxstarter($here, $ModuleName) {
 
     PersistBoxStarterPathToEnvironmentVariable "PSModulePath"
     PersistBoxStarterPathToEnvironmentVariable "Path"
-    Import-Module "$boxstarterPath\Boxstarter.Common" -DisableNameChecking
+    Import-Module "$boxstarterPath\$ModuleName" -DisableNameChecking -Force -ErrorAction SilentlyContinue
     write-host "Boxstarter is now ready. You can type 'Boxstarter' from any command line at any path."
     $successMsg = @"
 The $ModuleName Module has been copied to $boxstarterPath and added to your Module path. 
@@ -27,7 +27,7 @@ To list all available Boxstarter Commands, use:
 PS:>Import-Module $ModuleName
 PS:>Get-Command -Module Boxstarter.*
 
-To find more info visit http://Boxstarter.Codeplex.com or use:
+To find more info visit http://Boxstarter.org or use:
 PS:>Import-Module $ModuleName
 PS:>Get-Help Boxstarter
 "@
