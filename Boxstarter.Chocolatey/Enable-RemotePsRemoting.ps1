@@ -81,7 +81,10 @@ param(
     for($count = 1; $count -le 10; $count++) {
         $wmiResult = Invoke-Command $computername {
             Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
-        if($wmiResult -ne $Null){break}
+        if($wmiResult -ne $Null){
+            Write-BoxstarterMessage "PowerShell Remoting enabled successfully"
+            break
+        }
         $global:Error.RemoveAt(0)
     }
 }
