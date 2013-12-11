@@ -86,86 +86,88 @@ http://boxstarter.codeplex.com
     }
 
     Process {
+        $VMName | % { 
 
-        $vm=Get-VM $_ -ErrorAction SilentlyContinue
-        if($vm -eq $null){
-            throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
-        }
-
-        if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
-            $point = Get-VMSnapshot -VMName $_ -Name $CheckpointName -ErrorAction SilentlyContinue
-            $origState=$vm.State
-            if($point -ne $null) {
-                Restore-VMSnapshot -VMName $_ -Name $CheckpointName -Confirm:$false
-                Write-BoxstarterMessage "$checkpointName restored on $_ waiting to complete..."
-                if($origState -eq "Running"){Wait-HeartBeat $_}
-                $restored=$true
+            $vm=Get-VM $_ -ErrorAction SilentlyContinue
+            if($vm -eq $null){
+                throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
             }
-        }
 
-        if($vm.State -eq "saved"){
-            Remove-VMSavedState $_
-        }
-
-        if($vm.State -ne "running"){
-            Start-VM $_
-            Wait-HeartBeat $_
-        }
-
-        do {
-            Start-Sleep -milliseconds 100
-            $ComputerName=Get-VMGuestComputerName $_
-        } 
-        until ($ComputerName -ne $null)
-        $clientRemoting = Enable-BoxstarterClientRemoting $ComputerName
-        Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
-        $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
-        
-        $params=@{}
-        if(!$remotingTest) {
-            write-BoxstarterMessage "Testing WSMAN..."
-            $WSManResponse = Test-WSMan $ComputerName -ErrorAction SilentlyContinue
-            if($WSManResponse) { 
-                Write-BoxstarterMessage "WSMAN responded. Will not enable WMI." -verbose
-                $params["IgnoreWMI"]=$true
-            }
-            else {
-                write-BoxstarterMessage "Testing WMI..."
-                $wmiTest=try { Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue } catch {$ex=$_}
-                if($wmiTest -or ($ex -ne $null -and $ex.CategoryInfo.Reason -eq "UnauthorizedAccessException")) { 
-                    Write-BoxstarterMessage "WMI responded. Will not enable WMI." -verbose
-                    $params["IgnoreWMI"]=$true
+            if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
+                $point = Get-VMSnapshot -VMName $_ -Name $CheckpointName -ErrorAction SilentlyContinue
+                $origState=$vm.State
+                if($point -ne $null) {
+                    Restore-VMSnapshot -VMName $_ -Name $CheckpointName -Confirm:$false
+                    Write-BoxstarterMessage "$checkpointName restored on $_ waiting to complete..."
+                    if($origState -eq "Running"){Wait-HeartBeat $_}
+                    $restored=$true
                 }
             }
-            $credParts = $Credential.UserName.Split("\\")
-            if(($credParts.Count -eq 1 -and $credParts[0] -eq "administrator") -or `
-              ($credParts.Count -eq 2 -and $credParts[0] -eq $ComputerName -and $credParts[1] -eq "administrator") -or`
-              ($credParts.Count -eq 2 -and $credParts[0] -ne $ComputerName)){
-                $params["IgnoreLocalAccountTokenFilterPolicy"]=$true
-            }
-            if($credParts.Count -eq 2 -and $credParts[0] -eq $ComputerName -and $credParts[1] -eq "administrator"){
-                $params["IgnoreLocalAccountTokenFilterPolicy"]=$true
+
+            if($vm.State -eq "saved"){
+                Remove-VMSavedState $_
             }
 
-        }
+            if($vm.State -ne "running"){
+                Start-VM $_
+                Wait-HeartBeat $_
+            }
 
-        if(!$remotingTest -and ($params.Count -lt 2)) { 
-            Write-BoxstarterMessage "Stopping $_"
-            Stop-VM $_ -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
-            $vhd=Get-VMHardDiskDrive -VMName $_
-            $computerName = Enable-BoxstarterVHD $vhd.Path @params
-            Start-VM $_
-            Write-BoxstarterMessage "Started $_. Waiting for Heartbeat..."
-            Wait-HeartBeat $_
-        }
+            do {
+                Start-Sleep -milliseconds 100
+                $ComputerName=Get-VMGuestComputerName $_
+            } 
+            until ($ComputerName -ne $null)
+            $clientRemoting = Enable-BoxstarterClientRemoting $ComputerName
+            Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
+            $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
+        
+            $params=@{}
+            if(!$remotingTest) {
+                write-BoxstarterMessage "Testing WSMAN..."
+                $WSManResponse = Test-WSMan $ComputerName -ErrorAction SilentlyContinue
+                if($WSManResponse) { 
+                    Write-BoxstarterMessage "WSMAN responded. Will not enable WMI." -verbose
+                    $params["IgnoreWMI"]=$true
+                }
+                else {
+                    write-BoxstarterMessage "Testing WMI..."
+                    $wmiTest=try { Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue } catch {$ex=$_}
+                    if($wmiTest -or ($ex -ne $null -and $ex.CategoryInfo.Reason -eq "UnauthorizedAccessException")) { 
+                        Write-BoxstarterMessage "WMI responded. Will not enable WMI." -verbose
+                        $params["IgnoreWMI"]=$true
+                    }
+                }
+                $credParts = $Credential.UserName.Split("\\")
+                if(($credParts.Count -eq 1 -and $credParts[0] -eq "administrator") -or `
+                  ($credParts.Count -eq 2 -and $credParts[0] -eq $ComputerName -and $credParts[1] -eq "administrator") -or`
+                  ($credParts.Count -eq 2 -and $credParts[0] -ne $ComputerName)){
+                    $params["IgnoreLocalAccountTokenFilterPolicy"]=$true
+                }
+                if($credParts.Count -eq 2 -and $credParts[0] -eq $ComputerName -and $credParts[1] -eq "administrator"){
+                    $params["IgnoreLocalAccountTokenFilterPolicy"]=$true
+                }
 
-        if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
-            Write-BoxstarterMessage "Creating Checkpoint $vmCheckpoint"
-            Checkpoint-VM -Name $_ -SnapshotName $CheckpointName
-        }
+            }
 
-        $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $computerName,$Credential
-        return $res
+            if(!$remotingTest -and ($params.Count -lt 2)) { 
+                Write-BoxstarterMessage "Stopping $_"
+                Stop-VM $_ -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+                $vhd=Get-VMHardDiskDrive -VMName $_
+                $computerName = Enable-BoxstarterVHD $vhd.Path @params
+                Start-VM $_
+                Write-BoxstarterMessage "Started $_. Waiting for Heartbeat..."
+                Wait-HeartBeat $_
+            }
+
+            if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
+                Write-BoxstarterMessage "Creating Checkpoint $vmCheckpoint"
+                Checkpoint-VM -Name $_ -SnapshotName $CheckpointName
+            }
+
+            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $computerName,$Credential
+            return $res
+        }
     }
 
     End {

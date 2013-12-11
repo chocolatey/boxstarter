@@ -35,7 +35,7 @@ Describe "Enable-BoxstarterVM" {
         Mock Get-VM
 
         try {
-            Enable-BoxstarterVM Me -Credential $mycreds | Out-Null
+            Enable-BoxstarterVM -VMName Me -Credential $mycreds | Out-Null
         }
         catch{
             $err = $_
