@@ -65,60 +65,64 @@ http://boxstarter.codeplex.com
     [CmdletBinding()]
     [OutputType([BoxstarterConnectionConfig])]
     param(
-        [parameter(Mandatory=$true, Position=0)]
-        [string]$VMName,
+        [parameter(Mandatory=$true, ValueFromPipeline=$True, Position=0)]
+        [string[]]$VMName,
         [parameter(Mandatory=$true, Position=1)]
         [Management.Automation.PsCredential]$Credential,
         [string]$CheckpointName
     )
-    ##Cannot run remotely unelevated. Look into self elevating
-    if(!(Test-Admin)) {
-        Write-Error "You must be running as an administrator. Please open a Powershell console as Administrator and rerun Install-BoxstarperPackage."
-        return
-    }
+    Begin {
+        ##Cannot run remotely unelevated. Look into self elevating
+        if(!(Test-Admin)) {
+            Write-Error "You must be running as an administrator. Please open a Powershell console as Administrator and rerun Install-BoxstarperPackage."
+            return
+        }
 
-    $CurrentVerbosity=$global:VerbosePreference
-    try {
+        $CurrentVerbosity=$global:VerbosePreference
 
         if($PSBoundParameters["Verbose"] -eq $true) {
             $global:VerbosePreference="Continue"
         }
+    }
 
-        $vm=Get-VM $vmName -ErrorAction SilentlyContinue
+    Process {
+
+        $vm=Get-VM $_ -ErrorAction SilentlyContinue
         if($vm -eq $null){
-            throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $vmName"
+            throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
         }
 
         if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
-            $point = Get-VMSnapshot -VMName $vmName -Name $CheckpointName -ErrorAction SilentlyContinue
+            $point = Get-VMSnapshot -VMName $_ -Name $CheckpointName -ErrorAction SilentlyContinue
             $origState=$vm.State
             if($point -ne $null) {
-                Restore-VMSnapshot -VMName $vmName -Name $CheckpointName -Confirm:$false
-                Write-BoxstarterMessage "$checkpointName restored on $vmName waiting to complete..."
-                if($origState -eq "Running"){Wait-HeartBeat $VMName}
+                Restore-VMSnapshot -VMName $_ -Name $CheckpointName -Confirm:$false
+                Write-BoxstarterMessage "$checkpointName restored on $_ waiting to complete..."
+                if($origState -eq "Running"){Wait-HeartBeat $_}
                 $restored=$true
             }
         }
 
         if($vm.State -eq "saved"){
-            Remove-VMSavedState $vmName
+            Remove-VMSavedState $_
         }
 
-        if($vm.State -eq "running"){
-            $ComputerName=Get-VMGuestComputerName $VMName
-            $clientRemoting = Enable-BoxstarterClientRemoting $ComputerName
-            Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
-            $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
+        if($vm.State -ne "running"){
+            Start-VM $_
+            Wait-HeartBeat $_
         }
-        else {
-            if($vm.Notes -match "--Boxstarter Remoting Enabled Box:(.*)--"){
-                $remotingTest=$true
-                $ComputerName=$matches[1]
-            }
-        }
+
+        do {
+            Start-Sleep -milliseconds 100
+            $ComputerName=Get-VMGuestComputerName $_
+        } 
+        until ($ComputerName -ne $null)
+        $clientRemoting = Enable-BoxstarterClientRemoting $ComputerName
+        Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
+        $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
         
         $params=@{}
-        if(!$remotingTest -and $vm.State -eq "Running") {
+        if(!$remotingTest) {
             write-BoxstarterMessage "Testing WSMAN..."
             $WSManResponse = Test-WSMan $ComputerName -ErrorAction SilentlyContinue
             if($WSManResponse) { 
@@ -146,29 +150,25 @@ http://boxstarter.codeplex.com
         }
 
         if(!$remotingTest -and ($params.Count -lt 2)) { 
-            if($vm.State -ne "Stopped") {
-                Write-BoxstarterMessage "Stopping $VMName"
-                Stop-VM $VmName -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
-            }
-            $vhd=Get-VMHardDiskDrive -VMName $vmName
+            Write-BoxstarterMessage "Stopping $_"
+            Stop-VM $_ -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+            $vhd=Get-VMHardDiskDrive -VMName $_
             $computerName = Enable-BoxstarterVHD $vhd.Path @params
-        }
-
-        if($vm.State -ne "Running" ) {
-            Start-VM $VmName
-            Write-BoxstarterMessage "Started $VMName. Waiting for Heartbeat..."
-            Wait-HeartBeat $VMName
+            Start-VM $_
+            Write-BoxstarterMessage "Started $_. Waiting for Heartbeat..."
+            Wait-HeartBeat $_
         }
 
         if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
             Write-BoxstarterMessage "Creating Checkpoint $vmCheckpoint"
-            Checkpoint-VM -Name $vmName -SnapshotName $CheckpointName
+            Checkpoint-VM -Name $_ -SnapshotName $CheckpointName
         }
-        Add-VMNotes $vm $ComputerName
+
         $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $computerName,$Credential
         return $res
     }
-    finally{
+
+    End {
         $global:VerbosePreference=$CurrentVerbosity
     }
 }
@@ -182,12 +182,6 @@ function Get-VMGuestComputerName($vmName) {
             $GuestExchangeItemXml.SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Data']/VALUE/child::text()").Value 
         }    
     }    
-}
-
-function Add-VMNotes ($VM, $ComputerName) {
-    $notes = $VM.Notes
-    if ($Notes -match "Boxstarter Remoting Enabled") { return }
-    Set-VM -Name $VM.Name -Notes ($notes += "--Boxstarter Remoting Enabled Box:$ComputerName--")
 }
 
 function Wait-HeartBeat($vmName) {

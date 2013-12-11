@@ -206,7 +206,7 @@ Describe "Enable-BoxstarterVM" {
         }
     }
 
-    Context "When remoting is enabled and Notes have not been written"{
+    Context "When remoting is enabled"{
         Mock Get-VM { return @{State="Running";Name="me"} }
         Mock Enable-BoxstarterClientRemoting {return $True}
         Mock Invoke-Command { return new-Object -TypeName PSObject }
@@ -220,58 +220,8 @@ Describe "Enable-BoxstarterVM" {
         It "Should not Stop VM"{
             Assert-MockCalled Stop-VM -times 0
         }
-        It "should note that Boxstarter is enabled" {
-            Assert-MockCalled set-VM -parameterFilter { $Notes -match "Boxstarter Remoting Enabled" }
-        }
         It "should return VM ComputerName" {
             $result.ComputerName | should be "SomeComputer"
-        }
-        It "should return Credential" {
-            $result.Credential | should be $mycreds
-        }
-    }
-
-    Context "When remoting is enabled and Notes have not been written"{
-        Mock Get-VM { return @{State="Running";Name="me";Notes="--Boxstarter Remoting Enabled--"} }
-        Mock Enable-BoxstarterClientRemoting {return $True}
-        Mock Invoke-Command { return new-Object -TypeName PSObject }
-        Mock Get-VMGuestComputerName { "SomeComputer" }
-        
-        $result = Enable-BoxstarterVM Me -Credential $mycreds
-
-        It "Should not Edit VHD"{
-            Assert-MockCalled Enable-BoxstarterVHD -times 0
-        }
-        It "Should not Stop VM"{
-            Assert-MockCalled Stop-VM -times 0
-        }
-        It "should not note that Boxstarter is enabled" {
-            Assert-MockCalled set-VM -times 0
-        }
-        It "should return VM ComputerName" {
-            $result.ComputerName | should be "SomeComputer"
-        }
-        It "should return Credential" {
-            $result.Credential | should be $mycreds
-        }
-    }
-
-    Context "When VM is Stopped AND NOTED enabled"{
-        Mock Get-VM { return @{State="stopped";Name="me";Notes="--Boxstarter Remoting Enabled Box:Box1--"} }
-        
-        $result = Enable-BoxstarterVM Me -Credential $mycreds
-
-        It "Should not Edit VHD"{
-            Assert-MockCalled Enable-BoxstarterVHD -times 0
-        }
-        It "Should Start VM"{
-            Assert-MockCalled Start-VM
-        }
-        It "should not note that Boxstarter is enabled" {
-            Assert-MockCalled set-VM -times 0
-        }
-        It "should return VM ComputerName" {
-            $result.ComputerName | should be "Box1"
         }
         It "should return Credential" {
             $result.Credential | should be $mycreds

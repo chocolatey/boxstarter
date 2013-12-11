@@ -66,7 +66,11 @@ http://boxstarter.codeplex.com
         $after = (Get-Volume).DriveLetter
         $winVolume = compare $before $after -Passthru
         try{
-            Get-PSDrive | Out-Null
+            do {
+                Start-Sleep -milliseconds 100
+                $drives = Get-PSDrive
+            }
+            until (Test-Inclusion $drives $winVolume)
             $winVolume = $winVolume | ? {Test-Path "$($_):\windows\System32\config"}
             if($winVolume -eq $null){
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD does not contain system volume"
@@ -83,8 +87,7 @@ http://boxstarter.codeplex.com
             $computerName = (Get-ItemProperty "HKLM:\VHDSYS\ControlSet00$current\Control\ComputerName\ComputerName" -Name ComputerName).ComputerName
 
             if(!$IgnoreWMI){
-                Enable-FireWallRule WMI-RPCSS-In-TCP
-                Enable-FireWallRule WMI-WINMGMT-In-TCP
+                (Get-Item (Get-FireWallKey)).Property | ? { $_-like 'wmi-*' } | % { Enable-FireWallRule $_}
                 Write-BoxstarterMessage "Enabled WMI Firewall Rules."
             }
 
@@ -130,4 +133,9 @@ function Get-FireWallKey{
 function Get-CurrentControlSet {
     return (Get-ItemProperty "HKLM:\VHDSYS\Select" -Name Current).Current
 
+}
+
+function Test-Inclusion($superset, $subset) {
+    $subset | ? {$superset -notcontains $_} | % { return $false}
+    return $true
 }
