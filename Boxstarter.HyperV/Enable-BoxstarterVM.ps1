@@ -78,6 +78,11 @@ http://boxstarter.codeplex.com
             return
         }
 
+        if(!(Get-Module -ListAvailable | ? {$_.Name -eq "Hyper-V"})){
+            Write-Error "Boxstarter could not find the Hyper-V Powershell Module installed. This is required for use with Boxstarter.HyperV. Run Install-windowsfeature -name hyper-v -IncludeManagementTools."
+            return
+        }
+
         $CurrentVerbosity=$global:VerbosePreference
 
         if($PSBoundParameters["Verbose"] -eq $true) {
