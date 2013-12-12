@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>boxstarter.bootstrapper</id>
+    <id>Boxstarter.Bootstrapper</id>
     <version>$version$</version>
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
-    <title>BoxStarter Bootstrapper Module</title>
+    <title>Boxstarter Bootstrapper Module</title>
     <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=boxstarter&amp;DownloadId=635599&amp;Build=20006</iconUrl>
-    <projectUrl>http://BoxStarter.org</projectUrl>
+    <projectUrl>http://Boxstarter.org</projectUrl>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <description>Boxstarter's Bootstrapper module provides a powershell wrapper that supports reboots and automatic logons and exposes commands that can detect pending reboots, perform logging and messaging, and several commands that can configure various windows settings.</description>
-    <tags>boxstarter bootstrapper environment setup</tags>
+    <tags>Boxstarter bootstrapper environment setup</tags>
     <dependencies>
       <dependency id="Boxstarter.Common" version="$version$" />
       <dependency id="Boxstarter.WinConfig" version="$version$" />      
