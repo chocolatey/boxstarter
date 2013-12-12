@@ -130,6 +130,16 @@ Completed    : True
 FinishTime   : 11/30/2013 1:56:58 AM
 StartTime    : 11/30/2013 1:56:36 AM
 </pre>
+
+<h3>Using BoxstarterConnectionConfig objects</h3>
+<p>If you have multiple machines you want to install but they require different credentials, use a BoxstarterConnectionConfig. This class contains a ComputerName and a PSCredential property that you can set and pipe to <code>Install-BoxstarterPackage</code>.</p>
+<pre>
+$cred1=Get-Credential=MyTargetMachine\myusername
+$cred2=Get-Credential=Domain\myDomainUser
+$result = (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList machine1,$cred1),`
+    (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList machine2,$cred2) | 
+    Install-BoxstarterPackage -PackagNamee MyPackage
+</pre>
 <h3>Troubleshooting Remote Installations</h3>
 <h4>Establishing remote connections with servers not on the local subnet</h4>
 <p>By default,  server versions of Windows have a firewall rule restricting traffic that is not on the local subnet. There may be circumstances where you might want to connect over the public internet to another machine. This can be done by manually enabling the "WINRM-HTTP-In-TCP-PUBLIC" firewall rule using the Powershell 3.0 <code>Set-NetFirewallRule</code> or the commanndline <code>netsh advfirewall</code> command.</p>

@@ -27,8 +27,8 @@ Enable-BoxstarterVM -VMName myVM -Credential $cred
 <p>This object can be piped to Boxstarter's Install-BoxstarterPackage command.</p>
 <pre>
 $cred=Get-Credential domain\username
-(Enable-BoxstarterVM -VMName myVM1 -Credential $cred),`
-    (Enable-BoxstarterVM -VMName myVM2 -Credential $cred) | 
+"myVM1","myVM2" |
+  Enable-BoxstarterVM -Credential $cred | 
     Install-BoxstarterPackage -PackageName myPackage
 </pre>
 <p>This installs myPackage on myVM1 and myVM2 after ensuring that both are propperly configured for a remote install.</p>
@@ -42,6 +42,29 @@ Enable-BoxstarterVM -VMName myVM1 -Credential $cred -CheckPointName BareOS |
     Install-BoxstarterPackage -PackageName myPackage
 </pre>
 <p>This resets the VM to its BareOS state before Installing the myPackage package.</p>
+<h3>What about creating New VMs with Boxstarter?</h3>
+<p>I considered adding a New-BoxstarterVM command but the fact is that Microsoft's own Hyper-V PowerShell module does a fine job of making this easy. This is typically a task that is not done nearly as feequently as tearing down and reseting an existing VM so it did not seem like a feature much worth the effort. To demonstrate how you would setup a New Hyper-V VM. You could use a script like this:</p>
+<pre>
+New-VMSwitch -NetAdapterInterfaceDescription "Intel(R) Centrino(R) Advanced-N 6205" -Name MySwitch
+New-VM -Name "myVM" -MemoryStartupBytes 1GB -SwitchName MySwitch -VHDPath "C:\Users\Matt\Downloads\Windows Server 2008 R2 Enterprise Evaluation (Full Edition).vhd"
+Start-VM "myVM"
+</pre>
+<p>Thats pretty simple. This creates a virtual switch that binds to our network adapter. Your adapter might be named differently. Run <code>Get-NetAdapter</code> to get a list of your adapters. Then create the VM and attach it to a VHD and the switch you just created. Now you have a VM with windows server 2008 R2 connected to the internet. There are a ton of other useful commands. Run <code>get-command -Module Hyper-V</code> to see them all. They are all well documented. For example, to view the documentation on the <code>Add-VMDvdDrive</code> command, run:</p>
+<pre>
+Get-Help Add-VMDvdDrive -Full
+</pre>
+If for some reason you cannot find the Hyper-V module on your machine (its supported with windows PowerShell 4), you may need to enable the feature:
+<pre>
+Install-windowsfeature -name hyper-v -IncludeManagementTools
+</pre>
+<h3>Download a free evaluation edition Windows VHD</h3>
+<p>You dont need a purchased copy of Windows or a fancy shmancy MSDN subscription to test out Boxstarter Installs on a VM. Microsoft provides evaluation copies of many of its OS versions on VHD that can be used for a limited numer of days (usually 90). You can legally reinstall a new copy when the evaluation expires. While this is unfit for a production environment, its a great way to test your boxstarter or chocolatey installs.</p>
+<p>Here are links to free Windows evaluation VHDs:</p>
+<ul>
+    <li><a href="http://technet.microsoft.com/en-US/evalcenter/hh699156.aspx?ocid=wc-tn-wctc">Windows 8.1</a></li>
+    <li><a href="http://www.microsoft.com/en-us/download/details.aspx?id=16572">Windows 2008 R2</a></li>
+    <li><a href="http://technet.microsoft.com/en-us/evalcenter/dn205286.aspx">Windows 2012 R2</a></li>
+</ul>
 
 <h3>Working with remote Hyper-V hosts or other virtualization technologies</h3>
 <p>Boxstarter will very soon provide support for Azure and AWS VMs. However, if you are working with any virtualization technologies that support the VHD file format, you can use the <code>Enable-BoxstarterVHD</code> command to enable WMI, LocalAccountTokenFilterPolicy and retrieve the computer name of the VM running the VHD. The VHD must be accesible and writable to the user issuing the command and it must contain the system volume (the drive with the Windows folder) of the VM.</p>
@@ -50,3 +73,12 @@ Enable-BoxstarterVHD -VHDPath "C:\Virtual hard disks\win81diff_F2AE6535-2532-455
 </pre>
 <p>This will mount The VHD provided in the VHDPath, enable the WMI Firewall ports and enable LocalAccountTokenFilterPolicy in the Windows registry stored in the VHD.</p>
 <p>NOTE: Although The parameter is explicitly referred to as <code>VHDPath</code>, any valid VHD file extension is accepted. The above example uses a differencing disk but is valid since that is the primary hard drive of a guest VM.</p>
+<h3>Troubleshooting Boxstarter VM Installs</h3>
+<h4>General Connectivity</h4>
+<p>Boxstarter makes a best effort attempt to test and configure your VM for remote installation. However, every environment is different and may include slightly tweaked configurations that Boxstarter cannot anticipate. Especially if you are inside a domain environment, there may be various group policies in place that edit various settings and permission levels that will cause a Boxstarter install to fail. Almost all of these scenarios can be corrected for and over time, Boxstarter should improve at compensating for these nuances.</p>
+
+<p>The first thing to do if Boxstarter is unable to reach the vm is to run:</p>
+<pre>Enable-PSRemoting -Force</pre>
+<p>on the vm. This will most often put the machine in a state where it can accept remote sessions from Boxstarter.</p>
+<h4>Have you lost your domain trust relationship?</h4>
+<p>In a domain environment, it is possible that over time a VM may lose its trust relationship with the Domain Controller especially if you revert to a snapshot that has an expired machine password. When this happens things stop to authenticate correctly and often remote communicaion sessions are denied. It is not always obvious that this is the problem. Usually you can tell by examining the Network Adapter on the VM and it states that it is Unauthenticated. The most reliable fix for this is to Unjoin the domain and then rejoin.</p>

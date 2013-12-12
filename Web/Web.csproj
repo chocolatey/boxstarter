@@ -194,6 +194,7 @@
     <Content Include="PublishingPackages.cshtml" />
     <Content Include="UnderstandingPackages.cshtml" />
     <Content Include="UsingBoxstarter.cshtml" />
+    <Content Include="VMIntegration.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

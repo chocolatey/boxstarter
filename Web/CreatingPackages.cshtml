@@ -118,6 +118,7 @@ Install-WindowsUpdate -AcceptEula
 <ul>
     <li>Boxstarter Chocolatey packages should be repeatable. This is especially true if you anticipate the need to reboot. When Boxstarter reboots, it starts running the package from the beginning. So ensure that there is nothing that would cause the package to break if run twice.</li>
     <li>If you have several Chocolatey packages that you want to install during the Boxstarter session, it is preferable to call CINST directly from inside your ChocolateyInstall instead of declaring them as dependencies. This is because Boxstarter cannot intercept Chocolatey dependencies so those packages will not have any reboot protections.</li>
+    <li>Do not use <code>Restart-Computer</code> or any other command that will reboot the computer. Instead use <code>Invoke-Reboot</code>. Ths will allow Boxstarter to get things in order first so that after the machine recovers from the reboot, Boxstarter can log the user back in and restart the install script.</li>
 </ul>
 <h3>Packing your Package .nupkg</h3>
 <p>Once you are finished composing your package contents, you can call the <code>Invoke-BoxstarterBuild MyPackage</code> command to generate the *.nupkg file for MyPackage. Boxstarter saves these files in the root of <code>$Boxstarter.LocalRepo</code>. If you have several packages in the local repository that you want to build all at once, omit the package name from the command to build all packages in the repository.</p>
