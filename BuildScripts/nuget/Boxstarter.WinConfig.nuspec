@@ -16,6 +16,8 @@
       <dependency id="Boxstarter.Common" version="$version$" />
     </dependencies>
     <releaseNotes>
+      - Fix VM Hang when restoring snapshots taken when the VM was shut down.
+      - More Error handling improvements: Remove connection interruption errors from returned error collection. They are still logged.
       - Supports new Boxstarter.HyperV module.
       - Add Commands for configuring remoting and installing packages on a Hyper-V vm with support for restoring and creating checkpoints
       - Add ability to configure a VHD to open it to WMI so that Boxstarter Installs canenable remoting.
