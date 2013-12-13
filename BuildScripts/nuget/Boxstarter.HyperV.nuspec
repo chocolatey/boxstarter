@@ -16,6 +16,7 @@
       <dependency id="Boxstarter.Chocolatey" version="$version$" />
     </dependencies>
     <releaseNotes>
+      - Fix setup.bat in bootstrapper
       - Use WindowsIdentity instead of environment vars for current username and domain since the env vars sometimes get overwritten with the SYSTEM user.
       - Fix VM Hang when restoring snapshots taken when the VM was shut down.
       - More Error handling improvements: Remove connection interruption errors from returned error collection. They are still logged.
