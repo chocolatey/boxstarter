@@ -388,7 +388,12 @@ function Start-Record($computerName) {
 function Finish-Record($obj) {
     $obj.FinishTime = Get-Date
     $global:error | %{
-        $obj.Errors += $_
+        if($_.CategoryInfo -ne $null -and $_.CategoryInfo.Category -eq "OperationStopped"){
+            Log-BoxstarterMessage $_
+        }
+        else {
+            $obj.Errors += $_
+        }
     }
     Write-Output $obj
 }
@@ -495,6 +500,7 @@ function Enable-RemotingOnRemote ($ComputerName, $Credential){
         Write-BoxstarterMessage "Powershell Remoting is not enabled or accesible on $ComputerName" -Verbose
         $wmiTest=Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
         if($wmiTest -eq $null){
+            $global:error.RemoveAt(0)
             return $false
         }
         if($Force -or (Confirm-Choice "Powershell Remoting is not enabled on Remote computer. Should Boxstarter enable powershell remoting?")){
@@ -550,7 +556,7 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
             catch{
                 throw
             }
-        } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $sessionArgs.Credential.Password, $DisableReboots
+        } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $sessionArgs.Credential.Password, $DisableReboots -ErrorAction SilentlyContinue
         
         Write-Debug "Result from Remote Boxstarter: $($remoteResult.Result)"
         if($remoteResult -eq $null -or $remoteResult.Result -eq $null -or $remoteResult.Result -eq "Rebooting") {
@@ -650,7 +656,7 @@ function Rollback-ClientRemoting($ClientRemotingStatus, $CredSSPStatus) {
         Set-Item "wsman:\localhost\client\trustedhosts" -Value "$($ClientRemotingStatus.PreviousTrustedHosts)" -Force
     }
     if($CredSSPStatus -ne $null -and $CredSSPStatus.Success){
-        Disable-WSManCredSSP -Role Client
+        try {Disable-WSManCredSSP -Role Client -ErrorAction SilentlyContinue } catch{ Write-BoxstarterMessage "Unable to disable CredSSP locally" }
         if($CredSSPStatus.PreviousCSSPTrustedHosts -ne $null){
             try{
                 Write-BoxstarterMessage "Reseting CredSSP Trusted Hosts to $($CredSSPStatus.PreviousCSSPTrustedHosts.Replace('wsman/',''))" -Verbose
