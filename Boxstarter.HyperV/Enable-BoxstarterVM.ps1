@@ -104,7 +104,6 @@ http://boxstarter.codeplex.com
                 if($point -ne $null) {
                     Restore-VMSnapshot -VMName $_ -Name $CheckpointName -Confirm:$false
                     Write-BoxstarterMessage "$checkpointName restored on $_ waiting to complete..."
-                    if($origState -eq "Running"){Wait-HeartBeat $_}
                     $restored=$true
                 }
             }
