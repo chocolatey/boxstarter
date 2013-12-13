@@ -97,12 +97,12 @@ Invoke-Reboot
         else {
             $boxstarter.NoPassword=$True
         }
-        $Boxstarter.BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
         $credPassword = $BoxstarterPassword
         if($credPassword -eq $null) {$credPassword=(New-Object System.Security.SecureString)}
-        if(Get-IsRemote){ Create-BoxstarterTask (New-Object Management.Automation.PsCredential ($Boxstarter.BoxstarterUser,$credPassword)) }
+        $currentUser=Get-CurrentUser
+        if(Get-IsRemote){ Create-BoxstarterTask (New-Object Management.Automation.PsCredential ("$($currentUser.Domain)\$($currentUser.Name)",$credPassword)) }
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
         return $true
     }
@@ -129,14 +129,15 @@ function Read-AuthenticatedPassword {
     while(--$attemptsLeft -ge 0 -and !$val) {
         try{
             $Password=Read-Host -AsSecureString "Autologon Password"
-            $creds = New-Object System.Management.Automation.PsCredential("$env:UserDomain\$env:username", $password)
+            $currentUser=Get-CurrentUser
+            $creds = New-Object System.Management.Automation.PsCredential("$($currentUser.Domain)\$($currentUser.Name)", $password)
             Start-Process "Cmd.exe" -argumentlist "/c","echo" -Credential $creds
             write-BoxstarterMessage "Succesfully authenticated password."
             return $password
         }
         catch { }
     }
-    write-BoxstarterMessage "Unable to authenticate password for $env:UserDomain\$env:username. Proceeding with autologon disabled"
+    write-BoxstarterMessage "Unable to authenticate password for $($currentUser.Domain)\$($currentUser.Name). Proceeding with autologon disabled"
     return $null
 }
 

@@ -44,6 +44,7 @@
     <Compile Include="Write-BoxstarterMessage.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Get-CurrentUser.ps1" />
     <Content Include="Write-BoxstarterLogo.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

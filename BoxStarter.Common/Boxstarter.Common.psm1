@@ -13,7 +13,8 @@ Export-ModuleMember     Write-BoxstarterMessage,
                         Confirm-Choice,
                         Create-BoxstarterTask,
                         Remove-BoxstarterTask,
-                        Write-BoxstarterLogo
+                        Write-BoxstarterLogo,
+                        Get-CurrentUser
                         
 Export-ModuleMember -Variable Boxstarter
 

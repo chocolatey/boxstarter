@@ -38,8 +38,9 @@ function Cleanup-Boxstarter {
     }
 
     if(!(Get-IsRemote) -and $BoxstarterPassword.Length -gt 0) {
-        Write-BoxstarterMessage "Securely Storing $($env:userdomain)\$($Boxstarter.BoxstarterUser) credentials for automatic logon"
-        Set-SecureAutoLogon $Boxstarter.BoxstarterUser $BoxstarterPassword $env:userdomain
+        $currentUser=Get-CurrentUser
+        Write-BoxstarterMessage "Securely Storing $($currentUser.Domain)\$($currentUser.Name) credentials for automatic logon"
+        Set-SecureAutoLogon $currentUser.Name $BoxstarterPassword $currentUser.Domain
         Write-BoxstarterMessage "Logon Set"
     }
 }
