@@ -6,11 +6,11 @@
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
     <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=boxstarter&amp;DownloadId=635599&amp;Build=20006</iconUrl>
-    <title>BoxStarter</title>
-    <projectUrl>http://BoxStarter.org</projectUrl>
+    <title>Boxstarter</title>
+    <projectUrl>http://Boxstarter.org</projectUrl>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <description>Repeatable, reboot resilient windows environment installations made easy using Chocolatey packages. When its time to repave either bare metal or virtualized instances, locally or on a remote machine, Boxstarter can automate both trivial and highly complex installations. Compatible with all Windows versions from Windows 7/2008 R2 forward.</description>
-    <tags>boxstarter chocolatey environment setup</tags>
+    <tags>Boxstarter chocolatey environment setup</tags>
     <dependencies>
       <dependency id="Boxstarter.Common" version="$version$" />
       <dependency id="Boxstarter.WinConfig" version="$version$" />
