@@ -121,7 +121,7 @@ Task Package-DownloadZip -depends Clean-Artifacts {
 
     exec { ."$env:chocolateyInstall\bin\7za.bat" a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\license.txt" }
     exec { ."$env:chocolateyInstall\bin\7za.bat" a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\buildscripts\bootstrapper.ps1" }
-    exec { ."$env:chocolateyInstall\bin\7za.bat" a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\Setup.bat" }
+    exec { ."$env:chocolateyInstall\bin\7za.bat" a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\buildscripts\Setup.bat" }
 }
 
 Task Deploy-DownloadZip -depends Package-DownloadZip {

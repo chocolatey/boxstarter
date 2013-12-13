@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildScripts", "BuildScript
 		BuildScripts\chocolateyinstall.ps1 = BuildScripts\chocolateyinstall.ps1
 		BuildScripts\default.ps1 = BuildScripts\default.ps1
 		BuildScripts\Microsoft.WebApplication.targets = BuildScripts\Microsoft.WebApplication.targets
+		BuildScripts\setup.bat = BuildScripts\setup.bat
 		BuildScripts\setup.ps1 = BuildScripts\setup.ps1
 	EndProjectSection
 EndProject
@@ -30,7 +31,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		boxstarter.config = boxstarter.config
 		build.bat = build.bat
 		LICENSE.txt = LICENSE.txt
-		setup.bat = setup.bat
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{87B9154F-EDBF-47CE-AAF2-7ECF4B6C9A93}"
