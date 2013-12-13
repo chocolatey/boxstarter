@@ -103,9 +103,9 @@ function start-Task{
     $tasks=@()
     $tasks+=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
     Write-Debug "Found $($tasks.Length) tasks already running"
-    schtasks /RUN /I /TN 'Boxstarter Task' | Out-Null
+    $taskResult = schtasks /RUN /I /TN 'Boxstarter Task'
     if($LastExitCode -gt 0){
-        throw "Unable to run scheduled task"
+        throw "Unable to run scheduled task. Message from task was $taskResult"
     }
     write-debug "Launched task. Waiting for task to launch comand..."
     do{
