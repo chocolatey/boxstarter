@@ -71,24 +71,21 @@ http://boxstarter.codeplex.com
         mount-vhd $VHDPath
         $after = (Get-Volume).DriveLetter
         $winVolume = compare $before $after -Passthru
+        Write-BoxstarterMessage "Drives added after mount are $($winVolume)" -Verbose
+        $winVolume | % { new-PSDrive -Name $_ -PSProvider FileSystem -Root "$($_):\" -ErrorAction SilentlyContinue}
         try{
-            do {
-                Start-Sleep -milliseconds 100
-                $drives = Get-PSDrive
-            }
-            until (Test-Inclusion $drives $winVolume)
-            $winVolume = $winVolume | ? {Test-Path "$($_):\windows\System32\config"}
-            if($winVolume -eq $null){
+            $sysVolume = $winVolume | ? {Test-Path "$($_):\windows\System32\config"}
+            if($sysVolume -eq $null){
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD does not contain system volume"
             }    
-            Write-BoxstarterMessage "Mounted $VHDPath with system volume to Drive $($winVolume)"
+            Write-BoxstarterMessage "Mounted $VHDPath with system volume to Drive $($sysVolume)"
             if(!$IgnoreLocalAccountTokenFilterPolicy) {
-                reg load HKLM\VHDSOFTWARE "$($winVolume):\windows\system32\config\software" | out-null
+                reg load HKLM\VHDSOFTWARE "$($sysVolume):\windows\system32\config\software" | out-null
                 $policyResult = reg add HKLM\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1 /f
                 Write-BoxstarterMessage "Enabled LocalAccountTokenFilterPolicy with result: $policyResult"
             }
 
-            reg load HKLM\VHDSYS "$($winVolume):\windows\system32\config\system" | out-null
+            reg load HKLM\VHDSYS "$($sysVolume):\windows\system32\config\system" | out-null
             $current=Get-CurrentControlSet
             $computerName = (Get-ItemProperty "HKLM:\VHDSYS\ControlSet00$current\Control\ComputerName\ComputerName" -Name ComputerName).ComputerName
 
@@ -139,9 +136,4 @@ function Get-FireWallKey{
 function Get-CurrentControlSet {
     return (Get-ItemProperty "HKLM:\VHDSYS\Select" -Name Current).Current
 
-}
-
-function Test-Inclusion($superset, $subset) {
-    $subset | ? {$superset -notcontains $_} | % { return $false}
-    return $true
 }
