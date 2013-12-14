@@ -12,6 +12,10 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
     <releaseNotes>
+      - Fix the hiding of error messages during chocolatey scripts
+      - fix bitlocker suspension of machines that protect non OS drives
+      - Fix VHD mounting on some machines that do not automatically create a PSDrive for the newly mounted disk.
+      - Do not disable CredSSP on remote machines while authenticated using CredSSP
       - Fix setup.bat in bootstrapper
       - Use WindowsIdentity instead of environment vars for current username and domain since the env vars sometimes get overwritten with the SYSTEM user.
       - Fix VM Hang when restoring snapshots taken when the VM was shut down.
