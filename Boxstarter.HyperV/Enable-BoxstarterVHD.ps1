@@ -58,7 +58,6 @@ http://boxstarter.codeplex.com
             $global:VerbosePreference="Continue"
         }
 
-
         if(!(Get-Module -ListAvailable | ? {$_.Name -eq "Hyper-V"})){
             Write-Error "Boxstarter could not find the Hyper-V Powershell Module installed. This is required for use with Boxstarter.HyperV. Run Install-windowsfeature -name hyper-v -IncludeManagementTools."
             return
@@ -72,7 +71,7 @@ http://boxstarter.codeplex.com
         $after = (Get-Volume).DriveLetter
         $winVolume = compare $before $after -Passthru
         Write-BoxstarterMessage "Drives added after mount are $($winVolume)" -Verbose
-        $winVolume | % { new-PSDrive -Name $_ -PSProvider FileSystem -Root "$($_):\" -ErrorAction SilentlyContinue}
+        $winVolume | % { new-PSDrive -Name $_ -PSProvider FileSystem -Root "$($_):\" -ErrorAction SilentlyContinue | out-null}
         try{
             $sysVolume = $winVolume | ? {Test-Path "$($_):\windows\System32\config"}
             if($sysVolume -eq $null){

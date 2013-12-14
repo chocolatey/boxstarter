@@ -113,7 +113,7 @@ http://boxstarter.codeplex.com
             }
 
             if($vm.State -ne "running"){
-                Start-VM $_
+                Start-VM $_ -ErrorAction SilentlyContinue
                 Wait-HeartBeat $_
             }
 
@@ -158,7 +158,7 @@ http://boxstarter.codeplex.com
                 Write-BoxstarterMessage "Stopping $_"
                 Stop-VM $_ -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
                 $vhd=Get-VMHardDiskDrive -VMName $_
-                $computerName = Enable-BoxstarterVHD $vhd.Path @params
+                Enable-BoxstarterVHD $vhd.Path @params | Out-Null
                 Start-VM $_
                 Write-BoxstarterMessage "Started $_. Waiting for Heartbeat..."
                 Wait-HeartBeat $_
