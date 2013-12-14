@@ -553,7 +553,7 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
             catch{
                 throw
             }
-        } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $sessionArgs.Credential.Password, $DisableReboots -ErrorAction SilentlyContinue
+        } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $sessionArgs.Credential.Password, $DisableReboots
         
         Write-Debug "Result from Remote Boxstarter: $($remoteResult.Result)"
         if($remoteResult -eq $null -or $remoteResult.Result -eq $null -or $remoteResult.Result -eq "Rebooting") {
