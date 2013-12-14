@@ -35,7 +35,7 @@ Describe "Invoke-Reboot" {
     Context "When reboots are not suppressed" {
         $Boxstarter.RebootOk=$true
         $Boxstarter.IsRebooting=$false
-        Mock Get-BitlockerVolume {@{ProtectionStatus="On"}}
+        Mock Get-BitlockerVolume {@{ProtectionStatus="On";VolumeType="operatingSystem"}}
 
         Invoke-Reboot
 
