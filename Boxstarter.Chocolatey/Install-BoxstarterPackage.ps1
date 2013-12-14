@@ -443,9 +443,6 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
         if($enableCredSSP){
             Disable-RemoteCredSSP $sessionArgs
         }
-        if($sessionArgs.Authentication){
-            $sessionArgs.Remove("Authentication")
-        }
         if($session -ne $null -and $session.Name -eq "Boxstarter") {
             Remove-PSSession $Session
             $Session = $null
@@ -640,6 +637,9 @@ function Enable-RemoteCredSSP($sessionArgs) {
 
 function Disable-RemoteCredSSP ($sessionArgs){
     Write-BoxstarterMessage "Disabling CredSSP Authentication on $ComputerName" -Verbose
+    if($sessionArgs.Authentication){
+        $sessionArgs.Remove("Authentication")
+    }
     Invoke-Command @sessionArgs { 
         param($Credential)
         Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
