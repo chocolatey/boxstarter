@@ -302,6 +302,7 @@ about_boxstarter_chocolatey
         #and dont need to test, configure and tear down
         if($Session -ne $null){
             $Session | %{
+                Write-BoxstarterMessage "Processing Session..." -Verbose
                 Set-SessionArgs $_ $sessionArgs
                 $record = Start-Record $_.ComputerName
                 try {
@@ -440,6 +441,9 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
         return $true
     }
     finally {
+        if($sessionArgs.Authentication){
+            $sessionArgs.Remove("Authentication")
+        }
         if($enableCredSSP){
             Disable-RemoteCredSSP $sessionArgs
         }
@@ -605,21 +609,43 @@ function Set-SessionArgs($session, $sessionArgs) {
 }
 
 function Should-EnableCredSSP($sessionArgs, $computerName) {
+    Write-BoxstarterMessage "Testing remote CredSSP..." -Verbose
     if($sessionArgs.Credential){
         $uriArgs=@{}
         if($sessionArgs.ConnectionURI){
             $uri = [URI]$sessionArgs.ConnectionURI
             $uriArgs = @{Port=$uri.port;UseSSL=($uri.scheme -eq "https")}
         }
-        try {$credsspEnabled = Test-WsMan -ComputerName $ComputerName @uriArgs -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue } catch {}
+        try {
+            $credsspEnabled = Test-WsMan -ComputerName $ComputerName @uriArgs -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue 
+        } 
+        catch {
+            Write-BoxstarterMessage "Exception from testing WSMan for CredSSP access" -Verbose
+            $xml=[xml]$_
+            if($xml -ne $null) {
+                Write-BoxstarterMessage "WSMan Fault Found" -Verbose
+                Write-BoxstarterMessage "$($xml.OuterXml)" -Verbose
+            }
+            else {
+                Write-BoxstarterMessage $_ -Verbose
+            }
+        }
         if($credsspEnabled -eq $null){
+            Write-BoxstarterMessage "Need to enable credssp on server" -Verbose
             if($global:Error.Count -gt 0){ $global:Error.RemoveAt(0) }
             return $True
         }
-        elseif($credsspEnabled -ne $null){
+        else{
+            Write-BoxstarterMessage "CredSSP test response:" -Verbose
+            [XmlElement]$xml=$credsspEnabled
+            if($xml -ne $null) {
+                Write-BoxstarterMessage "WSMan XML Found..." -Verbose
+                Write-BoxstarterMessage "$($xml.OuterXml)" -Verbose
+            }
             $sessionArgs.Authentication="CredSSP"
         }
     }
+    Write-BoxstarterMessage "Do not need to enable credssp on server" -Verbose
     return $false
 }
 
@@ -637,9 +663,6 @@ function Enable-RemoteCredSSP($sessionArgs) {
 
 function Disable-RemoteCredSSP ($sessionArgs){
     Write-BoxstarterMessage "Disabling CredSSP Authentication on $ComputerName" -Verbose
-    if($sessionArgs.Authentication){
-        $sessionArgs.Remove("Authentication")
-    }
     Invoke-Command @sessionArgs { 
         param($Credential)
         Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking

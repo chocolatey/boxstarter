@@ -64,6 +64,7 @@ about_boxstarter_logging
     $fmtTitle = Format-BoxStarterMessage $message
     if($Verbose){
         Write-Verbose $fmtTitle
+        Log-BoxstarterMessage $fmtTitle
     }
     else {
         #Boxstarter has a Write-host proxy function and it ensures all is logged

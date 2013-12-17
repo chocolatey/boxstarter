@@ -128,6 +128,8 @@ http://boxstarter.codeplex.com
         
             $params=@{}
             if(!$remotingTest) {
+                Log-BoxstarterMessage "PowerShell remoting connection failed:"
+                if($global:Error.Count -gt 0) { Log-BoxstarterMessage $global:Error[0] }
                 write-BoxstarterMessage "Testing WSMAN..."
                 $WSManResponse = Test-WSMan $ComputerName -ErrorAction SilentlyContinue
                 if($WSManResponse) { 
@@ -135,11 +137,17 @@ http://boxstarter.codeplex.com
                     $params["IgnoreWMI"]=$true
                 }
                 else {
+                    Log-BoxstarterMessage "WSMan connection failed:"
+                    if($global:Error.Count -gt 0) { Log-BoxstarterMessage $global:Error[0] }
                     write-BoxstarterMessage "Testing WMI..."
                     $wmiTest=try { Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue } catch {$ex=$_}
                     if($wmiTest -or ($ex -ne $null -and $ex.CategoryInfo.Reason -eq "UnauthorizedAccessException")) { 
                         Write-BoxstarterMessage "WMI responded. Will not enable WMI." -verbose
                         $params["IgnoreWMI"]=$true
+                    }
+                    else {
+                        Log-BoxstarterMessage "WMI connection failed:"
+                        if($global:Error.Count -gt 0) { Log-BoxstarterMessage $global:Error[0] }
                     }
                 }
                 $credParts = $Credential.UserName.Split("\\")
@@ -182,11 +190,13 @@ http://boxstarter.codeplex.com
 function Get-VMGuestComputerName($vmName) {
     $vm = Get-WmiObject -Namespace root\virtualization\v2 -Class Msvm_ComputerSystem -Filter "ElementName='$vmName'"
     $vm.GetRelated("Msvm_KvpExchangeComponent").GuestIntrinsicExchangeItems | % {
-        $GuestExchangeItemXml = ([XML]$_).SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Name']/VALUE[child::text()='FullyQualifiedDomainName']") 
+        if(([XML]$_) -ne $null){
+            $GuestExchangeItemXml = ([XML]$_).SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Name']/VALUE[child::text()='FullyQualifiedDomainName']") 
         
-        if ($GuestExchangeItemXml -ne $null) { 
-            $GuestExchangeItemXml.SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Data']/VALUE/child::text()").Value 
-        }    
+            if ($GuestExchangeItemXml -ne $null) { 
+                $GuestExchangeItemXml.SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Data']/VALUE/child::text()").Value 
+            }
+        }
     }    
 }
 
