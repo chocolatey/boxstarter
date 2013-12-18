@@ -541,7 +541,8 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
 function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
     while($session.Availability -eq "Available") {
         $remoteResult = Invoke-Command -session $session {
-            param($possibleResult,$SuppressLogging,$pkg,$password,$DisableReboots)
+            param($possibleResult,$SuppressLogging,$pkg,$password,$DisableReboots, $verbosity)
+            $global:VerbosePreference=$verbosity
             Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
             $Boxstarter.SuppressLogging=$SuppressLogging
             $result=$null
@@ -557,7 +558,7 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
             catch{
                 throw
             }
-        } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $sessionArgs.Credential.Password, $DisableReboots
+        } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $sessionArgs.Credential.Password, $DisableReboots, $global:VerbosePreference
         
         Write-Debug "Result from Remote Boxstarter: $($remoteResult.Result)"
         if($remoteResult -eq $null -or $remoteResult.Result -eq $null -or $remoteResult.Result -eq "Rebooting") {
