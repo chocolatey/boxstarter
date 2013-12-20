@@ -85,6 +85,6 @@ param(
             Write-BoxstarterMessage "PowerShell Remoting enabled successfully"
             break
         }
-        $global:Error.RemoveAt(0)
+        if($global:Error.Count -gt 0){$global:Error.RemoveAt(0)}
     }
 }
