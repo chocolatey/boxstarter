@@ -9,7 +9,7 @@ Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 | 
     % { . $_.ProviderPath }
-$Boxstarter.SuppressLogging=$true
+$Boxstarter.SuppressLogging=$false
 
 Describe "Install-BoxstarterPackage" {
     $regRoot="HKCU:\SOFTWARE\Pester\temp"

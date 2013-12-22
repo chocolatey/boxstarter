@@ -301,36 +301,13 @@ about_boxstarter_chocolatey
         #If $sessions are being provided we assume remoting is setup on both ends
         #and dont need to test, configure and tear down
         if($Session -ne $null){
-            $Session | %{
-                Write-BoxstarterMessage "Processing Session..." -Verbose
-                Set-SessionArgs $_ $sessionArgs
-                $record = Start-Record $_.ComputerName
-                try {
-                    if(-not (Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs)){
-                        $record.Completed=$false
-                    }
-                }
-                catch {
-                    $record.Completed=$false
-                }
-                finally{
-                    Finish-Record $record
-                }
-            }
+            Process-Sessions $Session $sessionArgs
             return
         }
 
         #We need the computernames to configure remoting
-        if($ConnectionURI){
-            $ConnectionUri | %{
-                $computerName+=$_.Host
-            }
-        }
-
-        if($BoxstarterConnectionConfig){
-            $BoxstarterConnectionConfig | %{
-                $computerName+=$_.ComputerName
-            }
+        if(!$ComputerName){
+            $ComputerName = Get-ComputerNames $ConnectionUri $BoxstarterConnectionConfig
         }
 
         try{
@@ -371,6 +348,43 @@ about_boxstarter_chocolatey
     }
     finally{
         $global:VerbosePreference=$CurrentVerbosity
+    }
+}
+
+function Get-ComputerNames($ConnectionUris, $BoxstarterConnectionConfigs) {
+    $computerNames = @()
+
+    if($ConnectionURIs){
+        $ConnectionUris | %{
+            $computerNames+=$_.Host
+        }
+    }
+
+    if($BoxstarterConnectionConfigs){
+        $BoxstarterConnectionConfigs | %{
+            $computerNames+=$_.ComputerName
+        }
+    }
+
+    return $computerNames
+}
+
+function Process-Sessions($sessions, $sessionArgs){
+    $Sessions | %{
+        Write-BoxstarterMessage "Processing Session..." -Verbose
+        Set-SessionArgs $_ $sessionArgs
+        $record = Start-Record $_.ComputerName
+        try {
+            if(-not (Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs)){
+                $record.Completed=$false
+            }
+        }
+        catch {
+            $record.Completed=$false
+        }
+        finally{
+            Finish-Record $record
+        }
     }
 }
 
@@ -430,7 +444,17 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
             return $false
         }
 
-        Setup-BoxstarterModuleAndLocalRepo $session
+        for($count = 1; $count -le 5; $count++) {
+            try {
+                Write-BoxstarterMessage "Attempt #$count to copy Boxstarter modules to $($session.ComputerName)" -Verbose
+                Setup-BoxstarterModuleAndLocalRepo $session
+                break
+            }
+            catch {
+                if($global:Error.Count -gt 0){$global:Error.RemoveAt(0)}
+                if($count -eq 5) { throw $_ }
+            }
+        }
 
         if($enableCredSSP){
             if($session){ Remove-PSSession $session -ErrorAction SilentlyContinue }
@@ -538,42 +562,143 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
     }
 }
 
+function Invoke-RemoteBoxstarter($Package, $Password, $DisableReboots) {
+    $remoteResult = Invoke-Command -session $session {
+        param($SuppressLogging,$pkg,$password,$DisableReboots, $verbosity)
+        $global:VerbosePreference=$verbosity
+        Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
+        $Boxstarter.SuppressLogging=$SuppressLogging
+        $result=$null
+        try {
+            $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -DisableReboots:$DisableReboots
+            if($Boxstarter.IsRebooting){
+                return @{Result="Rebooting"}
+            }
+            if($result=$true){
+                return @{Result="Completed"}
+            }
+        }
+        catch{
+            throw
+        }
+    } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Password, $DisableReboots, $global:VerbosePreference
+    Write-BoxstarterMessage "Result from Remote Boxstarter: $($remoteResult.Result)" -Verbose
+    return $remoteResult
+}
+
+function Test-RebootingOrDisconnected($RemoteResult) {
+    if($remoteResult -eq $null -or $remoteResult.Result -eq $null -or $remoteResult.Result -eq "Rebooting") {
+        return $true
+    }
+    else {
+        return $false
+    }
+}
+
+function Wait-ForSessionToClose($session) {
+    Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
+    $timeout=0
+    while($session.State -eq "Opened" -and $timeout -lt 120){
+        $timeout += 2
+        start-sleep -seconds 2
+    }
+}
+
+function Test-ShutDownInProgress($Session) {
+    $response=Invoke-Command -Session $Session { 
+        $systemMetrics = Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class SystemMetrics
+{
+    private const int SM_SHUTTINGDOWN = 0x2000;
+
+    [DllImport("user32.dll")]
+    public static extern int GetSystemMetrics(int smIndex);
+
+    public static bool IsShuttingdown() 
+    {
+        return (GetSystemMetrics(SM_SHUTTINGDOWN) != 0);
+    }
+
+}
+'@ -PassThru
+        return $systemMetrics::IsShuttingdown()
+    }
+
+    if($response -eq $false) {
+        Write-BoxstarterMessage "System Shutdown not in progress" -Verbose
+    }
+    else {
+        Write-BoxstarterMessage "System Shutdown in progress" -Verbose
+    }
+
+    return $response
+}
+
+function Test-Reconnection($Session, $sessionPID) {
+    $reconnected = $false
+
+    #If there is a pending reboot then session is in the middle of a restart
+    $response=Invoke-Command -Session $session { 
+        Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 
+        return Test-PendingReboot
+    } -ErrorAction SilentlyContinue
+    Write-BoxstarterMessage "Reboot check returned $response" -Verbose
+
+
+    if($response -ne $null -and $response -eq $false){
+        #Check for a system shutdown in progress
+        $response = Test-ShutDownInProgress $session
+
+        if($response -eq $false) {
+            $reconnected = $true #Session is connectable
+            try{
+                #In case previou session's task is still alive kill it so itr does not lock anything
+                Write-BoxstarterMessage "Killing $sessionPID" -Verbose
+                Invoke-Command -Session $session { 
+                    param($p)
+                    if(Get-Process -Id $p -ErrorAction SilentlyContinue){
+                        KILL $p -ErrorAction Stop
+                    }
+                    else {
+                        $global:Error.RemoveAt(0)
+                    }
+                } -ArgumentList $sessionPID
+            } catch{
+                Write-BoxstarterMessage "Failed to kill $sessionPID : $($global:Error[0])" -Verbose
+                $global:Error.RemoveAt(0)
+            }
+        }
+    }
+    #if the session is pending a reboot but not in the middle of a system shutdown, 
+    #try to invoke a reboot to prevent us from hanging while waiting
+    elseif($response -eq $true){
+        Write-BoxstarterMessage "Attempting to restart $($session.ComputerName)" -Verbose
+        Invoke-Command @sessionArgs { 
+            Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 
+            $Boxstarter.RebootOK=$true
+            if(Test-PendingReboot){Invoke-Reboot}
+        } -ErrorAction SilentlyContinue
+    }
+
+    return $reconnected
+}
+
 function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
     while($session.Availability -eq "Available") {
-        $remoteResult = Invoke-Command -session $session {
-            param($possibleResult,$SuppressLogging,$pkg,$password,$DisableReboots, $verbosity)
-            $global:VerbosePreference=$verbosity
-            Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
-            $Boxstarter.SuppressLogging=$SuppressLogging
-            $result=$null
-            try {
-                $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -DisableReboots:$DisableReboots
-                if($Boxstarter.IsRebooting){
-                    return @{Result="Rebooting"}
-                }
-                if($result=$true){
-                    return @{Result="Completed"}
-                }
-            }
-            catch{
-                throw
-            }
-        } -ArgumentList $possibleResult, $Boxstarter.SuppressLogging, $Package, $sessionArgs.Credential.Password, $DisableReboots, $global:VerbosePreference
-        
-        Write-Debug "Result from Remote Boxstarter: $($remoteResult.Result)"
-        if($remoteResult -eq $null -or $remoteResult.Result -eq $null -or $remoteResult.Result -eq "Rebooting") {
-            Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
-            $timeout=0
-            while($session.State -eq "Opened" -and $timeout -lt 120){
-                $timeout += 2
-                start-sleep -seconds 2
-            }
+        $sessionPID = Invoke-Command -Session $session { return $PID }
+        $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential.Password $DisableReboots
+
+        if(Test-RebootingOrDisconnected $remoteResult) {
+            Wait-ForSessionToClose $session
+
             $reconnected=$false
             Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
             Do{
                 if($session -ne $null){
                     Remove-PSSession $session
-                    $session= $null
+                    $session = $null
                 }
                 $response=$null
                 start-sleep -seconds 2
@@ -582,13 +707,7 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
                     $global:Error.RemoveAt(0)
                 }
                 elseif($session -ne $null -and $Session.Availability -eq "Available"){
-                    $response=Invoke-Command @sessionArgs { 
-                        Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 
-                        return Test-PendingReboot
-                    } -ErrorAction SilentlyContinue
-                    if($response -ne $null -and $response -eq $false){
-                        $reconnected = $true
-                    }
+                    $reconnected = Test-Reconnection $session $sessionPID
                 }
             }
             Until($reconnected -eq $true)
@@ -659,6 +778,7 @@ function Enable-RemoteCredSSP($sessionArgs) {
         Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null" 
     } -ArgumentList $sessionArgs.Credential
     $sessionArgs.Authentication="CredSSP"
+    Write-BoxstarterMessage "Creating New session with CredSSP Auth..." -Verbose
     return New-PSSession @sessionArgs -Name Boxstarter
 }
 
