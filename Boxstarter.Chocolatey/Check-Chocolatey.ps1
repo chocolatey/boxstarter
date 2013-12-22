@@ -42,7 +42,7 @@ Start-Process "$env:temp\net45.exe" -verb runas -wait -argumentList "/quiet /nor
 function Get-HttpToFile ($url, $file){
     Write-BoxstarterMessage "Downloading $url to $file" -Verbose
     Invoke-RetriableScript -RetryScript {
-        if(Test-Path $file){Remove-Item $file -Force}
+        if(Test-Path $args[1]){Remove-Item $args[1] -Force}
         $downloader=new-object net.webclient
         $wp=[system.net.WebProxy]::GetDefaultProxy()
         $wp.UseDefaultCredentials=$true
