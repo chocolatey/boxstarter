@@ -157,11 +157,7 @@ function Download-Package([string]$bootstrapPackage) {
     }
     $Boxstarter.Package=$bootstrapPackage
     del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
-    if(test-path (Join-Path $Boxstarter.LocalRepo "$bootstrapPackage.*.nupkg")){
-        $source = $Boxstarter.LocalRepo
-    } else {
-        $source = (Get-BoxstarterConfig).NugetSources
-    }
+    $source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
     write-BoxstarterMessage "Installing $bootstrapPackage package from $source" -Verbose
     Chocolatey install $bootstrapPackage -source $source -force
 }

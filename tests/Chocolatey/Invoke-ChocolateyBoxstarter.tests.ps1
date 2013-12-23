@@ -30,6 +30,19 @@ Describe "Invoke-ChocolateyBoxstarter" {
         }          
     }
 
+    Context "When calling normally" {
+        Mock New-PackageFromScript {return "somePackage"} -ParameterFilter {$source -eq "TestDrive:\package.txt"}
+        Mock Chocolatey
+        Mock Check-Chocolatey
+        New-Item TestDrive:\package.txt -type file | Out-Null
+
+        Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | out-null
+
+        it "should concatenate local repo and nuget sources for source param to chocolatey" {
+            Assert-MockCalled chocolatey -ParameterFilter {$source -eq "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"}
+        }
+    }
+
     Context "When not invoked via boxstarter and given a password" {
         $Boxstarter.ScriptToCall=$null
         Mock Invoke-Boxstarter

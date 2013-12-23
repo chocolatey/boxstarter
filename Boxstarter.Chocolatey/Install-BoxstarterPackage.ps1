@@ -558,6 +558,11 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
         $zipPackage = $shellApplication.NameSpace("$env:temp\Boxstarter\Boxstarter.zip") 
         $destinationFolder = $shellApplication.NameSpace("$env:temp\boxstarter") 
         $destinationFolder.CopyHere($zipPackage.Items(),0x10)
+        [xml]$configXml = Get-Content (Join-Path $env:temp\Boxstarter BoxStarter.config)
+        if($configXml.config.LocalRepo -ne $null) {
+            $configXml.config.RemoveChild(($configXml.config.ChildNodes | ? { $_.Name -eq "LocalRepo"}))
+            $configXml.Save((Join-Path $env:temp\Boxstarter BoxStarter.config))
+        }
         Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
     }
 }
@@ -675,7 +680,7 @@ function Test-Reconnection($Session, $sessionPID) {
     #try to invoke a reboot to prevent us from hanging while waiting
     elseif($response -eq $true){
         Write-BoxstarterMessage "Attempting to restart $($session.ComputerName)" -Verbose
-        Invoke-Command @sessionArgs { 
+        Invoke-Command -Session $session { 
             Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 
             $Boxstarter.RebootOK=$true
             if(Test-PendingReboot){Invoke-Reboot}

@@ -373,6 +373,27 @@ Describe "Install-BoxstarterPackage" {
         $Boxstarter.LocalRepo=$currentRepo
     }
 
+    Context "When using a boxstarter.config with a custom LocalRepo" {
+        Mock Invoke-Remotely
+        $repo=(Get-PSDrive TestDrive).Root
+        Copy-Item "$($Boxstarter.LocalRepo)\example.*.nupkg" "$repo\mylocalrepo.nupkg"
+        $session = New-PSSession localhost
+        Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
+        $currentConfig=Get-Content "$($Boxstarter.BaseDir)\Boxstarter.Config"
+        $currentRepo=$Boxstarter.LocalRepo
+        Set-BoxStarterConfig -LocalRepo $repo
+    
+        Install-BoxstarterPackage -session $session -PackageName test-package -DisableReboots -LocalRepo $repo | Out-Null
+
+        It "will Remove LocalRepo node in Boxstarter.Config on Remote"{
+            [xml]$configXml = Get-Content "$env:temp\boxstarter\boxstarter.config"
+            $configXml.config.LocalRepo | should be $null
+        }
+        Remove-PSSession $session
+        $Boxstarter.LocalRepo=$currentRepo
+        Set-Content "$($Boxstarter.BaseDir)\Boxstarter.Config" -Value $currentConfig -Force
+    }
+
     Context "When using a computer name and remoting enabled on remote and local computer" {
         Mock Enable-RemotingOnRemote { return $true }
         Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
