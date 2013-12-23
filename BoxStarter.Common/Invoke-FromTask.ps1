@@ -183,10 +183,10 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
         }
     }
     finally{
+        $reader.Dispose()
         if($waitProc -ne $null -and !$waitProc.HasExited){
             KillTree $waitProc.ID
         }
-        $reader.Dispose()
     }    
 }
 
