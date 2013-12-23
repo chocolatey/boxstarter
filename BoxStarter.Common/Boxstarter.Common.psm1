@@ -14,7 +14,8 @@ Export-ModuleMember     Write-BoxstarterMessage,
                         Create-BoxstarterTask,
                         Remove-BoxstarterTask,
                         Write-BoxstarterLogo,
-                        Get-CurrentUser
+                        Get-CurrentUser,
+                        Get-IsMicrosoftUpdateEnabled
                         
 Export-ModuleMember -Variable Boxstarter
 
