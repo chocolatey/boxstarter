@@ -140,7 +140,7 @@ http://boxstarter.codeplex.com
                     Log-BoxstarterMessage "WSMan connection failed:"
                     if($global:Error.Count -gt 0) { Log-BoxstarterMessage $global:Error[0] }
                     write-BoxstarterMessage "Testing WMI..."
-                    $wmiTest=try { Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue } catch {$ex=$_}
+                    $wmiTest=try { Invoke-WmiMethod -ComputerName $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue } catch {$ex=$_}
                     if($wmiTest -or ($ex -ne $null -and $ex.CategoryInfo.Reason -eq "UnauthorizedAccessException")) { 
                         Write-BoxstarterMessage "WMI responded. Will not enable WMI." -verbose
                         $params["IgnoreWMI"]=$true

@@ -8,7 +8,8 @@ All Unnamed ars will be passed as arguments to the script
     for($count = 1; $count -le 5; $count++) {
         try {
             Write-BoxstarterMessage "Attempt #$count..." -Verbose
-            Invoke-Command -ScriptBlock $RetryScript -ArgumentList $args
+            $ret = Invoke-Command -ScriptBlock $RetryScript -ArgumentList $args
+            return $ret
             break
         }
         catch {

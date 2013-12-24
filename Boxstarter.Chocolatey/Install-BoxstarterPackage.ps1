@@ -523,7 +523,7 @@ function Enable-RemotingOnRemote ($ComputerName, $Credential){
     }
     if($remotingTest -eq $null){
         Write-BoxstarterMessage "Powershell Remoting is not enabled or accesible on $ComputerName" -Verbose
-        $wmiTest=Invoke-WmiMethod -Computer $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
+        $wmiTest=Invoke-WmiMethod -ComputerName $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
         if($wmiTest -eq $null){
             $global:error.RemoveAt(0)
             return $false
@@ -785,11 +785,16 @@ function Enable-RemoteCredSSP($sessionArgs) {
             Create-BoxstarterTask $Credential
             Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null"
             Remove-BoxstarterTask
-        } -ArgumentList $Args[0].Credential
+        } -ArgumentList $Args[0].Credential -ErrorAction Stop
     } $sessionArgs
     $sessionArgs.Authentication="CredSSP"
     Write-BoxstarterMessage "Creating New session with CredSSP Auth..." -Verbose
-    return New-PSSession @sessionArgs -Name Boxstarter
+    $session = Invoke-RetriableScript {
+        $splat=$args[0]
+        $s = New-PSSession @splat -Name Boxstarter -ErrorAction Stop 
+        return $s
+    } $sessionArgs
+    return $session
 }
 
 function Disable-RemoteCredSSP ($sessionArgs){
