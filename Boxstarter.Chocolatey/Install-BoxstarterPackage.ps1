@@ -664,7 +664,7 @@ function Test-Reconnection($Session, $sessionPID) {
                 Invoke-Command -Session $session { 
                     param($p)
                     if(Get-Process -Id $p -ErrorAction SilentlyContinue){
-                        KILL $p -ErrorAction Stop
+                        KILL $p -ErrorAction Stop -Force
                     }
                     else {
                         $global:Error.RemoveAt(0)
@@ -712,6 +712,7 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
                     $global:Error.RemoveAt(0)
                 }
                 elseif($session -ne $null -and $Session.Availability -eq "Available"){
+                    if($remoteResult.Result -eq "Rebooting"){$sessionPID=-1}
                     $reconnected = Test-Reconnection $session $sessionPID
                 }
             }
@@ -776,12 +777,16 @@ function Should-EnableCredSSP($sessionArgs, $computerName) {
 
 function Enable-RemoteCredSSP($sessionArgs) {
     Write-BoxstarterMessage "Creating a scheduled task to enable CredSSP Authentication on $ComputerName..."
-    Invoke-Command @sessionArgs { 
-        param($Credential)
-        Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
-        Create-BoxstarterTask $Credential
-        Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null" 
-    } -ArgumentList $sessionArgs.Credential
+    Invoke-RetriableScript {
+        $splat=$args[0]
+        Invoke-Command @splat { 
+            param($Credential)
+            Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
+            Create-BoxstarterTask $Credential
+            Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null"
+            Remove-BoxstarterTask
+        } -ArgumentList $Args[0].Credential
+    } $sessionArgs
     $sessionArgs.Authentication="CredSSP"
     Write-BoxstarterMessage "Creating New session with CredSSP Auth..." -Verbose
     return New-PSSession @sessionArgs -Name Boxstarter
