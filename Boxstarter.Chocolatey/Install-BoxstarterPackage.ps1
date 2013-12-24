@@ -763,7 +763,7 @@ function Should-EnableCredSSP($sessionArgs, $computerName) {
         }
         else{
             Write-BoxstarterMessage "CredSSP test response:" -Verbose
-            [XmlElement]$xml=$credsspEnabled
+            [System.Xml.XmlElement]$xml=$credsspEnabled
             if($xml -ne $null) {
                 Write-BoxstarterMessage "WSMan XML Found..." -Verbose
                 Write-BoxstarterMessage "$($xml.OuterXml)" -Verbose
