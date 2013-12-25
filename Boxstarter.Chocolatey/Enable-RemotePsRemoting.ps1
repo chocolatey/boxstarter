@@ -51,7 +51,7 @@ param(
     ## In this task, we call Enable-PsRemoting
     schtasks /CREATE /TN 'Enable Remoting' /SC WEEKLY /RL HIGHEST ``
         /RU $username /RP $password ``
-        /TR "powershell -noprofile -command Enable-PsRemoting -Force" /F |
+        /TR "powershell -noprofile -command Enable-PsRemoting -Force | Out-File (Join-Path `$env:TEMP Enable-PSRemoting.txt)" /F |
         Out-String
     schtasks /RUN /TN 'Enable Remoting' | Out-String
 
