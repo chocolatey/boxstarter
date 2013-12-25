@@ -28,6 +28,23 @@ Describe "Install-BoxstarterPackage" {
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
+    Context "When remoting enabled on remote and local computer but CredSSP is not enabled on remote" {
+        Mock Enable-RemotePSRemoting { return New-Object PSObject }
+        Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
+        Mock Invoke-Command 
+        Mock Invoke-RetriableScript #-ParameterFilter {$RetryScript -ne $null -and $RetryScript.ToString() -like "*WSManCredSSP*"}
+        Mock Invoke-Command { return $false } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*Test-PendingReboot"}
+
+        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds -Force -Verbose
+
+        It "will Enable CredSSP on Remote on both computers"{
+            Assert-MockCalled Invoke-RetriableScript -ParameterFilter {$RetryScript.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"} -Times 2
+        }
+        It "will disable CredSSP when done on both computers"{
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server | out-Null`"*"} -Times 2
+        }        
+    }
+
     Context "When using a BoxstarterconnectionConfig and remoting enabled on remote and local computer" {
         Mock Enable-RemotingOnRemote { return $true }
         Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
@@ -272,22 +289,6 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will disable CredSSP when done"{
             Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server | out-Null`"*"} -Times 0
-        }        
-    }
-
-    Context "When remoting enabled on remote and local computer but CredSSP is not enabled on remote" {
-        Mock Enable-RemotePSRemoting { return New-Object PSObject }
-        Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
-        Mock Invoke-Command
-        Mock Invoke-Command { return $false } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*Test-PendingReboot"}
-
-        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds -Force | Out-Null
-
-        It "will Enable CredSSP on Remote on both computers"{
-            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"} -Times 2
-        }
-        It "will disable CredSSP when done on both computers"{
-            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server | out-Null`"*"} -Times 2
         }        
     }
 

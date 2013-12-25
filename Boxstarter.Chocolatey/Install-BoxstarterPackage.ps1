@@ -515,7 +515,7 @@ function Invoke-Locally {
 function Enable-RemotingOnRemote ($ComputerName, $Credential){
     Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
     try { 
-        $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction Stop
+        $remotingTest = Invoke-Command -ComputerName $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction Stop
     }
     catch {
         $ex=$_
@@ -785,13 +785,13 @@ function Enable-RemoteCredSSP($sessionArgs) {
             Create-BoxstarterTask $Credential
             Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null"
             Remove-BoxstarterTask
-        } -ArgumentList $Args[0].Credential -ErrorAction Stop
+        } -ArgumentList $args[0].Credential
     } $sessionArgs
     $sessionArgs.Authentication="CredSSP"
     Write-BoxstarterMessage "Creating New session with CredSSP Auth..." -Verbose
     $session = Invoke-RetriableScript {
         $splat=$args[0]
-        $s = New-PSSession @splat -Name Boxstarter -ErrorAction Stop 
+        $s = New-PSSession @splat -Name Boxstarter
         return $s
     } $sessionArgs
     return $session
