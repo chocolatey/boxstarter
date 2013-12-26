@@ -30,7 +30,7 @@ function Enable-Net40 {
         if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
             if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
             Write-BoxstarterMessage "Downloading .net 4.5..."
-            Get-HttpToFile "http://go.microsoft.com/?linkid=9816306" "$env:temp\net45.exe"
+            Get-HttpToFile "http://download.microsoft.com/download/b/a/4/ba4a7e71-2906-4b2d-a0e1-80cf16844f5f/dotnetfx45_full_x86_x64.exe" "$env:temp\net45.exe"
             Write-BoxstarterMessage "Installing .net 4.5..."
             Invoke-FromTask @"
 Start-Process "$env:temp\net45.exe" -verb runas -wait -argumentList "/quiet /norestart /log $env:temp\net45.log"
