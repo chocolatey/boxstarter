@@ -431,7 +431,7 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
     }
     catch {
         $record.Completed=$false
-        throw $_
+        Write-Error $_
     }
     finally{
         Finish-Record $record
