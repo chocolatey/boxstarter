@@ -431,6 +431,7 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
     }
     catch {
         $record.Completed=$false
+        throw $_
     }
     finally{
         Finish-Record $record
@@ -584,7 +585,7 @@ function Invoke-RemoteBoxstarter($Package, $Password, $DisableReboots) {
             }
         }
         catch{
-            throw
+            throw $_
         }
     } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Password, $DisableReboots, $global:VerbosePreference
     Write-BoxstarterMessage "Result from Remote Boxstarter: $($remoteResult.Result)" -Verbose
