@@ -61,13 +61,13 @@ about_boxstarter_logging
 
 #>    
     param(
-        [Parameter(position=0,Mandatory=$True,ValueFromPipeline=$True)]
+        [Parameter(position=0,ValueFromPipeline=$True)]
         [object]$object
     )
 
     process {
         write-host $object
-        if($Boxstarter -and $BoxStarter.Log){
+        if($Boxstarter -and $BoxStarter.Log -and $object){
             $object >> $Boxstarter.Log            
         }
     }
