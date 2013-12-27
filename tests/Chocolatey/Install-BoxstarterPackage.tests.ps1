@@ -18,7 +18,7 @@ Describe "Install-BoxstarterPackage" {
     Mock Invoke-ChocolateyBoxstarter
     Mock Enable-PSRemoting
     Mock Enable-WSManCredSSP
-    Mock Test-WSMan { return New-Object PSObject } -ParameterFilter { $Credential -ne $null }
+    Mock Test-WSMan { return ([Xml]"<response><node/></response>").response } -ParameterFilter { $Credential -ne $null }
     Mock Disable-WSManCredSSP
     Mock Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
     Mock Invoke-WmiMethod { New-Object System.Object }
@@ -28,6 +28,36 @@ Describe "Install-BoxstarterPackage" {
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
+    Context "When remoting and wmi are not enabled on remote computer" {
+        Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
+        Mock Invoke-WmiMethod
+        Mock Invoke-Command { New-Object System.Object }
+
+        $result = Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds 2> $Null
+
+        It "will throw"{
+            $result.Errors.Count | should be 1
+        }
+        It "will report failure in results" {
+            $result.Completed | should be $false
+        }
+    }
+
+    Context "When remoting enabled on remote and local computer and CredSSP is enabled on remote" {
+        Mock Enable-RemotePSRemoting { return New-Object PSObject }
+        Mock Test-WSMan { return ([Xml]"<response><node/></response>").response }
+        Mock Invoke-Command
+
+        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force | Out-Null
+
+        It "will Enable CredSSP on Remote"{
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"} -Times 0
+        }
+        It "will disable CredSSP when done"{
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server | out-Null`"*"} -Times 0
+        }        
+    }
+
     Context "When remoting enabled on remote and local computer but CredSSP is not enabled on remote" {
         Mock Enable-RemotePSRemoting { return New-Object PSObject }
         Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
@@ -35,7 +65,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Invoke-RetriableScript #-ParameterFilter {$RetryScript -ne $null -and $RetryScript.ToString() -like "*WSManCredSSP*"}
         Mock Invoke-Command { return $false } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*Test-PendingReboot"}
 
-        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds -Force -Verbose
+        Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds -Force | Out-Null
 
         It "will Enable CredSSP on Remote on both computers"{
             Assert-MockCalled Invoke-RetriableScript -ParameterFilter {$RetryScript.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"} -Times 2
@@ -235,21 +265,6 @@ Describe "Install-BoxstarterPackage" {
         }
     }    
 
-    Context "When remoting and wmi are not enabled on remote computer" {
-        Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
-        Mock Invoke-WmiMethod
-        Mock Invoke-Command { New-Object System.Object }
-
-        $result = Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds 2> $Null
-
-        It "will throw"{
-            $result.Errors.Count | should be 1
-        }
-        It "will report failure in results" {
-            $result.Completed | should be $false
-        }
-    }
-
     Context "When remoting not enabled on remote computer but WMI is and the force switch is not set" {
         Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
         Mock Confirm-Choice
@@ -275,21 +290,6 @@ Describe "Install-BoxstarterPackage" {
         It "will run the cookbook script"{
             Assert-MockCalled Enable-RemotePSRemoting
         }
-    }
-
-    Context "When remoting enabled on remote and local computer and CredSSP is enabled on remote" {
-        Mock Enable-RemotePSRemoting { return New-Object PSObject }
-        Mock Test-WSMan { New-Object PSObject }
-        Mock Invoke-Command
-
-        Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force | Out-Null
-
-        It "will Enable CredSSP on Remote"{
-            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"} -Times 0
-        }
-        It "will disable CredSSP when done"{
-            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server | out-Null`"*"} -Times 0
-        }        
     }
 
     Context "When using a https ConnectionURI and testing CredSSP" {

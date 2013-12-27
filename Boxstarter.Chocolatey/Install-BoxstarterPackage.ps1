@@ -526,7 +526,7 @@ function Enable-RemotingOnRemote ($ComputerName, $Credential){
         Write-BoxstarterMessage "Powershell Remoting is not enabled or accesible on $ComputerName" -Verbose
         $wmiTest=Invoke-WmiMethod -ComputerName $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
         if($wmiTest -eq $null){
-            $global:error.RemoveAt(0)
+            if($global:Error.Count -gt 0){ $global:Error.RemoveAt(0) }
             return $false
         }
         if($Force -or (Confirm-Choice "Powershell Remoting is not enabled on Remote computer. Should Boxstarter enable powershell remoting?")){
