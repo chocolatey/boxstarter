@@ -529,7 +529,7 @@ function Enable-RemotingOnRemote ($ComputerName, $Credential){
             if($global:Error.Count -gt 0){ $global:Error.RemoveAt(0) }
             return $false
         }
-        if($Force -or (Confirm-Choice "Powershell Remoting is not enabled on Remote computer. Should Boxstarter enable powershell remoting?")){
+        if($Force -or (Confirm-Choice "Powershell Remoting is not enabled on Remote computer. Should Boxstarter enable powershell remoting? This will also change the Network Location type on the remote machine to PRIVATE if it is currently PUBLIC.")){
             Write-BoxstarterMessage "Enabling Powershell Remoting on $ComputerName"
             Enable-RemotePSRemoting $ComputerName $Credential
         }
@@ -744,11 +744,11 @@ function Should-EnableCredSSP($sessionArgs, $computerName) {
             $uriArgs = @{Port=$uri.port;UseSSL=($uri.scheme -eq "https")}
         }
         try {
-            $credsspEnabled = Test-WsMan -ComputerName $ComputerName @uriArgs -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue 
+            $credsspEnabled = Test-WsMan -ComputerName $ComputerName @uriArgs -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue
         } 
         catch {
             Write-BoxstarterMessage "Exception from testing WSMan for CredSSP access" -Verbose
-            $xml=[xml]$_
+            try { $xml=[xml]$_ } catch { $global:Error.RemoveAt(0) }
             if($xml -ne $null) {
                 Write-BoxstarterMessage "WSMan Fault Found" -Verbose
                 Write-BoxstarterMessage "$($xml.OuterXml)" -Verbose
@@ -778,7 +778,7 @@ function Should-EnableCredSSP($sessionArgs, $computerName) {
 
 function Enable-RemoteCredSSP($sessionArgs) {
     Write-BoxstarterMessage "Creating a scheduled task to enable CredSSP Authentication on $ComputerName..."
-    Invoke-RetriableScript {
+    $n=Invoke-RetriableScript {
         $splat=$args[0]
         Invoke-Command @splat { 
             param($Credential)
