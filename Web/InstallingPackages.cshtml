@@ -23,6 +23,13 @@ Install-BoxstarterPackage -PackageName MyPackage -DisableReboots
 </pre>
 <p>Since no reboot will be performed, the credential is unnecessary.</p>
 
+<h3>Installing a package without a package</h3>
+<p>As mentioned previously on <a href="/CreatingPackages">Creating Packages</a>, you may not need to create a package. If your install script is limited to a single script file, you can use a file path or URL to a script and Boxstarter will create a package on the fly using this script as the ChocolateyInstall.ps1.</p>
+<pre>
+Install-BoxstarterPackage -PackageName https://gist.github.com/mwrock/8066325/raw/e0c830528429cd68a8c71dbff6f48298576d8d20/gistfile1.txt
+</pre>
+<p>This will download the script in the raw text gist and create a Nuget package using the script as the ChocolateyInstall.ps1. If the script is in a file accesible to Boxstarter, one can pass the path to the file as the -PackageName parameter.</p>
+
 <h3>Understanding and controling installation output</h3>
 <h4>Pipeline Output</h4>
 <p>For each machine that boxstarter installs (see <a href="#RemoteInstallations">below</a> for remote installation details) an object is emited to the PowerShell pipeline containing details about the install:</p>
