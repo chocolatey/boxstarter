@@ -21,10 +21,19 @@ Remove-BoxstarterTask
 #>
     param([Management.Automation.PsCredential]$Credential)
     if($Credential.GetNetworkCredential().Password.length -gt 0){
-        schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
+        schtasks /CREATE /TN 'Temp Boxstarter Task' /SC WEEKLY /RL HIGHEST `
             /RU "$($Credential.UserName)" /IT /RP $Credential.GetNetworkCredential().Password `
         /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
             Out-Null
+
+        #Give task a normal priority
+        $taskFile = Join-Path $env:TEMP RemotingTask.txt
+        Remove-Item $taskFile -Force -ErrorAction SilentlyContinue
+        [xml]$xml = schtasks /QUERY /TN 'Temp Boxstarter Task' /XML
+        $xml.Task.Settings.Priority="4"
+        $xml.Save($taskFile)
+        schtasks /CREATE /TN 'Boxstarter Task' /RU "$($Credential.UserName)" /IT /RP $Credential.GetNetworkCredential().Password /XML "$taskFile" /F | Out-Null
+        schtasks /DELETE /TN 'Temp Boxstarter Task' /F | Out-Null
     }
     else { #For testing
         schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
