@@ -17,6 +17,13 @@
       <dependency id="Boxstarter.Bootstrapper" version="$version$" />  
     </dependencies>
     <releaseNotes>
+      - Add lots of verbose level logging and console output around connection set and errors
+      - Add Retry logic around most remote calls
+      - Fix Module Auto Loading and function recognition on PS 3+
+      - Concatenate local repo and nuget sources so when using local packages they can use dependencies stored in the nuget sources
+      - When enabling PS remoting via WMI, change public network location to private
+      - Add Enable/Disable Microsoft Updates
+      - Ensure all scheduled tasks run with Normal priority not Below Normal
       - Fix the hiding of error messages during chocolatey scripts
       - fix bitlocker suspension of machines that protect non OS drives
       - Fix VHD mounting on some machines that do not automatically create a PSDrive for the newly mounted disk.
