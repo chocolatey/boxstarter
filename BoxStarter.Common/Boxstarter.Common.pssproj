@@ -32,6 +32,7 @@
     <Compile Include="Confirm-Choice.ps1" />
     <Compile Include="Create-BoxstarterTask.ps1" />
     <Compile Include="Format-BoxStarterMessage.ps1" />
+    <Compile Include="Get-IsMicrosoftUpdateEnabled.ps1" />
     <Compile Include="Get-IsRemote.ps1" />
     <Compile Include="Init-Settings.ps1" />
     <Compile Include="Invoke-FromTask.ps1" />
