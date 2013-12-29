@@ -423,6 +423,7 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
         }
         $enableCredSSP = Should-EnableCredSSP $sessionArgs $computerName
 
+        write-BoxstarterMessage "Creating a new session with $computerName..." -Verbose
         $session = New-PSSession @sessionArgs -Name Boxstarter
 
         if(-not (Install-BoxstarterPackageForSession $session $PackageName $DisableReboots $sessionArgs $enableCredSSP)){
