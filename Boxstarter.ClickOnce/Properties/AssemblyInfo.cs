@@ -5,7 +5,7 @@ using System.Reflection;
 // associated with an assembly.
 [assembly: AssemblyTitle("Boxstarter.WebLaunch")]
 [assembly: AssemblyProduct("Boxstarter.WebLaunch")]
-[assembly: AssemblyCopyright("(c) 2013 Matt Wrock")]
+[assembly: AssemblyCopyright("(c) 2014 Matt Wrock")]
 [assembly: AssemblyTrademark("d9d8ae1ae8506f094b99797eb19068d468ece1d7")]
 [assembly: AssemblyVersion("2.2.59")]
 [assembly: AssemblyFileVersion("2.2.59")]
