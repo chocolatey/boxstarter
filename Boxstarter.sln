@@ -59,6 +59,8 @@ Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "BuildPackages", "BuildPacka
 EndProject
 Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.HyperV", "Boxstarter.HyperV\Boxstarter.HyperV.pssproj", "{00AD20D0-9FF8-4E4B-9B9A-006D06430FD0}"
 EndProject
+Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.Azure", "Boxstarter.Azure\Boxstarter.Azure.pssproj", "{AFE71B90-0CD1-42B8-9E7A-FFB2791AB326}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,10 @@ Global
 		{00AD20D0-9FF8-4E4B-9B9A-006D06430FD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00AD20D0-9FF8-4E4B-9B9A-006D06430FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00AD20D0-9FF8-4E4B-9B9A-006D06430FD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFE71B90-0CD1-42B8-9E7A-FFB2791AB326}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFE71B90-0CD1-42B8-9E7A-FFB2791AB326}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFE71B90-0CD1-42B8-9E7A-FFB2791AB326}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFE71B90-0CD1-42B8-9E7A-FFB2791AB326}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
