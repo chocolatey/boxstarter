@@ -351,16 +351,20 @@ about_boxstarter_chocolatey
     }
 }
 
-function Get-ComputerNames($ConnectionUris, $BoxstarterConnectionConfigs) {
+function Get-ComputerNames([URI[]]$ConnectionUris, $BoxstarterConnectionConfigs) {
     $computerNames = @()
+    Write-BoxstarterMessage "resolving computernames..." -Verbose
 
     if($ConnectionURIs){
+        Write-BoxstarterMessage "resolving URIs to computernames..." -Verbose
         $ConnectionUris | %{
+            Write-BoxstarterMessage "$($_ -is [uri]) found $($_.Host) for $($_.ToString())" -Verbose
             $computerNames+=$_.Host
         }
     }
 
     if($BoxstarterConnectionConfigs){
+        Write-BoxstarterMessage "resolving Configs to computernames..." -Verbose
         $BoxstarterConnectionConfigs | %{
             $computerNames+=$_.ComputerName
         }
@@ -401,6 +405,7 @@ function Start-Record($computerName) {
 }
 
 function Finish-Record($obj) {
+    Write-BoxstarterMessage "Composing record for pipeline..." -Verbose
     $obj.FinishTime = Get-Date
     $global:error | %{
         if($_.CategoryInfo -ne $null -and $_.CategoryInfo.Category -eq "OperationStopped"){
@@ -410,13 +415,15 @@ function Finish-Record($obj) {
             $obj.Errors += $_
         }
     }
+    Write-BoxstarterMessage "writing object..." -Verbose
     Write-Output $obj
+    Write-BoxstarterMessage "object written..." -Verbose
 }
 
 function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots){
     $record = Start-Record $ComputerName
     try {
-        if(!(Enable-RemotingOnRemote $ComputerName $sessionArgs.Credential)){
+        if(!(Enable-RemotingOnRemote $sessionArgs $ComputerName)){
             Write-Error "Unable to access remote computer via Powershell Remoting or WMI. You can enable it by running: Enable-PSRemoting -Force from an Administrator Powershell console on the remote computer."
             $record.Completed=$false
             return
@@ -467,15 +474,19 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
         return $true
     }
     finally {
+        Write-BoxstarterMessage "checking if session should be removed..." -Verbose
+        if($session -ne $null -and $session.Name -eq "Boxstarter") {
+            Write-BoxstarterMessage "Removing session..." -Verbose
+            Remove-PSSession $Session
+            Write-BoxstarterMessage "Session removed..." -Verbose
+            $Session = $null
+        }
+
         if($sessionArgs.Authentication){
             $sessionArgs.Remove("Authentication")
         }
         if($enableCredSSP){
             Disable-RemoteCredSSP $sessionArgs
-        }
-        if($session -ne $null -and $session.Name -eq "Boxstarter") {
-            Remove-PSSession $Session
-            $Session = $null
         }
     }
 }
@@ -514,10 +525,11 @@ function Invoke-Locally {
     }
 }
 
-function Enable-RemotingOnRemote ($ComputerName, $Credential){
+function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
+    
     Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
     try { 
-        $remotingTest = Invoke-Command -ComputerName $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction Stop
+        $remotingTest = Invoke-Command @sessionArgs { Get-WmiObject Win32_ComputerSystem } -ErrorAction Stop
     }
     catch {
         $ex=$_
@@ -525,14 +537,14 @@ function Enable-RemotingOnRemote ($ComputerName, $Credential){
     }
     if($remotingTest -eq $null){
         Write-BoxstarterMessage "Powershell Remoting is not enabled or accesible on $ComputerName" -Verbose
-        $wmiTest=Invoke-WmiMethod -ComputerName $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
+        $wmiTest=Invoke-WmiMethod -ComputerName $ComputerName -Credential $sessionArgs.Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
         if($wmiTest -eq $null){
             if($global:Error.Count -gt 0){ $global:Error.RemoveAt(0) }
             return $false
         }
         if($Force -or (Confirm-Choice "Powershell Remoting is not enabled on Remote computer. Should Boxstarter enable powershell remoting? This will also change the Network Location type on the remote machine to PRIVATE if it is currently PUBLIC.")){
             Write-BoxstarterMessage "Enabling Powershell Remoting on $ComputerName"
-            Enable-RemotePSRemoting $ComputerName $Credential
+            Enable-RemotePSRemoting $ComputerName $sessionArgs.Credential
         }
         else {
             Write-BoxstarterMessage "Not enabling local Powershell Remoting on $ComputerName. Aborting package install"
@@ -540,7 +552,7 @@ function Enable-RemotingOnRemote ($ComputerName, $Credential){
         }
     }
     else {
-        Write-BoxstarterMessage "Remoting is accesible on $ComputerName"
+        Write-BoxstarterMessage "Remoting is accesible on $($sessionArgs.ComputerName)"
     }
     return $True
 }
@@ -802,12 +814,15 @@ function Enable-RemoteCredSSP($sessionArgs) {
 function Disable-RemoteCredSSP ($sessionArgs){
     Write-BoxstarterMessage "Disabling CredSSP Authentication on $ComputerName" -Verbose
     Invoke-Command @sessionArgs { 
-        param($Credential)
+        param($Credential, $verbosity)
+        $Global:VerbosePreference = $verbosity
         Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
         Create-BoxstarterTask $Credential
-        Invoke-FromTask "Disable-WSManCredSSP -Role Server | Out-Null"
+        $taskResult = Invoke-FromTask "Disable-WSManCredSSP -Role Server"
+        Write-BoxstarterMessage "result from disabling credssp is: $taskResult" -Verbose
         Remove-BoxstarterTask
-    } -ArgumentList $sessionArgs.Credential
+    } -ArgumentList $sessionArgs.Credential, $Global:VerbosePreference
+    Write-BoxstarterMessage "Finished disabling CredSSP Authentication on $ComputerName" -Verbose
 }
 
 function Rollback-ClientRemoting($ClientRemotingStatus, $CredSSPStatus) {

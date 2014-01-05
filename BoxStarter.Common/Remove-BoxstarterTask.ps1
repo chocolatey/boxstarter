@@ -13,5 +13,8 @@ Create-BoxstarterTask
 Invoke-BoxstarterTask
 
 #>    
-	schtasks /DELETE /TN 'Boxstarter Task' /F 2>&1 | Out-null
+    Write-BoxstarterMessage "Removing Boxstarter Scheduled Task..." -Verbose
+	$result = schtasks /DELETE /TN 'Boxstarter Task' /F 2>&1
+    Write-BoxstarterMessage "Removed Boxstarter Scheduled Task with this result: $result" -Verbose
+
 }

@@ -28,6 +28,38 @@ Describe "Install-BoxstarterPackage" {
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
+    Context "When using a https ConnectionURI and testing CredSSP" {
+        Mock Enable-RemotePSRemoting { return New-Object PSObject }
+        Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
+        Mock Invoke-Command
+        Mock New-PSSession {@{Availability="Available"}}
+
+        Install-BoxstarterPackage -ConnectionURI "https://server:5678/wsman" -PackageName test -Credential $mycreds -Force | Out-Null
+
+        It "will use https"{
+            Assert-MockCalled Test-WSMan -ParameterFilter {$UseSSL -eq $true}
+        }
+        It "will specify port"{
+            Assert-MockCalled Test-WSMan -ParameterFilter {$Port -eq 5678}
+        }        
+    }
+
+    Context "When using a http ConnectionURI and testing CredSSP" {
+        Mock Enable-RemotePSRemoting { return New-Object PSObject }
+        Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
+        Mock Invoke-Command
+        Mock New-PSSession {@{Availability="Available"}}
+
+        [uri]"http://server:5678/wsman" | Install-BoxstarterPackage -PackageName test -Credential $mycreds -Force | Out-Null
+
+        It "will use http"{
+            Assert-MockCalled Test-WSMan -ParameterFilter {$UseSSL -eq $false}
+        }
+        It "will specify port"{
+            Assert-MockCalled Test-WSMan -ParameterFilter {$Port -eq 5678}
+        }        
+    }
+
     Context "When remoting and wmi are not enabled on remote computer" {
         Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
         Mock Invoke-WmiMethod
@@ -71,7 +103,7 @@ Describe "Install-BoxstarterPackage" {
             Assert-MockCalled Invoke-RetriableScript -ParameterFilter {$RetryScript.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"} -Times 2
         }
         It "will disable CredSSP when done on both computers"{
-            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server | out-Null`"*"} -Times 2
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server*"} -Times 2
         }        
     }
 
@@ -290,38 +322,6 @@ Describe "Install-BoxstarterPackage" {
         It "will run the cookbook script"{
             Assert-MockCalled Enable-RemotePSRemoting
         }
-    }
-
-    Context "When using a https ConnectionURI and testing CredSSP" {
-        Mock Enable-RemotePSRemoting { return New-Object PSObject }
-        Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
-        Mock Invoke-Command
-        Mock New-PSSession {@{Availability="Available"}}
-
-        Install-BoxstarterPackage -ConnectionURI "https://server:5678/wsman" -PackageName test -Credential $mycreds -Force | Out-Null
-
-        It "will use https"{
-            Assert-MockCalled Test-WSMan -ParameterFilter {$UseSSL -eq $true}
-        }
-        It "will specify port"{
-            Assert-MockCalled Test-WSMan -ParameterFilter {$Port -eq 5678}
-        }        
-    }
-
-    Context "When using a http ConnectionURI and testing CredSSP" {
-        Mock Enable-RemotePSRemoting { return New-Object PSObject }
-        Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
-        Mock Invoke-Command
-        Mock New-PSSession {@{Availability="Available"}}
-
-        [uri]"http://server:5678/wsman" | Install-BoxstarterPackage -PackageName test -Credential $mycreds -Force | Out-Null
-
-        It "will use http"{
-            Assert-MockCalled Test-WSMan -ParameterFilter {$UseSSL -eq $false}
-        }
-        It "will specify port"{
-            Assert-MockCalled Test-WSMan -ParameterFilter {$Port -eq 5678}
-        }        
     }
 
     Context "When using a session and remoting enabled on remote and local computer" {
