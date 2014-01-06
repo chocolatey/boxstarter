@@ -7,7 +7,7 @@ try {
     Set-TaskbarSmall
     Enable-RemoteDesktop
 
-    cinstm VisualStudio2012Ultimate
+    cinst VisualStudio2012Ultimate
 
     try{
         $devenv = Get-Item "$($Boxstarter.programFiles86)\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe" -ErrorAction SilentlyContinue
@@ -17,22 +17,22 @@ try {
         }
     }catch{}
     
-    cinstm fiddler4
-    cinstm mssqlserver2012express
-    cinstm git-credential-winstore
-    cinstm console-devel
-    cinstm sublimetext2
-    cinstm skydrive
-    cinstm poshgit
-    cinstm dotpeek
-    cinstm googlechrome
-    cinstm Paint.net
-    cinstm windirstat
-    cinstm sysinternals
-    cinstm NugetPackageExplorer
-    cinstm resharper
-    cinstm winrar
-    cinstm windbg
+    cinst fiddler4
+    cinst mssqlserver2012express
+    cinst git-credential-winstore
+    cinst console-devel
+    cinst sublimetext2
+    cinst skydrive
+    cinst poshgit
+    cinst dotpeek
+    cinst googlechrome
+    cinst Paint.net
+    cinst windirstat
+    cinst sysinternals
+    cinst NugetPackageExplorer
+    cinst resharper
+    cinst winrar
+    cinst windbg
 
     cinst Microsoft-Hyper-V-All -source windowsFeatures
     cinst IIS-WebServerRole -source windowsfeatures
