@@ -13,7 +13,7 @@ Package Name of the package.
  Either a file path or URI pointing to a resource containing a script.
 
  .PARAMETER PackageName
- The name of the package. If not provided, this will be "temp_$env:computername"
+ The name of the package. If not provided, this will be "temp_BoxstarterPackage"
 
 .EXAMPLE
 $packageName = New-PackageFromScript myScript.ps1
@@ -49,7 +49,7 @@ about_boxstarter_chocolatey
 	param (
         [Parameter(Mandatory=1)]
         [string] $Source,
-        [string] $PackageName="temp_$env:Computername"
+        [string] $PackageName="temp_BoxstarterPackage"
     )
 
     if(!(test-path function:\Get-WebFile)){
