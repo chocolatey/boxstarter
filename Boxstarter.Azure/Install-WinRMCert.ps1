@@ -2,7 +2,7 @@
 Get-AzurePublishSettingsFile
 Import-AzurePublishSettingsFile C:\Users\Matt\Downloads\Subscription-1-1-5-2014-credentials.publishsettings
 Install-WinRMCert -serviceName wrockcraft2 -vmname wrockcraft
-Get-AzureWinRMUri | Enter-pssession -Credential $c
+Get-AzureWinRMUri -serviceName wrockcraft2 -vmname wrockcraft | Enter-pssession -Credential $c
 #>
 function Install-WinRMCert($serviceName, $vmname)
 {
