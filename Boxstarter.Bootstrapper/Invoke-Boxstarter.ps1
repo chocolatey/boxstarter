@@ -94,7 +94,7 @@ Invoke-Reboot
             $boxstarter.NoPassword=$False
             $script:BoxstarterPassword=InitAutologon $password
         } 
-        else {
+        if($script:BoxstarterPassword -eq $null) {
             $boxstarter.NoPassword=$True
         }
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile

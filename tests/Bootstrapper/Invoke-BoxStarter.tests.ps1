@@ -189,6 +189,7 @@ Describe "Invoke-Boxstarter" {
         it "will not read host for the password" {
             Assert-MockCalled Read-AuthenticatedPassword -times 0
         }
+        $script:BoxstarterPassword=$null
     }
 
     Context "When the NoPassword switch is specified and reboot is ok" {

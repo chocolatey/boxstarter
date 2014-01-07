@@ -16,12 +16,14 @@ function Cleanup-Boxstarter {
             remove-item "$(Get-BoxstarterTempDir)\Boxstarter.Script"
             $promptToExit=$true
         }
-        $winLogonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
-        $winlogonProps = Get-ItemProperty -Path $winLogonKey
-        if($winlogonProps.DefaultUserName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultUserName" -ErrorAction SilentlyContinue}
-        if($winlogonProps.DefaultDomainName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultDomainName" -ErrorAction SilentlyContinue}
-        if($winlogonProps.DefaultPassword){Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction SilentlyContinue}
-        if($winlogonProps.AutoAdminLogon){Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue}
+        if(!$Boxstarter.NoPassword) {
+            $winLogonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+            $winlogonProps = Get-ItemProperty -Path $winLogonKey
+            if($winlogonProps.DefaultUserName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultUserName" -ErrorAction SilentlyContinue}
+            if($winlogonProps.DefaultDomainName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultDomainName" -ErrorAction SilentlyContinue}
+            if($winlogonProps.DefaultPassword){Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction SilentlyContinue}
+            if($winlogonProps.AutoAdminLogon){Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue}
+        }
         Write-Debug "Cleaned up logon registry and restart file"
         if($promptToExit -or $KeepWindowOpen){
             Read-Host 'Type ENTER to exit'
