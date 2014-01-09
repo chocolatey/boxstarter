@@ -40,7 +40,7 @@ PS:>Get-Help Boxstarter
             mkdir $startMenu
         }
         $target="powershell.exe"
-        $targetArgs="-ExecutionPolicy bypass -NoExit -Command &$boxstarterPath\BoxstarterShell.ps1"
+        $targetArgs="-ExecutionPolicy bypass -NoExit -Command `"&$boxstarterPath\BoxstarterShell.ps1`""
 
         $link = Join-Path $desktop "Boxstarter Shell.lnk"
         Create-Shortcut $link $target $targetArgs $boxstarterPath
@@ -48,7 +48,7 @@ PS:>Get-Help Boxstarter
         $link = Join-Path $startMenu "Boxstarter Shell.lnk"
         Create-Shortcut $link $target $targetArgs $boxstarterPath
 
-        Add-Content -Path "$binPath\BoxstarterShell.bat" -Force -Value "$target $TargetArgs"
+        Set-Content -Path "$binPath\BoxstarterShell.bat" -Force -Value "$target $TargetArgs"
     }
 
 }

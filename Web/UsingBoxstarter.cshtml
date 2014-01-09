@@ -4,8 +4,41 @@
 
 @section headerBody {
     <h1>Using Boxstarter Commands</h1>
-    <p class="lead">If you are unfamiliar with using PowerShell modules, here is some guidance to get you started.
+    <p class="lead">
+    You can use the Boxstarter Shell to run Boxstarter Commands or any Powershell console of your choice. Here is some guidance to get you started.
 }
+<h3>The Boxstarter Shell</h3>
+<p>Especially if you are not comfortable with Windows PowerShell, you may prefer to use the Boxstarter Shell to run Boxstarter commands. The Boxstarter Shell will make sure that the user is running with administrative priveleges, the execution policy is compatible and all Boxstarter PowerShell modules are loaded and acessible. This shell also prints some basic "Getting Started" text at startup to assist you in running your first commands. To access the Boxstarter Shell:</p>
+<p>If you installed Boxstarter using Chocolatey, you can simply type BoxstarterShell from any command line:</p>
+<pre>
+Microsoft Windows [Version 6.1.7601]
+Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+C:\Windows\system32>BOXSTARTERSHELL
+Welcome to the Boxstarter shell!
+The Boxstarter commands have been imported from C:\Users\mwrock\AppData\Roaming
+\Boxstarter and are available for you to run in this shell.
+You may also import them into the shell of your choice.
+Here are some commands to get you started:
+Install a Package:   Install-BoxstarterPackage
+Create a Package:    New-BoxstarterPackage
+Build a Package:     Invoke-BoxstarterBuild
+Enable a VM:         Enable-BoxstarterVM
+For Command help:    Get-Help <command name> -Full
+For Boxstarter documentation, source code, to report bugs or participate in dis
+cussions, please visit http://boxstarter.org
+PS C:\>
+</pre>
+
+<p>Or you can use the shortcuts installed to the desktop and start menu:</p>
+<div class="row">
+    <div class="col-sm-2 col-md-2">
+            <img src="Images/shortcut.png">
+    </div>
+    <div class="col-sm-10 col-md-4">
+            <img src="Images/shell.png">
+    </div>
+</div>
+<p>The remainder of the instructions on this page cover requirements to consider if using your own shell.</p>
 <h3>Administrative Privileges</h3>
 <p>Many Boxstarter commands require an "Elevated" PowerShell console. This is a PowerShell window opened explicitly with administrative privileges. Where it can, Boxstarter will attempt to open a new command with administrative privileges, but in some other cases, you may get an error stating that administrative rights are required.</p>
 
