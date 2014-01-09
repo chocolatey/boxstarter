@@ -30,6 +30,7 @@
     <Compile Include="Boxstarter.Azure.psd1" />
     <Compile Include="BoxStarter.Azure.psm1" />
     <Compile Include="Enable-BoxstarterVM.ps1" />
+    <Compile Include="Install-WinRMCert.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />

@@ -27,6 +27,7 @@ Optional path whose contents will be copied to the repository
 
 .LINK
 http://boxstarter.codeplex.com
+New-PackageFromScript
 about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey
 Invoke-BoxstarterBuild

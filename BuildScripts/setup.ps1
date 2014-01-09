@@ -17,8 +17,8 @@ function Install-Boxstarter($here, $ModuleName) {
 
     PersistBoxStarterPathToEnvironmentVariable "PSModulePath"
     PersistBoxStarterPathToEnvironmentVariable "Path"
+    $binPath =  Join-Path $env:ChocolateyInstall bin
     Import-Module "$boxstarterPath\$ModuleName" -DisableNameChecking -Force -ErrorAction SilentlyContinue
-    write-host "Boxstarter is now ready. You can type 'Boxstarter' from any command line at any path."
     $successMsg = @"
 The $ModuleName Module has been copied to $boxstarterPath and added to your Module path. 
 You will need to open a new console for the path to be visible.
@@ -32,9 +32,55 @@ PS:>Import-Module $ModuleName
 PS:>Get-Help Boxstarter
 "@
     Write-BoxstarterMessage $successMsg
+
+    if($ModuleName -eq "Boxstarter.Chocolatey") {
+        $desktop = $([System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::DesktopDirectory))
+        $startMenu=$("$env:appdata\Microsoft\Windows\Start Menu\Programs\Boxstarter")
+        if(!(Test-Path $startMenu)){
+            mkdir $startMenu
+        }
+        $target="powershell.exe"
+        $targetArgs="-ExecutionPolicy bypass -NoExit -Command &$boxstarterPath\BoxstarterShell.ps1"
+
+        $link = Join-Path $desktop "Boxstarter Shell.lnk"
+        Create-Shortcut $link $target $targetArgs $boxstarterPath
+
+        $link = Join-Path $startMenu "Boxstarter Shell.lnk"
+        Create-Shortcut $link $target $targetArgs $boxstarterPath
+
+        Add-Content -Path "$binPath\BoxstarterShell.bat" -Force -Value "$target $TargetArgs"
+    }
+
 }
 
+function Create-Shortcut($location, $target, $targetArgs, $boxstarterPath) {
+    $wshshell = New-Object -ComObject WScript.Shell
+    $lnk = $wshshell.CreateShortcut($location)
+    $lnk.TargetPath = $target
+    $lnk.Arguments = "$targetArgs"
+    $lnk.WorkingDirectory = $boxstarterPath
+    $lnk.IconLocation="$boxstarterPath\BoxLogo.ico"
+    $lnk.Save()
 
+	$tempFile = "$env:temp\TempShortcut.lnk"
+		
+	$writer = new-object System.IO.FileStream $tempFile, ([System.IO.FileMode]::Create)
+	$reader = new-object System.IO.FileStream $location, ([System.IO.FileMode]::Open)
+		
+	while ($reader.Position -lt $reader.Length)
+	{		
+		$byte = $reader.ReadByte()
+		if ($reader.Position -eq 22) {
+			$byte = 34
+		}
+		$writer.WriteByte($byte)
+	}
+		
+	$reader.Close()
+	$writer.Close()
+				
+	Move-Item -Path $tempFile $location -Force
+}
 function PersistBoxStarterPathToEnvironmentVariable($variableName){
     $value = [Environment]::GetEnvironmentVariable($variableName, 'User')
     if($value){

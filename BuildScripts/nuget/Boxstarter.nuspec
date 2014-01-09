@@ -38,4 +38,7 @@
       - Add ability to configure a VHD to open it to WMI so that Boxstarter Installs canenable remoting.
     </releaseNotes>
   </metadata>
+  <files>
+    <file src="..\BoxstarterChocolateyinstall.ps1" target="tools\chocolateyinstall.ps1"/>
+  </files>
 </package>

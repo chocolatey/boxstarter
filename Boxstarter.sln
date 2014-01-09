@@ -15,6 +15,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildScripts", "BuildScripts", "{E959DA78-673C-42A8-B935-F9665BC4C54B}"
 	ProjectSection(SolutionItems) = preProject
 		BuildScripts\bootstrapper.ps1 = BuildScripts\bootstrapper.ps1
+		BoxstarterChocolateyInstall.ps1 = BoxstarterChocolateyInstall.ps1
 		BuildScripts\build.proj = BuildScripts\build.proj
 		BuildScripts\build.ps1 = BuildScripts\build.ps1
 		BuildScripts\chocolateyinstall.ps1 = BuildScripts\chocolateyinstall.ps1
@@ -29,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		BoxStarter.bat = BoxStarter.bat
 		boxstarter.config = boxstarter.config
+		BoxstarterShell.ps1 = BoxstarterShell.ps1
 		build.bat = build.bat
 		LICENSE.txt = LICENSE.txt
 	EndProjectSection
