@@ -16,6 +16,12 @@
       <dependency id="Boxstarter.Common" version="$version$" />
     </dependencies>
     <releaseNotes>
+      - Adding an optional Boxstarter Shell to ensure environment is correct
+      - Retry Nuget package creation in case of latency between nuget.exe nuspec creation and accessing the nuspec
+      - Fix Remote installs when using a ConnectionURI on a non default port
+      - Do not prompt for password and keep auto logon ON if autologon is already configured for user
+      - Fix install from web when using a computer name with unicode characters
+      - Fix Hangs at end of a remote install on azure 2012 R2 boxes
       - Add lots of verbose level logging and console output around connection set and errors
       - Add Retry logic around most remote calls
       - Fix Module Auto Loading and function recognition on PS 3+
