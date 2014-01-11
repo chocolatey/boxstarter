@@ -173,11 +173,11 @@ http://boxstarter.codeplex.com
             }
 
             if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
-                Write-BoxstarterMessage "Creating Checkpoint $vmCheckpoint"
+                Write-BoxstarterMessage "Creating Checkpoint $CheckpointName"
                 Checkpoint-VM -Name $_ -SnapshotName $CheckpointName
             }
 
-            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $computerName,$Credential
+            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList "http://$computerName:5985/wsman",$Credential
             return $res
         }
     }

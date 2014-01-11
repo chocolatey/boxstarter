@@ -307,7 +307,15 @@ about_boxstarter_chocolatey
 
         #We need the computernames to configure remoting
         if(!$ComputerName){
-            $ComputerName = Get-ComputerNames $ConnectionUri $BoxstarterConnectionConfig
+            if($BoxstarterConnectionConfig){
+                write-BoxstarterMessage "extracting Uris from $($BoxstarterConnectionConfig.Count) configs $($BoxstarterConnectionConfig[0].ConnectionURI)"
+                $uris = $BoxstarterConnectionConfig | % { $_.ConnectionURI }
+            }
+            else{
+                $uris = $ConnectionUri
+            }
+            write-BoxstarterMessage "Sending Uri $($uris[0])"
+            $ComputerName = Get-ComputerNames $uris
         }
 
         try{
@@ -327,11 +335,11 @@ about_boxstarter_chocolatey
             }
             elseif($BoxstarterConnectionConfig) {
                 $BoxstarterConnectionConfig | %{
-                    $sessionArgs.ComputerName = $_.ComputerName
+                    $sessionArgs.ConnectionURI = $_.ConnectionURI
                     if($_.Credential){
                         $sessionArgs.Credential = $_.Credential
                     }
-                    Install-BoxstarterPackageOnComputer $_.ComputerName $sessionArgs $PackageName $DisableReboots
+                    Install-BoxstarterPackageOnComputer $_.ConnectionURI.Host $sessionArgs $PackageName $DisableReboots
                 }
             }
             else {
@@ -351,25 +359,14 @@ about_boxstarter_chocolatey
     }
 }
 
-function Get-ComputerNames([URI[]]$ConnectionUris, $BoxstarterConnectionConfigs) {
+function Get-ComputerNames([URI[]]$ConnectionUris) {
     $computerNames = @()
-    Write-BoxstarterMessage "resolving computernames..." -Verbose
 
-    if($ConnectionURIs){
-        Write-BoxstarterMessage "resolving URIs to computernames..." -Verbose
-        $ConnectionUris | %{
-            Write-BoxstarterMessage "$($_ -is [uri]) found $($_.Host) for $($_.ToString())" -Verbose
-            $computerNames+=$_.Host
-        }
+    Write-BoxstarterMessage "resolving URIs to computernames..." -Verbose
+    $ConnectionUris | %{
+        Write-BoxstarterMessage "$($_ -is [uri]) found $($_.Host) for $($_.ToString())" -Verbose
+        $computerNames+=$_.Host
     }
-
-    if($BoxstarterConnectionConfigs){
-        Write-BoxstarterMessage "resolving Configs to computernames..." -Verbose
-        $BoxstarterConnectionConfigs | %{
-            $computerNames+=$_.ComputerName
-        }
-    }
-
     return $computerNames
 }
 

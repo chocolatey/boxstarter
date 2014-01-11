@@ -78,10 +78,7 @@ http://boxstarter.codeplex.com
             return
         }
 
-        if(!(Get-Command -Name Get-VM -ErrorAction SilentlyContinue)){
-            Write-Error "Boxstarter could not find the Hyper-V Powershell Module installed. This is required for use with Boxstarter.HyperV. Run Install-windowsfeature -name hyper-v -IncludeManagementTools."
-            return
-        }
+        ###Validate that the VM and Azure account is good.
 
         $CurrentVerbosity=$global:VerbosePreference
 
@@ -92,92 +89,55 @@ http://boxstarter.codeplex.com
 
     Process {
         $VMName | % { 
+            $checkpointDirectory = Join-Path $Boxstarter.BaseDir "Boxstarter.Azure.Checkpoints"
+            if(!(Test-Path $checkpointDirectory)){ Mkdir $checkpointDirectory | Out-Null }
+            $checkpointFile= Join-Path $checkpointDirectory $CheckpointName-$_.xml
 
-            $vm=Get-VM $_ -ErrorAction SilentlyContinue
+            Write-BoxstarterMessage "Locating Azure VM $_..."
+            $vm=Get-AzureVM -Name $_
             if($vm -eq $null){
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
             }
 
+            $serviceName = $VM.ServiceName
+
             if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
-                $point = Get-VMSnapshot -VMName $_ -Name $CheckpointName -ErrorAction SilentlyContinue
-                $origState=$vm.State
-                if($point -ne $null) {
-                    Restore-VMSnapshot -VMName $_ -Name $CheckpointName -Confirm:$false
-                    Write-BoxstarterMessage "$checkpointName restored on $_ waiting to complete..."
+                if(Test-Path  $checkpointFile) {
+                    Write-BoxstarterMessage "Removing Azure VM $_..."
+                    $removedVMDisk=Get-AzureOSDisk -vm (Get-AzureVM -ServiceName $serviceName -Name $_ | select -ExpandProperty vm)
+                    Remove-AzureVM -ServiceName $ServiceName -Name $_ | Out-Null
+                    $disk = $removedVMDisk.DiskName
+                    Write-BoxstarterMessage "Waiting for disk $disk to be free..."
+                    do {Start-Sleep -milliseconds 100} 
+                    until ((Get-AzureDisk -DiskName $disk).AttachedTo -eq $null)
+                    Write-BoxstarterMessage "$checkpointName restoring on $_. Waiting to complete..."
+                    Import-AzureVM -path $checkpointFile | New-AzureVM -ServiceName $serviceName -WaitForBoot | Out-Null
                     $restored=$true
                 }
             }
 
-            if($vm.State -eq "saved"){
-                Remove-VMSavedState $_
+            if($vm.Status -ne "ReadyRole"){
+                Write-BoxstarterMessage "Starting Azure VM $_..."
+                Start-AzureVM -Name $_ -ServiceName $serviceName
+                Wait-ReadyState $_
             }
 
-            if($vm.State -ne "running"){
-                Start-VM $_ -ErrorAction SilentlyContinue
-                Wait-HeartBeat $_
-            }
-
-            do {
-                Start-Sleep -milliseconds 100
-                $ComputerName=Get-VMGuestComputerName $_
-            } 
-            until ($ComputerName -ne $null)
+            Install-WinRMCert -ServiceName $serviceName -VMName $_
+            $uri = Get-AzureWinRMUri -serviceName $serviceName -Name $_
+            $ComputerName=$uri.Host
             $clientRemoting = Enable-BoxstarterClientRemoting $ComputerName
             Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
-            $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
-        
-            $params=@{}
+            $remotingTest = Invoke-Command $uri { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
             if(!$remotingTest) {
-                Log-BoxstarterMessage "PowerShell remoting connection failed:"
-                if($global:Error.Count -gt 0) { Log-BoxstarterMessage $global:Error[0] }
-                write-BoxstarterMessage "Testing WSMAN..."
-                $WSManResponse = Test-WSMan $ComputerName -ErrorAction SilentlyContinue
-                if($WSManResponse) { 
-                    Write-BoxstarterMessage "WSMAN responded. Will not enable WMI." -verbose
-                    $params["IgnoreWMI"]=$true
-                }
-                else {
-                    Log-BoxstarterMessage "WSMan connection failed:"
-                    if($global:Error.Count -gt 0) { Log-BoxstarterMessage $global:Error[0] }
-                    write-BoxstarterMessage "Testing WMI..."
-                    $wmiTest=try { Invoke-WmiMethod -ComputerName $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue } catch {$ex=$_}
-                    if($wmiTest -or ($ex -ne $null -and $ex.CategoryInfo.Reason -eq "UnauthorizedAccessException")) { 
-                        Write-BoxstarterMessage "WMI responded. Will not enable WMI." -verbose
-                        $params["IgnoreWMI"]=$true
-                    }
-                    else {
-                        Log-BoxstarterMessage "WMI connection failed:"
-                        if($global:Error.Count -gt 0) { Log-BoxstarterMessage $global:Error[0] }
-                    }
-                }
-                $credParts = $Credential.UserName.Split("\\")
-                if(($credParts.Count -eq 1 -and $credParts[0] -eq "administrator") -or `
-                  ($credParts.Count -eq 2 -and $credParts[0] -eq $ComputerName -and $credParts[1] -eq "administrator") -or`
-                  ($credParts.Count -eq 2 -and $credParts[0] -ne $ComputerName)){
-                    $params["IgnoreLocalAccountTokenFilterPolicy"]=$true
-                }
-                if($credParts.Count -eq 2 -and $credParts[0] -eq $ComputerName -and $credParts[1] -eq "administrator"){
-                    $params["IgnoreLocalAccountTokenFilterPolicy"]=$true
-                }
-
+                Write-BoxstarterMessage "Unable to establish a remote connection with $_"
             }
-
-            if(!$remotingTest -and ($params.Count -lt 2)) { 
-                Write-BoxstarterMessage "Stopping $_"
-                Stop-VM $_ -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
-                $vhd=Get-VMHardDiskDrive -VMName $_
-                Enable-BoxstarterVHD $vhd.Path @params | Out-Null
-                Start-VM $_
-                Write-BoxstarterMessage "Started $_. Waiting for Heartbeat..."
-                Wait-HeartBeat $_
-            }
-
+        
             if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
-                Write-BoxstarterMessage "Creating Checkpoint $vmCheckpoint"
-                Checkpoint-VM -Name $_ -SnapshotName $CheckpointName
+                Write-BoxstarterMessage "Creating Checkpoint $CheckpointName for service $serviceName VM $_ at $CheckpointFile"
+                Export-AzureVM -ServiceName $serviceName -Name $_ -Path $CheckpointFile | Out-Null
             }
 
-            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $computerName,$Credential
+            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $uri,$Credential
             return $res
         }
     }
@@ -187,20 +147,7 @@ http://boxstarter.codeplex.com
     }
 }
 
-function Get-VMGuestComputerName($vmName) {
-    $vm = Get-WmiObject -Namespace root\virtualization\v2 -Class Msvm_ComputerSystem -Filter "ElementName='$vmName'"
-    $vm.GetRelated("Msvm_KvpExchangeComponent").GuestIntrinsicExchangeItems | % {
-        if(([XML]$_) -ne $null){
-            $GuestExchangeItemXml = ([XML]$_).SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Name']/VALUE[child::text()='FullyQualifiedDomainName']") 
-        
-            if ($GuestExchangeItemXml -ne $null) { 
-                $GuestExchangeItemXml.SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Data']/VALUE/child::text()").Value 
-            }
-        }
-    }    
-}
-
-function Wait-HeartBeat($vmName) {
+function Wait-ReadyState($vmName) {
     do {Start-Sleep -milliseconds 100} 
-    until ((Get-VMIntegrationService -VMName $vmName | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
+    until ((Get-AzureVM -Name $vmName).Status -eq "ReadyRole")
 }

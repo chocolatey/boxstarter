@@ -1,10 +1,10 @@
 $source = @"
 public class BoxstarterConnectionConfig {
-    public BoxstarterConnectionConfig(string computerName, System.Management.Automation.PSCredential credential) {
-        ComputerName=computerName;
+    public BoxstarterConnectionConfig(System.Uri connectionURI, System.Management.Automation.PSCredential credential) {
+        ConnectionURI=connectionURI;
         Credential=credential;
     }
-    public string ComputerName;
+    public System.Uri ConnectionURI;
     public System.Management.Automation.PSCredential Credential;
 }
 "@

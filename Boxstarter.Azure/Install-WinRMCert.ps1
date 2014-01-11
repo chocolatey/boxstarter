@@ -4,10 +4,11 @@ Import-AzurePublishSettingsFile C:\Users\Matt\Downloads\Subscription-1-1-5-2014-
 Install-WinRMCert -serviceName wrockcraft2 -vmname wrockcraft
 Get-AzureWinRMUri -serviceName wrockcraft2 -vmname wrockcraft | Enter-pssession -Credential $c
 #>
-function Install-WinRMCert($serviceName, $vmname)
+function Install-WinRMCert($ServiceName, $VMName)
 {
  $winRMCert = (Get-AzureVM -ServiceName $serviceName -Name $vmname | select -ExpandProperty vm).DefaultWinRMCertificateThumbprint
- 
+ if($winRMCert -eq $null){ return }
+
  $AzureX509cert = Get-AzureCertificate -ServiceName $serviceName -Thumbprint $winRMCert -ThumbprintAlgorithm sha1
  
  $certTempFile = [IO.Path]::GetTempFileName()
