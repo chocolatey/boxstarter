@@ -308,13 +308,11 @@ about_boxstarter_chocolatey
         #We need the computernames to configure remoting
         if(!$ComputerName){
             if($BoxstarterConnectionConfig){
-                write-BoxstarterMessage "extracting Uris from $($BoxstarterConnectionConfig.Count) configs $($BoxstarterConnectionConfig[0].ConnectionURI)"
                 $uris = $BoxstarterConnectionConfig | % { $_.ConnectionURI }
             }
             else{
                 $uris = $ConnectionUri
             }
-            write-BoxstarterMessage "Sending Uri $($uris[0])"
             $ComputerName = Get-ComputerNames $uris
         }
 

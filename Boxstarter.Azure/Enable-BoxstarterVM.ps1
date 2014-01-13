@@ -81,7 +81,6 @@ http://boxstarter.codeplex.com
         ###Validate that the VM and Azure account is good.
 
         $CurrentVerbosity=$global:VerbosePreference
-
         if($PSBoundParameters["Verbose"] -eq $true) {
             $global:VerbosePreference="Continue"
         }
@@ -89,36 +88,28 @@ http://boxstarter.codeplex.com
 
     Process {
         $VMName | % { 
-            $checkpointDirectory = Join-Path $Boxstarter.BaseDir "Boxstarter.Azure.Checkpoints"
-            if(!(Test-Path $checkpointDirectory)){ Mkdir $checkpointDirectory | Out-Null }
-            $checkpointFile= Join-Path $checkpointDirectory $CheckpointName-$_.xml
+            $exportFile= Join-Path $env:temp $_.xml
 
             Write-BoxstarterMessage "Locating Azure VM $_..."
-            $vm=Get-AzureVM -Name $_
+            $vmShallow=Get-AzureVM -Name $_
             if($vm -eq $null){
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
             }
 
-            $serviceName = $VM.ServiceName
+            $serviceName = $vmShallow.ServiceName
+            $VM=Get-AzureVM -ServiceName $serviceName -Name $_ | select -ExpandProperty vm
 
             if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
-                if(Test-Path  $checkpointFile) {
-                    Write-BoxstarterMessage "Removing Azure VM $_..."
-                    $removedVMDisk=Get-AzureOSDisk -vm (Get-AzureVM -ServiceName $serviceName -Name $_ | select -ExpandProperty vm)
-                    Remove-AzureVM -ServiceName $ServiceName -Name $_ | Out-Null
-                    $disk = $removedVMDisk.DiskName
-                    Write-BoxstarterMessage "Waiting for disk $disk to be free..."
-                    do {Start-Sleep -milliseconds 100} 
-                    until ((Get-AzureDisk -DiskName $disk).AttachedTo -eq $null)
-                    Write-BoxstarterMessage "$checkpointName restoring on $_. Waiting to complete..."
-                    Import-AzureVM -path $checkpointFile | New-AzureVM -ServiceName $serviceName -WaitForBoot | Out-Null
+                $snapshot = Get-AzureVMCheckpoint -VM $VM -CheckpointName $CheckpointName
+                if($snapshot -ne $null) {
+                    Restore-AzureVMCheckpoint -VM $VM -CheckpointName $CheckpointName
                     $restored=$true
                 }
             }
 
-            if($vm.Status -ne "ReadyRole"){
+            if($vmShallow.Status -ne "ReadyRole"){
                 Write-BoxstarterMessage "Starting Azure VM $_..."
-                Start-AzureVM -Name $_ -ServiceName $serviceName
+                Start-AzureVM -Name $_ -ServiceName $serviceName | Out-Null
                 Wait-ReadyState $_
             }
 
@@ -134,7 +125,7 @@ http://boxstarter.codeplex.com
         
             if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
                 Write-BoxstarterMessage "Creating Checkpoint $CheckpointName for service $serviceName VM $_ at $CheckpointFile"
-                Export-AzureVM -ServiceName $serviceName -Name $_ -Path $CheckpointFile | Out-Null
+                Set-AzureVMCheckpoint -VM $VM -CheckpointName $CheckpointName | Out-Null
             }
 
             $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $uri,$Credential
@@ -150,4 +141,21 @@ http://boxstarter.codeplex.com
 function Wait-ReadyState($vmName) {
     do {Start-Sleep -milliseconds 100} 
     until ((Get-AzureVM -Name $vmName).Status -eq "ReadyRole")
+}
+
+function Get-Blob($BlobUri) {
+    $storageAccount = (Get-AzureSubscription).CurrentStorageAccountName
+    $blobPath = $BlobUri.LocalPath
+ 
+    #get the storage account key
+    $key = (Get-AzureStorageKey -StorageAccountName $storageAccount).Primary
+ 
+    #generate credentials based on the key
+    $creds = New-Object Microsoft.WindowsAzure.StorageCredentialsAccountAndKey($storageAccount,$key)
+ 
+    #create an instance of the CloudBlobClient class
+    $blobClient = New-Object Microsoft.WindowsAzure.StorageClient.CloudBlobClient("http://$($blobUri.Host)", $creds)
+ 
+    #and grab a reference to our target blob
+    return $blobClient.GetBlobReference($blobPath)
 }

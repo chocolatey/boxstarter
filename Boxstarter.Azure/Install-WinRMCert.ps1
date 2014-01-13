@@ -9,6 +9,7 @@ function Install-WinRMCert($ServiceName, $VMName)
  $winRMCert = (Get-AzureVM -ServiceName $serviceName -Name $vmname | select -ExpandProperty vm).DefaultWinRMCertificateThumbprint
  if($winRMCert -eq $null){ return }
 
+ Write-BoxstarterMessage "Installing WinRM Certificate"
  $AzureX509cert = Get-AzureCertificate -ServiceName $serviceName -Thumbprint $winRMCert -ThumbprintAlgorithm sha1
  
  $certTempFile = [IO.Path]::GetTempFileName()
