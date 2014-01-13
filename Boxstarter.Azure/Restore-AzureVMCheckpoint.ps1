@@ -21,7 +21,7 @@ Get-AzureVMCheckpoint
         [string]$VMName,
         [string]$CheckpointName
     )
-    $snapshot = Get-AzureVMCheckpoint $vmName $CheckpointName
+    $checkpoint = Get-AzureVMCheckpoint $vmName $CheckpointName
     $blob=Get-Blob $vmName
     $vm=Get-AzureVM -Name $vmName
     $serviceName = $vm.ServiceName
@@ -44,8 +44,8 @@ Get-AzureVMCheckpoint
     Write-BoxstarterMessage "Removing disk $($vmOSDisk.DiskName)..."
     Remove-AzureDisk -DiskName $vmOSDisk.DiskName | Out-Null
 
-    Write-BoxstarterMessage "Copying $($snapshot.Uri) to blob..."
-    $blob.CopyFromBlob($snapshot)
+    Write-BoxstarterMessage "Copying $($checkpoint.snapshot.Uri) to blob..."
+    $blob.CopyFromBlob($checkpoint.snapshot)
 
     Write-BoxstarterMessage "Creating new disk from blob..."
     Add-AzureDisk -DiskName $vmOSDisk.DiskName -MediaLocation $blob.Uri -OS Windows | Out-Null
