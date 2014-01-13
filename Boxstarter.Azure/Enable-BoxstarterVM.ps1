@@ -92,17 +92,16 @@ http://boxstarter.codeplex.com
 
             Write-BoxstarterMessage "Locating Azure VM $_..."
             $vmShallow=Get-AzureVM -Name $_
-            if($vm -eq $null){
+            if($vmShallow -eq $null){
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
             }
 
             $serviceName = $vmShallow.ServiceName
-            $VM=Get-AzureVM -ServiceName $serviceName -Name $_ | select -ExpandProperty vm
 
             if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
-                $snapshot = Get-AzureVMCheckpoint -VM $VM -CheckpointName $CheckpointName
+                $snapshot = Get-AzureVMCheckpoint -VM $_ -CheckpointName $CheckpointName
                 if($snapshot -ne $null) {
-                    Restore-AzureVMCheckpoint -VM $VM -CheckpointName $CheckpointName
+                    Restore-AzureVMCheckpoint -VM $_ -CheckpointName $CheckpointName
                     $restored=$true
                 }
             }
@@ -125,7 +124,7 @@ http://boxstarter.codeplex.com
         
             if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
                 Write-BoxstarterMessage "Creating Checkpoint $CheckpointName for service $serviceName VM $_ at $CheckpointFile"
-                Set-AzureVMCheckpoint -VM $VM -CheckpointName $CheckpointName | Out-Null
+                Set-AzureVMCheckpoint -VM $_ -CheckpointName $CheckpointName | Out-Null
             }
 
             $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $uri,$Credential
@@ -141,21 +140,4 @@ http://boxstarter.codeplex.com
 function Wait-ReadyState($vmName) {
     do {Start-Sleep -milliseconds 100} 
     until ((Get-AzureVM -Name $vmName).Status -eq "ReadyRole")
-}
-
-function Get-Blob($BlobUri) {
-    $storageAccount = (Get-AzureSubscription).CurrentStorageAccountName
-    $blobPath = $BlobUri.LocalPath
- 
-    #get the storage account key
-    $key = (Get-AzureStorageKey -StorageAccountName $storageAccount).Primary
- 
-    #generate credentials based on the key
-    $creds = New-Object Microsoft.WindowsAzure.StorageCredentialsAccountAndKey($storageAccount,$key)
- 
-    #create an instance of the CloudBlobClient class
-    $blobClient = New-Object Microsoft.WindowsAzure.StorageClient.CloudBlobClient("http://$($blobUri.Host)", $creds)
- 
-    #and grab a reference to our target blob
-    return $blobClient.GetBlobReference($blobPath)
 }

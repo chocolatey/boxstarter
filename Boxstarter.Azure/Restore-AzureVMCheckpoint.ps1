@@ -1,14 +1,14 @@
 function Restore-AzureVMCheckpoint {
     param (
-        $VM,
+        [string]$VMName,
         [string]$CheckpointName
     )
-    $vmName = $VM.RoleName
-    $snapshot = Get-AzureVMCheckpoint $VM $CheckpointName
-    $blob=Get-Blob $VM
-    $serviceName = (Get-AzureVM -Name $vmName).ServiceName
+    $snapshot = Get-AzureVMCheckpoint $vmName $CheckpointName
+    $blob=Get-Blob $vmName
+    $vm=Get-AzureVM -Name $vmName
+    $serviceName = $vm.ServiceName
     $exportPath = "$env:temp\boxstarterAzureCheckpoint$vmName.xml"
-    $vmOSDisk=$vm.OSVirtualHardDisk
+    $vmOSDisk=Get-AzureOSDisk -VM (Get-AzureVM -ServiceName $serviceName -Name $VMName)
 
     Write-BoxstarterMessage "Exporting vm config for $vmName of $serviceName service to $exportPath..."
     $exportResult = Export-AzureVM -ServiceName $serviceName -Name $vmName -Path $exportPath

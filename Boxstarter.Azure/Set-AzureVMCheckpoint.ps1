@@ -1,9 +1,9 @@
 function Set-AzureVMCheckpoint {
     param (
-        $VM,
+        [string]$VMName,
         [string]$CheckpointName
     )
-    $blob=Get-blob $VM
+    $blob=Get-blob $VMName
 
     $attributes = New-Object System.Collections.Specialized.NameValueCollection
     $attributes.Add("name",$CheckpointName)
