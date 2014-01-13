@@ -16,6 +16,7 @@ The Name of a the checkpoint to apply
 http://boxstarter.codeplex.com
 Set-AzureVMCheckpoint
 Get-AzureVMCheckpoint
+Remove-AzureVMCheckpoint
 #>    
     param (
         [string]$VMName,

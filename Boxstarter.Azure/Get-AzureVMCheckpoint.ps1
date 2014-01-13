@@ -17,6 +17,7 @@ checkpoints for the VM will be returned.
 .LINK
 http://boxstarter.codeplex.com
 Set-AzureVMCheckpoint
+Remove-AzureVMCheckpoint
 Restore-AzureVMCheckpoint
 #>
     [CmdletBinding()]

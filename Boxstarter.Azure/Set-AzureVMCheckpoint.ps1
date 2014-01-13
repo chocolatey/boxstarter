@@ -16,6 +16,7 @@ The Name of a the checkpoint to save
 .LINK
 http://boxstarter.codeplex.com
 Get-AzureVMCheckpoint
+Remove-AzureVMCheckpoint
 Restore-AzureVMCheckpoint
 #>    
     param (
