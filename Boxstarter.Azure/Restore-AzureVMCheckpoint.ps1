@@ -1,4 +1,22 @@
 function Restore-AzureVMCheckpoint {
+<#
+.SYNOPSIS
+Restores an Azure VM with a previously set checkpoint
+
+.DESCRIPTION
+Restores the state of a VM with a Blob snapshot previously created with Set-AzureVMCheckpoint.
+
+.PARAMETER $VMName
+The Name of the Azure Virtual Machine to restore
+
+.PARAMETER $CheckpointName
+The Name of a the checkpoint to apply
+
+.LINK
+http://boxstarter.codeplex.com
+Set-AzureVMCheckpoint
+Get-AzureVMCheckpoint
+#>    
     param (
         [string]$VMName,
         [string]$CheckpointName

@@ -16,6 +16,7 @@ The Name of a specific checkpoint to return
 .LINK
 http://boxstarter.codeplex.com
 Set-AzureVMCheckpoint
+Restore-AzureVMCheckpoint
 #>    
     param (
         [string]$VMName,
