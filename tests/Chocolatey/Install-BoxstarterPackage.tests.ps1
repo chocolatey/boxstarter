@@ -28,6 +28,37 @@ Describe "Install-BoxstarterPackage" {
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
+    Context "When using a BoxstarterconnectionConfig and remoting enabled on remote and local computer" {
+        Mock Enable-RemotingOnRemote { return $true }
+        Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
+        Mock Enable-BoxstarterCredSSP {@{Success=$true}}
+        Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
+
+        $result = (new-Object -TypeName BoxstarterconnectionConfig -ArgumentList "http://localhost:5985/wsman",$null) | Install-BoxstarterPackage -PackageName test-package -DisableReboots
+
+        It "will copy boxstarter modules"{
+            "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.bootstrapper\boxstarter.bootstrapper.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.winconfig\boxstarter.winconfig.psd1" | should exist
+            "$env:temp\boxstarter\boxstarter.common\boxstarter.common.psd1" | should exist
+        }
+        It "will copy boxstarter build packages"{
+            Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % {
+                "$env:temp\boxstarter\buildpackages\$($_.Name)" | should exist
+            }
+        }
+        It "will execute package"{
+            ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package"
+        }
+        It "will output correct computers in results"{
+            $result[0].ComputerName | should be "localhost"
+        }
+        It "will report success in results" {
+            $result[0].Completed | should be $true
+        }
+    }
+
     Context "When using a https ConnectionURI and testing CredSSP" {
         Mock Enable-RemotePSRemoting { return New-Object PSObject }
         Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
@@ -105,37 +136,6 @@ Describe "Install-BoxstarterPackage" {
         It "will disable CredSSP when done on both computers"{
             Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server*"} -Times 2
         }        
-    }
-
-    Context "When using a BoxstarterconnectionConfig and remoting enabled on remote and local computer" {
-        Mock Enable-RemotingOnRemote { return $true }
-        Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
-        Mock Enable-BoxstarterCredSSP {@{Success=$true}}
-        Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
-
-        $result = (new-Object -TypeName BoxstarterconnectionConfig -ArgumentList localhost,$null) | Install-BoxstarterPackage -PackageName test-package -DisableReboots
-
-        It "will copy boxstarter modules"{
-            "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
-            "$env:temp\boxstarter\boxstarter.bootstrapper\boxstarter.bootstrapper.psd1" | should exist
-            "$env:temp\boxstarter\boxstarter.winconfig\boxstarter.winconfig.psd1" | should exist
-            "$env:temp\boxstarter\boxstarter.common\boxstarter.common.psd1" | should exist
-        }
-        It "will copy boxstarter build packages"{
-            Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % {
-                "$env:temp\boxstarter\buildpackages\$($_.Name)" | should exist
-            }
-        }
-        It "will execute package"{
-            ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package"
-        }
-        It "will output correct computers in results"{
-            $result[0].ComputerName | should be "localhost"
-        }
-        It "will report success in results" {
-            $result[0].Completed | should be $true
-        }
     }
 
     Context "When calling locally" {
