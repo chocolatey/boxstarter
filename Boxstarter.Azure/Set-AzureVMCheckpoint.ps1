@@ -19,11 +19,19 @@ Get-AzureVMCheckpoint
 Remove-AzureVMCheckpoint
 Restore-AzureVMCheckpoint
 #>    
+    [CmdletBinding()]
     param (
+        [parameter(Mandatory=$true, Position=0)]
         [string]$VMName,
+        [parameter(Mandatory=$true, Position=1)]
         [string]$CheckpointName
     )
     $blob=Get-blob $VMName
+
+    $existingBlob = Get-AzureVMCheckpoint -VMName $VMName -CheckpointName $CheckpointName
+    if($existingBlob -ne $null) {
+        $existingBlob.Snapshot.Delete()
+    }
 
     $attributes = New-Object System.Collections.Specialized.NameValueCollection
     $attributes.Add("name",$CheckpointName)

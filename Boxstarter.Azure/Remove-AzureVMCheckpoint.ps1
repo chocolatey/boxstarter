@@ -18,11 +18,18 @@ Get-AzureVMCheckpoint
 Set-AzureVMCheckpoint
 Restore-AzureVMCheckpoint
 #>    
+    [CmdletBinding()]
     param (
+        [parameter(Mandatory=$true, Position=0)]
         [string]$VMName,
+        [parameter(Mandatory=$true, Position=1)]
         [string]$CheckpointName
     )
     $checkpoint=Get-AzureVMCheckpoint @PSBoundParameters
+
+    if($checkpoint -eq $null) {
+        throw New-Object -TypeName ArgumentException -ArgumentList "CheckpointName","No checkpoint found with name $checkpointname for VM $VMName"
+    }
 
     $checkpoint.Snapshot.Delete()
 }

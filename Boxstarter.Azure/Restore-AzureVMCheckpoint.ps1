@@ -18,11 +18,18 @@ Set-AzureVMCheckpoint
 Get-AzureVMCheckpoint
 Remove-AzureVMCheckpoint
 #>    
+    [CmdletBinding()]
     param (
+        [parameter(Mandatory=$true, Position=0)]
         [string]$VMName,
+        [parameter(Mandatory=$true, Position=1)]
         [string]$CheckpointName
     )
     $checkpoint = Get-AzureVMCheckpoint $vmName $CheckpointName
+    if($checkpoint -eq $null) {
+        throw New-Object -TypeName ArgumentException -ArgumentList "CheckpointName","No checkpoint found with name $checkpointname for VM $VMName"
+    }
+
     $blob=Get-Blob $vmName
     $vm=Get-AzureVM -Name $vmName
     $serviceName = $vm.ServiceName
