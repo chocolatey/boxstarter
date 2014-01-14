@@ -30,7 +30,12 @@
     <Compile Include="Boxstarter.Azure.psd1" />
     <Compile Include="BoxStarter.Azure.psm1" />
     <Compile Include="Enable-BoxstarterVM.ps1" />
+    <Compile Include="Get-AzureVMCheckpoint.ps1" />
+    <Compile Include="Get-Blob.ps1" />
     <Compile Include="Install-WinRMCert.ps1" />
+    <Compile Include="Remove-AzureVMCheckpoint.ps1" />
+    <Compile Include="Restore-AzureVMCheckpoint.ps1" />
+    <Compile Include="Set-AzureVMCheckpoint.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />

@@ -1,13 +1,14 @@
 function Enable-BoxstarterVM {
 <#
 .SYNOPSIS
-Opens WMI ports and LocalAccountTokenFilterPolicy for workgroup Hyper-V VMs
+Finds the PowerShell Remote ConnectionURI of an Azure VM and ensures it can be accessed
 
 .DESCRIPTION
-Prepares a Hyper-V VM for Boxstarter Installation. Opening WMI 
-ports if remoting is not enabled and enabling 
-LocalAccountTokenFilterPolicy if the VM is not in a domain so 
-that Boxstarter can later enable PowerShell Remoting.
+Ensures that an Azure VM can be accessed by Boxstarter. Checks the Azure Powershell 
+SDK settings are set correctly and also examines the VM endpoints to ensure the correct 
+settings for PowerShell remoting. If necessary, the WinRM certificate of the VM is 
+downloaded and installed. The VM's PowerShell remoting ConnectionURI is located and 
+returned via a BoxstarterConfig instance.
 
 Enable-BoxstarterVM will also restore the VM to a specified 
 checkpoint or create a new checkpoint if the given checkpoint 
@@ -23,43 +24,59 @@ The Credential to use to test PSRemoting.
 If a Checkpoint exists by this name, it will be restored. Otherwise one will be created.
 
 .NOTES
-PSRemoting mut be enabled in order for Boxstarter to install to a remote machine. Bare 
-Metal machines require a manual step of enabling it before remote Boxstarter installs 
-will work. However, on a Hyper-V VM, Boxstarter can manage this by mounting and 
-manipulating the VM's VHD. Boxstarter can open the WMI ports which enable it to create a 
-Scheduled Task that will enable PSRemoting. For VMs that are not domain joined, 
-Boxstarter will also enable LocalAccountTokenFilterPolicy so that local accounts can 
-authenticate remotely.
+Boxstarter uses Azure Blob snapshots to create and manage VM checkpoints. These 
+will not be found in the Azure portal, but you can use Boxstarter's checkpoint 
+commands to manage them: Set-AzureVMCheckpoint, Get-AzureVMCheckpoint, 
+Restore-AzureVMCheckpoint and Remove-AzureVMCheckpoint.
 
-For Non-HyperV VMs, use Enable-BoxstarterVHD to perform these adjustments on the VHD of 
-the VM. The VM must be powered off and accesible.
+The Windows Azure Powershell SDK and the .NET Libraries SDK are both used to 
+manage the Azure VMs and Blobs.
 
 .OUTPUTS
-A BoxstarterConnectionConfig that contains the DNS Name of the VM Computer and 
+A BoxstarterConnectionConfig that contains the ConnectionURI of the VM Computer and 
 the PSCredential needed to authenticate.
+
+.EXAMPLE
+$cred=Get-Credential AzureAdmin
+New-AzureQuickVM -ServiceName MyService -Windows -Name MyVM `
+  -ImageName 3a50f22b388a4ff7ab41029918570fa6__Windows-Server-2012-Essentials-20131217-enus `
+  -Password $cred.GetNetworkCredential().Password -AdminUsername $cred.UserName 
+  -Location "West-US" -WaitForBoot
+Enable-BoxstarterVM MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
+
+Uses the Azure Powershell SDK to create a new VM. Enable-BoxstarterVM 
+then installs the WinRM certificate and obtains the VM's ConnectionURI 
+which is piped to Install-BoxstarterPackage to install MyPackage.
 
 .EXAMPLE
 Enable-BoxstarterVM MyVM $cred
 
-Prepares MyVM for a Boxstarter Installation
+Installs the WinRM certificate associated with the VM and locates its ConnectionURI
 
 .EXAMPLE
 Enable-BoxstarterVM MyVM $cred | Install-BoxstarterPackage MyPackage
 
-Prepares MyVM and then installs MyPackage
+Obtains the VM ConnectionURI and uses that to install MyPackage
 
 .EXAMPLE
 Enable-BoxstarterVM MyVM $cred ExistingSnapshot | Install-BoxstarterPackage MyPackage
 
-Prepares MyVM, Restores ExistingSnapshot and then installs MyPackage
+Gets MyVM's ConnectionURI, restores it to the state stored in ExistingSnapshot 
+and then installs MyPackage
 
 .EXAMPLE
 Enable-BoxstarterVM MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
 
-Prepares MyVM, Creates a new snapshot named NewSnapshot and then installs MyPackage
+Gets MyVM's ConnectionURI, creates a new snapshot named NewSnapshot and 
+then installs MyPackage
 
 .LINK
 http://boxstarter.codeplex.com
+Install-BoxstarterPackage
+Set-AzureVMCheckpoint
+Get-AzureVMCheckpoint
+Restore-AzureVMCheckpoint
+Remove-AzureVMCheckpoint
 
 #>
     [CmdletBinding()]

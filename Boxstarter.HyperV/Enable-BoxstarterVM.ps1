@@ -35,7 +35,7 @@ For Non-HyperV VMs, use Enable-BoxstarterVHD to perform these adjustments on the
 the VM. The VM must be powered off and accesible.
 
 .OUTPUTS
-A BoxstarterConnectionConfig that contains the DNS Name of the VM Computer and 
+A BoxstarterConnectionConfig that contains the ConnectionURI of the VM Computer and 
 the PSCredential needed to authenticate.
 
 .EXAMPLE
@@ -60,7 +60,8 @@ Prepares MyVM, Creates a new snapshot named NewSnapshot and then installs MyPack
 
 .LINK
 http://boxstarter.codeplex.com
-
+Enable-BoxstarterVHD
+Install-BoxstarterPackage
 #>
     [CmdletBinding()]
     [OutputType([BoxstarterConnectionConfig])]
@@ -177,7 +178,7 @@ http://boxstarter.codeplex.com
                 Checkpoint-VM -Name $_ -SnapshotName $CheckpointName
             }
 
-            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList "http://$computerName:5985/wsman",$Credential
+            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList "http://$($computerName):5985/wsman",$Credential
             return $res
         }
     }
