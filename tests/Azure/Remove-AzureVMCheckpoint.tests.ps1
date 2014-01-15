@@ -22,21 +22,6 @@ Describe "Remove-AzureVMCheckpoint" {
     } -parameterFilter {$ServiceName.Length -gt 0}
     Mock Get-AzureOSDisk
 
-    Context "When Azure .NET SDK is not installed" {
-        Mock Add-Type { throw "not installed" }
-
-        try {
-            Remove-AzureVMCheckpoint -VMName "vm" -CheckpointName "cp"
-        }
-        catch{
-            $err = $_
-        }
-
-        It "Will throw Invalid Operation Exception" {
-            $err.CategoryInfo.Reason | should be "InvalidOperationException"
-        }
-    }
-
     Context "When VM cannot be found" {
         Mock Get-AzureVM { return $null } -parameterFilter {$ServiceName.Length -eq 0}
 

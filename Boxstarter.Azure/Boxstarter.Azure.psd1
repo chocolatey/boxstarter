@@ -21,6 +21,8 @@ PowerShellVersion = '3.0'
 # Minimum version of the .NET Framework required by this module
 DotNetFrameworkVersion = '4.0'
 
+RequiredAssemblies = @( "$env:ProgramFiles\Microsoft SDKs\Windows Azure\.NET SDK\v2.2\bin\Microsoft.WindowsAzure.StorageClient.dll" )
+
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @('..\Boxstarter.Common\Boxstarter.Common.psd1','..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1')
 

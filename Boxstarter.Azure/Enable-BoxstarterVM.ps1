@@ -86,6 +86,9 @@ Remove-AzureVMCheckpoint
         [string[]]$VMName,
         [parameter(Mandatory=$true, Position=1)]
         [Management.Automation.PsCredential]$Credential,
+        [parameter(Mandatory=$false, Position=2)]
+        [string]$CloudServiceName,
+        [parameter(Mandatory=$false, Position=3)]
         [string]$CheckpointName
     )
     Begin {
@@ -108,29 +111,27 @@ Remove-AzureVMCheckpoint
             $exportFile= Join-Path $env:temp $_.xml
 
             Write-BoxstarterMessage "Locating Azure VM $_..."
-            $vmShallow=Get-AzureVM -Name $_
-            if($vmShallow -eq $null){
+            $vm=Get-AzureVM -ServiceName $CloudServiceName -Name $_
+            if($vm -eq $null){
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
             }
 
-            $serviceName = $vmShallow.ServiceName
-
             if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
-                $snapshot = Get-AzureVMCheckpoint -VM $_ -CheckpointName $CheckpointName
+                $snapshot = Get-AzureVMCheckpoint -VM $vm -CheckpointName $CheckpointName
                 if($snapshot -ne $null) {
-                    Restore-AzureVMCheckpoint -VM $_ -CheckpointName $CheckpointName
+                    Restore-AzureVMCheckpoint -VM $vm -CheckpointName $CheckpointName
                     $restored=$true
                 }
             }
 
             if($vmShallow.Status -ne "ReadyRole"){
                 Write-BoxstarterMessage "Starting Azure VM $_..."
-                Start-AzureVM -Name $_ -ServiceName $serviceName | Out-Null
+                Start-AzureVM -Name $_ -ServiceName $CloudServiceName | Out-Null
                 Wait-ReadyState $_
             }
 
-            Install-WinRMCert -ServiceName $serviceName -VMName $_
-            $uri = Get-AzureWinRMUri -serviceName $serviceName -Name $_
+            Install-WinRMCert $vm
+            $uri = Get-AzureWinRMUri -serviceName $CloudServiceName -Name $_
             $ComputerName=$uri.Host
             $clientRemoting = Enable-BoxstarterClientRemoting $ComputerName
             Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
@@ -140,8 +141,8 @@ Remove-AzureVMCheckpoint
             }
         
             if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
-                Write-BoxstarterMessage "Creating Checkpoint $CheckpointName for service $serviceName VM $_ at $CheckpointFile"
-                Set-AzureVMCheckpoint -VM $_ -CheckpointName $CheckpointName | Out-Null
+                Write-BoxstarterMessage "Creating Checkpoint $CheckpointName for service $CloudServiceName VM $_ at $CheckpointFile"
+                Set-AzureVMCheckpoint -VM $vm -CheckpointName $CheckpointName | Out-Null
             }
 
             $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $uri,$Credential
