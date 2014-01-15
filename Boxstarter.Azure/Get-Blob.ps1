@@ -12,10 +12,10 @@ function Get-Blob {
         throw New-Object -TypeName InvalidOperationException -ArgumentList "The CurrentStorageAccountName has not been set. Use Set-AzureSubscription to set your current storage account"
     }
 
-    $key = (Get-AzureStorageKey -StorageAccountName $storageAccount).Primary
+    $key = Invoke-RetriableScript { (Get-AzureStorageKey -StorageAccountName $args[0]).Primary } $storageAccount
     $creds = New-Object Microsoft.WindowsAzure.StorageCredentialsAccountAndKey($storageAccount,$key)
 
-    $vmOSDisk=Get-AzureOSDisk -vm $VM
+    $vmOSDisk=Invoke-RetriableScript { Get-AzureOSDisk -vm $args[0] } $VM
     $blobURI = $vmOSDisk.MediaLink
     $blobPath = $BlobUri.LocalPath.Substring(1)
     $blobClient = New-Object Microsoft.WindowsAzure.StorageClient.CloudBlobClient("http://$($blobUri.Host)", $creds)

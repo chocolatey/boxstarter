@@ -111,7 +111,7 @@ Remove-AzureVMCheckpoint
             $exportFile= Join-Path $env:temp $_.xml
 
             Write-BoxstarterMessage "Locating Azure VM $_..."
-            $vm=Get-AzureVM -ServiceName $CloudServiceName -Name $_
+            $vm = Invoke-RetriableScript { Get-AzureVM -ServiceName $args[0] -Name $args[1] } $CloudServiceName $_
             if($vm -eq $null){
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
             }
@@ -124,9 +124,9 @@ Remove-AzureVMCheckpoint
                 }
             }
 
-            if($vmShallow.Status -ne "ReadyRole"){
+            if($vm.InstanceStatus -ne "ReadyRole"){
                 Write-BoxstarterMessage "Starting Azure VM $_..."
-                Start-AzureVM -Name $_ -ServiceName $CloudServiceName | Out-Null
+                Invoke-RetriableScript { Start-AzureVM -Name $args[0] -ServiceName $args[1] } $_ $CloudServiceName | Out-Null
                 Wait-ReadyState $_
             }
 
@@ -157,5 +157,5 @@ Remove-AzureVMCheckpoint
 
 function Wait-ReadyState($vmName) {
     do {Start-Sleep -milliseconds 100} 
-    until ((Get-AzureVM -Name $vmName).Status -eq "ReadyRole")
+    until (( Invoke-RetriableScript { (Get-AzureVM -Name $args[0]).Status } $vmName ) -eq "ReadyRole")
 }

@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Get-CurrentUser.ps1" />
+    <Content Include="Invoke-RetriableScript.ps1" />
     <Content Include="Write-BoxstarterLogo.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -51,7 +51,6 @@
   <ItemGroup>
     <Content Include="Enable-BoxstarterCredSSP.ps1" />
     <Content Include="BoxstarterConnectionConfig.ps1" />
-    <Content Include="Invoke-RetriableScript.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Boxstarter.Chocolatey.psd1" />

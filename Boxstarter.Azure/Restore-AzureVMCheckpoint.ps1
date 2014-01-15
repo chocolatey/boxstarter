@@ -37,9 +37,8 @@ Remove-AzureVMCheckpoint
     }
 
     $blob=Get-Blob $vm
-    $serviceName = $vm.ServiceName
     $exportPath = "$env:temp\boxstarterAzureCheckpoint$($vm.Name).xml"
-    $vmOSDisk=Get-AzureOSDisk -VM $VM
+    $vmOSDisk=Invoke-RetriableScript { Get-AzureOSDisk -VM $args[0] } $VM
 
     Write-BoxstarterMessage "Exporting vm config for $($vm.Name) of $serviceName service to $exportPath..."
     $exportResult = Export-AzureVM -ServiceName $vm.serviceName -Name $vm.Name -Path $exportPath
@@ -48,21 +47,21 @@ Remove-AzureVMCheckpoint
     }
 
     Write-BoxstarterMessage "Removing Azure VM $($vm.Name)..."
-    Remove-AzureVM -ServiceName $serviceName -Name $VM.Name | Out-Null
+    Invoke-RetriableScript { Remove-AzureVM -ServiceName $args[0].serviceName -Name $args[0].Name } $VM| Out-Null
 
     Write-BoxstarterMessage "Waiting for disk $($vmOSDisk.DiskName) to be free..."
     do {Start-Sleep -milliseconds 100} 
-    until ((Get-AzureDisk -DiskName $vmOSDisk.DiskName).AttachedTo -eq $null)
+    until ((Invoke-RetriableScript { (Get-AzureDisk -DiskName $args[0]).AttachedTo } $vmOSDisk.DiskName ) -eq $null)
 
     Write-BoxstarterMessage "Removing disk $($vmOSDisk.DiskName)..."
-    Remove-AzureDisk -DiskName $vmOSDisk.DiskName | Out-Null
+    Invoke-RetriableScript { Remove-AzureDisk -DiskName $args[0] } $vmOSDisk.DiskName | Out-Null
 
     Write-BoxstarterMessage "Copying $($checkpoint.snapshot.Uri) to blob..."
     $blob.CopyFromBlob($checkpoint.snapshot)
 
     Write-BoxstarterMessage "Creating new disk from blob..."
-    Add-AzureDisk -DiskName $vmOSDisk.DiskName -MediaLocation $blob.Uri -OS Windows | Out-Null
+    Invoke-RetriableScript { Add-AzureDisk -DiskName $args[0] -MediaLocation $args[1] -OS Windows } $vmOSDisk.DiskName $blob.Uri | Out-Null
 
     Write-BoxstarterMessage "Creating new VM at Checkpoint..."
-    Import-AzureVM -path $exportPath | New-AzureVM -ServiceName $vm.serviceName -WaitForBoot | Out-Null
+    Invoke-RetriableScript { Import-AzureVM -path $args[0] | New-AzureVM -ServiceName $args[1] -WaitForBoot } $exportPath $vm.serviceName | Out-Null
  }
