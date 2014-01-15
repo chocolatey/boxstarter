@@ -10,45 +10,11 @@ Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "Remove-AzureVMCheckpoint" {
+    Add-Type -path "$env:ProgramFiles\Microsoft SDKs\Windows Azure\.NET SDK\v2.2\bin\Microsoft.WindowsAzure.StorageClient.dll"
     $Boxstarter.SuppressLogging=$false
-    Mock Get-AzureVM { 
-        $obj=New-Object -TypeName Microsoft.WindowsAzure.Commands.ServiceManagement.Model.PersistentVMRoleListContext
-        $obj.ServiceName="myService"
-        $obj.Status="ReadyRole"
-        return $obj 
-    } -parameterFilter {$ServiceName.Length -eq 0}
-    Mock Get-AzureVM { 
-        return New-Object -TypeName Microsoft.WindowsAzure.Commands.ServiceManagement.Model.PersistentVM
-    } -parameterFilter {$ServiceName.Length -gt 0}
     Mock Get-AzureOSDisk
+    $vm = new-Object Microsoft.WindowsAzure.Commands.ServiceManagement.Model.PersistentVMRoleContext
+    $vm.Name="VMName"
+    $vm.ServiceName="service"
 
-    Context "When VM cannot be found" {
-        Mock Get-AzureVM { return $null } -parameterFilter {$ServiceName.Length -eq 0}
-
-        try {
-            Remove-AzureVMCheckpoint -VMName "vm" -CheckpointName "cp"
-        }
-        catch{
-            $err = $_
-        }
-
-        It "Will throw Argument Exception" {
-            $err.CategoryInfo.Reason | should be "ArgumentException"
-        }
-    }
-
-    Context "When the Current Storage Account has not been set in the subscription" {
-        Mock Get-AzureSubscription {@{CurrentStorageAccountName=$null}}
-
-        try {
-            Remove-AzureVMCheckpoint -VMName "vm" -CheckpointName "cp"
-        }
-        catch{
-            $err = $_
-        }
-
-        It "Will throw Argument Exception" {
-            $err.CategoryInfo.Reason | should be "InvalidOperationException"
-        }
-    }
 }

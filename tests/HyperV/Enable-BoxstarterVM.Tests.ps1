@@ -220,8 +220,8 @@ Describe "Enable-BoxstarterVM" {
         It "Should not Stop VM"{
             Assert-MockCalled Stop-VM -times 0
         }
-        It "should return VM ComputerName" {
-            $result.ComputerName | should be "SomeComputer"
+        It "should return VM ConnectionURI" {
+            $result.ConnectionURI | should be "http://SomeComputer:5985/wsman"
         }
         It "should return Credential" {
             $result.Credential | should be $mycreds

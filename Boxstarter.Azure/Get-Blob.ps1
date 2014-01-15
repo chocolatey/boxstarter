@@ -2,9 +2,6 @@ function Get-Blob {
     param (
         [Microsoft.WindowsAzure.Commands.ServiceManagement.Model.IPersistentVM]$VM
     )
-    if($vm -eq $null){
-        throw New-Object -TypeName ArgumentException -ArgumentList "VMName","The VM with the Name provided could not be found"
-    }
     $ServiceName=$vm.ServiceName
 
     $storageAccount = (Get-AzureSubscription).CurrentStorageAccountName
