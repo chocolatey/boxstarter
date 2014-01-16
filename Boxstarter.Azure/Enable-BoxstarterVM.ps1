@@ -82,12 +82,12 @@ Remove-AzureVMCheckpoint
     [CmdletBinding()]
     [OutputType([BoxstarterConnectionConfig])]
     param(
-        [parameter(Mandatory=$true, ValueFromPipeline=$True, Position=0)]
-        [string[]]$VMName,
-        [parameter(Mandatory=$true, Position=1)]
-        [Management.Automation.PsCredential]$Credential,
-        [parameter(Mandatory=$false, Position=2)]
+        [parameter(Mandatory=$true, Position=0)]
         [string]$CloudServiceName,
+        [parameter(Mandatory=$true, ValueFromPipeline=$True, Position=1)]
+        [string[]]$VMName,
+        [parameter(Mandatory=$true, Position=2)]
+        [Management.Automation.PsCredential]$Credential,
         [parameter(Mandatory=$false, Position=3)]
         [string]$CheckpointName
     )
@@ -127,13 +127,13 @@ Remove-AzureVMCheckpoint
             if($vm.InstanceStatus -ne "ReadyRole"){
                 Write-BoxstarterMessage "Starting Azure VM $_..."
                 Invoke-RetriableScript { Start-AzureVM -Name $args[0] -ServiceName $args[1] } $_ $CloudServiceName | Out-Null
-                Wait-ReadyState $_
+                Wait-ReadyState -VMName $_
             }
 
             Install-WinRMCert $vm
-            $uri = Get-AzureWinRMUri -serviceName $CloudServiceName -Name $_
+            $uri = Invoke-RetriableScript { Get-AzureWinRMUri -serviceName $args[0] -Name $args[1] } $CloudServiceName $_
             $ComputerName=$uri.Host
-            $clientRemoting = Enable-BoxstarterClientRemoting $ComputerName
+            Enable-BoxstarterClientRemoting $ComputerName | out-Null
             Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
             $remotingTest = Invoke-Command $uri { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
             if(!$remotingTest) {
