@@ -92,15 +92,25 @@ Remove-AzureVMCheckpoint
         [string]$CheckpointName
     )
     Begin {
+        $CurrentVerbosity=$global:VerbosePreference
+
         ##Cannot run remotely unelevated. Look into self elevating
         if(!(Test-Admin)) {
             Write-Error "You must be running as an administrator. Please open a Powershell console as Administrator and rerun Install-BoxstarperPackage."
             return
         }
 
-        ###Validate that the VM and Azure account is good.
+        $subscription=Get-AzureSubscription
+        if($subscription -eq $null){
+            throw @"
+Your Azure subscription information has not been sent.
+Run Get-AzurePublishSettingsFile to download your Publisher settings.
+Then run Import-AzurePublishSettingsFile with the settings file.
+Once that is done, please run Enable-BoxstarterVM again.
+"@
+            return
+        }
 
-        $CurrentVerbosity=$global:VerbosePreference
         if($PSBoundParameters["Verbose"] -eq $true) {
             $global:VerbosePreference="Continue"
         }
@@ -114,6 +124,13 @@ Remove-AzureVMCheckpoint
             $vm = Invoke-RetriableScript { Get-AzureVM -ServiceName $args[0] -Name $args[1] } $CloudServiceName $_
             if($vm -eq $null){
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
+            }
+
+            if($subscription.CurrentStorageAccountName -eq $null) {
+                $disk=Invoke-RetriableScript { Get-AzureOSDisk -VM $args[0] } $vm
+                $endpoint="http://$($disk.MediaLink.Host)/"
+                $storageAccount=Invoke-RetriableScript { Get-AzureStorageAccount } | ? { $_.Endpoints -contains $endpoint }
+                Set-AzureSubscription -SubscriptionName $subscription.SubscriptionName -CurrentStorageAccountName $storageAccount.Label
             }
 
             if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
