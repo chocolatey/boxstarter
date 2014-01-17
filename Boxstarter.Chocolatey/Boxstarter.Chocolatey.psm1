@@ -6,5 +6,4 @@ Export-ModuleMember Invoke-ChocolateyBoxstarter, New-BoxstarterPackage, Invoke-B
 
 Export-ModuleMember Install-ChocolateyInstallPackageOverride,
                     Write-HostOverride
-Export-ModuleMember -alias Install-ChocolateyInstallPackage,
-                           Write-Host
+Export-ModuleMember -alias Install-ChocolateyInstallPackage, Write-Host, Enable-BoxstarterVM
