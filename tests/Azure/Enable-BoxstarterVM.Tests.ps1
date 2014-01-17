@@ -145,4 +145,19 @@ Describe "Enable-BoxstarterVM.Azure" {
             $err.CategoryInfo.Reason | should be "InvalidOperationException"
         }
     }
+
+    Context "When VM connectionURI cant be obtained"{
+        Mock Get-AzureWinRMUri
+
+        try {
+            Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds
+        }
+        catch {
+            $err=$_
+        }
+
+        It "should throw InvalidOperationException" {
+            $err.CategoryInfo.Reason | should be "InvalidOperationException"
+        }
+    }
 }

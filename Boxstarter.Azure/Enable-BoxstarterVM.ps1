@@ -149,12 +149,15 @@ Once that is done, please run Enable-BoxstarterVM again.
 
             Install-WinRMCert $vm
             $uri = Invoke-RetriableScript { Get-AzureWinRMUri -serviceName $args[0] -Name $args[1] } $CloudServiceName $_
+            if($uri -eq $null) {
+                throw New-Object -TypeName InvalidOperationException -ArgumentList "WinRM Endpoint is not configured on VM. Use Add-AzureEndpoint to add Powershell remoting endpoint and use Enable-PSRemoting -Force on the VM to enable powershell remoting."
+            }
             $ComputerName=$uri.Host
             Enable-BoxstarterClientRemoting $ComputerName | out-Null
             Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
             $remotingTest = Invoke-Command $uri { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
             if(!$remotingTest) {
-                Write-BoxstarterMessage "Unable to establish a remote connection with $_"
+                throw New-Object -TypeName InvalidOperationException -ArgumentList "Unable to establish a remote connection with $_. Use Enable-PSRemoting -Force on the VM to enable powershell remoting."
             }
         
             if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
