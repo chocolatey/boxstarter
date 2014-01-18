@@ -1,23 +1,22 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Boxstarter</id>
+    <id>Boxstarter.Azure</id>
     <version>$version$</version>
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
+    <title>Boxstarter Azure Module</title>
     <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=boxstarter&amp;DownloadId=635599&amp;Build=20006</iconUrl>
-    <title>Boxstarter</title>
     <projectUrl>http://Boxstarter.org</projectUrl>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-    <description>Repeatable, reboot resilient windows environment installations made easy using Chocolatey packages. When its time to repave either bare metal or virtualized instances, locally or on a remote machine, Boxstarter can automate both trivial and highly complex installations. Compatible with all Windows versions from Windows 7/2008 R2 forward.</description>
-    <tags>Boxstarter chocolatey environment setup</tags>
+    <description>Boxstarter's Azure module includes functionality for targeting Azure VMs with the ability to save and restore checkpoints leveraging blob snapshots.</description>
+    <tags>Boxstarter bootstrapper environment setup VM virtualization Azure</tags>
     <dependencies>
       <dependency id="Boxstarter.Common" version="$version$" />
-      <dependency id="Boxstarter.WinConfig" version="$version$" />
-      <dependency id="Boxstarter.Bootstrapper" version="$version$" />
       <dependency id="Boxstarter.Chocolatey" version="$version$" />
-      <dependency id="Boxstarter.HyperV" version="$version$" />
-      <dependency id="Boxstarter.Azure" version="$version$" />    </dependencies>
+      <dependency id="WindowsAzurePowershell" />
+      <dependency id="WindowsAzureLibrariesForNet" version="2.2" />
+    </dependencies>
     <releaseNotes>
       - Adding an optional Boxstarter Shell to ensure environment is correct
       - Retry Nuget package creation in case of latency between nuget.exe nuspec creation and accessing the nuspec
@@ -40,11 +39,12 @@
       - Use WindowsIdentity instead of environment vars for current username and domain since the env vars sometimes get overwritten with the SYSTEM user.
       - Fix VM Hang when restoring snapshots taken when the VM was shut down.
       - More Error handling improvements: Remove connection interruption errors from returned error collection. They are still logged.
-      - Add Commands for configuring remoting and installing packages on a Hyper-V vm with support for restoring and creating checkpoints
-      - Add ability to configure a VHD to open it to WMI so that Boxstarter Installs canenable remoting.
     </releaseNotes>
   </metadata>
   <files>
-    <file src="..\BoxstarterChocolateyinstall.ps1" target="tools\chocolateyinstall.ps1"/>
+    <file src="..\..\LICENSE.txt" target="tools"/>
+    <file src="..\chocolateyinstall.ps1" target="tools"/>
+    <file src="..\Setup.ps1" target="tools"/>    
+    <file src="..\..\Boxstarter.Azure\**\*.*" target="tools\Boxstarter.Azure"/>
   </files>
 </package>
