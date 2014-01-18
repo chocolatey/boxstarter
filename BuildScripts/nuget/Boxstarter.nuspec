@@ -17,7 +17,7 @@
       <dependency id="Boxstarter.Bootstrapper" version="$version$" />
       <dependency id="Boxstarter.Chocolatey" version="$version$" />
       <dependency id="Boxstarter.HyperV" version="$version$" />
-      <dependency id="Boxstarter.Azure" version="$version$" />    </dependencies>
+    </dependencies>
     <releaseNotes>
       - Adding an optional Boxstarter Shell to ensure environment is correct
       - Retry Nuget package creation in case of latency between nuget.exe nuspec creation and accessing the nuspec
