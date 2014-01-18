@@ -153,7 +153,7 @@ Once that is done, please run Enable-BoxstarterVM again.
                 Wait-ReadyState -VMName $_
             }
 
-            Install-WinRMCert $vm
+            Install-WinRMCert $vm | Out-Null
             $uri = Invoke-RetriableScript { Get-AzureWinRMUri -serviceName $args[0] -Name $args[1] } $CloudServiceName $_
             if($uri -eq $null) {
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "WinRM Endpoint is not configured on VM. Use Add-AzureEndpoint to add Powershell remoting endpoint and use Enable-PSRemoting -Force on the VM to enable powershell remoting."

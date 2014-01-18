@@ -74,6 +74,7 @@ Install-BoxstarterPackage
         [string[]]$VMName,
         [parameter(Mandatory=$true, Position=1)]
         [Management.Automation.PsCredential]$Credential,
+        [parameter(Mandatory=$false, Position=2)]
         [string]$CheckpointName
     )
     Begin {
