@@ -14,6 +14,12 @@ Enable-BoxstarterVM will also restore the VM to a specified
 checkpoint or create a new checkpoint if the given checkpoint 
 does not exist.
 
+.Parameter Provider
+The VM Provider to use.
+
+.PARAMETER CloudServiceName
+The name of the Azyure Cloud Service associated with the VM.
+
 .PARAMETER VMName
 The name of the VM to enable.
 
@@ -42,30 +48,30 @@ New-AzureQuickVM -ServiceName MyService -Windows -Name MyVM `
   -ImageName 3a50f22b388a4ff7ab41029918570fa6__Windows-Server-2012-Essentials-20131217-enus `
   -Password $cred.GetNetworkCredential().Password -AdminUsername $cred.UserName 
   -Location "West-US" -WaitForBoot
-Enable-BoxstarterVM MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
+Enable-BoxstarterVM -Provider Azure -CloudServiceName MyService -VMName MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
 
 Uses the Azure Powershell SDK to create a new VM. Enable-BoxstarterVM 
 then installs the WinRM certificate and obtains the VM's ConnectionURI 
 which is piped to Install-BoxstarterPackage to install MyPackage.
 
 .EXAMPLE
-Enable-BoxstarterVM MyVM $cred
+Enable-BoxstarterVM -Provider Azure -CloudServiceName MyService -VMName MyVM $cred
 
 Installs the WinRM certificate associated with the VM and locates its ConnectionURI
 
 .EXAMPLE
-Enable-BoxstarterVM MyVM $cred | Install-BoxstarterPackage MyPackage
+Enable-BoxstarterVM -Provider Azure -CloudServiceName MyService -VMName MyVM $cred | Install-BoxstarterPackage MyPackage
 
 Obtains the VM ConnectionURI and uses that to install MyPackage
 
 .EXAMPLE
-Enable-BoxstarterVM MyVM $cred ExistingSnapshot | Install-BoxstarterPackage MyPackage
+Enable-BoxstarterVM -Provider Azure -CloudServiceName MyService -VMName MyVM $cred ExistingSnapshot | Install-BoxstarterPackage MyPackage
 
 Gets MyVM's ConnectionURI, restores it to the state stored in ExistingSnapshot 
 and then installs MyPackage
 
 .EXAMPLE
-Enable-BoxstarterVM MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
+Enable-BoxstarterVM -Provider Azure -CloudServiceName MyService -VMName MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
 
 Gets MyVM's ConnectionURI, creates a new snapshot named NewSnapshot and 
 then installs MyPackage

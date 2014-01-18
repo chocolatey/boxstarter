@@ -13,6 +13,9 @@ Enable-BoxstarterVM will also restore the VM to a specified
 checkpoint or create a new checkpoint if the given checkpoint 
 does not exist.
 
+.Parameter Provider
+The VM Provider to use.
+
 .PARAMETER VMName
 The name of the VM to enable.
 
@@ -39,22 +42,23 @@ A BoxstarterConnectionConfig that contains the ConnectionURI of the VM Computer 
 the PSCredential needed to authenticate.
 
 .EXAMPLE
-Enable-BoxstarterVM MyVM $cred
+$cred=Get-Credential domain\username
+Enable-BoxstarterVM -Provider HyperV -VMName MyVM $cred
 
 Prepares MyVM for a Boxstarter Installation
 
 .EXAMPLE
-Enable-BoxstarterVM MyVM $cred | Install-BoxstarterPackage MyPackage
+Enable-BoxstarterVM -Provider HyperV -VMName MyVM $cred | Install-BoxstarterPackage MyPackage
 
 Prepares MyVM and then installs MyPackage
 
 .EXAMPLE
-Enable-BoxstarterVM MyVM $cred ExistingSnapshot | Install-BoxstarterPackage MyPackage
+Enable-BoxstarterVM -Provider HyperV -VMName MyVM $cred ExistingSnapshot | Install-BoxstarterPackage MyPackage
 
 Prepares MyVM, Restores ExistingSnapshot and then installs MyPackage
 
 .EXAMPLE
-Enable-BoxstarterVM MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
+Enable-BoxstarterVM -Provider HyperV -VMName MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
 
 Prepares MyVM, Creates a new snapshot named NewSnapshot and then installs MyPackage
 

@@ -1,5 +1,6 @@
 function Resolve-VMPlugin {
     [CmdletBinding()]
+    [OutputType([BoxstarterConnectionConfig])]
     param(
         $Provider
     )
