@@ -40,7 +40,7 @@ Remove-AzureVMCheckpoint
     $exportPath = "$env:temp\boxstarterAzureCheckpoint$($vm.Name).xml"
     $vmOSDisk=Invoke-RetriableScript { Get-AzureOSDisk -VM $args[0] } $VM
 
-    Write-BoxstarterMessage "Exporting vm config for $($vm.Name) of $serviceName service to $exportPath..."
+    Write-BoxstarterMessage "Exporting vm config for $($vm.ServiceName) of $serviceName service to $exportPath..."
     $exportResult = Export-AzureVM -ServiceName $vm.serviceName -Name $vm.Name -Path $exportPath
     if($exportResult -eq $null) {
         throw "Unable to export VM"
