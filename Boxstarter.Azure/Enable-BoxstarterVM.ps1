@@ -163,7 +163,7 @@ Once that is done, please run Enable-BoxstarterVM again.
             Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
             $remotingTest = Invoke-Command $uri { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
             if(!$remotingTest) {
-                throw New-Object -TypeName InvalidOperationException -ArgumentList "Unable to establish a remote connection with $_. Use Enable-PSRemoting -Force on the VM to enable powershell remoting."
+                Write-Error "Unable to establish a remote connection with $_. Use Enable-PSRemoting -Force on the VM to enable powershell remoting."
             }
         
             if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {

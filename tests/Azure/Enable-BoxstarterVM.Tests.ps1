@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-if(get-module Boxstarter.Azure){Remove-Module boxstarter.Azure}
+Remove-Module boxstarter.*
 Resolve-Path $here\..\..\Boxstarter.Azure\*.ps1 | 
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
@@ -8,6 +8,7 @@ Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
     % { . $_.ProviderPath }
+Remove-Item alias:\Enable-BoxstarterVM
 
 Describe "Enable-BoxstarterVM.Azure" {
     $Boxstarter.SuppressLogging=$true
@@ -36,7 +37,7 @@ Describe "Enable-BoxstarterVM.Azure" {
         $snapshotName="snapshot"
         Mock Get-AzureVMCheckpoint { "I am a snapshot" } -parameterFilter {$CheckpointName -eq $snapshotName}
 
-        Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -CheckPointName $snapshotName | Out-Null
+        Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -CheckPointName $snapshotName -ErrorAction SilentlyContinue | Out-Null
 
         It "Should restore snapshot"{
             Assert-MockCalled Restore-AzureVMCheckpoint
@@ -49,7 +50,7 @@ Describe "Enable-BoxstarterVM.Azure" {
         Mock Get-AzureVM { return @{Status="ReadyRole"} } -parameterFilter { $ServiceName.Length -eq 0 }
         Mock Start-AzureVM -verifiable
 
-        Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -verbose | Out-Null
+        Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -ErrorAction SilentlyContinue | Out-Null
 
         It "Should start vm"{
             Assert-VerifiableMocks
@@ -60,7 +61,7 @@ Describe "Enable-BoxstarterVM.Azure" {
     Context "When a checkpoint is specified that does not exists"{
         $snapshotName="snapshot"
 
-        Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -CheckPointName $snapshotName | Out-Null
+        Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -CheckPointName $snapshotName -ErrorAction SilentlyContinue | Out-Null
 
         It "Should not restore snapshot"{
             Assert-MockCalled Restore-AzureVMCheckpoint -times 0
@@ -72,7 +73,7 @@ Describe "Enable-BoxstarterVM.Azure" {
 
     Context "When no checkpoint is specified"{
 
-        Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds | Out-Null
+        Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -ErrorAction SilentlyContinue | Out-Null
 
         It "Should not restore snapshot"{
             Assert-MockCalled Restore-AzureVMCheckpoint -times 0
@@ -83,7 +84,7 @@ Describe "Enable-BoxstarterVM.Azure" {
     }
 
     Context "When calling normally"{
-        $result = Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds
+        $result = Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -ErrorAction SilentlyContinue
 
         It "should return VM ConnectionURI" {
             $result.ConnectionURI | should be $vmConnectionURI
@@ -124,7 +125,7 @@ Describe "Enable-BoxstarterVM.Azure" {
             }
         )}
 
-        $result = Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds
+        $result = Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -ErrorAction SilentlyContinue
 
         It "should set current storage account to acct2" {
             Assert-MockCalled Set-AzureSubscription -parameterFilter { $SubscriptionName -eq "subName" -and $CurrentStorageAccountName -eq "acct2" }

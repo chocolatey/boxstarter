@@ -8,6 +8,8 @@ Describe "Enable-BoxstarterVM" {
     % { . $_.ProviderPath }
     Resolve-Path $here\..\..\boxstarter.Chocolatey\*.ps1 | 
     % { . $_.ProviderPath }
+    Remove-Item alias:\Enable-BoxstarterVM
+
     $Boxstarter.SuppressLogging=$true
     New-Item $env:temp\boxstarter.vhd -ItemType File -Force | out-Null
 
