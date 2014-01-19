@@ -17,30 +17,10 @@
       <dependency id="Boxstarter.Bootstrapper" version="$version$" />  
     </dependencies>
     <releaseNotes>
-      - Adding an optional Boxstarter Shell to ensure environment is correct
-      - Retry Nuget package creation in case of latency between nuget.exe nuspec creation and accessing the nuspec
-      - Fix Remote installs when using a ConnectionURI on a non default port
-      - Do not prompt for password and keep auto logon ON if autologon is already configured for user
-      - Fix install from web when using a computer name with unicode characters
-      - Fix Hangs at end of a remote install on azure 2012 R2 boxes
-      - Add lots of verbose level logging and console output around connection set and errors
-      - Add Retry logic around most remote calls
-      - Fix Module Auto Loading and function recognition on PS 3+
-      - Concatenate local repo and nuget sources so when using local packages they can use dependencies stored in the nuget sources
-      - When enabling PS remoting via WMI, change public network location to private
-      - Add Enable/Disable Microsoft Updates
-      - Ensure all scheduled tasks run with Normal priority not Below Normal
-      - Fix the hiding of error messages during chocolatey scripts
-      - fix bitlocker suspension of machines that protect non OS drives
-      - Fix VHD mounting on some machines that do not automatically create a PSDrive for the newly mounted disk.
-      - Do not disable CredSSP on remote machines while authenticated using CredSSP
-      - Fix setup.bat in bootstrapper
-      - Use WindowsIdentity instead of environment vars for current username and domain since the env vars sometimes get overwritten with the SYSTEM user.
-      - Fix VM Hang when restoring snapshots taken when the VM was shut down.
-      - More Error handling improvements: Remove connection interruption errors from returned error collection. They are still logged.
-      - Supports new Boxstarter.HyperV module.
-      - Add Commands for configuring remoting and installing packages on a Hyper-V vm with support for restoring and creating checkpoints
-      - Add ability to configure a VHD to open it to WMI so that Boxstarter Installs canenable remoting.
+      - Adds Windows Azure VM Integration
+      - Supports VM Checkpoints using Azure Blob Snapshots
+      - Adds Graceful failure to Enable-RemoteDesktop for Home versions of Windows 7
+      - Adds support for unattended install of Boxstarter
     </releaseNotes>
   </metadata>
   <files>
