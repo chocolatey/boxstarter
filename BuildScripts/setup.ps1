@@ -31,7 +31,7 @@ To find more info visit http://Boxstarter.org or use:
 PS:>Import-Module $ModuleName
 PS:>Get-Help Boxstarter
 "@
-    Write-BoxstarterMessage $successMsg
+    Write-Host $successMsg
 
     if($ModuleName -eq "Boxstarter.Chocolatey") {
         $desktop = $([System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::DesktopDirectory))
