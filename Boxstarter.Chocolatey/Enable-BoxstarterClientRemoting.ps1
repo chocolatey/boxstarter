@@ -33,7 +33,7 @@ Install-BoxstarterPackage
         PreviousTrustedHosts=$null;
     }
     Write-BoxstarterMessage "Configuring local Powershell Remoting settings..."
-    try { $wsman = Test-WSMan } catch { $credssp = $_}
+    try { $wsman = Test-WSMan -ErrorAction Stop } catch { $credssp = $_}
     if($credssp.Exception -ne $null){
         Write-BoxstarterMessage "Local Powershell Remoting is not enabled" -Verbose
         if($Force -or (Confirm-Choice "Powershell remoting is not enabled locally. Should Boxstarter enable powershell remoting?"))
