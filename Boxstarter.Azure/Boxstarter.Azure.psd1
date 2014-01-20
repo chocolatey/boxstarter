@@ -4,7 +4,7 @@ Description = 'Provides Cmdlets that wil install a boxstarter package on a Windo
 ModuleToProcess = './boxstarter.Azure.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.2.111'
+ModuleVersion = '2.2.118'
 
 # ID used to uniquely identify this module
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e59'
@@ -45,7 +45,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = '8dfa0500ab16bbe6b872fc89c18eb062704f5a8c'
+PrivateData = '91c745e9000ccd29e5f3156679f453d7263124ff'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

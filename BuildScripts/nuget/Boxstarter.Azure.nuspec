@@ -14,7 +14,7 @@
     <dependencies>
       <dependency id="Boxstarter" version="$version$" />
       <dependency id="WindowsAzurePowershell" />
-      <dependency id="WindowsAzureLibrariesForNet" version="2.2" />
+      <dependency id="WindowsAzureLibsForNet" version="2.2" />
     </dependencies>
     <releaseNotes>
       - Adds Windows Azure VM Integration
