@@ -68,12 +68,6 @@ Install-WindowsFeature -name hyper-v -IncludeManagementTools
 
 <h2 id="azure">Windows Azure VMs</h2>
 
-
-
-
-
-
-
 <h3>Prerequisites</h3>
 <p>Boxstarter's Windows Azure VM support is limited to:</p>
 <ul>
@@ -84,7 +78,7 @@ Install-WindowsFeature -name hyper-v -IncludeManagementTools
 <h3>Installing the Boxstarter.Azure module</h3>
 <p>The Boxstarter.Azure module does not automatically install with the main Boxstarter install package, but just a single Chocolatey command can accomplish this.</p>
 <pre>CINST Boxstarter.Azure</pre>
-<p>This will install the Boxstarter.Azure module and all of its prerequisites: Windows Azure Powershell, Windows Azure SDK for .Net Libraries, .Net Framework v4.5.</p>
+<p>This will install the Boxstarter.Azure module and all of its prerequisites: Windows Azure Powershell, Windows Azure SDK for .Net Libraries, and the .Net Framework v4.5.</p>
 <h3>One time configuration of Azure subscription information</h3>
 <p>Before Windows Azure Powershell can begin to manage your VMs, it needs your account information as well as authentication verification. This is incredibly easy to setup and involves just two commands:</p>
 <pre>Get-AzurePublishSettingsFile</pre>
@@ -102,9 +96,9 @@ New-AzureQuickVM -ServiceName MyService -Windows -Name MyVM `
   -Password $cred.GetNetworkCredential().Password -AdminUsername $cred.UserName 
   -Location "West-US" -WaitForBoot
 </pre>
-<p>This creates a small Windows Server 2012 R2 VM located in the West US region. Note: If the Service Name already exists, do not include the <code>-Location</code> argument since the VM will be created in the location that service is configured for. To find out what all of the Location options are, use the <code>Get-AzureLocation</code> command.</p>
+<p>This creates a small Windows Server 2012 R2 VM located in the West US region and will wait for the VM to complete its boot sequence. Note: If the Service Name already exists, do not include the <code>-Location</code> argument since the VM will be created in the location that service is configured for. To find out what all of the Location options are, use the <code>Get-AzureLocation</code> command.</p>
 <p>While this example uses a Windows Server 2012 R2 image, you can use any of the images in the Azure gallery or even images you have created yourself. Use <code>Get-AzureVMImage</code> for information on all of the images available.</p>
-<p>The Azure powershell commnds are very useful. Use <code>Get-Command -Module Azure</code> to find all commands available in the Windows Azure Powershell module.</p>
+<p>The Azure powershell commnds are very useful. Use <code>Get-Command -Module Azure</code> to find all commands available in the Windows Azure Powershell module. All comands include the customary powershell command line help. Simply run <code>Get-Help [Command Name] -Full</code> to view the full documentation of a command.</p>
 <h3>Provisioning your Windows Azure VM</h3>
 
 <p>Boxstarter will locate the VMs PowerShell remoting Connection URI and install the VMs certificate on the local machine which will enable a SSL connection to be established so that Boxstarter can install your package on the VM. Here is an example:</p>
@@ -117,12 +111,13 @@ $cred=Get-Credential AzureAdmin
 <p>This installs myPackage on myVM1 and myVM2.</p>
 
 <h3>Checkpoints</h3>
-<p>Just like with the HyperV provider, the <code>Enable-BoxstarterVM</code> command can take a CheckpointName parameter. If this checkpoint exists, Boxstarter will restore the VM to this checkpoint before performing any action. If the checkpoint does not exist, Boxstarter will create a new Checkpoint after any configurations have been made.</p>
+<p>Just like with the HyperV provider, the <code>Enable-BoxstarterVM</code> command can take a CheckpointName parameter. If this checkpoint exists, Boxstarter will restore the VM to this checkpoint before performing any action. If the checkpoint does not exist, Boxstarter will create a new Checkpoint before installing any packages.</p>
 
 <p>This is particularly useful when you want to restore a machine to a known state before performing an installation.</p>
 <pre>
 $cred=Get-Credential domain\username
-Enable-BoxstarterVM -Provider azure -CloudServiceName MyService -VMName myVM1 -Credential $cred -CheckPointName BareOS | 
+Enable-BoxstarterVM -Provider azure -CloudServiceName MyService `
+  -VMName myVM1 -Credential $cred -CheckPointName BareOS | 
     Install-BoxstarterPackage -PackageName myPackage
 </pre>
 <p>This resets the VM to its BareOS state before Installing the myPackage package.</p>
@@ -146,14 +141,8 @@ $vm=Get-AzureVM -ServiceName MyService -Name MyVM
 Get-AzureVMCheckpoint -VM $vm
 </pre>
 
-
-
-
-
-
-
 <h2>Working with other virtualization technologies</h2>
-<p>Boxstarter will very soon provide support for AWS VMs. However, Boxstarter can work wit hany VM provider using <cose>Install-BoxstarterPackage</cose> as long as the VM has powershell remoting enabled and the VM's DNS name is accesible on the network. For "On Premise" VM providers, if they support the VHD file format, you can use the <code>Enable-BoxstarterVHD</code> command to enable WMI, LocalAccountTokenFilterPolicy and retrieve the computer name of the VM running the VHD. The VHD must be accessible and writable to the user issuing the command and it must contain the system volume (the drive with the Windows folder) of the VM.</p>
+<p>Boxstarter will very soon provide support for AWS VMs. However, Boxstarter can work with any VM provider using <cose>Install-BoxstarterPackage</cose> as long as the VM has powershell remoting enabled and the VM's DNS name is accesible on the network. For "On Premise" VM providers, if they support the VHD file format, you can use the <code>Enable-BoxstarterVHD</code> command to enable WMI, LocalAccountTokenFilterPolicy and retrieve the computer name of the VM running the VHD. The VHD must be accessible and writable to the user issuing the command and it must contain the system volume (the drive with the Windows folder) of the VM.</p>
 <pre>
 Enable-BoxstarterVHD -VHDPath "C:\Virtual hard disks\win81diff_F2AE6535-2532-455F-8E5A-0211595221F8.avhdx"
 </pre>
