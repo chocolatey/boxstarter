@@ -6,9 +6,9 @@ function Resolve-VMPlugin {
     )
 
     DynamicParam {
-        if(!$provider){$provider="HyperV"}
+        if($provider -eq $null -or $Provider.Length -eq 0){$provider="HyperV"}
         $module=Get-Module "Boxstarter.$provider"
-        $command = Get-Command $module\Enable-BoxstarterVM
+        $command = Get-Command "$module\Enable-BoxstarterVM"
         $metadata=New-Object System.Management.Automation.CommandMetaData($command)
         $paramDictionary = new-object `
                     -Type System.Management.Automation.RuntimeDefinedParameterDictionary
@@ -23,8 +23,9 @@ function Resolve-VMPlugin {
         return $paramDictionary
     }
     Begin{
+        if($provider -eq $null -or $Provider.Length -eq 0){$provider="HyperV"}
         $module=Get-Module "Boxstarter.$provider"
-        $command = Get-Command $module\Enable-BoxstarterVM
+        $command = Get-Command "$module\Enable-BoxstarterVM"
         $PSBoundParameters.Remove("Provider") | Out-Null
         &($command) @PSBoundParameters
     }
