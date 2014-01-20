@@ -37,6 +37,9 @@
     <Compile Include="Restore-AzureVMCheckpoint.ps1" />
     <Compile Include="Set-AzureVMCheckpoint.ps1" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Get-CheckpointPrefix.ps1" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
 </Project>
