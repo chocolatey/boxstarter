@@ -547,7 +547,7 @@ function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
         }
     }
     else {
-        Write-BoxstarterMessage "Remoting is accesible on $($sessionArgs.ComputerName)"
+        Write-BoxstarterMessage "Remoting is accesible on $ComputerName"
     }
     return $True
 }
