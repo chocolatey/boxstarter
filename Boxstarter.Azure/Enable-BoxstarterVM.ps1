@@ -46,8 +46,8 @@ the PSCredential needed to authenticate.
 $cred=Get-Credential AzureAdmin
 New-AzureQuickVM -ServiceName MyService -Windows -Name MyVM `
   -ImageName 3a50f22b388a4ff7ab41029918570fa6__Windows-Server-2012-Essentials-20131217-enus `
-  -Password $cred.GetNetworkCredential().Password -AdminUsername $cred.UserName 
-  -Location "West-US" -WaitForBoot
+  -Password $cred.GetNetworkCredential().Password -AdminUsername $cred.UserName `
+  -Location "West US" -WaitForBoot
 Enable-BoxstarterVM -Provider Azure -CloudServiceName MyService -VMName MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
 
 Uses the Azure Powershell SDK to create a new VM. Enable-BoxstarterVM 
