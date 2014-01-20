@@ -80,7 +80,7 @@ Install-WindowsFeature -name hyper-v -IncludeManagementTools
 <pre>CINST Boxstarter.Azure</pre>
 <p>This will install the Boxstarter.Azure module and all of its prerequisites: Windows Azure Powershell, Windows Azure SDK for .Net Libraries, and the .Net Framework v4.5.</p>
 <h3>One time configuration of Azure subscription information</h3>
-<p>Before Windows Azure Powershell can begin to manage your VMs, it needs your account information as well as authentication verification. This is incredibly easy to setup and involves just three commands:</p>
+<p>Before Windows Azure Powershell can begin to manage your VMs, it needs your account information as well as authentication verification. This is incredibly easy, <b>only needs to be performed once</b> and involves just three commands:</p>
 <pre>Get-AzurePublishSettingsFile</pre>
 <p>This command will launch your default browser and initiate a Publisher Settings download. First you will land on the Windows Azure sign in page and as soon as you succesfully authenticate, the download will begin.</p>
 <img src="images\publishAzure.png" />
