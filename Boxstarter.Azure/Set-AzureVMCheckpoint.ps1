@@ -38,7 +38,7 @@ Restore-AzureVMCheckpoint
     if($existingBlob -ne $null) {
         $existingBlob.Snapshot.Delete()
     }
-
+    $CheckpointName = "$(Get-CheckpointPrefix $VM)-$CheckpointName"
     $attributes = New-Object System.Collections.Specialized.NameValueCollection
     $attributes.Add("name",$CheckpointName)
     return $blob.CreateSnapshot($attributes, $null)

@@ -40,6 +40,9 @@ Restore-AzureVMCheckpoint
         [string]$CheckpointName
     )
     $blob=Get-Blob $VM
+    if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
+        $CheckpointName = "$(Get-CheckpointPrefix $VM)-$CheckpointName"
+    }
 
     $options = New-Object Microsoft.WindowsAzure.StorageClient.BlobRequestOptions
     $options.BlobListingDetails = "Snapshots,Metadata"
@@ -49,9 +52,11 @@ Restore-AzureVMCheckpoint
     return $snapshots | ? { 
         ($CheckpointName -eq $null -or $CheckpointName.Length -eq 0 -or $_.Metadata["name"] -eq $CheckpointName) -and $_.SnapshotTime -ne $null 
     } | % { 
-        New-Object PSObject -Prop @{
-            Name=$_.Metadata["name"]
-            Snapshot=$_
-        } 
+        if($_.Metadata["name"].Length -gt (Get-CheckpointPrefix $VM).Length+1) {
+            New-Object PSObject -Prop @{
+                Name=$_.Metadata["name"].Substring((Get-CheckpointPrefix $VM).Length+1)
+                Snapshot=$_
+            } 
+        }
     }
  }
