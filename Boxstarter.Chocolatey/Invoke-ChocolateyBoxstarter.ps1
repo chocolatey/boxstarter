@@ -106,7 +106,7 @@ Set-BoxstarterConfig
 #>    
     [CmdletBinding()]
     param(
-      [string]$BootstrapPackage=$null,
+      [string[]]$BootstrapPackage=$null,
       [string]$LocalRepo,
       [switch]$DisableReboots,
       [System.Security.SecureString]$Password,
@@ -117,14 +117,18 @@ Set-BoxstarterConfig
         if($DisableReboots){$Boxstarter.RebootOk=$false}
         if($Boxstarter.ScriptToCall -eq $null){
             if($bootstrapPackage -ne $null -and $bootstrapPackage.length -gt 0){
-                write-BoxstarterMessage "Installing package '$bootstrapPackage'" -Color Cyan
+                write-BoxstarterMessage "Installing package $($bootstrapPackage -join ', ')" -Color Cyan
             }
             else{
                 write-BoxstarterMessage "Installing Chocolatey" -Color Cyan
             }
+            $scriptArgs=@{}
+            if($bootstrapPackage){$scriptArgs.bootstrapPackage=$bootstrapPackage}
+            if($LocalRepo){$scriptArgs.Localrepo=$localRepo}
+            if($DisableReboots){$scriptArgs.DisableReboots = $DisableReboots}
             $script=@"
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
-Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstrapPackage"}) $(if($LocalRepo){"-Localrepo $localRepo"})  $(if($DisableReboots){"-DisableReboots"})
+Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage '$($bootstrapPackage -join ''',''')'"}) $(if($LocalRepo){"-Localrepo $localRepo"})  $(if($DisableReboots){"-DisableReboots"})
 "@
             return Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password -KeepWindowOpen:$KeepWindowOpen -NoPassword:$NoPassword
         }
@@ -135,7 +139,7 @@ Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstra
         Check-Chocolatey -ShouldIntercept
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
         if($bootstrapPackage -ne $null){
-            Download-Package $bootstrapPackage
+            $bootstrapPackage | % { Download-Package $_ }
         }
     }
     finally {

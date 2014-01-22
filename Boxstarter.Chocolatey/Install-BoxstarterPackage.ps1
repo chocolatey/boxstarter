@@ -257,7 +257,7 @@ about_boxstarter_chocolatey
         [parameter(Mandatory=$true, Position=1, ParameterSetName="ConnectionUri")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="Session")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="BoxstarterConnectionConfig")]
-        [string]$PackageName,
+        [string[]]$PackageName,
         [Management.Automation.PsCredential]$Credential,
         [switch]$Force,
         [switch]$DisableReboots,
@@ -488,7 +488,7 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
 
 function Invoke-Locally {
     param(
-        [string]$PackageName,
+        [string[]]$PackageName,
         [Management.Automation.PsCredential]$Credential,
         [switch]$Force,
         [switch]$DisableReboots,
