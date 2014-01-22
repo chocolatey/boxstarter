@@ -89,6 +89,7 @@
     <Content Include="Images\install.PNG" />
     <Content Include="Images\installed.PNG" />
     <Content Include="Images\launch.PNG" />
+    <Content Include="Images\publishAzure.PNG" />
     <Content Include="Images\runanyway.PNG" />
     <Content Include="Images\setup.PNG" />
     <Content Include="Images\shell.PNG" />
@@ -105,7 +106,6 @@
     <Content Include="Blog.cshtml" />
     <Content Include="downloads\*.*" />
     <Content Include="Launch\Application Files\**\*.*" />
-    <None Include="Properties\PublishProfiles\boxstarter %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\boxstarter.pubxml" />
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -153,7 +153,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>19492</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

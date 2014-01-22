@@ -67,9 +67,9 @@ This function wraps a Chocolatey Install and provides these additional features
  requiring different credentials.
 
  .PARAMETER PackageName
- The name of a NugetPackage to be installed or a URI or 
- file path pointing to a chocolatey script. If using a package name,
- the .nupkg file for the provided package name is searched in the 
+ The names of one or more Nuget Packages to be installed or URIs or 
+ file paths pointing to a chocolatey script. If using package names,
+ the .nupkg file for the provided package names are searched in the 
  following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
  - The chocolatey feed
@@ -139,9 +139,9 @@ Errors: An array of all errors encountered during the duration of the
 installaion.
 
 .EXAMPLE
-Invoke-ChocolateyBoxstarter example
+Invoke-ChocolateyBoxstarter "example1","example2"
 
-This installs the example .nupkg. If pending 
+This installs the example1 and example2 .nupkg files. If pending 
 reboots are detected, boxstarter will restart the machine. Boxstarter
 will not perform automatic logins after restart since no Credential
 was given.

@@ -29,9 +29,10 @@ This essentially wraps Chocolatey Install and provides these additional features
  a .nupkg file will be created using the script.
  
  .PARAMETER BootstrapPackage
- The name of a NugetPackage The package to be installed or a URI or 
- file path pointing to a chocolatey script. If using a package name,
- the .nupkg file for the provided package name is searched in the following locations and order:
+ The names of one or more Nuget Packages to be installed or URIs or 
+ file paths pointing to a chocolatey script. If using package names,
+ the .nupkg file for the provided package names are searched in the 
+ following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
  - The chocolatey feed
  - The boxstarter feed on myget
@@ -60,12 +61,12 @@ When set, Boxstarter will never prompt for logon. Use this if using
 an account without password validation.
 
 .EXAMPLE
-Invoke-ChocolateyBoxstarter example
+Invoke-ChocolateyBoxstarter "example1","example2"
 
-This invokes boxstarter and installs the example .nupkg. If pending 
-reboots are detected, boxstarter will restart the machine. Boxstarter
-will prompt the user to enter a password which will be used for 
-automatic logins in the event a restart is required.
+This invokes boxstarter and installs the example1 and example2 .nupkg 
+files. If pending reboots are detected, boxstarter will restart the 
+machine. Boxstarter will prompt the user to enter a password which will 
+be used for automatic logins in the event a restart is required.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter https://gist.github.com/mwrock/6771863/raw/b579aa269c791a53ee1481ad01711b60090db1e2/gistfile1.txt
