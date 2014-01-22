@@ -61,6 +61,22 @@ Describe "Getting-Chocolatey" {
         }        
     }
 
+    Context "When Installing multiple packages" {
+        Mock Call-Chocolatey
+        Mock Test-PendingReboot {return $false}
+        Mock Invoke-Reboot
+        $packages=@("package1","package2")
+        
+        Chocolatey Install $packages
+
+        it "will get chocolatey for package1" {
+            Assert-MockCalled Call-Chocolatey -ParameterFilter {$packageNames -eq "package1"} -times 1
+        }        
+        it "will get chocolatey for package2" {
+            Assert-MockCalled Call-Chocolatey -ParameterFilter {$packageNames -eq "package2"} -times 1
+        }        
+    }
+
     Context "When chocolatey writes a reboot error and reboots are ok" {
         Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true

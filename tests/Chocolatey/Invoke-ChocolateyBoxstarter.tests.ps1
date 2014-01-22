@@ -155,4 +155,16 @@ Describe "Invoke-ChocolateyBoxstarter" {
         }        
     }
 
+    Context "When specifying multiple packages" {
+        Mock Chocolatey
+        Mock Check-Chocolatey
+        $packages=@("package1","package2")
+
+        Invoke-ChocolateyBoxstarter $packages -NoPassword | out-null
+
+        it "should pass both packages to chocolatey" {
+            Assert-MockCalled chocolatey -ParameterFilter {$packageNames -eq $packages }
+        }
+    }
+
 }
