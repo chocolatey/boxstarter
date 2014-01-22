@@ -140,7 +140,7 @@ Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage '$($boots
         Check-Chocolatey -ShouldIntercept
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
         if($bootstrapPackage -ne $null){
-            $bootstrapPackage | % { Download-Package $_ }
+            Download-Package $bootstrapPackage
         }
     }
     finally {
@@ -156,12 +156,19 @@ function Resolve-LocalRepo([string]$localRepo) {
     return $localRepo
 }
 
-function Download-Package([string]$bootstrapPackage) {
-    if($BootstrapPackage -like "*://*" -or (Test-Path $BootstrapPackage -PathType Leaf)){
-        $BootstrapPackage = New-PackageFromScript $bootstrapPackage
+function Download-Package([string[]]$bootstrapPackage) {
+    $BootstrapPackage = $BootstrapPackage | % {
+        if($_ -like "*://*" -or (Test-Path $_ -PathType Leaf)){
+            New-PackageFromScript $_
+        }
+        else {
+            $_
+        }
     }
     $Boxstarter.Package=$bootstrapPackage
-    del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
+    if($bootstrapPackage.Count -eq 1){
+        del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
+    }
     $source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
     write-BoxstarterMessage "Installing $bootstrapPackage package from $source" -Verbose
     Chocolatey install $bootstrapPackage -source $source -force

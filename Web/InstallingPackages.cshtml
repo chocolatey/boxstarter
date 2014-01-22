@@ -14,12 +14,12 @@
 <p>To kick off a Boxstarter installation session, use the <code>Install-BoxstarterPackage</code> command.</p>
 <pre>
 $cred=Get-Credential domain\username
-Install-BoxstarterPackage -PackageName MyPackage -Credential $cred
+Install-BoxstarterPackage -PackageName "MyPackage1","MyPackage2" -Credential $cred
 </pre>
-<p>This will install the MyPackage package locally and use the credentials given for any auto login needed after a reboot.</p>
+<p>This will install the MyPackage1 and MyPackage2 packages locally and use the credentials given for any auto login needed after a reboot.</p>
 <p>There may be times when you either know that no reboot will be needed or you want to ensure that none take place. To tell Boxstarter not to perform any reboots, even if a pending reboot is detected, use the <code>-DisableReboots</code> argument.</p>
 <pre>
-Install-BoxstarterPackage -PackageName MyPackage -DisableReboots
+Install-BoxstarterPackage -PackageName "MyPackage1","MyPackage2" -DisableReboots
 </pre>
 <p>Since no reboot will be performed, the credential is unnecessary.</p>
 
