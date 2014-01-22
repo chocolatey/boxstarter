@@ -167,9 +167,11 @@ function Download-Package([string[]]$bootstrapPackage) {
     }
     $Boxstarter.Package=$bootstrapPackage
     if($bootstrapPackage.Count -eq 1){
+        Write-BoxstarterMessage "Deleting previous $bootstrapPackage package" -Verbose
         del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
+        $force=$true
     }
     $source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
-    write-BoxstarterMessage "Installing $bootstrapPackage package from $source" -Verbose
-    Chocolatey install $bootstrapPackage -source $source -force
+    write-BoxstarterMessage "Installing $($bootstrapPackage.Count) packages from $source" -Verbose
+    Chocolatey install $bootstrapPackage -source $source -force:$force
 }

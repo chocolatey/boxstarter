@@ -94,6 +94,8 @@ Intercepts Chocolatey call to check for reboots
     param([int[]]$RebootCodes=@())
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
     $PSBoundParameters.Remove("RebootCodes") | Out-Null
+    $packageNames=-split $packageNames
+    Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
     #backcompat for choco versions prior to 0.9.8.21
     if(!$packageNames){$packageNames=$packageName}
     
@@ -126,6 +128,7 @@ Intercepts Chocolatey call to check for reboots
                 }
             }
             catch { 
+                Write-BoxstarterMessage "There was an error calling chocolater" -Verbose
                 $ex=$_
                 Log-BoxstarterMessage $_
                 #Only write the error to the error stream if it was not previously
@@ -140,7 +143,7 @@ Intercepts Chocolatey call to check for reboots
                 }
             }
         Stop-Timedsection $session
-        if(!$Boxstarter.rebootOk) {return}
+        if(!$Boxstarter.rebootOk) {continue}
         if($Boxstarter.IsRebooting){
             Remove-ChocolateyPackageInProgress $packageName
             return
