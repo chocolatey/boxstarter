@@ -96,6 +96,18 @@ in the BuildPackages directory just under the root Boxstarter
 directory but can be changed with Set-BoxstarterConfig.
 
 .NOTES
+If specifying only one package, Boxstarter calls chocolatey with the 
+-force argument and deletes the previously installed package directory. 
+This means that regardless of wether or not the package had been 
+installed previously, Boxstarter will attempt to download and reinstall it.
+This only holds true for the outer package. If the package contains calls 
+to CINST for additional packages, those installs will not reinstall if 
+previously installed.
+
+If an array of package names are passed to Install-BoxstarterPackage, 
+Boxstarter will NOT apply the above reinstall logic and will skip the 
+install for any package that had been previously installed.
+
 When establishing a remote connection, Boxstarter uses CredSSP 
 authentication so that the session can access any network resources 
 normally accesible to the Credential. If necessary, Boxstarter 

@@ -60,6 +60,19 @@ is ideal when not invoking boxstarter from a console.
 When set, Boxstarter will never prompt for logon. Use this if using
 an account without password validation.
 
+.NOTES
+If specifying only one package, Boxstarter calls chocolatey with the 
+-force argument and deletes the previously installed package directory. 
+This means that regardless of wether or not the package had been 
+installed previously, Boxstarter will attempt to download and reinstall it.
+This only holds true for the outer package. If the package contains calls 
+to CINST for additional packages, those installs will not reinstall if 
+previously installed.
+
+If an array of package names are passed to Invoke-ChocolateyBoxstarter, 
+Boxstarter will NOT apply the above reinstall logic and will skip the 
+install for any package that had been previously installed.
+
 .EXAMPLE
 Invoke-ChocolateyBoxstarter "example1","example2"
 
