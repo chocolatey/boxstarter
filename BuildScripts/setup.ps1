@@ -17,7 +17,7 @@ function Install-Boxstarter($here, $ModuleName) {
 
     PersistBoxStarterPathToEnvironmentVariable "PSModulePath"
     PersistBoxStarterPathToEnvironmentVariable "Path"
-    $binPath =  Join-Path $env:ChocolateyInstall bin
+    $binPath =  "$here\..\..\..\bin"
     $boxModule=Get-Module Boxstarter.Chocolatey
     if($boxModule) {
         if($boxModule.Path -like "$env:LOCALAPPDATA\Apps\*") {
