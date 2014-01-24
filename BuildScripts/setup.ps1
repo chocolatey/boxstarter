@@ -18,7 +18,15 @@ function Install-Boxstarter($here, $ModuleName) {
     PersistBoxStarterPathToEnvironmentVariable "PSModulePath"
     PersistBoxStarterPathToEnvironmentVariable "Path"
     $binPath =  Join-Path $env:ChocolateyInstall bin
-    Import-Module "$boxstarterPath\$ModuleName" -DisableNameChecking -Force -ErrorAction SilentlyContinue
+    $boxModule=Get-Module Boxstarter.Chocolatey
+    if($boxModule) {
+        if($boxModule.Path -like "$env:LOCALAPPDATA\Apps\*") {
+            $clickonce=$true
+        }
+    }
+    if(!$clickonce){
+        Import-Module "$boxstarterPath\$ModuleName" -DisableNameChecking -Force -ErrorAction SilentlyContinue
+    }
     $successMsg = @"
 The $ModuleName Module has been copied to $boxstarterPath and added to your Module path. 
 You will need to open a new console for the path to be visible.
