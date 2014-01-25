@@ -16,6 +16,10 @@
       <dependency id="Boxstarter.Chocolatey" version="$version$" />
     </dependencies>
     <releaseNotes>
+      - Can supply multiple packages to Install-BoxstarterPackage and Launch URLs
+      - Boxstarter.Azure now globally imports the Windows Azure module
+      - Fixed issues with using the Boxstarter Web launcher to install Boxstarter
+      - Fixed errors when installing Boxstarter with Chocolatey in the same session after installing Chocolatey
       - Adds Windows Azure VM Integration
       - Supports VM Checkpoints using Azure Blob Snapshots
       - Adds Graceful failure to Enable-RemoteDesktop for Home versions of Windows 7
