@@ -17,6 +17,7 @@
       <dependency id="WindowsAzureLibsForNet" version="2.2" />
     </dependencies>
     <releaseNotes>
+      - Fix pipeline input of VM names broken by function proxy
       - Can supply multiple packages to Install-BoxstarterPackage and Launch URLs
       - Boxstarter.Azure now globally imports the Windows Azure module
       - Fixed issues with using the Boxstarter Web launcher to install Boxstarter

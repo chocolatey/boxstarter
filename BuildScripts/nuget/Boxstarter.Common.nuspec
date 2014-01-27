@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
     <releaseNotes>
+      - Fix pipeline input of VM names broken by function proxy
       - Can supply multiple packages to Install-BoxstarterPackage and Launch URLs
       - Boxstarter.Azure now globally imports the Windows Azure module
       - Fixed issues with using the Boxstarter Web launcher to install Boxstarter

@@ -22,7 +22,7 @@ function Resolve-VMPlugin {
 
         return $paramDictionary
     }
-    Begin{
+    Process{
         if($provider -eq $null -or $Provider.Length -eq 0){$provider="HyperV"}
         $module=Get-Module "Boxstarter.$provider"
         $command = Get-Command "$module\Enable-BoxstarterVM"
