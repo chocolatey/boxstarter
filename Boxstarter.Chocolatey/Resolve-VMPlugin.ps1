@@ -7,7 +7,8 @@ function Resolve-VMPlugin {
 
     DynamicParam {
         if($provider -eq $null -or $Provider.Length -eq 0){$provider="HyperV"}
-        Import-Module "Boxstarter.$provider" -ErrorAction SilentlyContinue | Out-Null
+        $unNormalized=(Get-Item "$PSScriptRoot\..\Boxstarter.$provider\Boxstarter.$provider.psd1")
+        Import-Module $unNormalized.FullName -global -DisableNameChecking -Force -ErrorAction SilentlyContinue | Out-Null
         $module=Get-Module "Boxstarter.$provider"
         $command = Get-Command "$module\Enable-BoxstarterVM"
         $metadata=New-Object System.Management.Automation.CommandMetaData($command)
