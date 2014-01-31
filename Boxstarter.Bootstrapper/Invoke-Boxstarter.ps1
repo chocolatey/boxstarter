@@ -91,12 +91,14 @@ Invoke-Reboot
         if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
         if($encryptedPassword){$password = ConvertTo-SecureString -string $encryptedPassword}
         if(!$NoPassword){
+            Write-BoxstarterMessage "NoPassword is false checking autologin" -verbose
             $boxstarter.NoPassword=$False
             $script:BoxstarterPassword=InitAutologon $password
         } 
         if($script:BoxstarterPassword -eq $null) {
             $boxstarter.NoPassword=$True
         }
+        Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and rebootok is set to $($Boxstarter.RebootOk) and the nopassword param passed was $NoPassword" -verbose
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
         $credPassword = $BoxstarterPassword
@@ -153,6 +155,7 @@ function InitAutologon([System.Security.SecureString]$password){
         }
     } else {$autoLogon=0}
     $Boxstarter.AutologedOn = ($autoLogon -gt 0)
+    Write-BoxstarterMessage "AutoLogin status is $($Boxstarter.AutologedOn)" -verbose
     if($Boxstarter.RebootOk -and !$Password -and !$Boxstarter.AutologedOn) {
         Write-BoxstarterMessage "Please type CTRL+C or close this window to exit Boxstarter if you do not want to risk a reboot during this Boxstarter install.`r`n" -nologo -Color Yellow
         write-BoxstarterMessage @"

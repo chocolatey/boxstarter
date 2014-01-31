@@ -128,7 +128,10 @@ Set-BoxstarterConfig
       [switch]$NoPassword
     )
     try{
-        if($DisableReboots){$Boxstarter.RebootOk=$false}
+        if($DisableReboots){
+            Write-BoxstarterMessage "Disabling reboots" -Verbose
+            $Boxstarter.RebootOk=$false
+        }
         if($Boxstarter.ScriptToCall -eq $null){
             if($bootstrapPackage -ne $null -and $bootstrapPackage.length -gt 0){
                 write-BoxstarterMessage "Installing package $($bootstrapPackage -join ', ')" -Color Cyan

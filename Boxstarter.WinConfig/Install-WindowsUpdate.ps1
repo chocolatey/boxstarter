@@ -54,6 +54,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         $wus=Get-WmiObject -Class Win32_Service -Filter "Name='wuauserv'"
         $origStatus=$wus.State
         $origStartupType=$wus.StartMode
+        Write-BoxstarterMessage "Update service is in the $origStatus state and its startup type is $origStartupType" -verbose
         if($origStartupType -eq "Auto"){
             $origStartupType = "Automatic"
         }
@@ -133,6 +134,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         }
         if($origStatus -eq "Stopped")
         {
+            Write-BoxstarterMessage "Stopping win update service and setting its startup type to $origStartupType" -verbose
             Set-Service wuauserv -StartupType $origStartupType
             stop-service wuauserv -ErrorAction SilentlyContinue
         }
