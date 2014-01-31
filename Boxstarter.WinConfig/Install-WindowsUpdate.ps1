@@ -54,6 +54,9 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         $wus=Get-WmiObject -Class Win32_Service -Filter "Name='wuauserv'"
         $origStatus=$wus.State
         $origStartupType=$wus.StartMode
+        if($origStartupType -eq "Auto"){
+            $origStartupType = "Automatic"
+        }
         if($origStatus -eq "Stopped"){
             if($origStartupType -eq "Disabled"){
                 Set-Service wuauserv -StartupType Automatic
