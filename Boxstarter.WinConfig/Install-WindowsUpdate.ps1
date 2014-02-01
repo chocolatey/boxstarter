@@ -76,6 +76,9 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
                     Out-BoxstarterLog " * Adding $($update.title) to list of updates to download"
                     $updatesToDownload.add($update) | Out-Null
                 }
+                elseif($update.InstallationBehavior.CanRequestUserInput -eq $true) {
+                    Out-BoxstarterLog " * $($update.title) Requires user input and will not be downloaded"
+                }
                 else {Out-BoxstarterLog " * $($update.title) already downloaded"}
             }
 
@@ -87,14 +90,17 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
             }
             
             foreach($update in $result.updates) {
-                if(!($update.EulaAccepted) -and $acceptEula){
-                    $update.AcceptEula()
+                if($update.InstallationBehavior.CanRequestUserInput -eq $false) {
+                    if(!($update.EulaAccepted) -and $acceptEula){
+                        $update.AcceptEula()
+                    }
+                    $updatesToinstall.add($update) | Out-Null
                 }
-                $updatesToinstall.add($update) | Out-Null
             }
 
             $installSession=Start-TimedSection "Installing Updates"
             Out-BoxstarterLog "This may take several minutes..."
+            if($UpdatesToInstall.Count -gt 0) {
                 $Installer.updates = $UpdatesToInstall
                 try { $result = $Installer.Install() } catch {
                     if(!($SuppressReboots) -and (test-path function:\Invoke-Reboot)){
@@ -124,6 +130,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
                         }
                     }
                 }
+            }
             Stop-TimedSection $installSession
         }
         else{Write-BoxstarterMessage "There is no update applicable to this machine"}    
