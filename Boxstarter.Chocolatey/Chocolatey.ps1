@@ -125,10 +125,12 @@ Intercepts Chocolatey call to check for reboots
                 }
                 else{
                     Call-Chocolatey @PSBoundParameters
+                    Write-BoxstarterMessage "Exit Code: $LastExitCode" -Verbose
+                    Write-Error "Chocolatey reported an unsuccesful exit code of $LastExitCode"
                 }
             }
             catch { 
-                Write-BoxstarterMessage "There was an error calling chocolater" -Verbose
+                Write-BoxstarterMessage "There was an error calling chocolatey" -Verbose
                 $ex=$_
                 Log-BoxstarterMessage $_
                 #Only write the error to the error stream if it was not previously
