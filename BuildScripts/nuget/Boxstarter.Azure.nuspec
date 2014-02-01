@@ -17,6 +17,10 @@
       <dependency id="WindowsAzureLibsForNet" version="2.2" />
     </dependencies>
     <releaseNotes>
+      - report an exception if chocolatey faied to find package
+      - Do not attempt to install windows updates that require user interaction
+      - Fix Windows Update from breaking when reseting the windows update service if it was stopped prior to running
+      - Load VM Plugins relative to current path and not by module name in case module is not in PSModulePath
       - Fix pipeline input of VM names broken by function proxy
       - Can supply multiple packages to Install-BoxstarterPackage and Launch URLs
       - Boxstarter.Azure now globally imports the Windows Azure module
