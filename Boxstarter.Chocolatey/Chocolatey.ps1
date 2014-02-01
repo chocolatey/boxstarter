@@ -126,7 +126,9 @@ Intercepts Chocolatey call to check for reboots
                 else{
                     Call-Chocolatey @PSBoundParameters
                     Write-BoxstarterMessage "Exit Code: $LastExitCode" -Verbose
-                    Write-Error "Chocolatey reported an unsuccesful exit code of $LastExitCode"
+                    if($LastExitCode -ne 0) {
+                        Write-Error "Chocolatey reported an unsuccesful exit code of $LastExitCode"
+                    }
                 }
             }
             catch { 
