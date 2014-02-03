@@ -66,7 +66,7 @@ about_boxstarter_logging
     )
 
     process {
-        write-host $object
+        if(!$Boxstarter.SuppressLogging){write-host $object}
         if($Boxstarter -and $BoxStarter.Log -and $object){
             $object >> $Boxstarter.Log            
         }

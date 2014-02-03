@@ -59,7 +59,6 @@ about_boxstarter_logging
         [ConsoleColor]$color=[ConsoleColor]::green,
         [switch]$Verbose
     )
-    if($Boxstarter.SuppressLogging){return}
     if(!$nologo){$message = "Boxstarter: $message"}
     $fmtTitle = Format-BoxStarterMessage $message
     if($Verbose){
@@ -68,6 +67,6 @@ about_boxstarter_logging
     }
     else {
         #Boxstarter has a Write-host proxy function and it ensures all is logged
-        Write-Host $fmtTitle -ForeGroundColor $color
+        if(!$Boxstarter.SuppressLogging){Write-Host $fmtTitle -ForeGroundColor $color}
     }
 }
