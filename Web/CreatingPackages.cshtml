@@ -70,7 +70,7 @@ Copy-Item (Join-Path -Path (Get-PackageRoot($MyInvocation)) -ChildPath 'console.
 <p>Assuming you have a console.xml file at the root of the path you provided to <code>New-BoxstarterPackage</code>, you can access that file from your ChocolateyInstall.ps1 script.</p>
 
 <h3>Composing the ChocolateyInstall Script</h3>
-<p>If you are already familiar with authoring <a href="https://github.com/chocolatey/chocolatey/wiki/CreatePackagesQuickStart">chocolatey package scripts</a>, you know how to do this already. The only difference with Boxstarter scripts is that your script also has access to Boxstarter's api for configuring windows, running updates as well as logging and reboot control.</p>
+<p>If you are already familiar with authoring <a href="https://github.com/chocolatey/chocolatey/wiki/CreatePackagesQuickStart">chocolatey package scripts</a>, you know how to do this already. The only difference with Boxstarter scripts is that your script also has access to Boxstarter's API for configuring windows, running updates as well as logging and reboot control.</p>
 <p>Lets open the ChocolateyInstall.ps1 script that the New-BoxstarterPackage command created for our MyPackage package:</p>
 <pre>
 Notepad (Join-Path -Path $Boxstarter.LocalRepo -ChildPath "MyPackage\tools\ChocolateyInstall.ps1")

@@ -1,7 +1,7 @@
 ﻿function Test-Admin {
 <#
 .SYNOPSIS
-Determins if the console is elevated
+Determines if the console is elevated
 
 #>
     $identity  = [System.Security.Principal.WindowsIdentity]::GetCurrent()

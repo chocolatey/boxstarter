@@ -1,7 +1,7 @@
 function Check-Chocolatey ([switch]$ShouldIntercept){
     Enable-Net40
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
-        Write-BoxstarterMessage "Chocolatey not instaled. Downloading and installing..."
+        Write-BoxstarterMessage "Chocolatey not installed. Downloading and installing..."
         $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
         New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
         $config = Get-BoxstarterConfig

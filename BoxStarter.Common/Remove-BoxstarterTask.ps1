@@ -1,10 +1,10 @@
 function Remove-BoxstarterTask {
 <#
 .SYNOPSIS
-Deletes the boxstarter task.
+Deletes the Boxstarter task.
 
 .DESCRIPTION
-Deletes the boxstarter task. Boxstarter calls this when an 
+Deletes the Boxstarter task. Boxstarter calls this when an 
 installation session completes.
 
 .LINK

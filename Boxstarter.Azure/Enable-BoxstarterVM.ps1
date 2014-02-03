@@ -4,7 +4,7 @@ function Enable-BoxstarterVM {
 Finds the PowerShell Remote ConnectionURI of an Azure VM and ensures it can be accessed
 
 .DESCRIPTION
-Ensures that an Azure VM can be accessed by Boxstarter. Checks the Azure Powershell 
+Ensures that an Azure VM can be accessed by Boxstarter. Checks the Azure PowerShell 
 SDK settings are set correctly and also examines the VM endpoints to ensure the correct 
 settings for PowerShell remoting. If necessary, the WinRM certificate of the VM is 
 downloaded and installed. The VM's PowerShell remoting ConnectionURI is located and 
@@ -18,7 +18,7 @@ does not exist.
 The VM Provider to use.
 
 .PARAMETER CloudServiceName
-The name of the Azyure Cloud Service associated with the VM.
+The name of the Azure Cloud Service associated with the VM.
 
 .PARAMETER VMName
 The name of the VM to enable.
@@ -35,7 +35,7 @@ will not be found in the Azure portal, but you can use Boxstarter's checkpoint
 commands to manage them: Set-AzureVMCheckpoint, Get-AzureVMCheckpoint, 
 Restore-AzureVMCheckpoint and Remove-AzureVMCheckpoint.
 
-The Windows Azure Powershell SDK and the .NET Libraries SDK are both used to 
+The Windows Azure PowerShell SDK and the .NET Libraries SDK are both used to 
 manage the Azure VMs and Blobs.
 
 .OUTPUTS
@@ -50,7 +50,7 @@ New-AzureQuickVM -ServiceName MyService -Windows -Name MyVM `
   -Location "West US" -WaitForBoot
 Enable-BoxstarterVM -Provider Azure -CloudServiceName MyService -VMName MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
 
-Uses the Azure Powershell SDK to create a new VM. Enable-BoxstarterVM 
+Uses the Azure PowerShell SDK to create a new VM. Enable-BoxstarterVM 
 then installs the WinRM certificate and obtains the VM's ConnectionURI 
 which is piped to Install-BoxstarterPackage to install MyPackage.
 
@@ -102,7 +102,7 @@ Remove-AzureVMCheckpoint
 
         ##Cannot run remotely unelevated. Look into self elevating
         if(!(Test-Admin)) {
-            Write-Error "You must be running as an administrator. Please open a Powershell console as Administrator and rerun Install-BoxstarperPackage."
+            Write-Error "You must be running as an administrator. Please open a PowerShell console as Administrator and rerun Install-BoxstarperPackage."
             return
         }
 
@@ -156,14 +156,14 @@ Once that is done, please run Enable-BoxstarterVM again.
             Install-WinRMCert $vm | Out-Null
             $uri = Invoke-RetriableScript { Get-AzureWinRMUri -serviceName $args[0] -Name $args[1] } $CloudServiceName $_
             if($uri -eq $null) {
-                throw New-Object -TypeName InvalidOperationException -ArgumentList "WinRM Endpoint is not configured on VM. Use Add-AzureEndpoint to add Powershell remoting endpoint and use Enable-PSRemoting -Force on the VM to enable powershell remoting."
+                throw New-Object -TypeName InvalidOperationException -ArgumentList "WinRM Endpoint is not configured on VM. Use Add-AzureEndpoint to add PowerShell remoting endpoint and use Enable-PSRemoting -Force on the VM to enable PowerShell remoting."
             }
             $ComputerName=$uri.Host
             Enable-BoxstarterClientRemoting $ComputerName | out-Null
             Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
             $remotingTest = Invoke-Command $uri { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
             if(!$remotingTest) {
-                Write-Error "Unable to establish a remote connection with $_. Use Enable-PSRemoting -Force on the VM to enable powershell remoting."
+                Write-Error "Unable to establish a remote connection with $_. Use Enable-PSRemoting -Force on the VM to enable PowerShell remoting."
             }
         
             if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {

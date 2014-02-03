@@ -8,8 +8,8 @@ console and Boxstarter log.
 Boxstarter runs the provided script and redirects the 
 standard output and standard error streams to the host
 console and to the Boxstarter log. This will include both
-powershell write-output and errors as well as the output
-from any standard commandline executables that use 
+PowerShell write-output and errors as well as the output
+from any standard command line executables that use 
 standard output and error streams.
 
 .PARAMETER script
@@ -21,7 +21,7 @@ Enter-BoxstarterLogable{
     Netstat
 }
 
-This sends both the out put of the powershemm Get-Process
+This sends both the out put of the PowerShell Get-Process
 cmdlet and the Netstat command line utility to the screen
 as well as th boxstarter log.
 
@@ -42,7 +42,7 @@ Logs provided text or objects to the console and
 Boxstarter log.
 
 .DESCRIPTION
-This is essentially identical to Tee-Object wih the PS 3.0
+This is essentially identical to Tee-Object with the PS 3.0
 only parameter -Append. This will work in either PS 2.0 or
 PS 3.0.
 

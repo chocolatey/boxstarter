@@ -1,5 +1,5 @@
 @{
-Description = 'Provides Cmdlets that wil install a boxstarter package on a Windows Azure VM'
+Description = 'Provides Cmdlets that will install a boxstarter package on a Windows Azure VM'
 # Script module or binary module file associated with this manifest.
 ModuleToProcess = './boxstarter.Azure.psm1'
 

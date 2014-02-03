@@ -7,8 +7,8 @@ Invokes a command inside of a scheduled task
 This invokes the boxstarter scheduled task. 
 The task is run in an elevated session using the provided 
 credentials. If the processes started by the task become idle for 
-more that the specified timeout, the task will be termiated. All 
-output and ny errors from the task will be streamed to the calling 
+more that the specified timeout, the task will be terminated. All 
+output and any errors from the task will be streamed to the calling 
 session. 
 
  .PARAMETER Command
@@ -107,7 +107,7 @@ function start-Task{
     if($LastExitCode -gt 0){
         throw "Unable to run scheduled task. Message from task was $taskResult"
     }
-    write-debug "Launched task. Waiting for task to launch comand..."
+    write-debug "Launched task. Waiting for task to launch command..."
     do{
         if(!(Test-Path $env:temp\BoxstarterTask.ps1)){
             Write-Debug "Task Completed before its process was captured."

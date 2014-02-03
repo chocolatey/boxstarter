@@ -1,7 +1,7 @@
 function Disable-InternetExplorerESC {
 <#
 .SYNOPSIS
-Turns off IE Enhansed Security Configuration that is on by defaulton Server OS versions
+Turns off IE Enhanced Security Configuration that is on by default on Server OS versions
 
 .LINK
 http://boxstarter.codeplex.com

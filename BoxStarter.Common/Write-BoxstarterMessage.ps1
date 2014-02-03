@@ -11,7 +11,7 @@ Boxstarter log file with a timestamp.
 The string to be logged
 
 .PARAMETER NoLogo
-If ommited, the message will be preceeded with "Boxstarter: "
+If omitted, the message will be preceded with "Boxstarter: "
 
 .PARAMETER Color
 Specifies a foreground color to use for the message. Green is the 
@@ -19,7 +19,7 @@ default.
 
 .PARAMETER Verbose
 Instructs Write-Boxstarter to write to the Verbose stream. Although 
-this will always log messages to the Boxstrter log, it will only log 
+this will always log messages to the Boxstarter log, it will only log 
 to the console if the session's VerbosePreference is set to capture 
 the Verbose stream or the -Verbose switch was set when calling
 Install-BoxstarterPackage.
@@ -45,7 +45,7 @@ This will appear in the log:
 
 .NOTES
 If the SuppressLogging setting of the $Boxstarter variable is true, 
-logging mesages will be suppresed and not sent to the console or the 
+logging messages will be suppressed and not sent to the console or the 
 log.
 
 .LINK

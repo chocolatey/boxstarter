@@ -4,30 +4,30 @@ function Invoke-BoxStarter{
 Invokes the Boxstarter bootstrapper
 
 .DESCRIPTION
-This wraps any powershell script block and executes it in an environment tailored for uninterrupted installations
+This wraps any PowerShell script block and executes it in an environment tailored for uninterrupted installations
  - Turns off the windows update service during installation to prevent installation conflicts and minimize the need for reboots
  - Imports the Boxstarter.WinConfig module that provides functions for customizing windows
  - Provides Reboot Resiliency by ensuring the package installation is immediately restarted up on reboot if there is a reboot during the installation.
- - Ensures everything runs under admin
+ - Ensures everything runs under administrator permissions
 If the password argument is not included and RebootOk is passed, 
 the user will be prompted for a password immediately after 
 invoking the command and that password will be used for any 
 subsequent reboot during the boxstarter run.
 
 .Parameter ScriptToCall
-The script that boxstarter wraps. After Boxstarter Shuts down 
+The script that Boxstarter wraps. After Boxstarter shuts down 
 the update services and ensures that the console is running as 
-admin, it invokes this script. The script may call Invoke-Reboot 
+an administrator, it invokes this script. The script may call Invoke-Reboot 
 at any time and Boxstarter will ensure that the machine is 
-rebooted, loged in and the script is rerun.
+rebooted, logged in and the script is rerun.
 
 .Parameter Password
 This password will be used to automatically log the user in if a 
-reboot is required and reboots are eabled.
+reboot is required and reboots are enabled.
 
 .Parameter RebootOk
 If set, a reboot will be performed if boxstarter determines that a 
-reboot is pending. If no password is supplied t othe Password 
+reboot is pending. If no password is supplied to the Password 
 parameterBoxstarter will prompt the user to enter a password which 
 will be used for automatic logins in the event a restart is 
 required.
@@ -44,7 +44,7 @@ an account without password validation.
 .EXAMPLE
 Invoke-Boxstarter {Import-Modler myinstaller;Invoke-MyInstall} -RebootOk
 
-This invokes boxstarter and iinvokes MyInstall. If pending 
+This invokes Boxstarter and invokes MyInstall. If pending 
 reboots are detected, boxstarter will restart the machine. Boxstarter
 will prompt the user to enter a password which will be used for 
 automatic logins in the event a restart is required.
@@ -98,7 +98,7 @@ Invoke-Reboot
         if($script:BoxstarterPassword -eq $null) {
             $boxstarter.NoPassword=$True
         }
-        Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and rebootok is set to $($Boxstarter.RebootOk) and the nopassword param passed was $NoPassword" -verbose
+        Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and rebootok is set to $($Boxstarter.RebootOk) and the nopassword parameter passed was $NoPassword" -verbose
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
         $credPassword = $BoxstarterPassword
@@ -134,7 +134,7 @@ function Read-AuthenticatedPassword {
             $currentUser=Get-CurrentUser
             $creds = New-Object System.Management.Automation.PsCredential("$($currentUser.Domain)\$($currentUser.Name)", $password)
             Start-Process "Cmd.exe" -argumentlist "/c","echo" -Credential $creds
-            write-BoxstarterMessage "Succesfully authenticated password."
+            write-BoxstarterMessage "Successfully authenticated password."
             return $password
         }
         catch { }

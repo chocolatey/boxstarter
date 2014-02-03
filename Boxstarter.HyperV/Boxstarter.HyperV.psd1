@@ -1,5 +1,5 @@
 @{
-Description = 'Provides Cmdlets that wil install a boxstarter package on a Hyper-V VM'
+Description = 'Provides Cmdlets that will install a Boxstarter package on a Hyper-V VM'
 # Script module or binary module file associated with this manifest.
 ModuleToProcess = './boxstarter.HyperV.psm1'
 
