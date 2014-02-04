@@ -43,6 +43,16 @@ Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
 Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
 </pre>
 
+<h3>Set-StartScreenOptions</h3>
+<p>Sets options for the Start Screen in Windows 8/8.1</p>
+<pre>
+Set-StartScreenOptions -enableBootToDesktop -enableShowStartOnActiveScreen -enableShowAppsViewOnStartScreen -enableSearchEverywhereInAppsView -enableListDesktopAppsFirst
+</pre>
+<p>It is also possible to do the converse actions, if required.</p>
+<pre>
+Set-StartScreenOptions -disableBootToDesktop -disableShowStartOnActiveScreen -disableShowAppsViewOnStartScreen -disableSearchEverywhereInAppsView -disableListDesktopAppsFirst
+</pre>
+
 <h3>Set-TaskbarSmall</h3>
 <p>Makes the windows task bar skinny</p>
 

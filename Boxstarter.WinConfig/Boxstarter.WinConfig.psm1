@@ -14,4 +14,5 @@ Export-ModuleMember Disable-UAC, `
                     Get-LibraryNames, `
                     Update-ExecutionPolicy, `
                     Enable-MicrosoftUpdate, `
-                    Disable-MicrosoftUpdate
+                    Disable-MicrosoftUpdate, `
+					Set-StartScreenOptions

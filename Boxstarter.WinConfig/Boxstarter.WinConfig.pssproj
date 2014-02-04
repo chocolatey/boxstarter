@@ -45,6 +45,7 @@
   <ItemGroup>
     <Content Include="Disable-MicrosoftUpdate.ps1" />
     <Content Include="Enable-MicrosoftUpdate.ps1" />
+    <Content Include="Set-StartScreenOptions.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
