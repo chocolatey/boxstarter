@@ -53,6 +53,16 @@ Set-StartScreenOptions -enableBootToDesktop -enableShowStartOnActiveScreen -enab
 Set-StartScreenOptions -disableBootToDesktop -disableShowStartOnActiveScreen -disableShowAppsViewOnStartScreen -disableSearchEverywhereInAppsView -disableListDesktopAppsFirst
 </pre>
 
+<h3>Set-CornerNavigationOptions</h3>
+<p>Sets options for the Windows Corner Navigation in Windows 8/8.1</p>
+<pre>
+Set-CornerNavigationOptions -EnableUpperRightCornerShowCharms -EnableUpperLeftCornerSwitchApps -EnableLowerLeftCornerWithPowerShell
+</pre>
+<p>It is also possible to do the converse actions, if required.</p>
+<pre>
+Set-CornerNavigationOptions -DisableUpperRightCornerShowCharms -DisableUpperLeftCornerSwitchApps -DisableLowerLeftCornerWithPowerShell
+</pre>
+
 <h3>Set-TaskbarSmall</h3>
 <p>Makes the windows task bar skinny</p>
 
