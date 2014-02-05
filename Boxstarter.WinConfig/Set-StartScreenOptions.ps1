@@ -83,7 +83,7 @@ http://boxstarter.codeplex.com
 	}
 
 	if(Test-Path -Path $accentKey) {
-		if($EnableDesktopBackgroundOnStart) { Set-ItemProperty -Path $accentKey -Name 'OpenAtLogon' -Value 219 }
-		if($DisableDesktopBackgroundOnStart) { Set-ItemProperty -Path $accentKey -Name 'OpenAtLogon' -Value 221 }
+		if($EnableDesktopBackgroundOnStart) { Set-ItemProperty -Path $accentKey -Name 'MotionAccentId_v1.00' -Value 219 }
+		if($DisableDesktopBackgroundOnStart) { Set-ItemProperty -Path $accentKey -Name 'MotionAccentId_v1.00' -Value 221 }
     }
 }
