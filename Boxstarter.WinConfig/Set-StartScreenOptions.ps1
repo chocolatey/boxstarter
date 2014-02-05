@@ -37,36 +37,53 @@ Disables the ability to list desktop apps first when sorted by category, see ena
 http://boxstarter.codeplex.com
 
 #>    
-
+    [CmdletBinding()]
 	param(
-		[switch]$enableBootToDesktop,
-		[switch]$disableBootToDesktop,
-		[switch]$enableShowStartOnActiveScreen,
-		[switch]$disableShowStartOnActiveScreen,
-		[switch]$enableShowAppsViewOnStartScreen,
-		[switch]$disableShowAppsViewOnStartScreen,
-		[switch]$enableSearchEverywhereInAppsView,
-		[switch]$disableSearchEverywhereInAppsView,
-		[switch]$enableListDesktopAppsFirst,
-		[switch]$disableListDesktopAppsFirst
+		[switch]$EnableBootToDesktop,
+		[switch]$DisableBootToDesktop,
+		[switch]$EnableDesktopBackgroundOnStart,
+		[switch]$DisableDesktopBackgroundOnStart,
+		[switch]$EnableShowStartOnActiveScreen,
+		[switch]$DisableShowStartOnActiveScreen,
+		[switch]$EnableShowAppsViewOnStartScreen,
+		[switch]$DisableShowAppsViewOnStartScreen,
+		[switch]$EnableSearchEverywhereInAppsView,
+		[switch]$DisableSearchEverywhereInAppsView,
+		[switch]$EnableListDesktopAppsFirst,
+		[switch]$DisableListDesktopAppsFirst
 	)
 
-	$key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartPage'
+    $PSBoundParameters.Keys | %{
+        if($_-like "En*"){ $other="Dis" + $_.Substring(2)}
+        if($_-like "Dis*"){ $other="En" + $_.Substring(3)}
+        if($PSBoundParameters[$_] -and $PSBoundParameters[$other]){
+            throw new-Object -TypeName ArgumentException "You may not set both $_ and $other. You can only set one."
+        }
+    }
 
-	if(Test-Path -Path $key) {
-		if($enableBootToDesktop) { Set-ItemProperty -Path $key -Name 'OpenAtLogon' -Value 0 }
-		if($disableBootToDesktop) { Set-ItemProperty -Path $key -Name 'OpenAtLogon' -Value 1 }
+	$key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer'
+    $startPageKey = "$key\StartPage"
+    $accentKey = "$key\Accent"
 
-		if($enableShowStartOnActiveScreen) { Set-ItemProperty -Path $key -Name 'MonitorOverride' -Value 1 }
-		if($disableShowStartOnActiveScreen) { Set-ItemProperty -Path $key -Name 'MonitorOverride' -Value 0 }
+	if(Test-Path -Path $startPageKey) {
+		if($enableBootToDesktop) { Set-ItemProperty -Path $startPageKey -Name 'OpenAtLogon' -Value 0 }
+		if($disableBootToDesktop) { Set-ItemProperty -Path $startPageKey -Name 'OpenAtLogon' -Value 1 }
 
-		if($enableShowAppsViewOnStartScreen) { Set-ItemProperty -Path $key -Name 'MakeAllAppsDefault' -Value 1 }
-		if($disableShowAppsViewOnStartScreen) { Set-ItemProperty -Path $key -Name 'MakeAllAppsDefault' -Value 0 }
+		if($enableShowStartOnActiveScreen) { Set-ItemProperty -Path $startPageKey -Name 'MonitorOverride' -Value 1 }
+		if($disableShowStartOnActiveScreen) { Set-ItemProperty -Path $startPageKey -Name 'MonitorOverride' -Value 0 }
 
-		if($enableSearchEverywhereInAppsView) { Set-ItemProperty -Path $key -Name 'GlobalSearchInApps' -Value 1 }
-		if($disableSearchEverywhereInAppsView) { Set-ItemProperty -Path $key -Name 'GlobalSearchInApps' -Value 0 }
+		if($enableShowAppsViewOnStartScreen) { Set-ItemProperty -Path $startPageKey -Name 'MakeAllAppsDefault' -Value 1 }
+		if($disableShowAppsViewOnStartScreen) { Set-ItemProperty -Path $startPageKey -Name 'MakeAllAppsDefault' -Value 0 }
 
-		if($enableListDesktopAppsFirst) { Set-ItemProperty -Path $key -Name 'DesktopFirst' -Value 1 }
-		if($disableListDesktopAppsFirst) { Set-ItemProperty -Path $key -Name 'DesktopFirst' -Value 0 }
+		if($enableSearchEverywhereInAppsView) { Set-ItemProperty -Path $startPageKey -Name 'GlobalSearchInApps' -Value 1 }
+		if($disableSearchEverywhereInAppsView) { Set-ItemProperty -Path $startPageKey -Name 'GlobalSearchInApps' -Value 0 }
+
+		if($enableListDesktopAppsFirst) { Set-ItemProperty -Path $startPageKey -Name 'DesktopFirst' -Value 1 }
+		if($disableListDesktopAppsFirst) { Set-ItemProperty -Path $startPageKey -Name 'DesktopFirst' -Value 0 }
 	}
+
+	if(Test-Path -Path $accentKey) {
+		if($EnableDesktopBackgroundOnStart) { Set-ItemProperty -Path $accentKey -Name 'OpenAtLogon' -Value 219 }
+		if($DisableDesktopBackgroundOnStart) { Set-ItemProperty -Path $accentKey -Name 'OpenAtLogon' -Value 221 }
+    }
 }
