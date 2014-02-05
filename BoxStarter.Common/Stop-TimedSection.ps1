@@ -6,7 +6,7 @@ Ends a timed section
 .DESCRIPTION
 A timed section is a portion of script that is timed. Used 
 with Start-TimedSection, the beginning and end of the section 
-are loged to both the console and the log along with the 
+are logged to both the console and the log along with the 
 amount of time elapsed.
 
 .PARAMETER SectionId

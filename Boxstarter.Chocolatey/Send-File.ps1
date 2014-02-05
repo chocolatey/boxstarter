@@ -58,7 +58,7 @@ for($position = 0; $position -lt $sourceBytes.Length;
 $remoteScript = {
     param($destination, $length)
 
-    ## Convert the destination path to a full filesytem path (to support
+    ## Convert the destination path to a full file system path (to support
     ## relative paths)
     $Destination = $executionContext.SessionState.`
         Path.GetUnresolvedProviderPathFromPSPath("$env:temp\$Destination")

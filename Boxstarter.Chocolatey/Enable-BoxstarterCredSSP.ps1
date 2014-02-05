@@ -1,23 +1,23 @@
 function Enable-BoxstarterCredSSP {
 <#
 .SYNOPSIS
-Enables and configures CredSSP Authentication to be used in Powershell remoting sessions
+Enables and configures CredSSP Authentication to be used in PowerShell remoting sessions
 
 .DESCRIPTION
-Enabling CredSSP alows a caller from one remote session to authenticate on other remote 
+Enabling CredSSP allows a caller from one remote session to authenticate on other remote 
 resources. This is known as credential delegation. By default, PowerShell sessions do not 
 use credSSP and therefore cannot bake a "second hop" to use other remote resources that 
 require their authentication token.
 
 Enable-BoxstarterCredSSP allows remote boxstarter installs to use credential delegation 
-in the case where one might keep someresources on another remote machine that need to be 
+in the case where one might keep some resources on another remote machine that need to be 
 installed into their current remote session.
 
 This command will enable CredSSP and add all RemoteHostsToTrust to the CredSSP trusted 
 hosts list. It will also edit the users group policy to allow Fresh Credential Delegation.
 
 .PARAMETER RemoteHostsToTrust
-A list of ComputerNames to add to the CredSSP Trusted hosrs list.
+A list of ComputerNames to add to the CredSSP Trusted hosts list.
 
 .OUTPUTS
 A list of the original trusted hosts on the local machine.

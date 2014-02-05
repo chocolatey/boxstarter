@@ -4,13 +4,13 @@ function Install-WindowsUpdate {
 Downloads and installs updates via Windows Update
 
 .DESCRIPTION
-This uses the windows update servise to search, download and install updates. By default, only critical updates are included and a reboot will be induced if required.
+This uses the windows update service to search, download and install updates. By default, only critical updates are included and a reboot will be induced if required.
 
 .PARAMETER GetUpdatesFromMS
 If this switch is set, the default windows update server, if any, is bypassed and windows update requests go to the public Microsoft Windows update service.
 
 .PARAMETER AcceptEula
-If any update requires a eula acceptance, setting this switch will accept the eula and allow the update to be installed.
+If any update requires a Eula acceptance, setting this switch will accept the Eula and allow the update to be installed.
 
 .PARAMETER SuppressReboots
 Setting this switch will suppress a reboot in the event that any update requires one.

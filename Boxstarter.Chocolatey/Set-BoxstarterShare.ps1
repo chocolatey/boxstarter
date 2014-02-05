@@ -8,14 +8,14 @@ Shares the Boxstarter root directory - $Boxstarter.BaseDir - so that
 it can be accessed remotely. This allows remote machines to Invoke 
 ChocolateyBoxstarter via \\server\shareName\Boxstarter.bat. Unless 
 specified otherwise, the share name is Boxstarter and Everyone is 
-given Read permisions.
+given Read permissions.
 
 .PARAMETER ShareName
 The name to give to the share. This is the name by which other 
 machines can access it. Boxstarter is the default.
 
 .PARAMETER Accounts
-A ist of accounts to be given read access to the share. Everyone is 
+A list of accounts to be given read access to the share. Everyone is 
 the default.
 
 .EXAMPLE
@@ -26,7 +26,7 @@ Shares the Boxstarter root as Boxstarter to everyone.
 .EXAMPLE
 Set-BoxstarterShare BuildRepo
 
-Shares the Boxstrarter Root as BuildRepo to everyone.
+Shares the Boxstarter Root as BuildRepo to everyone.
 
 .EXAMPLE
 Set-BoxstarterShare -Accounts "corp\mwrock","corp\gmichaels"
@@ -56,7 +56,7 @@ Invoke-BoxstarterBuild
     }
     IEX "net share $shareName='$($Boxstarter.BaseDir)' $acctOption"
     if($LastExitCode -ne 0) {
-        Throw "Sharing $shareName on $($Boxstarter.BaseDir) to $acctOption was not succesfull. Use NET SHARE $ShareName to see if share already exists. To Delete the share use NET SHARE $ShareName /DELETE."
+        Throw "Sharing $shareName on $($Boxstarter.BaseDir) to $acctOption was not successful. Use NET SHARE $ShareName to see if share already exists. To Delete the share use NET SHARE $ShareName /DELETE."
     }
 }
 

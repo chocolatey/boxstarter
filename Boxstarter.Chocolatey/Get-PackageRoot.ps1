@@ -8,11 +8,11 @@ This function is intended to be called from inside a running
 ChocolateyInstall.ps1 file. It returns the root path of the package
 which is one level above the Tools directory. This can be helpful
 when you need to reference any files that you copied to your 
-Boxstarter Repository which copies them to this location usung
+Boxstarter Repository which copies them to this location using
 New-BoxstarterPackage.
 
 .PARAMETER Invocation
-This is $MyInvocation instance accesible from ChocolateyInstall.ps1
+This is $MyInvocation instance accessible from ChocolateyInstall.ps1
 
 .EXAMPLE
 Copy-Item "$env:programfiles\Sublime Text 2\Data\*" Package\Sublime -recurse

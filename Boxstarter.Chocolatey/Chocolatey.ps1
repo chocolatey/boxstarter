@@ -96,7 +96,7 @@ Intercepts Chocolatey call to check for reboots
     $PSBoundParameters.Remove("RebootCodes") | Out-Null
     $packageNames=-split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
-    #backcompat for choco versions prior to 0.9.8.21
+    #backcompat for Chocolatey versions prior to 0.9.8.21
     if(!$packageNames){$packageNames=$packageName}
     
     foreach($packageName in $packageNames){
@@ -127,7 +127,7 @@ Intercepts Chocolatey call to check for reboots
                     Call-Chocolatey @PSBoundParameters
                     Write-BoxstarterMessage "Exit Code: $LastExitCode" -Verbose
                     if($LastExitCode -ne 0) {
-                        Write-Error "Chocolatey reported an unsuccesful exit code of $LastExitCode"
+                        Write-Error "Chocolatey reported an unsuccessful exit code of $LastExitCode"
                     }
                 }
             }

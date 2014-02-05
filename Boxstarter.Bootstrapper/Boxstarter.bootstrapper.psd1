@@ -1,5 +1,5 @@
 @{
-Description = 'Provides an unattended installation evironment supporting automaic reboots, suspension of update services and logging'
+Description = 'Provides an unattended installation environment supporting automatic reboots, suspension of update services and logging'
 # Script module or binary module file associated with this manifest.
 ModuleToProcess = './boxstarter.bootstrapper.psm1'
 

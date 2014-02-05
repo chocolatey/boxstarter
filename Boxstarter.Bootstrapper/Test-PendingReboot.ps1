@@ -6,8 +6,8 @@ Checks to see if Windows is pending a reboot
 .DESCRIPTION
 Uses a script from Brian Wilhite 
 http://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542 
-that queries the registry, Windows Update and System C
-onfiguration Manager to determine if a pending reboot is 
+that queries the registry, Windows Update and System 
+Configuration Manager to determine if a pending reboot is 
 required.
 
 One may want to check this before installing software 

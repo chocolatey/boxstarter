@@ -2,7 +2,7 @@
 ***********************************************************************************
 *   This function was written by Andy Arismendi
 *   Published at http://poshcode.org/2982
-*   Under Creative Commons Lisence 
+*   Under Creative Commons License 
 *   http://creativecommons.org/publicdomain/zero/1.0/legalcode
 ***********************************************************************************
 #>
@@ -127,7 +127,7 @@ begin {
                 {
                     if (key.Length == 0)
                     {
-                        throw new Exception("Key lenght zero");
+                        throw new Exception("Key length zero");
                     }
 
                     objectAttributes = new LSA_OBJECT_ATTRIBUTES();

@@ -26,7 +26,7 @@ The Credential to use to test PSRemoting.
 If a Checkpoint exists by this name, it will be restored. Otherwise one will be created.
 
 .NOTES
-PSRemoting mut be enabled in order for Boxstarter to install to a remote machine. Bare 
+PSRemoting must be enabled in order for Boxstarter to install to a remote machine. Bare 
 Metal machines require a manual step of enabling it before remote Boxstarter installs 
 will work. However, on a Hyper-V VM, Boxstarter can manage this by mounting and 
 manipulating the VM's VHD. Boxstarter can open the WMI ports which enable it to create a 
@@ -35,7 +35,7 @@ Boxstarter will also enable LocalAccountTokenFilterPolicy so that local accounts
 authenticate remotely.
 
 For Non-HyperV VMs, use Enable-BoxstarterVHD to perform these adjustments on the VHD of 
-the VM. The VM must be powered off and accesible.
+the VM. The VM must be powered off and accessible.
 
 .OUTPUTS
 A BoxstarterConnectionConfig that contains the ConnectionURI of the VM Computer and 
@@ -80,12 +80,12 @@ Install-BoxstarterPackage
     Begin {
         ##Cannot run remotely unelevated. Look into self elevating
         if(!(Test-Admin)) {
-            Write-Error "You must be running as an administrator. Please open a Powershell console as Administrator and rerun Install-BoxstarperPackage."
+            Write-Error "You must be running as an administrator. Please open a PowerShell console as Administrator and rerun Install-BoxstarperPackage."
             return
         }
 
         if(!(Get-Command -Name Get-VM -ErrorAction SilentlyContinue)){
-            Write-Error "Boxstarter could not find the Hyper-V Powershell Module installed. This is required for use with Boxstarter.HyperV. Run Install-windowsfeature -name hyper-v -IncludeManagementTools."
+            Write-Error "Boxstarter could not find the Hyper-V PowerShell Module installed. This is required for use with Boxstarter.HyperV. Run Install-windowsfeature -name hyper-v -IncludeManagementTools."
             return
         }
 

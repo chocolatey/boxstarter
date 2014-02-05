@@ -16,12 +16,12 @@ This essentially wraps Chocolatey Install and provides these additional features
  - Imports the Boxstarter.WinConfig module that provides functions for customizing windows
  - Detects pending reboots and restarts the machine when necessary to avoid installation failures
  - Provides Reboot Resiliency by ensuring the package installation is immediately restarted up on reboot if there is a reboot during the installation.
- - Ensures everything runs under admin
+ - Ensures everything runs under administrator permissions
 
  The .nupkg file for the provided package name is searched in the following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
- - The chocolatey feed
- - The boxstarter feed on myget
+ - The Chocolatey feed
+ - The Boxstarter feed on MyGet
  This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
 
  If the package name provided is a URL or resolves to a file. Then 
@@ -34,8 +34,8 @@ This essentially wraps Chocolatey Install and provides these additional features
  the .nupkg file for the provided package names are searched in the 
  following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
- - The chocolatey feed
- - The boxstarter feed on myget
+ - The Chocolatey feed
+ - The Boxstarter feed on MyGet
 
 .Parameter Localrepo
 This is the path to the local boxstarter repository where boxstarter 
@@ -63,7 +63,7 @@ an account without password validation.
 .NOTES
 If specifying only one package, Boxstarter calls chocolatey with the 
 -force argument and deletes the previously installed package directory. 
-This means that regardless of wether or not the package had been 
+This means that regardless of whether or not the package had been 
 installed previously, Boxstarter will attempt to download and reinstall it.
 This only holds true for the outer package. If the package contains calls 
 to CINST for additional packages, those installs will not reinstall if 
@@ -102,7 +102,7 @@ specified share.
 Invoke-ChocolateyBoxstarter win8Install -LocalRepo \\server\share\boxstarter
 
 This installs the Win8Install .nupkg and specifies that it is ok to 
-reboot the macine if a pending reboot is needed. Boxstarter will look 
+reboot the machine if a pending reboot is needed. Boxstarter will look 
 for the Win8Install .nupkg file in the \\serer\share\boxstarter 
 directory.
 

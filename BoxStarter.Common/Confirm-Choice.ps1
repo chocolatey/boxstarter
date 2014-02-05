@@ -5,7 +5,7 @@ Prompts the user to choose a yes/no option.
 
 .DESCRIPTION
 The message parameter is presented to the user and the user is then prompted to 
-respond yes or no. In environments such as the Powershell ISE, the Confirm param 
+respond yes or no. In environments such as the PowerShell ISE, the Confirm param 
 is the title of the window presenting the message.
 
 .Parameter Message

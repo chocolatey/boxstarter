@@ -13,13 +13,13 @@ This function wraps a Chocolatey Install and provides these additional features
  - Imports the Boxstarter.WinConfig module that provides functions for customizing windows
  - Detects pending reboots and restarts the machine when necessary to avoid installation failures
  - Provides Reboot Resiliency by ensuring the package installation is immediately restarted up on reboot if there is a reboot during the installation.
- - Ensures everything runs under admin
+ - Ensures everything runs under administrator permissions
  - Supports remote installations allowing packages to be installed on a remote machine
 
  The .nupkg file for the provided package name is searched in the following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
- - The chocolatey feed
- - The boxstarter feed on myget
+ - The Chocolatey feed
+ - The Boxstarter feed on MyGet
  This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
 
  If the package name provided is a URL or resolves to a file, then 
@@ -28,20 +28,20 @@ This function wraps a Chocolatey Install and provides these additional features
 
  Boxstarter can install packages onto a remote machine. To accomplish this,
  use either the ComputerName, Session or ConnectionURI parameters. Boxstarter uses
- powershell remoting to establish an iteractive session on the remote computer.
+ PowerShell remoting to establish an interactive session on the remote computer.
  Boxstarter configures all the necessary client side remoting settings necessary if 
  they are not already configured. Boxstarter will prompt the user to verify that 
  this is ok. Using the -Force switch will suppress the prompt. Boxstarter also ensures
  that CredSSP authentication is enabled so that any network calls made by a package will 
  forward the users credentials.
 
- Powershell Remoting must be enabled on the target machine in order to establish a connection. 
- If that machine's WMI ports are accesible, Boxstarter can enable powershell remoting 
+ PowerShell Remoting must be enabled on the target machine in order to establish a connection. 
+ If that machine's WMI ports are accessible, Boxstarter can enable PowerShell remoting 
  on the remote machine on its own. Otherwise, it can be manually enabled by entering 
 
  Enable-PSRemoting -Force
 
- In an administrative powershell console on the remote machine.
+ In an administrative PowerShell console on the remote machine.
  
  .PARAMETER ComputerName
  If provided, Boxstarter will install the specified package name on all computers.
@@ -58,12 +58,12 @@ This function wraps a Chocolatey Install and provides these additional features
  PowerShell sessions. Note that these sessions may be closed by the time 
  Install-BoxstarterPackage finishes. If Boxstarter needs to restart the remote 
  computer, the session will be discarded and a new session will be created using 
- the ConnectionURI of the original sesion.
+ the ConnectionURI of the original session.
 
  .PARAMETER BoxstarterConnectionConfig
  If provided, Boxstarter will install the specified package name on all computers
- inclused in the BoxstarterConnectionConfig. This object contains a ComputerName
- and a PSCredential. Use this objsct if you need to pass different computers
+ included in the BoxstarterConnectionConfig. This object contains a ComputerName
+ and a PSCredential. Use this object if you need to pass different computers
  requiring different credentials.
 
  .PARAMETER PackageName
@@ -72,16 +72,16 @@ This function wraps a Chocolatey Install and provides these additional features
  the .nupkg file for the provided package names are searched in the 
  following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
- - The chocolatey feed
- - The boxstarter feed on myget
+ - The Chocolatey feed
+ - The Boxstarter feed on MyGet
 
 .PARAMETER DisableReboots
 If set, reboots are suppressed.
 
 .PARAMETER Credential
 The credentials to use for auto logins after reboots. If installing on
-a remote machine, ths credential will also be used to establish the 
-connecion to the remote machine and also for any scheduled task that
+a remote machine, this credential will also be used to establish the 
+connection to the remote machine and also for any scheduled task that
 boxstarter needs to create and run under a local context.
 
 .PARAMETER KeepWindowOpen
@@ -98,7 +98,7 @@ directory but can be changed with Set-BoxstarterConfig.
 .NOTES
 If specifying only one package, Boxstarter calls chocolatey with the 
 -force argument and deletes the previously installed package directory. 
-This means that regardless of wether or not the package had been 
+This means that regardless of whether or not the package had been 
 installed previously, Boxstarter will attempt to download and reinstall it.
 This only holds true for the outer package. If the package contains calls 
 to CINST for additional packages, those installs will not reinstall if 
@@ -110,7 +110,7 @@ install for any package that had been previously installed.
 
 When establishing a remote connection, Boxstarter uses CredSSP 
 authentication so that the session can access any network resources 
-normally accesible to the Credential. If necessary, Boxstarter 
+normally accessible to the Credential. If necessary, Boxstarter 
 configures CredSSP authentication on both the local and remote 
 machines as well as the necessary Group Policy and WSMan settings 
 for credential delegation. When the installation completes, 
@@ -118,10 +118,10 @@ Boxstarter rolls back all settings that it changed to their original
 state.
 
 When using a Windows PowerShell session instead of ComputerName or 
-ConnectionURI, Boxstarter will use the authenticaion mechanism of the 
+ConnectionURI, Boxstarter will use the authentication mechanism of the 
 existing session and will not configure CredSSP if the session provided 
 is not using CredSSP. If the session is not using CredSSP, it may be 
-denied access to network resources normally accesble to the Credential 
+denied access to network resources normally accessible to the Credential 
 being used. If you do need to access network resources external to the 
 session, you should use CredSSP when establishing the connection.
 
@@ -142,13 +142,13 @@ FinishTime: The time that Boxstarter finished the installation
 
 Completed: True or False indicating if Boxstarter was able to complete 
 the installation without a terminating exception interrupting the install. 
-Even if this value is True, it does not mean that all componebts installed 
+Even if this value is True, it does not mean that all components installed 
 in the package succeeded. Boxstarter will not terminate an installation if 
 individual Chocolatey packages fail. Use the Errors property to discover 
 errors that were raised throughout the installation.
 
 Errors: An array of all errors encountered during the duration of the 
-installaion.
+installation.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter "example1","example2"
@@ -199,8 +199,8 @@ $cred=Get-Credential mwrock
 Install-BoxstarterPackage -ComputerName MyOtherComputer.mydomain.com -Package MyPackage -Credential $cred -Force
 
 This installs the MyPackage package on MyOtherComputer.mydomain.com.
-Becauce the -Force parameter is used, Boxstarter will not prompt the
-user to confirm that it is ok to enable Powershell remoting if it is 
+Because the -Force parameter is used, Boxstarter will not prompt the
+user to confirm that it is ok to enable PowerShell remoting if it is 
 not already enabled. It will attempt to enable it without prompts.
 
 .EXAMPLE
@@ -208,13 +208,13 @@ $cred=Get-Credential mwrock
 "computer1","computer2" | Install-BoxstarterPackage -Package MyPackage -Credential $cred -Force
 
 This installs the MyPackage package on computer1 and computer2
-Becauce the -Force parameter is used, Boxstarter will not prompt the
-user to confirm that it is ok to enable Powershell remoting if it is 
+Because the -Force parameter is used, Boxstarter will not prompt the
+user to confirm that it is ok to enable PowerShell remoting if it is 
 not already enabled. It will attempt to enable it without prompts.
 
 Using -Force is especially advisable when installing packages on multiple 
-computers because otherwise, if one computer is not accesible, the command 
-will prompt the user if it is ok to try and confiure the computer before 
+computers because otherwise, if one computer is not accessible, the command 
+will prompt the user if it is ok to try and configure the computer before 
 proceeding to the other computers.
 
 .EXAMPLE
@@ -301,7 +301,7 @@ about_boxstarter_chocolatey
 
         ##Cannot run remotely unelevated. Look into self elevating
         if(!(Test-Admin)) {
-            Write-Error "You must be running as an administrator. Please open a Powershell console as Administrator and rerun Install-BoxstarperPackage."
+            Write-Error "You must be running as an administrator. Please open a PowerShell console as Administrator and rerun Install-BoxstarperPackage."
             return
         }
 
@@ -311,13 +311,13 @@ about_boxstarter_chocolatey
         }
 
         #If $sessions are being provided we assume remoting is setup on both ends
-        #and dont need to test, configure and tear down
+        #and don't need to test, configure and tear down
         if($Session -ne $null){
             Process-Sessions $Session $sessionArgs
             return
         }
 
-        #We need the computernames to configure remoting
+        #We need the computer names to configure remoting
         if(!$ComputerName){
             if($BoxstarterConnectionConfig){
                 $uris = $BoxstarterConnectionConfig | % { $_.ConnectionURI }
@@ -372,7 +372,7 @@ about_boxstarter_chocolatey
 function Get-ComputerNames([URI[]]$ConnectionUris) {
     $computerNames = @()
 
-    Write-BoxstarterMessage "resolving URIs to computernames..." -Verbose
+    Write-BoxstarterMessage "resolving URIs to computer names..." -Verbose
     $ConnectionUris | %{
         Write-BoxstarterMessage "$($_ -is [uri]) found $($_.Host) for $($_.ToString())" -Verbose
         $computerNames+=$_.Host
@@ -431,7 +431,7 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
     $record = Start-Record $ComputerName
     try {
         if(!(Enable-RemotingOnRemote $sessionArgs $ComputerName)){
-            Write-Error "Unable to access remote computer via Powershell Remoting or WMI. You can enable it by running: Enable-PSRemoting -Force from an Administrator Powershell console on the remote computer."
+            Write-Error "Unable to access remote computer via PowerShell Remoting or WMI. You can enable it by running: Enable-PSRemoting -Force from an Administrator PowerShell console on the remote computer."
             $record.Completed=$false
             return
         }
@@ -543,23 +543,23 @@ function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
         $global:error.RemoveAt(0)
     }
     if($remotingTest -eq $null){
-        Write-BoxstarterMessage "Powershell Remoting is not enabled or accesible on $ComputerName" -Verbose
+        Write-BoxstarterMessage "PowerShell Remoting is not enabled or accessible on $ComputerName" -Verbose
         $wmiTest=Invoke-WmiMethod -ComputerName $ComputerName -Credential $sessionArgs.Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
         if($wmiTest -eq $null){
             if($global:Error.Count -gt 0){ $global:Error.RemoveAt(0) }
             return $false
         }
-        if($Force -or (Confirm-Choice "Powershell Remoting is not enabled on Remote computer. Should Boxstarter enable powershell remoting? This will also change the Network Location type on the remote machine to PRIVATE if it is currently PUBLIC.")){
-            Write-BoxstarterMessage "Enabling Powershell Remoting on $ComputerName"
+        if($Force -or (Confirm-Choice "PowerShell Remoting is not enabled on Remote computer. Should Boxstarter enable PowerShell remoting? This will also change the Network Location type on the remote machine to PRIVATE if it is currently PUBLIC.")){
+            Write-BoxstarterMessage "Enabling PowerShell Remoting on $ComputerName"
             Enable-RemotePSRemoting $ComputerName $sessionArgs.Credential
         }
         else {
-            Write-BoxstarterMessage "Not enabling local Powershell Remoting on $ComputerName. Aborting package install"
+            Write-BoxstarterMessage "Not enabling local PowerShell Remoting on $ComputerName. Aborting package install"
             return $False
         }
     }
     else {
-        Write-BoxstarterMessage "Remoting is accesible on $ComputerName"
+        Write-BoxstarterMessage "Remoting is accessible on $ComputerName"
     }
     return $True
 }
@@ -678,9 +678,9 @@ function Test-Reconnection($Session, $sessionPID) {
         $response = Test-ShutDownInProgress $session
 
         if($response -eq $false) {
-            $reconnected = $true #Session is connectable
+            $reconnected = $true #Session is connectible
             try{
-                #In case previou session's task is still alive kill it so itr does not lock anything
+                #In case previous session's task is still alive kill it so it does not lock anything
                 Write-BoxstarterMessage "Killing $sessionPID" -Verbose
                 Invoke-Command -Session $session { 
                     param($p)

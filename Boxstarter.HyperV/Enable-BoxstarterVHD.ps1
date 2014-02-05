@@ -9,7 +9,7 @@ LocalAccountTokenFilterPolicy so that Boxstarter can later enable
 PowerShell Remoting.
 
 .PARAMETER VHDPath
-The path to ther VHD file
+The path to the VHD file
 
 .PARAMETER IgnoreWMI
 If specified, WMI ports will not be enabled
@@ -18,7 +18,7 @@ If specified, WMI ports will not be enabled
 If specified, IgnoreLocalAccountTokenFilterPolicy will not be enabled
 
 .NOTES
-The VHD must be accesible, writable and contain a system drive.
+The VHD must be accessible, writable and contain a system drive.
 
 .OUTPUTS
 The computer name stored in the VHD's Windows Registry
@@ -59,7 +59,7 @@ http://boxstarter.codeplex.com
         }
 
         if(!(Get-Command -Name Get-VM -ErrorAction SilentlyContinue)){
-            Write-Error "Boxstarter could not find the Hyper-V Powershell Module installed. This is required for use with Boxstarter.HyperV. Run Install-windowsfeature -name hyper-v -IncludeManagementTools."
+            Write-Error "Boxstarter could not find the Hyper-V PowerShell Module installed. This is required for use with Boxstarter.HyperV. Run Install-windowsfeature -name hyper-v -IncludeManagementTools."
             return
         }
 

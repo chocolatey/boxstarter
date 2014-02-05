@@ -6,7 +6,7 @@ Begins a timed section
 .DESCRIPTION
 A timed section is a portion of script that is timed. Used 
 with Stop-TimedSection, the beginning and end of the section 
-are loged to both the console and the log along with the 
+are logged to both the console and the log along with the 
 amount of time elapsed.
 
 The function returns a guid that is used to identify the 
@@ -18,7 +18,7 @@ is used in the logging to identify the section.
 
 .PARAMETER Verbose
 Instructs Start-TimedSection to write to the Verbose stream. Although 
-this will always log messages to the Boxstrter log, it will only log 
+this will always log messages to the Boxstarter log, it will only log 
 to the console if the session's VerbosePreference is set to capture 
 the Verbose stream or the -Verbose switch was set when calling
 Install-BoxstarterPackage.
@@ -66,14 +66,14 @@ Note that the number of '+' chars indicate nesting level.
 $session=Start-TimedSection "My First Section" -Verbose
 Stop-TimedSection $session
 
-This will write the start and inish messages to the 
+This will write the start and finish messages to the 
 Boxstarter log but will not write to the console unless the 
 user has the the VerbosePreference variable or used the 
 Verbose switch of Install-BoxstarterPackage.
 
 .NOTES
 If the SuppressLogging setting of the $Boxstarter variable is true, 
-logging mesages will be suppresed and not sent to the console or the 
+logging messages will be suppressed and not sent to the console or the 
 log.
 
 .LINK

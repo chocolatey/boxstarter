@@ -16,7 +16,7 @@ properties {
 
 Task default -depends Build
 Task Build -depends Build-Clickonce, Build-Web, Test, Package
-Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to Myget'
+Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Codeplex, Push-Chocolatey
 Task All-Tests -depends Test, Integration-Test
@@ -130,7 +130,7 @@ Task Deploy-DownloadZip -depends Package-DownloadZip {
     Copy-Item "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\web\downloads"
 }
 
-Task Push-Nuget -description 'Pushes the module to Myget feed' {
+Task Push-Nuget -description 'Pushes the module to MyGet feed' {
     PushDirectory $baseDir\buildPackages
     PushDirectory $baseDir\buildArtifacts
 }

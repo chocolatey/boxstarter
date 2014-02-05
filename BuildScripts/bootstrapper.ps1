@@ -4,7 +4,7 @@ function Get-Boxstarter {
     )
     Write-Output "Welcome to the Boxstarter Module installer!"
     if(Check-Chocolatey -Force:$Force){
-        Write-Output "Chocoltey installed, Installing Boxstarter Modules."
+        Write-Output "Chocolatey installed, Installing Boxstarter Modules."
         cinst Boxstarter -version 2.3.24
         $Message = "Boxstarter Module Installer completed"
     }
@@ -24,7 +24,7 @@ function Check-Chocolatey {
         [switch] $Force
     )
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
-        $message = "Chocolatey is going to be downloaded and installed on your machine. If you do not have the .NET Framework Version 4, that will aldo be downloaded and installed."
+        $message = "Chocolatey is going to be downloaded and installed on your machine. If you do not have the .NET Framework Version 4, that will also be downloaded and installed."
         Write-Host $message
         if($Force -OR (Confirm-Install)){
             $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
