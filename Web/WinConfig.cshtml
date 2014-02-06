@@ -39,6 +39,7 @@ Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
 
 <h3>Set-ExplorerOptions</h3>
 <p>Sets options on the Windows Explorer shell</p>
+<p><strong>NOTE:</strong> This function is now deprecated.  Please use Set-WindowsExplorerOptions instead</p>
 <pre>
 Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
 </pre>
@@ -61,6 +62,16 @@ Set-CornerNavigationOptions -EnableUpperRightCornerShowCharms -EnableUpperLeftCo
 <p>It is also possible to do the converse actions, if required.</p>
 <pre>
 Set-CornerNavigationOptions -DisableUpperRightCornerShowCharms -DisableUpperLeftCornerSwitchApps -DisableUsePowerShellOnWinX
+</pre>
+
+<h3>Set-WindowsExplorerOptions</h3>
+<p>Sets options on the Windows Explorer shell</p>
+<pre>
+Set-WindowsExplorerOptions -EnableShowHidenFilesFoldersDrives -EnableShowProtectedOSFiles -EnableShowFileExtensions -EnableShowFullPathInTitleBar
+</pre>
+<p>It is also possible to do the converse actions, if required.</p>
+<pre>
+Set-WindowsExplorerOptions -DisableShowHidenFilesFoldersDrives -DisableShowProtectedOSFiles -DisableShowFileExtensions -DisableShowFullPathInTitleBar
 </pre>
 
 <h3>Set-TaskbarSmall</h3>
