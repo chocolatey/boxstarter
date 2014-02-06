@@ -3,34 +3,40 @@ function Set-StartScreenOptions {
 .SYNOPSIS
 Sets options for the Windows Start Screen.
 
-.PARAMETER enableBootToDesktop
+.PARAMETER EnableBootToDesktop
 When I sign in or close all apps on a screen, go to the desktop instead of Start
 
-.PARAMETER disableBootToDesktop
+.PARAMETER DisableBootToDesktop
 Disables the Boot to Desktop Option, see enableBootToDesktop
 
-.PARAMETER enableShowStartOnActiveScreen
+.PARAMETER EnableDesktopBackgroundOnStart
+Show Desktop background on Start
+
+.PARAMETER DisableDesktopBackgroundOnStart
+Do not show Desktop background on Start
+
+.PARAMETER EnableShowStartOnActiveScreen
 Show Start on the display I'm using when I press the Windows logo key
 
-.PARAMETER disableShowStartOnActiveScreen
+.PARAMETER DisableShowStartOnActiveScreen
 Disables the displaying of the Start screen on active screen, see enableShowStartOnActiveScreen
 
-.PARAMETER enableShowAppsViewOnStartScreen
+.PARAMETER EnableShowAppsViewOnStartScreen
 Show the Apps view automatically when I go to Start
 
-PARAMETER disableShowAppsViewOnStartScreen
+PARAMETER DisableShowAppsViewOnStartScreen
 Disables the showing of Apps View when Start is activated, see enableShowAppsViewOnStartScreen
 
-.PARAMETER enableSearchEverywhereInAppsView
+.PARAMETER EnableSearchEverywhereInAppsView
 Search everywhere instead of just my apps when I search from the Apps View
 
-.PARAMETER disableSearchEverywhereInAppsView
+.PARAMETER DisableSearchEverywhereInAppsView
 Disables the searching of everywhere instead of just apps, see enableSearchEverywhereInAppsView
 
-.PARAMETER enableListDesktopAppsFirst
+.PARAMETER EnableListDesktopAppsFirst
 List desktop apps first in the Apps view when it's sorted by category
 
-.PARAMETER disableListDesktopAppsFirst
+.PARAMETER DisableListDesktopAppsFirst
 Disables the ability to list desktop apps first when sorted by category, see enableListDesktopAppsFirst
 
 .LINK
