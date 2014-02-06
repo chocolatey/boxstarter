@@ -15,11 +15,11 @@ When I click the upper-left corner, switch between my recent apps
 .PARAMETER DisableUpperLeftCornerSwitchApps
 Disables the switching between recent apps, when clicking in the upper-left corner, see EnableUpperLeftCornerSwitchApps
 
-.PARAMETER EnableLowerLeftCornerWithPowerShell
+.PARAMETER EnableUsePowerShellOnWinX
 Replace Command Prompt with Windows PowerShell in the menu when I right-click the lower-left corner or press Windows key+X
 
-.PARAMETER DisableLowerLeftCornerWithPowerShell
-Disables the showing of Windows PowerShell in the lower-left corner, see EnableLowerLeftCornerWithPowerShell
+.PARAMETER DisableUsePowerShellOnWinX
+Disables the showing of Windows PowerShell in the lower-left corner, see EnableUsePowerShellOnWinX
 #>
 	[CmdletBinding()]
 	param(
@@ -27,8 +27,8 @@ Disables the showing of Windows PowerShell in the lower-left corner, see EnableL
 		[switch]$DisableUpperRightCornerShowCharms,
 		[switch]$EnableUpperLeftCornerSwitchApps,
 		[switch]$DisableUpperLeftCornerSwitchApps,
-		[switch]$EnableLowerLeftCornerWithPowerShell,
-		[switch]$DisableLowerLeftCornerWithPowerShell
+		[switch]$EnableUsePowerShellOnWinX,
+		[switch]$DisableUsePowerShellOnWinX
 	)
 
 	$PSBoundParameters.Keys | % {
@@ -51,7 +51,7 @@ Disables the showing of Windows PowerShell in the lower-left corner, see EnableL
 	}
 
 	if(Test-Path -Path $advancedKey) {
-		if($EnableLowerLeftCornerWithPowerShell) { Set-ItemProperty -Path $advancedKey -Name 'DontUsePowerShellOnWinX' -Value 0 }
-		if($DisableLowerLeftCornerWithPowerShell) { Set-ItemProperty -Path $advancedKey -Name 'DontUsePowerShellOnWinX' -Value 1 }
+		if($EnableUsePowerShellOnWinX) { Set-ItemProperty -Path $advancedKey -Name 'DontUsePowerShellOnWinX' -Value 0 }
+		if($DisableUsePowerShellOnWinX) { Set-ItemProperty -Path $advancedKey -Name 'DontUsePowerShellOnWinX' -Value 1 }
     }
 }
