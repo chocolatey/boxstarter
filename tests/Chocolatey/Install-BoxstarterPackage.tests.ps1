@@ -35,7 +35,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        $result = (new-Object -TypeName BoxstarterconnectionConfig -ArgumentList "http://localhost:5985/wsman",$null) | Install-BoxstarterPackage -PackageName test-package -DisableReboots
+        $result = (new-Object -TypeName BoxstarterconnectionConfig -ArgumentList "http://localhost:5985/wsman",$null,$null) | Install-BoxstarterPackage -PackageName test-package -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist

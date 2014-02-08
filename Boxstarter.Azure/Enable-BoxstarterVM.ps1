@@ -6,9 +6,11 @@ Finds the PowerShell Remote ConnectionURI of an Azure VM and ensures it can be a
 .DESCRIPTION
 Ensures that an Azure VM can be accessed by Boxstarter. Checks the Azure PowerShell 
 SDK settings are set correctly and also examines the VM endpoints to ensure the correct 
-settings for PowerShell remoting. If necessary, the WinRM certificate of the VM is 
-downloaded and installed. The VM's PowerShell remoting ConnectionURI is located and 
-returned via a BoxstarterConfig instance.
+settings for PowerShell remoting. If necessary and if running with administrative 
+privileges, the WinRM certificate of the VM is downloaded and installed. If not running 
+with admin privileges, a PowerShell SessionOption is used that skips the CA and CN 
+check. The VM's PowerShell remoting ConnectionURI is located and returned via a 
+BoxstarterConfig instance.
 
 Enable-BoxstarterVM will also restore the VM to a specified 
 checkpoint or create a new checkpoint if the given checkpoint 
