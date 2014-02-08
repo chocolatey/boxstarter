@@ -28,6 +28,8 @@ Install-BoxstarterPackage
     param(
     [string[]] $RemoteHostsToTrust
     )
+    if(Test-Admin) { $elevated = $true }
+
     $Result=@{    
         Success=$False;
         PreviousTrustedHosts=$null;
@@ -36,7 +38,7 @@ Install-BoxstarterPackage
     try { $wsman = Test-WSMan -ErrorAction Stop } catch { $credssp = $_}
     if($credssp.Exception -ne $null){
         Write-BoxstarterMessage "Local PowerShell Remoting is not enabled" -Verbose
-        if($Force -or (Confirm-Choice "PowerShell remoting is not enabled locally. Should Boxstarter enable PowerShell remoting?"))
+        if($elevated -and ($Force -or (Confirm-Choice "PowerShell remoting is not enabled locally. Should Boxstarter enable PowerShell remoting?")))
         {
             Write-BoxstarterMessage "Enabling PowerShell Remoting on local machine"
             $enableArgs=@{Force=$true}
