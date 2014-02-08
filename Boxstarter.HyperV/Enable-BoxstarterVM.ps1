@@ -183,7 +183,7 @@ Install-BoxstarterPackage
                 Checkpoint-VM -Name $_ -SnapshotName $CheckpointName
             }
 
-            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList "http://$($computerName):5985/wsman",$Credential
+            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList "http://$($computerName):5985/wsman",$Credential,$null
             return $res
         }
     }

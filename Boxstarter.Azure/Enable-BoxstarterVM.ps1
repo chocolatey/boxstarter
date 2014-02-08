@@ -100,12 +100,6 @@ Remove-AzureVMCheckpoint
     Begin {
         $CurrentVerbosity=$global:VerbosePreference
 
-        ##Cannot run remotely unelevated. Look into self elevating
-        if(!(Test-Admin)) {
-            Write-Error "You must be running as an administrator. Please open a PowerShell console as Administrator and rerun Install-BoxstarperPackage."
-            return
-        }
-
         $subscription=Get-AzureSubscription
         if($subscription -eq $null){
             throw @"
@@ -153,7 +147,13 @@ Once that is done, please run Enable-BoxstarterVM again.
                 Wait-ReadyState -VMName $_
             }
 
-            Install-WinRMCert $vm | Out-Null
+            if(!(Test-Admin)) {
+                $PSSessionOption = New-PSSessionOption -SkipCACheck -SkipCNCheck
+            }
+            else {
+                Install-WinRMCert $vm | Out-Null
+            }
+
             $uri = Invoke-RetriableScript { Get-AzureWinRMUri -serviceName $args[0] -Name $args[1] } $CloudServiceName $_
             if($uri -eq $null) {
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "WinRM Endpoint is not configured on VM. Use Add-AzureEndpoint to add PowerShell remoting endpoint and use Enable-PSRemoting -Force on the VM to enable PowerShell remoting."
@@ -171,7 +171,7 @@ Once that is done, please run Enable-BoxstarterVM again.
                 Set-AzureVMCheckpoint -VM $vm -CheckpointName $CheckpointName | Out-Null
             }
 
-            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $uri,$Credential
+            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $uri,$Credential,$PSSessionOption
             return $res
         }
     }

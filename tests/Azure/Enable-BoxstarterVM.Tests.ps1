@@ -161,4 +161,36 @@ Describe "Enable-BoxstarterVM.Azure" {
             $err.CategoryInfo.Reason | should be "InvalidOperationException"
         }
     }
+
+    Context "When not running as admin"{
+        Mock Test-Admin
+
+        $result = Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -ErrorAction SilentlyContinue
+
+        It "should not install certs" {
+            Assert-MockCalled Install-WinRMCert -times 0
+        }
+        It "should skip CA Check" {
+            $result.PSSessionOption.SkipCACheck | should be $true
+        }
+        It "should skip CN Check" {
+            $result.PSSessionOption.SkipCNCheck | should be $true
+        }
+    }
+
+    Context "When running as admin"{
+        Mock Test-Admin {$true}
+
+        $result = Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -ErrorAction SilentlyContinue
+
+        It "should not install certs" {
+            Assert-MockCalled Install-WinRMCert -times 1
+        }
+        It "should not skip CA Check" {
+            $result.PSSessionOption.SkipCACheck | should be $false
+        }
+        It "should not skip CN Check" {
+            $result.PSSessionOption.SkipCNCheck | should be $false
+        }
+    }
 }

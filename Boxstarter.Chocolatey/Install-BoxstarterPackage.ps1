@@ -352,6 +352,9 @@ about_boxstarter_chocolatey
                     if($_.Credential){
                         $sessionArgs.Credential = $_.Credential
                     }
+                    if($_.PSSessionOption){
+                        $sessionArgs.SessionOption = $_.PSSessionOption
+                    }
                     Install-BoxstarterPackageOnComputer $_.ConnectionURI.Host $sessionArgs $PackageName $DisableReboots $unelevated
                 }
             }
@@ -477,8 +480,11 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
         }
 
         if($enableCredSSP){
-            if($session){ Remove-PSSession $session -ErrorAction SilentlyContinue }
-            $session = Enable-RemoteCredSSP $sessionArgs
+            $credSSPSession = Enable-RemoteCredSSP $sessionArgs
+            if($session -ne $null -and $credSSPSession -ne $null){ 
+                Remove-PSSession $session -ErrorAction SilentlyContinue
+                $session=$credSSPSession
+            }
         }
         
         Invoke-Remotely $session $PackageName $DisableReboots $sessionArgs
@@ -543,7 +549,7 @@ function Enable-RemotingOnRemote ($sessionArgs, $ComputerName, $unelevated){
         $remotingTest = Invoke-Command @sessionArgs { Get-WmiObject Win32_ComputerSystem } -ErrorAction Stop
     }
     catch {
-        $ex=$_
+        Write-BoxstarterMessage $_.ToString() -Verbose
         $global:error.RemoveAt(0)
     }
     if($remotingTest -eq $null){
@@ -816,11 +822,18 @@ function Enable-RemoteCredSSP($sessionArgs) {
     } $sessionArgs
     $sessionArgs.Authentication="CredSSP"
     Write-BoxstarterMessage "Creating New session with CredSSP Auth..." -Verbose
-    $session = Invoke-RetriableScript {
-        $splat=$args[0]
-        $s = New-PSSession @splat -Name Boxstarter
-        return $s
-    } $sessionArgs
+    try { 
+        $session = Invoke-RetriableScript {
+            $splat=$args[0]
+            $s = New-PSSession @splat -Name Boxstarter -ErrorAction Stop
+            return $s
+        } $sessionArgs
+    }
+    catch {
+        $sessionArgs.Remove("Authentication")
+        Write-BoxstarterMessage $_.ToString() -Verbose
+        $global:error.RemoveAt(0)
+    }
     return $session
 }
 
