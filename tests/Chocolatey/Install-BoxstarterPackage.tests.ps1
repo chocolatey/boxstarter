@@ -234,7 +234,8 @@ Describe "Install-BoxstarterPackage" {
     }    
 
     Context "When no entries in trusted hosts" {
-        Mock Get-Item {@{Value=""}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
+        $global:t_called=0
+        Mock Get-Item {if($global:t_called -eq 0) { @{Value=""};$global:t_called=1 } else { @{Value="blah"} } } -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
         Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
@@ -245,7 +246,8 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When entries in trusted hosts do not contain computer" {
-        Mock Get-Item {@{Value="bler,blur,blor"}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
+        $global:t_called=0
+        Mock Get-Item {if($global:t_called -eq 0) { @{Value="bler,blur,blor"};$global:t_called=1 } else { @{Value="bler,blur,blor,blah,blah2"} } } -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
         Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
@@ -259,7 +261,8 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When entries in trusted hosts contain only one computer" {
-        Mock Get-Item {@{Value="bler,blah,blor"}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
+        $global:t_called=0
+        Mock Get-Item {if($global:t_called -eq 0) { @{Value="bler,blah,blor"};$global:t_called=1 } else { @{Value="bler,blah,blor,blah2"} } } -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
         Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
@@ -278,11 +281,8 @@ Describe "Install-BoxstarterPackage" {
 
         Install-BoxstarterPackage -computerName blah,blor -PackageName test -Credential $mycreds | Out-Null
 
-        It "will only set hosts once (at the end)"{
-            Assert-MockCalled Set-Item -Times 1
-        }
-        It "will set to original when done"{
-            Assert-MockCalled Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts" -and $Value -eq "bler,blah,blor"}
+        It "will not set hosts"{
+            Assert-MockCalled Set-Item -Times 0
         }
     }    
 

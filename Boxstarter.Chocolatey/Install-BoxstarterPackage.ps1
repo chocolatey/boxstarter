@@ -4,8 +4,6 @@ function Install-BoxstarterPackage {
 Installs a Boxstarter package
 
 .DESCRIPTION
-This function must be run as administrator.
-
 This function wraps a Chocolatey Install and provides these additional features
  - Installs chocolatey if it is not already installed
  - Installs the .net 4.5 framework if it is not installed which is a chocolatey requirement
@@ -13,7 +11,7 @@ This function wraps a Chocolatey Install and provides these additional features
  - Imports the Boxstarter.WinConfig module that provides functions for customizing windows
  - Detects pending reboots and restarts the machine when necessary to avoid installation failures
  - Provides Reboot Resiliency by ensuring the package installation is immediately restarted up on reboot if there is a reboot during the installation.
- - Ensures everything runs under administrator permissions
+ - Ensures Installation runs under administrator permissions
  - Supports remote installations allowing packages to be installed on a remote machine
 
  The .nupkg file for the provided package name is searched in the following locations and order:
@@ -116,6 +114,10 @@ machines as well as the necessary Group Policy and WSMan settings
 for credential delegation. When the installation completes, 
 Boxstarter rolls back all settings that it changed to their original 
 state.
+
+If Boxstarter is not running in an elevated console, it will not attempt 
+to enable CredSSP locally if it is not already enabled. It will also not 
+try to enablr PowerShell remoting if not running as administrator.
 
 When using a Windows PowerShell session instead of ComputerName or 
 ConnectionURI, Boxstarter will use the authentication mechanism of the 
