@@ -2,8 +2,14 @@ function Install-WinRMCert($VM)
 {
  $winRMCert = ($VM | select -ExpandProperty vm).DefaultWinRMCertificateThumbprint
  if($winRMCert -eq $null){ 
-    Write-BoxstarterMessage "Could not find Certificate" -Verbose
-    return 
+    $X509=Get-AzureCertificate -ServiceName $vm.serviceName -ThumbprintAlgorithm sha1
+    if($X509){
+        $winRMCert=$X509.Thumbprint
+    }
+    else {
+        Write-BoxstarterMessage "Could not find Certificate" -Verbose
+        return
+    } 
 }
 
  Write-BoxstarterMessage "Installing WinRM Certificate"
