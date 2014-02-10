@@ -3,7 +3,8 @@ function Set-TaskbarSmall {
 .SYNOPSIS
 Makes the windows task bar skinny
 #>
-    $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
-    Set-ItemProperty $key TaskbarSmallIcons 1
-    Restart-Explorer
+	Write-Warning "This command is deprecated, use Set-TaskbarOptions instead."
+	Write-Warning "Your call to this function will now be routed to the Set-TaskbarOptions function."
+
+    Set-TaskbarOptions -EnableMakeTaskbarSmall
 }
