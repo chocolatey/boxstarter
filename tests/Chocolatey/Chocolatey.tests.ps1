@@ -179,7 +179,20 @@ Describe "Getting-Chocolatey" {
             Assert-MockCalled Remove-Item -parameterFilter {$path -eq "dir2"}
         }
     }
+
+    Context "When chocolatey returns an erroneous exit code" {
+        Mock Test-PendingReboot {return $false}
+        Mock Invoke-Reboot
+        Mock Call-Chocolatey {$global:LASTEXITCODE=1}
+        
+        $error = Chocolatey Install pkg 2>&1
+
+        it "will write an error" {
+            $error| should match "Chocolatey reported an unsuccessful exit code of 1"
+        }
+    }
+
     #Not sure why I need to do this but pester test drive cleanup
     #does not properly cleanup without it
-    Remove-Item $TestDrive -recurse -force
+    #Remove-Item $TestDrive -recurse -force
 }
