@@ -35,9 +35,17 @@ Install-BoxstarterPackage
         PreviousTrustedHosts=$null;
     }
     Write-BoxstarterMessage "Configuring local PowerShell Remoting settings..."
+    
+    if(!(Get-Command Test-WSMan -ErrorAction SilentlyContinue)) {
+        #I have only seen this on VisualStudio.Com Hosted build servers
+        $Result.Success=$True
+        return $Result
+    }
+
     try { $wsman = Test-WSMan -ErrorAction Stop } catch { $credssp = $_}
     if($credssp.Exception -ne $null){
         Write-BoxstarterMessage "Local PowerShell Remoting is not enabled" -Verbose
+        Write-BoxstarterMessage "Error returned $($credssp.ToString())" -Verbose
         if($elevated -and ($Force -or (Confirm-Choice "PowerShell remoting is not enabled locally. Should Boxstarter enable PowerShell remoting?")))
         {
             Write-BoxstarterMessage "Enabling PowerShell Remoting on local machine"

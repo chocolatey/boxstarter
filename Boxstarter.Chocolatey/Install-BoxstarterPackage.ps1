@@ -301,11 +301,6 @@ about_boxstarter_chocolatey
             Set-Variable -Name $PsCmdlet.ParameterSetName -Value $list
         }
 
-        if(!(Test-Admin)) {
-            $unelevated = $true
-            Write-BoxstarterMessage "User is not running with Admin privileges. Will not attempt to enable CredSSP Authentication or remoting locally if not enabled."
-        }
-
         $sessionArgs=@{}
         if($Credential){
             $sessionArgs.Credential=$Credential
@@ -336,14 +331,12 @@ about_boxstarter_chocolatey
             #If unable to enable remoting on the client, abort
             if(!$ClientRemotingStatus.Success){return}
 
-            if(!$unelevated) {
-                $CredSSPStatus=Enable-BoxstarterCredSSP $ComputerName
-            }
+            $CredSSPStatus=Enable-BoxstarterCredSSP $ComputerName
 
             if($ConnectionURI){
                 $ConnectionUri | %{
                     $sessionArgs.ConnectionURI = $_
-                    Install-BoxstarterPackageOnComputer $_.Host $sessionArgs $PackageName $DisableReboots $unelevated
+                    Install-BoxstarterPackageOnComputer $_.Host $sessionArgs $PackageName $DisableReboots
                 }
             }
             elseif($BoxstarterConnectionConfig) {
@@ -355,13 +348,13 @@ about_boxstarter_chocolatey
                     if($_.PSSessionOption){
                         $sessionArgs.SessionOption = $_.PSSessionOption
                     }
-                    Install-BoxstarterPackageOnComputer $_.ConnectionURI.Host $sessionArgs $PackageName $DisableReboots $unelevated
+                    Install-BoxstarterPackageOnComputer $_.ConnectionURI.Host $sessionArgs $PackageName $DisableReboots
                 }
             }
             else {
                 $ComputerName | %{
                     $sessionArgs.ComputerName = $_
-                    Install-BoxstarterPackageOnComputer $_ $sessionArgs $PackageName $DisableReboots $unelevated
+                    Install-BoxstarterPackageOnComputer $_ $sessionArgs $PackageName $DisableReboots
                 }
             }
         }
@@ -433,10 +426,10 @@ function Finish-Record($obj) {
     Write-BoxstarterMessage "object written..." -Verbose
 }
 
-function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots, $unelevated){
+function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots){
     $record = Start-Record $ComputerName
     try {
-        if(!(Enable-RemotingOnRemote $sessionArgs $ComputerName $unelevated)){
+        if(!(Enable-RemotingOnRemote $sessionArgs $ComputerName)){
             Write-Error "Unable to access remote computer via PowerShell Remoting or WMI. You can enable it by running: Enable-PSRemoting -Force from an Administrator PowerShell console on the remote computer."
             $record.Completed=$false
             return
@@ -479,9 +472,10 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
             }
         }
 
-        if($enableCredSSP){
+        if($enableCredSSP.Success){
             $credSSPSession = Enable-RemoteCredSSP $sessionArgs
-            if($session -ne $null -and $credSSPSession -ne $null){ 
+            if($session -ne $null -and $credSSPSession -ne $null){
+                Write-BoxstarterMessage "CredSSP session succeeded. Replacing sessions..."
                 Remove-PSSession $session -ErrorAction SilentlyContinue
                 $session=$credSSPSession
             }
@@ -542,7 +536,7 @@ function Invoke-Locally {
     }
 }
 
-function Enable-RemotingOnRemote ($sessionArgs, $ComputerName, $unelevated){
+function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
     
     Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
     try { 
@@ -554,7 +548,7 @@ function Enable-RemotingOnRemote ($sessionArgs, $ComputerName, $unelevated){
     }
     if($remotingTest -eq $null){
         Write-BoxstarterMessage "PowerShell Remoting is not enabled or accessible on $ComputerName" -Verbose
-        if(!$unelevated) {
+        if(Test-Admin) {
             $wmiTest=Invoke-WmiMethod -ComputerName $ComputerName -Credential $sessionArgs.Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
         }
         if($wmiTest -eq $null){
@@ -724,8 +718,10 @@ function Test-Reconnection($Session, $sessionPID) {
 }
 
 function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
+    Write-BoxstarterMessage "Invoking remote install" -verbose
     while($session.Availability -eq "Available") {
         $sessionPID = Invoke-Command -Session $session { return $PID }
+        Write-BoxstarterMessage "Session's process ID is $sessionPID" -verbose
         $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential.Password $DisableReboots
 
         if(Test-RebootingOrDisconnected $remoteResult) {
@@ -831,7 +827,8 @@ function Enable-RemoteCredSSP($sessionArgs) {
     }
     catch {
         $sessionArgs.Remove("Authentication")
-        Write-BoxstarterMessage $_.ToString() -Verbose
+        $session=$null
+        Write-BoxstarterMessage "Unable to create credssp session. Error was: $($_.ToString())" -Verbose
         $global:error.RemoveAt(0)
     }
     return $session

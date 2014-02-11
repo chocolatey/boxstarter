@@ -38,6 +38,9 @@ Install-BoxstarterPackage
         PreviousCSSPTrustedHosts=$null;
         PreviousFreshCredDelegationHostCount=0
     }
+    if(!(Test-Admin)) {
+        return $result
+    }
     Write-BoxstarterMessage "Configuring CredSSP settings..."
     $credssp = Get-WSManCredSSP
 
