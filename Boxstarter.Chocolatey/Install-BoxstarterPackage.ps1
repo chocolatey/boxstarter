@@ -336,7 +336,7 @@ about_boxstarter_chocolatey
             if($ConnectionURI){
                 $ConnectionUri | %{
                     $sessionArgs.ConnectionURI = $_
-                    Install-BoxstarterPackageOnComputer $_.Host $sessionArgs $PackageName $DisableReboots
+                    Install-BoxstarterPackageOnComputer $_.Host $sessionArgs $PackageName $DisableReboots $CredSSPStatus
                 }
             }
             elseif($BoxstarterConnectionConfig) {
@@ -348,13 +348,13 @@ about_boxstarter_chocolatey
                     if($_.PSSessionOption){
                         $sessionArgs.SessionOption = $_.PSSessionOption
                     }
-                    Install-BoxstarterPackageOnComputer $_.ConnectionURI.Host $sessionArgs $PackageName $DisableReboots
+                    Install-BoxstarterPackageOnComputer $_.ConnectionURI.Host $sessionArgs $PackageName $DisableReboots $CredSSPStatus
                 }
             }
             else {
                 $ComputerName | %{
                     $sessionArgs.ComputerName = $_
-                    Install-BoxstarterPackageOnComputer $_ $sessionArgs $PackageName $DisableReboots
+                    Install-BoxstarterPackageOnComputer $_ $sessionArgs $PackageName $DisableReboots $CredSSPStatus
                 }
             }
         }
@@ -426,7 +426,7 @@ function Finish-Record($obj) {
     Write-BoxstarterMessage "object written..." -Verbose
 }
 
-function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots){
+function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots, $CredSSPStatus){
     $record = Start-Record $ComputerName
     try {
         if(!(Enable-RemotingOnRemote $sessionArgs $ComputerName)){
@@ -435,7 +435,9 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
             return
         }
 
-        $enableCredSSP = Should-EnableCredSSP $sessionArgs $computerName
+        if($CredSSPStatus.Success){
+            $enableCredSSP = Should-EnableCredSSP $sessionArgs $computerName
+        }
 
         write-BoxstarterMessage "Creating a new session with $computerName..." -Verbose
         $session = New-PSSession @sessionArgs -Name Boxstarter
@@ -472,7 +474,7 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
             }
         }
 
-        if($enableCredSSP.Success){
+        if($enableCredSSP){
             $credSSPSession = Enable-RemoteCredSSP $sessionArgs
             if($session -ne $null -and $credSSPSession -ne $null){
                 Write-BoxstarterMessage "CredSSP session succeeded. Replacing sessions..."
