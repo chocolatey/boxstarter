@@ -14,8 +14,9 @@ Intercept-Chocolatey
 function DISM { return; }
 
 Describe "Getting-Chocolatey" {
+    Mock Call-Chocolatey {$global:LASTEXITCODE=0}
+
     Context "When a reboot is pending and reboots are ok" {
-        Mock Call-Chocolatey
         Mock Test-PendingReboot {$true}
         $boxstarter.RebootOk=$true
         Mock Invoke-Reboot
@@ -31,7 +32,6 @@ Describe "Getting-Chocolatey" {
     }
 
     Context "When a reboot is pending but reboots are not ok" {
-        Mock Call-Chocolatey
         Mock Test-PendingReboot {$true}
         $boxstarter.RebootOk=$false
         Mock Invoke-Reboot
@@ -47,7 +47,6 @@ Describe "Getting-Chocolatey" {
     }
 
     Context "When a reboot is not pending" {
-        Mock Call-Chocolatey
         Mock Test-PendingReboot {return $false}
         Mock Invoke-Reboot
         
@@ -62,7 +61,6 @@ Describe "Getting-Chocolatey" {
     }
 
     Context "When Installing multiple packages" {
-        Mock Call-Chocolatey
         Mock Test-PendingReboot {return $false}
         Mock Invoke-Reboot
         $packages=@("package1","package2")
@@ -147,7 +145,6 @@ Describe "Getting-Chocolatey" {
     Context "When WindowsFeature is already installed" {
         Mock Test-PendingReboot {return $false}
         Mock Invoke-Reboot
-        Mock Call-Chocolatey
         Mock DISM {"State : Enabled"}
         
         Chocolatey Install "somefeature" -source "WindowsFeatures" | out-null
@@ -160,7 +157,6 @@ Describe "Getting-Chocolatey" {
     Context "When WindowsFeature is not already installed" {
         Mock Test-PendingReboot {return $false}
         Mock Invoke-Reboot
-        Mock Call-Chocolatey
         
         Chocolatey Install "somefeature" -source "WindowsFeatures" | out-null
 
