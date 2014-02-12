@@ -3,11 +3,11 @@ function Set-WindowsExplorerOptions {
 .SYNOPSIS
 Sets options on the Windows Explorer shell
 
-.PARAMETER EnableShowHidenFilesFoldersDrives
+.PARAMETER EnableShowHiddenFilesFoldersDrives
 If this flag is set, hidden files will be shown in Windows Explorer
 
-.PARAMETER DisableShowHidenFilesFoldersDrives
-Disables the showing on hidden files in Windows Explorer, see EnableShowHidenFilesFoldersDrives
+.PARAMETER DisableShowHiddenFilesFoldersDrives
+Disables the showing on hidden files in Windows Explorer, see EnableShowHiddenFilesFoldersDrives
 
 .PARAMETER EnableShowProtectedOSFiles
 If this flag is set, hidden Operating System files will be shown in Windows Explorer
@@ -34,8 +34,8 @@ http://boxstarter.codeplex.com
 
 	[CmdletBinding()]
 	param(
-		[switch]$EnableShowHidenFilesFoldersDrives,
-		[switch]$DisableShowHidenFilesFoldersDrives,
+		[switch]$EnableShowHiddenFilesFoldersDrives,
+		[switch]$DisableShowHiddenFilesFoldersDrives,
 		[switch]$EnableShowProtectedOSFiles,
 		[switch]$DisableShowProtectedOSFiles,
 		[switch]$EnableShowFileExtensions,
@@ -57,8 +57,8 @@ http://boxstarter.codeplex.com
 	$cabinetStateKey = "$key\CabinetState"
 
 	if(Test-Path -Path $advancedKey) {
-		if($EnableShowHidenFilesFoldersDrives) {Set-ItemProperty $advancedKey Hidden 1}
-		if($DisableShowHidenFilesFoldersDrives) {Set-ItemProperty $advancedKey Hidden 0}
+		if($EnableShowHiddenFilesFoldersDrives) {Set-ItemProperty $advancedKey Hidden 1}
+		if($DisableShowHiddenFilesFoldersDrives) {Set-ItemProperty $advancedKey Hidden 0}
 		
 		if($EnableShowFileExtensions) {Set-ItemProperty $advancedKey HideFileExt 0}
 		if($DisableShowFileExtensions) {Set-ItemProperty $advancedKey HideFileExt 1}
