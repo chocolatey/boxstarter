@@ -46,6 +46,7 @@
     <Content Include="Disable-MicrosoftUpdate.ps1" />
     <Content Include="Enable-MicrosoftUpdate.ps1" />
     <Content Include="Set-StartScreenOptions.ps1" />
+    <Content Include="Set-TaskbarOptions.ps1" />
     <Content Include="Set-WindowsExplorerOptions.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

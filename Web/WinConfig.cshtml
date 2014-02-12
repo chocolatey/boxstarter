@@ -39,7 +39,7 @@ Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
 
 <h3>Set-ExplorerOptions</h3>
 <p>Sets options on the Windows Explorer shell</p>
-<p><strong>NOTE:</strong> This function is now deprecated.  Please use Set-WindowsExplorerOptions instead</p>
+<p><strong>NOTE:</strong> This function is now deprecated.  Please use Set-WindowsExplorerOptions instead.</p>
 <pre>
 Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
 </pre>
@@ -76,6 +76,17 @@ Set-WindowsExplorerOptions -DisableShowHidenFilesFoldersDrives -DisableShowProte
 
 <h3>Set-TaskbarSmall</h3>
 <p>Makes the windows task bar skinny</p>
+<p><strong>NOTE:</strong> This function is now deprecated.  Please use Set-TaskbarOptions instead.</p>
+
+<h3>Set-TaskbarOptions</h3>
+<p>Sets options on the Windows Explorer shell</p>
+<pre>
+Set-TaskbarOptions -EnableMakeTaskbarSmall -EnableLockTheTaskbar
+</pre>
+<p>It is also possible to do the converse actions, if required.</p>
+<pre>
+Set-TaskbarOptions -DisableMakeTaskbarSmall -DisableLockTheTaskbar
+</pre>
 
 <h3>Update-ExecutionPolicy</h3>
 <p>The execution policy is set in a separate elevated PowerShell process. If running in the Chocolatey runner, the current window cannot be used because its execution policy has been explicitly set.</p> 
