@@ -4,7 +4,7 @@ function Get-Blob {
     )
     $ServiceName=$vm.ServiceName
 
-    $storageAccount = (Get-AzureSubscription).CurrentStorageAccountName
+    $storageAccount = (Get-AzureSubscription -current).CurrentStorageAccountName
     if($storageAccount -eq $null){
         throw New-Object -TypeName InvalidOperationException -ArgumentList "The CurrentStorageAccountName has not been set. Use Set-AzureSubscription to set your current storage account"
     }
