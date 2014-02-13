@@ -79,13 +79,13 @@ Set-WindowsExplorerOptions -DisableShowHiddenFilesFoldersDrives -DisableShowProt
 <p><strong>NOTE:</strong> This function is now deprecated.  Please use Set-TaskbarOptions instead.</p>
 
 <h3>Set-TaskbarOptions</h3>
-<p>Sets options on the Windows Explorer shell</p>
+<p>Sets options on the Windows Taskbar</p>
 <pre>
-Set-TaskbarOptions -EnableMakeTaskbarSmall -EnableLockTheTaskbar
+Set-TaskbarOptions -EnableMakeTaskbarSmall -EnableLockTheTaskbar -DockTaskbarTop
 </pre>
 <p>It is also possible to do the converse actions, if required.</p>
 <pre>
-Set-TaskbarOptions -DisableMakeTaskbarSmall -DisableLockTheTaskbar
+Set-TaskbarOptions -DisableMakeTaskbarSmall -DisableLockTheTaskbar -DockTaskbarBottom
 </pre>
 
 <h3>Update-ExecutionPolicy</h3>
