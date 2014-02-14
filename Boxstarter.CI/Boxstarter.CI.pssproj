@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{a76a363c-7088-497f-914b-c3239b8d1d73}</ProjectGuid>
+    <ProjectGuid>{c950befc-b3ee-4dcd-a0a6-a2244584d1e7}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>MyApplication</RootNamespace>
     <AssemblyName>MyApplication</AssemblyName>
-    <Name>Tests</Name>
+    <Name>Boxstarter.CI</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,27 +27,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="Chocolatey\Enable-BoxstarterCredSSP.Tests.ps1" />
-    <Content Include="CI\Get-BoxstarterDeployOptions.Tests.ps1" />
-    <Content Include="HyperV\Enable-BoxstarterVHD.Tests.ps1" />
-    <Content Include="HyperV\Enable-BoxstarterVM.Tests.ps1" />
+    <Compile Include="Boxstarter.CI.psm1" />
+    <Compile Include="Boxstarter.proj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Chocolatey\" />
-    <Folder Include="HyperV\" />
-    <Folder Include="CI\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Chocolatey\Chocolatey.tests.ps1" />
-    <Compile Include="Chocolatey\Enable-BoxstarterClientRemoting.Tests.ps1" />
-    <Compile Include="Chocolatey\Get-BoxstarterConfig.tests.ps1" />
-    <Compile Include="Chocolatey\Get-PackageRoot.tests.ps1" />
-    <Compile Include="Chocolatey\Install-BoxstarterPackage.tests.ps1" />
-    <Compile Include="Chocolatey\Invoke-BoxstarterBuild.tests.ps1" />
-    <Compile Include="Chocolatey\Invoke-ChocolateyBoxstarter.tests.ps1" />
-    <Compile Include="Chocolatey\New-BoxstarterPackage.tests.ps1" />
-    <Compile Include="Chocolatey\New-PackageFromScript.tests.ps1" />
-    <Compile Include="Chocolatey\Set-BoxstarterShare.Tests.ps1" />
+    <Content Include="Bootstrap.ps1" />
+    <Content Include="Get-BoxstarterDeployOptions.ps1" />
+    <Content Include="Get-OptionsPath.ps1" />
+    <Content Include="Get-SecretOptionsPath.ps1" />
+    <Content Include="Install-BoxstarterScripts.ps1" />
+    <Content Include="Set-BoxstarterDeployOptions.ps1" />
+    <Content Include="Test-BoxstarterPackage.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />

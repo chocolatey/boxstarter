@@ -1,0 +1,47 @@
+$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+if(get-module Boxstarter.CI){Remove-Module boxstarter.CI}
+Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
+    % { . $_.ProviderPath }
+Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 | 
+    % { . $_.ProviderPath }
+Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
+    % { . $_.ProviderPath }
+Resolve-Path $here\..\..\Boxstarter.CI\*.ps1 | 
+    % { . $_.ProviderPath }
+
+Describe "Get-BoxstarterDeployOptions" {
+    $Boxstarter.LocalRepo=(Get-PSDrive TestDrive).Root
+    $Boxstarter.SuppressLogging=$true
+
+    Context "When Getting existing options" {
+        Set-BoxstarterDeployOptions -DeploymentTargetNames @("targetvm1","targetvm2") `
+                                    -DeploymentVMProvider azure `
+                                    -DeploymentCloudServiceName myservice `
+                                    -DeploymentTargetPassword passwd `
+                                    -DeploymentTargetUserName Admin
+
+        $result = Get-BoxstarterDeployOptions
+
+        it "should get target" {
+            $result.DeploymentTargetNames[0] | should be "targetvm1"
+            $result.DeploymentTargetNames[1] | should be "targetvm2"
+            $result.DeploymentTargetNames.Count | should be 2
+        }
+        it "should get vm provider" {
+            $result.DeploymentVMProvider | should be "azure"
+        }
+        it "should get cloud service" {
+            $result.DeploymentCloudServiceName | should be "myservice"
+        }
+        it "should get credentials" {
+            $result.DeploymentTargetCredentials.UserName | should be "Admin"
+            $result.DeploymentTargetCredentials.GetNetworkCredential().Password | should be "passwd"
+        }
+        it "should put options file in the right place" {
+            "$($Boxstarter.LocalRepo)\BoxstarterScripts\options.xml" | should exist
+        }
+        it "should put secrets options file in the right place" {
+            "$($Boxstarter.LocalRepo)\BoxstarterScripts\$env:computername-$env:USERNAME-options.xml" | should exist
+        }
+    }
+}

@@ -39,7 +39,7 @@ New-BoxstarterPackage
             $searchPath = join-path $name "$name.nuspec"
             Write-BoxstarterMessage "Searching for $searchPath" -Verbose
             if(!(Test-Path $searchPath)){
-                throw "Cannot find $searchPath"
+                throw "Cannot find $($Boxstarter.LocalRepo)\$searchPath"
             }
             .$choco Pack (join-path $name "$name.nuspec") | out-null
             if(!$quiet){

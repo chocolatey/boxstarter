@@ -1,0 +1,10 @@
+<Project ToolsVersion="4.0"
+         DefaultTargets="Go"
+         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PowerShellExe Condition=" '$(PowerShellExe)'=='' ">%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>    
+  </PropertyGroup>
+  <Target Name="Go">
+    <Exec Command="$(PowerShellExe) -NoProfile -ExecutionPolicy bypass -Command &quot;Invoke-BoxstarterCI.ps1 -DeploymentTargetUserName $(DeploymentTargetUserName) -DeploymentTargetPassword $(DeploymentTargetPassword) -AzureSubscriptionName $(AzureSubscriptionName) -AzureSubscriptionId $(AzureSubscriptionId) -AzureSubscriptionCertificate &apos;$(AzureSubscriptionCertificate)&apos;;Test-BoxstarterPackage WindowsAzureLibsForNet&quot;" />
+  </Target>
+</Project>
