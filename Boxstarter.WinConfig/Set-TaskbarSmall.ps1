@@ -6,5 +6,5 @@ Makes the windows task bar skinny
 	Write-Warning "This command is deprecated, use Set-TaskbarOptions instead."
 	Write-Warning "Your call to this function will now be routed to the Set-TaskbarOptions function."
 
-    Set-TaskbarOptions -EnableMakeTaskbarSmall
+    Set-TaskbarOptions -Size Small
 }
