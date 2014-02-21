@@ -12,33 +12,31 @@ Resolve-Path $here\..\..\Boxstarter.CI\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "Install-BoxstarterScripts" {
-    $Boxstarter.BaseDir=(Get-PSDrive TestDrive).Root
-    $Boxstarter.LocalRepo=Join-Path $boxstarter.BaseDir "repo"
+    $repo = Join-Path (Get-PSDrive TestDrive).Root "repo"
     $Boxstarter.SuppressLogging=$true
-    Copy-Item $here\..\..\Boxstarter.CI $Boxstarter.BaseDir -Recurse 
 
     Context "When the repository exists" {
-        Mkdir $Boxstarter.LocalRepo | Out-Null
+        Mkdir $repo | Out-Null
 
-        Install-BoxstarterScripts $Boxstarter.LocalRepo
+        Install-BoxstarterScripts $repo
 
         It "should copy bootstrapper" {
-            join-Path $($Boxstarter.LocalRepo) "BoxstarterScripts\bootstrap.ps1" | Should exist
+            join-Path $repo "BoxstarterScripts\bootstrap.ps1" | Should exist
         }
         It "should copy msbuild file" {
-            join-Path $($Boxstarter.LocalRepo) "BoxstarterScripts\boxstarter.proj" | Should exist
+            join-Path $repo "BoxstarterScripts\boxstarter.proj" | Should exist
         }
         It "should copy BoxstarterBuild" {
-            join-Path $($Boxstarter.LocalRepo) "BoxstarterScripts\BoxstarterBuild.ps1" | Should exist
+            join-Path $repo "BoxstarterScripts\BoxstarterBuild.ps1" | Should exist
         }
         It "should write ignore file for secrets" {
-            Get-Content "$($Boxstarter.LocalRepo)\BoxstarterScripts\.gitignore" | Should be "*-options.xml"
+            Get-Content "$repo\BoxstarterScripts\.gitignore" | Should be "*-options.xml"
         }
     }
 
     Context "When the repository does not exist" {
         try {
-            Install-BoxstarterScripts $Boxstarter.LocalRepo
+            Install-BoxstarterScripts $repo
         }
         catch{
             $err = $_
