@@ -28,6 +28,12 @@ Describe "Install-BoxstarterScripts" {
         It "should copy msbuild file" {
             join-Path $($Boxstarter.LocalRepo) "BoxstarterScripts\boxstarter.proj" | Should exist
         }
+        It "should copy BoxstarterBuild" {
+            join-Path $($Boxstarter.LocalRepo) "BoxstarterScripts\BoxstarterBuild.ps1" | Should exist
+        }
+        It "should write ignore file for secrets" {
+            Get-Content "$($Boxstarter.LocalRepo)\BoxstarterScripts\.gitignore" | Should be "*-options.xml"
+        }
     }
 
     Context "When the repository does not exist" {
