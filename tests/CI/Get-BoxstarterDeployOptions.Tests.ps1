@@ -7,6 +7,7 @@ Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
 Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\Boxstarter.CI\*.ps1 | 
+    ? { $_.Path -like "*-*" } | 
     % { . $_.ProviderPath }
 
 Describe "Get-BoxstarterDeployOptions" {
