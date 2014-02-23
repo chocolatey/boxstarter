@@ -27,8 +27,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Boxstarter.CI.psd1" />
     <Compile Include="Boxstarter.CI.psm1" />
     <Compile Include="Boxstarter.proj" />
+    <Compile Include="BoxstarterBuild.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Bootstrap.ps1" />

@@ -40,6 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{87B9154F
 		BuildScripts\nuget\Boxstarter.Azure.nuspec = BuildScripts\nuget\Boxstarter.Azure.nuspec
 		BuildScripts\nuget\boxstarter.bootstrapper.nuspec = BuildScripts\nuget\boxstarter.bootstrapper.nuspec
 		BuildScripts\nuget\boxstarter.chocolatey.nuspec = BuildScripts\nuget\boxstarter.chocolatey.nuspec
+		BuildScripts\nuget\Boxstarter.CI.nuspec = BuildScripts\nuget\Boxstarter.CI.nuspec
 		BuildScripts\nuget\BoxStarter.Common.nuspec = BuildScripts\nuget\BoxStarter.Common.nuspec
 		BuildScripts\nuget\Boxstarter.HyperV.nuspec = BuildScripts\nuget\Boxstarter.HyperV.nuspec
 		BuildScripts\nuget\boxstarter.nuspec = BuildScripts\nuget\boxstarter.nuspec

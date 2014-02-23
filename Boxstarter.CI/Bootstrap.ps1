@@ -8,14 +8,15 @@ function Bootstrap-Boxstarter {
         . "$env:temp\choco.ps1"
     }
 
-    if(!(Test-Path $env:ChocolateyInstall\lib\Boxstarter*)) { 
-            Write-Host "Boxstarter not installed. Installing from $PSScriptRoot"
-            ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Boxstarter.Azure -source "$PSScriptRoot" 
-            Write-Host "Finished Boxstarter Install"
+    if(!(Test-Path $env:ChocolateyInstall\lib\Boxstarter.CI*)) { 
+            Write-Host "Boxstarter CI not installed. Installing from $PSScriptRoot"
+            ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Boxstarter.CI -source "$PSScriptRoot" 
+            Write-Host "Finished Boxstarter.CI Install"
     }
     else {
-        Write-Host "Boxstarter already installed"
+        Write-Host "Boxstarter.CI already installed"
     }
+
     if(!(Test-Path $env:ChocolateyInstall\lib\Pester*)) { ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Pester }
 
     $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
@@ -23,6 +24,8 @@ function Bootstrap-Boxstarter {
     Import-Module "$pesterDir\tools\pester.psm1"
     if(!(Get-Module Boxstarter.Azure)){
         Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.Azure.psd1
+    if(!(Get-Module Boxstarter.Azure)){
+        Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.CI.psd1
     }
 }
 
