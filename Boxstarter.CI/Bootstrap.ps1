@@ -24,6 +24,7 @@ function Bootstrap-Boxstarter {
     Import-Module "$pesterDir\tools\pester.psm1"
     if(!(Get-Module Boxstarter.Azure)){
         Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.Azure.psd1
+    }
     if(!(Get-Module Boxstarter.Azure)){
         Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.CI.psd1
     }
