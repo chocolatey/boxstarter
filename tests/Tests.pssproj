@@ -29,6 +29,7 @@
   <ItemGroup>
     <Content Include="Chocolatey\Enable-BoxstarterCredSSP.Tests.ps1" />
     <Content Include="CI\Get-BoxstarterDeployOptions.Tests.ps1" />
+    <Content Include="CI\Get-BoxstarterPackages.tests.ps1" />
     <Content Include="HyperV\Enable-BoxstarterVHD.Tests.ps1" />
     <Content Include="HyperV\Enable-BoxstarterVM.Tests.ps1" />
   </ItemGroup>

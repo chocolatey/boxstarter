@@ -35,6 +35,7 @@
   <ItemGroup>
     <Content Include="Bootstrap.ps1" />
     <Content Include="Get-BoxstarterDeployOptions.ps1" />
+    <Content Include="Get-BoxstarterPackage.ps1" />
     <Content Include="Get-OptionsPath.ps1" />
     <Content Include="Get-SecretOptionsPath.ps1" />
     <Content Include="Install-BoxstarterScripts.ps1" />
