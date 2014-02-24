@@ -3,4 +3,4 @@ Import-Module $unNormalized.FullName -global -DisableNameChecking -Force
 Resolve-Path $PSScriptRoot\*-*.ps1 | 
     % { . $_.ProviderPath }
 
-Export-ModuleMember Get-BoxstarterDeployOptions, Set-BoxstarterDeployOptions, Test-BoxstarterPackage, Install-BoxstarterScripts, Get-BoxstarterPackages
+Export-ModuleMember Get-BoxstarterDeployOptions, Set-BoxstarterDeployOptions, Test-BoxstarterPackage, Install-BoxstarterScripts, Get-BoxstarterPackages, Get-BoxstarterPackageNugetFeed, Set-BoxstarterPackageNugetFeed, Remove-BoxstarterPackageNugetFeed

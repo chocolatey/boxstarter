@@ -35,11 +35,15 @@
   <ItemGroup>
     <Content Include="Bootstrap.ps1" />
     <Content Include="Get-BoxstarterDeployOptions.ps1" />
-    <Content Include="Get-BoxstarterPackage.ps1" />
+    <Content Include="Get-BoxstarterPackageNugetFeed.ps1" />
+    <Content Include="Get-BoxstarterPackages.ps1" />
     <Content Include="Get-OptionsPath.ps1" />
+    <Content Include="Get-PackageFeedsPath.ps1" />
     <Content Include="Get-SecretOptionsPath.ps1" />
     <Content Include="Install-BoxstarterScripts.ps1" />
+    <Content Include="Remove-BoxstarterPackageNugetFeed.ps1" />
     <Content Include="Set-BoxstarterDeployOptions.ps1" />
+    <Content Include="Set-BoxstarterPackageNugetFeed.ps1" />
     <Content Include="Test-BoxstarterPackage.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
