@@ -66,7 +66,7 @@ Describe "Invoke-BoxstarterBuild" {
         try {Invoke-BoxstarterBuild $packageName} catch { $ex=$_ }
 
         It "Will throw No Nuspec" {
-            $ex | Should be "Cannot find $packageName\$packageName.nuspec"
+            $ex | Should be "Cannot find $($Boxstarter.LocalRepo)\$packageName\$packageName.nuspec"
         }
     }
 
