@@ -12,7 +12,7 @@ function Get-BoxstarterPackageNugetFeed {
         $feeds = Import-CliXML $path
     }
 
-    if($feeds.$packageName) {
+    if($feeds.ContainsKey($packageName)) {
         return $feeds.$packageName
     }
     else {

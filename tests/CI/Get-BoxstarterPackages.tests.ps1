@@ -61,4 +61,19 @@ Describe "Get-BoxstarterPackages" {
             $result[1].PublishedVersion | should be "6.6.6"
         }
     }
+
+    Context "When a package feed is null or empty" {
+        New-BoxstarterPackage -name package1
+        Set-BoxstarterPackageNugetFeed -PackageName package1 -NugetFeed $null
+        Mock Invoke-RestMethod
+
+        $result = Get-BoxstarterPackages
+
+        it "should not check the published feed" {
+            Assert-MockCalled Invoke-RestMethod  -times 0
+        }
+        it "should have no feed" {
+            $result[0].Feed | should be $null
+        }
+    }
 }
