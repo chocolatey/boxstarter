@@ -7,6 +7,7 @@ function Get-BoxstarterDeployOptions {
             DeploymentVMProvider=$null
             DeploymentCloudServiceName=$null
             RestoreCheckpoint=$null
+            DefaultNugetFeed=[Uri]"http://chocolatey.org/api/v2"
         }
     }
     else {

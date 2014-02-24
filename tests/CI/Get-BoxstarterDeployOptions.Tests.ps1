@@ -14,13 +14,21 @@ Describe "Get-BoxstarterDeployOptions" {
     $Boxstarter.LocalRepo=(Get-PSDrive TestDrive).Root
     $Boxstarter.SuppressLogging=$true
 
+    Context "When Getting options that have not been set" {
+        $result = Get-BoxstarterDeployOptions
+
+        it "should return the chocolatey feed as the default nuget feed" {
+            $result.DefaultNugetFeed | should be "http://chocolatey.org/api/v2"
+        }
+    }
+
     Context "When Getting existing options" {
         Set-BoxstarterDeployOptions -DeploymentTargetNames @("targetvm1","targetvm2") `
                                     -DeploymentVMProvider azure `
                                     -DeploymentCloudServiceName myservice `
                                     -DeploymentTargetPassword passwd `
-                                    -DeploymentTargetUserName Admin
-
+                                    -DeploymentTargetUserName Admin `
+                                    -DefaultNugetFeed "http://www.myget.org/F/boxstarter/api/v2"
         $result = Get-BoxstarterDeployOptions
 
         it "should get target" {
@@ -43,6 +51,9 @@ Describe "Get-BoxstarterDeployOptions" {
         }
         it "should put secrets options file in the right place" {
             "$($Boxstarter.LocalRepo)\BoxstarterScripts\$env:computername-$env:USERNAME-options.xml" | should exist
+        }
+        it "should get default nuget feed" {
+            $result.DefaultNugetFeed | should be "http://www.myget.org/F/boxstarter/api/v2"
         }
     }
 }

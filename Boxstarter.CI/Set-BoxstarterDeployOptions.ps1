@@ -7,7 +7,8 @@ function Set-BoxstarterDeployOptions {
         [string]$DeploymentCloudServiceName,
         [string]$RestoreCheckpoint,
         [string]$DeploymentTargetPassword,
-        [string]$DeploymentTargetUserName
+        [string]$DeploymentTargetUserName,
+        [Uri]$DefaultNugetFeed
     )
     $options=Get-BoxstarterDeployOptions
     if($PSBoundParameters.Keys -contains "DeploymentTargetCredentials"){$options.DeploymentTargetCredentials = $DeploymentTargetCredentials}
@@ -15,6 +16,7 @@ function Set-BoxstarterDeployOptions {
     if($PSBoundParameters.Keys -contains "DeploymentVMProvider"){$options.DeploymentVMProvider = $DeploymentVMProvider}
     if($PSBoundParameters.Keys -contains "DeploymentCloudServiceName"){$options.DeploymentCloudServiceName = $DeploymentCloudServiceName}
     if($PSBoundParameters.Keys -contains "RestoreCheckpoint"){$options.RestoreCheckpoint = $RestoreCheckpoint}
+    if($PSBoundParameters.Keys -contains "DefaultNugetFeed"){$options.DefaultNugetFeed = $DefaultNugetFeed}
     if($PSBoundParameters.Keys -contains "DeploymentTargetUserName"){
         $secpasswd = ConvertTo-SecureString $DeploymentTargetPassword -AsPlainText -Force
         $options.DeploymentTargetCredentials = New-Object System.Management.Automation.PSCredential ($DeploymentTargetUserName, $secpasswd)

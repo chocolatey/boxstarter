@@ -48,6 +48,7 @@
     <Compile Include="Chocolatey\New-BoxstarterPackage.tests.ps1" />
     <Compile Include="Chocolatey\New-PackageFromScript.tests.ps1" />
     <Compile Include="Chocolatey\Set-BoxstarterShare.Tests.ps1" />
+    <Compile Include="CI\Install-BoxstarterScripts.tests.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
