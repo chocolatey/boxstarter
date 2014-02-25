@@ -49,7 +49,7 @@ function Test-BoxstarterPackage {
             $pkg = $_
             if(Test-PackageVersionGreaterThanPublished $pkg) {
                 Write-Progress "Installing $pkg.Name. This may take several minutes..."
-                Invoke-BuildAndTest $pkg.Name $options $vmArgs $summary | % {
+                Invoke-BuildAndTest $pkg.Id $options $vmArgs $summary | % {
                     $summary.Total++
                     if($_.Status="PASSED") {
                         $summary.Passed++
