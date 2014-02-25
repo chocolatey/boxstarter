@@ -48,7 +48,6 @@ function Test-BoxstarterPackage {
         Get-BoxstarterPackages | % {
             $pkg = $_
             if(Test-PackageVersionGreaterThanPublished $pkg) {
-                Write-Progress "Installing $pkg.Name. This may take several minutes..."
                 Invoke-BuildAndTest $pkg.Id $options $vmArgs $summary | % {
                     $summary.Total++
                     if($_.Status="PASSED") {
@@ -119,16 +118,22 @@ function Remove-PreRelease ([string]$versionString) {
 }
 
 function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
-    Invoke-BoxstarterBuild $packageName
-    $options.DeploymentTargetNames | % {
+    $origLogSetting=$Boxstarter.SuppressLogging
+    $Boxstarter.SuppressLogging=$true
+    try {
+        Write-Progress "Building $packageName."
+        Invoke-BoxstarterBuild $packageName -Quiet
+
+        Write-Progress  "Testing $packageName. This may take several minutes..."
+        $options.DeploymentTargetNames | % {
         if($vmArgs) {
-            Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $_  @vmArgs -verbose 
+            Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $_  @vmArgs 
         }
         else {
             $_
         }
     } | 
-        Install-BoxstarterPackage -credential $options.DeploymentTargetCredentials -PackageName $packageName -Force -verbose | % {
+        Install-BoxstarterPackage -credential $options.DeploymentTargetCredentials -PackageName $packageName -Force | % {
             if(Test-InstallSuccess $_) {
                 $status="PASSED"
             }
@@ -142,6 +147,7 @@ function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
                 Status=$status
             }
         }
+    }finally { $Boxstarter.SuppressLogging = $origLogSetting }
 }
 
 function Test-InstallSuccess ($testResult) {
