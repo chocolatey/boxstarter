@@ -17,11 +17,6 @@ function Bootstrap-Boxstarter {
         Write-Host "Boxstarter.CI already installed"
     }
 
-    if(!(Test-Path $env:ChocolateyInstall\lib\Pester*)) { ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Pester }
-
-    $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
-    if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}
-    Import-Module "$pesterDir\tools\pester.psm1"
     if(!(Get-Module Boxstarter.Azure)){
         Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.Azure.psd1
     }

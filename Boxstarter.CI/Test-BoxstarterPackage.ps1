@@ -15,55 +15,83 @@ function Test-BoxstarterPackage {
         $vmArgs.Provider=$options.DeploymentVMProvider
     }
 
-    #Hacks to get Pester to work with dynamicly created tests
-    $global:pester = @{arr_testTags=""}
-    $global:testName = ""
-
-    if(!$packageName){
-        Write-BoxstarterMessage "Searching for packages that need to be built and tested..."
-        $packageName = Get-BoxstarterPackages | ? {
-            Test-PackageVersionGreaterThanPublished $_
-        } | % {$_.Name}
-    }
-    
-    if($PackageName.Count -eq 0) {
-        Write-BoxstarterMessage "All packages are up to date. Nothing to build and test."
-        return
+    $summary=@{
+        Total=0
+        Passed=0
+        Skipped=0
+        Failed=0
     }
 
-    $PackageName | % {
-        Invoke-BoxstarterBuild $_
-        $p=$_
-        Describe "Testing Package $p" {
-            $options.DeploymentTargetNames | % {
-                if($vmArgs) {
-                    Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $_  @vmArgs -verbose 
+    if($packageName) {
+        $PackageName | % {
+            $pkg = $_
+            Invoke-BuildAndTest $pkg $options $vmArgs $summary  | % {
+                $summary.Total++
+                if($_.Status="PASSED") {
+                    $summary.Passed++
                 }
                 else {
-                    $_
+                    $summary.Failed++
                 }
-            } | 
-                Install-BoxstarterPackage -credential $options.DeploymentTargetCredentials -PackageName $p -Force -verbose | % {
-                    $global:box_result = $_
-                    It "Should Complete Install on Computer: $($box_result.ComputerName)" {
-                        $box_result.Completed | Should be $true
-                    }
-                    It "Should have no exceptions on Computer: $($box_result.ComputerName)" {
-                        $box_result.Errors.Count | should be 0
-                    }
+                New-Object PSObject -Property @{
+                    Package=$pkg.Name
+                    RepoVersion="---"
+                    PublishedVersion="---"
+                    TestComputerName=$_.TestComputerName
+                    ResultDetails=$_.ResultDetails
+                    Status=$_.Status
                 }
+            }
         }
+    }
+    else {
+        Get-BoxstarterPackages | % {
+            $pkg = $_
+            if(Test-PackageVersionGreaterThanPublished $pkg) {
+                Write-Progress "Installing $pkg.Name. This may take several minutes..."
+                Invoke-BuildAndTest $pkg.Name $options $vmArgs $summary | % {
+                    $summary.Total++
+                    if($_.Status="PASSED") {
+                        $summary.Passed++
+                    }
+                    else {
+                        $summary.Failed++
+                    }
+                    New-Object PSObject -Property @{
+                        Package=$pkg.Id
+                        RepoVersion=$pkg.Version
+                        PublishedVersion=$(if($pkg.PublishedVersion -eq $null) {"Not Published"} else { $pkg.PublishedVersion })
+                        TestComputerName=$_.TestComputerName
+                        ResultDetails=$_.ResultDetails
+                        Status=$_.Status
+                    }
+                }
+            }
+            else {
+                $summary.Total++
+                $summary.Skipped++
+                New-Object PSObject -Property @{
+                    Package=$pkg.Id
+                    RepoVersion=$pkg.Version
+                    PublishedVersion=$(if($pkg.PublishedVersion -eq $null) {"Not Published"} else { $pkg.PublishedVersion })
+                    TestComputerName=$null
+                    ResultDetails=@{}
+                    Status="SKIPPED"
+                }
+            }
+        }
+        Write-BoxstarterMessage "Total: $($summary.Total) Passed: $($summary.Passed) Failed: $($summary.Failed) Skipped: $($summary.Skipped)"
     }
 }
 
 function Test-PackageVersionGreaterThanPublished ($package) {
     if(!$package.Feed) { 
-        Write-BoxstarterMessage "No feed has been assigned to $($package.Name). It will not be build and tested"
+        Write-BoxstarterMessage "No feed has been assigned to $($package.Name). It will not be built and tested" -verbose
         return $false 
     }
 
     if(!$package.PublishedVersion) {
-        Write-BoxstarterMessage "$($package.Name) has not yet been published. It will be built and tested"
+        Write-BoxstarterMessage "$($package.Name) has not yet been published. It will be built and tested" -verbose
         return $true 
     }
 
@@ -71,11 +99,11 @@ function Test-PackageVersionGreaterThanPublished ($package) {
     $pubVersion=New-Object -TypeName Version -ArgumentList (Remove-PreRelease $package.PublishedVersion)
 
     if($pkgVersion -gt $pubVersion) {
-        Write-BoxstarterMessage "The repository version '$($package.Version)' for $($package.Name) is greater than the published version '$($package.PublishedVersion)'. It will be built and tested"
+        Write-BoxstarterMessage "The repository version '$($package.Version)' for $($package.Name) is greater than the published version '$($package.PublishedVersion)'. It will be built and tested" -verbose
         return $true 
     }
     else {
-        Write-BoxstarterMessage "The repository version '$($package.Version)' for $($package.Name) is not greater than the published version '$($package.PublishedVersion)'. It will not be built and tested"
+        Write-BoxstarterMessage "The repository version '$($package.Version)' for $($package.Name) is not greater than the published version '$($package.PublishedVersion)'. It will not be built and tested" -verbose
         return $false 
     }
 }
@@ -87,5 +115,37 @@ function Remove-PreRelease ([string]$versionString) {
     }
     else {
         return $versionString 
+    }
+}
+
+function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
+    Invoke-BoxstarterBuild $packageName
+    $options.DeploymentTargetNames | % {
+        if($vmArgs) {
+            Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $_  @vmArgs -verbose 
+        }
+        else {
+            $_
+        }
+    } | 
+        Install-BoxstarterPackage -credential $options.DeploymentTargetCredentials -PackageName $packageName -Force -verbose | % {
+            if(Test-InstallSuccess $_) {
+                $status="PASSED"
+            }
+            else {
+                $status="FAILED"
+            }
+            new-Object PSObject -Property @{
+                Package=$packageName 
+                TestComputerName=$_.ComputerName
+                ResultDetails=$_
+                Status=$status
+            }
+        }
+}
+
+function Test-InstallSuccess ($testResult) {
+    if($testResult.Completed -and $testResult.Errors.Count -eq 0) {
+        return $true
     }
 }
