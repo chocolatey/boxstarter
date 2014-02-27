@@ -119,20 +119,20 @@ function Remove-PreRelease ([string]$versionString) {
 
 function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
     $origLogSetting=$Boxstarter.SuppressLogging
-    $Boxstarter.SuppressLogging=$true
+    #$Boxstarter.SuppressLogging=$true
     try {
         Write-Progress "Building $packageName."
         Invoke-BoxstarterBuild $packageName -Quiet
 
-        Write-Progress  "Testing $packageName. This may take several minutes..."
         $options.DeploymentTargetNames | % {
-        if($vmArgs) {
-            Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $_  @vmArgs 
-        }
-        else {
-            $_
-        }
-    } | 
+            Write-Progress  -Activity "Testing $packageName" -Status "on Machine: $_"
+            if($vmArgs) {
+                Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $_  @vmArgs 
+            }
+            else {
+                $_
+            }
+        } | 
         Install-BoxstarterPackage -credential $options.DeploymentTargetCredentials -PackageName $packageName -Force | % {
             if(Test-InstallSuccess $_) {
                 $status="PASSED"

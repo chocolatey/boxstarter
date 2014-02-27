@@ -58,7 +58,13 @@ Install-BoxstarterPackage
 
     if($ComputersToAdd.Count -gt 0){
         Write-BoxstarterMessage "Adding $($ComputersToAdd -join ',') to allowed credSSP hosts" -Verbose
-        Enable-WSManCredSSP -DelegateComputer $ComputersToAdd -Role Client -Force | Out-Null
+        try {
+            Enable-WSManCredSSP -DelegateComputer $ComputersToAdd -Role Client -Force -ErrorAction Stop | Out-Null
+        } 
+        catch {
+            Write-BoxstarterMessage "Enable-WSManCredSSP failed with: $_" -Verbose
+            return $result
+        }
     }
 
     $key = Get-CredentialDelegationKey
