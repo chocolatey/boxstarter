@@ -62,11 +62,12 @@ about_boxstarter_logging
 #>    
     param(
         [Parameter(position=0,ValueFromPipeline=$True)]
-        [object]$object
+        [object]$object,
+        [switch]$Quiet
     )
 
     process {
-        if(!$Boxstarter.SuppressLogging){write-host $object}
+        if(!$Quiet -and !$Boxstarter.SuppressLogging){write-host $object}
         if($Boxstarter -and $BoxStarter.Log -and $object){
             $object >> $Boxstarter.Log            
         }

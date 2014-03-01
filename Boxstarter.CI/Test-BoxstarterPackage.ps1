@@ -47,40 +47,42 @@ function Test-BoxstarterPackage {
     else {
         Get-BoxstarterPackages | % {
             $pkg = $_
+            $summary.Total++
             if(Test-PackageVersionGreaterThanPublished $pkg) {
                 Invoke-BuildAndTest $pkg.Id $options $vmArgs $summary | % {
-                    $summary.Total++
                     if($_.Status="PASSED") {
                         $summary.Passed++
                     }
                     else {
                         $summary.Failed++
                     }
-                    New-Object PSObject -Property @{
-                        Package=$pkg.Id
-                        RepoVersion=$pkg.Version
-                        PublishedVersion=$(if($pkg.PublishedVersion -eq $null) {"Not Published"} else { $pkg.PublishedVersion })
-                        TestComputerName=$_.TestComputerName
-                        ResultDetails=$_.ResultDetails
-                        Status=$_.Status
-                    }
+                    Write-Result $pkg $_
                 }
             }
             else {
-                $summary.Total++
                 $summary.Skipped++
-                New-Object PSObject -Property @{
-                    Package=$pkg.Id
-                    RepoVersion=$pkg.Version
-                    PublishedVersion=$(if($pkg.PublishedVersion -eq $null) {"Not Published"} else { $pkg.PublishedVersion })
-                    TestComputerName=$null
-                    ResultDetails=@{}
-                    Status="SKIPPED"
-                }
+                Write-Result $pkg
             }
-        }
+        } | Format-Table -Property @{Name="Status";Expression={$_.Status};Width=9},`
+                                   @{Name="Package";Expression={$_.Package};Width=15},`
+                                   @{Name="Computer";Expression={$_.Computer};Width=15},`
+                                   @{Name="Repo Version";Expression={$_.RepoVersion};Width=16},`
+                                   @{Name="Published Version";Expression={$_.PublishedVersion};Width=16}
         Write-BoxstarterMessage "Total: $($summary.Total) Passed: $($summary.Passed) Failed: $($summary.Failed) Skipped: $($summary.Skipped)"
     }
+}
+
+function Write-Result($package, $result) {
+    $res = New-Object PSObject -Property @{
+        Package=$package.Id
+        RepoVersion=$package.Version
+        PublishedVersion=$(if($package.PublishedVersion -eq $null) {"Not Published"} else { $package.PublishedVersion })
+        Computer=$result.TestComputerName
+        ResultDetails=$(if($result -eq $null) {@{}} else { $result.ResultDetails })
+        Status=$(if($result -eq $null) {"SKIPPED"} else { $result.Status })
+    }
+    $res | Out-BoxstarterLog -quiet
+    return $res
 }
 
 function Test-PackageVersionGreaterThanPublished ($package) {
@@ -119,7 +121,7 @@ function Remove-PreRelease ([string]$versionString) {
 
 function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
     $origLogSetting=$Boxstarter.SuppressLogging
-    #$Boxstarter.SuppressLogging=$true
+    $Boxstarter.SuppressLogging=$true
     try {
         Write-Progress "Building $packageName."
         Invoke-BoxstarterBuild $packageName -Quiet
