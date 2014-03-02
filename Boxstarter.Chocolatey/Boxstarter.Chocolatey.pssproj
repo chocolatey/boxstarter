@@ -51,6 +51,7 @@
   <ItemGroup>
     <Content Include="Enable-BoxstarterCredSSP.ps1" />
     <Content Include="BoxstarterConnectionConfig.ps1" />
+    <Content Include="Init-Settings.ps1" />
     <Content Include="Resolve-VMPlugin.ps1" />
   </ItemGroup>
   <ItemGroup>

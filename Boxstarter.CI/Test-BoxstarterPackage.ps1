@@ -24,6 +24,7 @@ function Test-BoxstarterPackage {
 
     $currentColor = $Host.UI.RawUI.ForegroundColor
     $summaryColor = "Green"
+    Update-FormatData  -PrependPath "$($Boxstarter.BaseDir)\Boxstarter.CI\TestResult.Format.ps1xml"
     try {
         Get-BoxstarterPackages -PackageName $PackageName | % {
             $Host.UI.RawUI.ForegroundColor = $currentColor
@@ -31,7 +32,7 @@ function Test-BoxstarterPackage {
             $summary.Total++
             if($PackageName -or (Test-PackageVersionGreaterThanPublished $pkg)) {
                 Invoke-BuildAndTest $pkg.Id $options $vmArgs $summary | % {
-                    if($_.Status="PASSED") {
+                    if($_.Status -eq "PASSED") {
                         $summary.Passed++
                         $Host.UI.RawUI.ForegroundColor = "Green"
                     }
@@ -47,11 +48,7 @@ function Test-BoxstarterPackage {
                 $summary.Skipped++
                 Write-Result $pkg
             }
-        } | Format-Table -Property @{Name="Status";Expression={$_.Status};Width=9},`
-                                    @{Name="Package";Expression={$_.Package};Width=15},`
-                                    @{Name="Computer";Expression={$_.Computer};Width=15},`
-                                    @{Name="Repo Version";Expression={$_.RepoVersion};Width=16},`
-                                    @{Name="Published Version";Expression={$_.PublishedVersion};Width=16}
+        } 
     }
     finally{
         $Host.UI.RawUI.ForegroundColor = $currentColor
@@ -69,6 +66,7 @@ function Write-Result($package, $result) {
         ResultDetails=$(if($result -eq $null) {@{}} else { $result.ResultDetails })
         Status=$(if($result -eq $null) {"SKIPPED"} else { $result.Status })
     }
+    $res.PSObject.TypeNames.Insert(0,'BoxstarterTestResult')
     $res | Out-BoxstarterLog -quiet
     return $res
 }
@@ -142,7 +140,8 @@ function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
 }
 
 function Test-InstallSuccess ($testResult) {
-    if($testResult.Completed -and $testResult.Errors.Count -eq 0) {
+    if($testResult.Completed -and ($testResult.Errors.Count -eq 0)) {
         return $true
     }
+    return $false
 }

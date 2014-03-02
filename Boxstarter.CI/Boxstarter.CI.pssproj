@@ -45,6 +45,7 @@
     <Content Include="Set-BoxstarterDeployOptions.ps1" />
     <Content Include="Set-BoxstarterPackageNugetFeed.ps1" />
     <Content Include="Test-BoxstarterPackage.ps1" />
+    <Content Include="TestResult.Format.ps1xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />

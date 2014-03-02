@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<Configuration>  
+  <ViewDefinitions>
+    <View>
+      <Name>service</Name>
+      <ViewSelectedBy>
+        <TypeName>BoxstarterTestResult</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Status</Label>
+            <Width>9</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Package</Label>
+            <Width>15</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Computer</Label>
+            <Width>15</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Repo Version</Label>
+            <Width>16</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Published Version</Label>
+            <Width>18</Width>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+               <PropertyName>Status</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Package</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Computer</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>RepoVersion</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>PublishedVersion</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>
