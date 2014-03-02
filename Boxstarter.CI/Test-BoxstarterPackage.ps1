@@ -132,12 +132,13 @@ function Remove-PreRelease ([string]$versionString) {
 function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
     $origLogSetting=$Boxstarter.SuppressLogging
     $Boxstarter.SuppressLogging=$true
+    $progressId=5000 #must be a unique int. This is likely not to conflict with anyone else
     try {
-        Write-Progress "Building $packageName."
+        Write-Progress -id $progressId "Building $packageName."
         Invoke-BoxstarterBuild $packageName -Quiet
 
         $options.DeploymentTargetNames | % {
-            Write-Progress  -Activity "Testing $packageName" -Status "on Machine: $_"
+            Write-Progress -Id $progressId -Activity "Testing $packageName" -Status "on Machine: $_"
             if($vmArgs) {
                 Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $_  @vmArgs 
             }
