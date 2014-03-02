@@ -46,7 +46,7 @@ function Test-BoxstarterPackage {
     }
     else {
         $currentColor = $Host.UI.RawUI.ForegroundColor
-
+        $summaryColor = "Green"
         try {
             Get-BoxstarterPackages | % {
                 $Host.UI.RawUI.ForegroundColor = $currentColor
@@ -61,6 +61,7 @@ function Test-BoxstarterPackage {
                         else {
                             $summary.Failed++
                             $Host.UI.RawUI.ForegroundColor = "Red"
+                            $summaryColor= "Red"
                         }
                         Write-Result $pkg $_
                     }
@@ -78,7 +79,8 @@ function Test-BoxstarterPackage {
         finally{
             $Host.UI.RawUI.ForegroundColor = $currentColor
         }
-        Write-BoxstarterMessage "Total: $($summary.Total) Passed: $($summary.Passed) Failed: $($summary.Failed) Skipped: $($summary.Skipped)"
+
+        Write-BoxstarterMessage "Total: $($summary.Total) Passed: $($summary.Passed) Failed: $($summary.Failed) Skipped: $($summary.Skipped)" -Color $summaryColor
     }
 }
 
