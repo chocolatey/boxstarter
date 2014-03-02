@@ -76,4 +76,42 @@ Describe "Get-BoxstarterPackages" {
             $result[0].Feed | should be $null
         }
     }
+
+    Context "When Getting packages by name" {
+        New-BoxstarterPackage -name package1
+        New-BoxstarterPackage -name package2
+        New-BoxstarterPackage -name package3
+        Mock Invoke-RestMethod
+
+        $result = Get-BoxstarterPackages -PackageName "package1","package3"
+
+        it "should return the correct number of packages" {
+            $result.Count | should be 2
+        }
+        it "should return package1" {
+            $result[0].Id | should be "package1"
+            $result[0].Version | should be "1.0.0"
+        }
+        it "should return package3" {
+            $result[1].Id | should be "package3"
+            $result[1].Version | should be "1.0.0"
+        }
+    }
+
+    Context "When Getting one package by name" {
+        New-BoxstarterPackage -name package1
+        New-BoxstarterPackage -name package2
+        New-BoxstarterPackage -name package3
+        Mock Invoke-RestMethod
+
+        $result = Get-BoxstarterPackages -PackageName "package2"
+
+        it "should return the correct number of packages" {
+            $result.Count | should be $null
+        }
+        it "should return package2" {
+            $result[0].Id | should be "package2"
+            $result[0].Version | should be "1.0.0"
+        }
+    }
 }

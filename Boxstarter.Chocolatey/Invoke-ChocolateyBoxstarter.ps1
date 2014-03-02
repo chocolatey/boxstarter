@@ -1,8 +1,3 @@
-$config = Get-BoxstarterConfig
-$BoxStarter.LocalRepo=$config.LocalRepo
-$Boxstarter.NugetSources=$config.NugetSources
-$Boxstarter.RebootOk=$true
-
 function Invoke-ChocolateyBoxstarter{
 <#
 .SYNOPSIS

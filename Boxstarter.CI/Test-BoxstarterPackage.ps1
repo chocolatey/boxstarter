@@ -22,66 +22,42 @@ function Test-BoxstarterPackage {
         Failed=0
     }
 
-    if($packageName) {
-        $PackageName | % {
+    $currentColor = $Host.UI.RawUI.ForegroundColor
+    $summaryColor = "Green"
+    try {
+        Get-BoxstarterPackages -PackageName $PackageName | % {
+            $Host.UI.RawUI.ForegroundColor = $currentColor
             $pkg = $_
-            Invoke-BuildAndTest $pkg $options $vmArgs $summary  | % {
-                $summary.Total++
-                if($_.Status="PASSED") {
-                    $summary.Passed++
-                }
-                else {
-                    $summary.Failed++
-                }
-                New-Object PSObject -Property @{
-                    Package=$pkg.Name
-                    RepoVersion="---"
-                    PublishedVersion="---"
-                    TestComputerName=$_.TestComputerName
-                    ResultDetails=$_.ResultDetails
-                    Status=$_.Status
+            $summary.Total++
+            if($PackageName -or (Test-PackageVersionGreaterThanPublished $pkg)) {
+                Invoke-BuildAndTest $pkg.Id $options $vmArgs $summary | % {
+                    if($_.Status="PASSED") {
+                        $summary.Passed++
+                        $Host.UI.RawUI.ForegroundColor = "Green"
+                    }
+                    else {
+                        $summary.Failed++
+                        $Host.UI.RawUI.ForegroundColor = "Red"
+                        $summaryColor= "Red"
+                    }
+                    Write-Result $pkg $_
                 }
             }
-        }
+            else {
+                $summary.Skipped++
+                Write-Result $pkg
+            }
+        } | Format-Table -Property @{Name="Status";Expression={$_.Status};Width=9},`
+                                    @{Name="Package";Expression={$_.Package};Width=15},`
+                                    @{Name="Computer";Expression={$_.Computer};Width=15},`
+                                    @{Name="Repo Version";Expression={$_.RepoVersion};Width=16},`
+                                    @{Name="Published Version";Expression={$_.PublishedVersion};Width=16}
     }
-    else {
-        $currentColor = $Host.UI.RawUI.ForegroundColor
-        $summaryColor = "Green"
-        try {
-            Get-BoxstarterPackages | % {
-                $Host.UI.RawUI.ForegroundColor = $currentColor
-                $pkg = $_
-                $summary.Total++
-                if(Test-PackageVersionGreaterThanPublished $pkg) {
-                    Invoke-BuildAndTest $pkg.Id $options $vmArgs $summary | % {
-                        if($_.Status="PASSED") {
-                            $summary.Passed++
-                            $Host.UI.RawUI.ForegroundColor = "Green"
-                        }
-                        else {
-                            $summary.Failed++
-                            $Host.UI.RawUI.ForegroundColor = "Red"
-                            $summaryColor= "Red"
-                        }
-                        Write-Result $pkg $_
-                    }
-                }
-                else {
-                    $summary.Skipped++
-                    Write-Result $pkg
-                }
-            } | Format-Table -Property @{Name="Status";Expression={$_.Status};Width=9},`
-                                       @{Name="Package";Expression={$_.Package};Width=15},`
-                                       @{Name="Computer";Expression={$_.Computer};Width=15},`
-                                       @{Name="Repo Version";Expression={$_.RepoVersion};Width=16},`
-                                       @{Name="Published Version";Expression={$_.PublishedVersion};Width=16}
-        }
-        finally{
-            $Host.UI.RawUI.ForegroundColor = $currentColor
-        }
+    finally{
+        $Host.UI.RawUI.ForegroundColor = $currentColor
+    }
 
-        Write-BoxstarterMessage "Total: $($summary.Total) Passed: $($summary.Passed) Failed: $($summary.Failed) Skipped: $($summary.Skipped)" -Color $summaryColor
-    }
+    Write-BoxstarterMessage "Total: $($summary.Total) Passed: $($summary.Passed) Failed: $($summary.Failed) Skipped: $($summary.Skipped)" -Color $summaryColor
 }
 
 function Write-Result($package, $result) {
