@@ -1,7 +1,8 @@
 function Test-BoxstarterPackage {
     [CmdletBinding()]
     param(
-        [string[]]$PackageName
+        [string[]]$PackageName,
+        [switch]$IncludeOutput
     )
     $options = Get-BoxstarterDeployOptions
     if(!$options.DeploymentTargetCredentials){
@@ -25,13 +26,18 @@ function Test-BoxstarterPackage {
     $currentColor = $Host.UI.RawUI.ForegroundColor
     $summaryColor = "Green"
     Update-FormatData  -PrependPath "$($Boxstarter.BaseDir)\Boxstarter.CI\TestResult.Format.ps1xml"
+    $CurrentVerbosity=$global:VerbosePreference
+
     try {
+        if($PSBoundParameters["Verbose"] -eq $true) {
+            $global:VerbosePreference="Continue"
+        }
         Get-BoxstarterPackages -PackageName $PackageName | % {
             $Host.UI.RawUI.ForegroundColor = $currentColor
             $pkg = $_
             $summary.Total++
             if($PackageName -or (Test-PackageVersionGreaterThanPublished $pkg)) {
-                Invoke-BuildAndTest $pkg.Id $options $vmArgs $summary | % {
+                Invoke-BuildAndTest $pkg.Id $options $vmArgs $IncludeOutput | % {
                     if($_.Status -eq "PASSED") {
                         $summary.Passed++
                         $Host.UI.RawUI.ForegroundColor = "Green"
@@ -52,6 +58,7 @@ function Test-BoxstarterPackage {
     }
     finally{
         $Host.UI.RawUI.ForegroundColor = $currentColor
+        $global:VerbosePreference=$CurrentVerbosity
     }
 
     Write-BoxstarterMessage "Total: $($summary.Total) Passed: $($summary.Passed) Failed: $($summary.Failed) Skipped: $($summary.Skipped)" -Color $summaryColor
@@ -105,9 +112,19 @@ function Remove-PreRelease ([string]$versionString) {
     }
 }
 
-function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
+function Invoke-BuildAndTest($packageName, $options, $vmArgs, $IncludeOutput) {
     $origLogSetting=$Boxstarter.SuppressLogging
-    $Boxstarter.SuppressLogging=$true
+    if($global:VerbosePreference -eq "Continue") {
+        Write-BoxstarterMessage "Verbosity is on" -verbose
+        $verbose = $true 
+    }
+    else {
+        Write-BoxstarterMessage "Verbosity is off" -verbose
+        $verbose = $false 
+    }
+    if(!$IncludeOutput -and !$verbose){ 
+        $Boxstarter.SuppressLogging=$true 
+    }
     $progressId=5000 #must be a unique int. This is likely not to conflict with anyone else
     try {
         Write-Progress -id $progressId "Building $packageName."
@@ -116,13 +133,13 @@ function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
         $options.DeploymentTargetNames | % {
             Write-Progress -Id $progressId -Activity "Testing $packageName" -Status "on Machine: $_"
             if($vmArgs) {
-                Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $_  @vmArgs 
+                Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $_  @vmArgs -Verbose:$verbose
             }
             else {
                 $_
             }
         } | 
-        Install-BoxstarterPackage -credential $options.DeploymentTargetCredentials -PackageName $packageName -Force | % {
+        Install-BoxstarterPackage -credential $options.DeploymentTargetCredentials -PackageName $packageName -Force -verbose:$verbose | % {
             if(Test-InstallSuccess $_) {
                 $status="PASSED"
             }
