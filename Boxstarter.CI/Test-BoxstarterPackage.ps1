@@ -45,29 +45,39 @@ function Test-BoxstarterPackage {
         }
     }
     else {
-        Get-BoxstarterPackages | % {
-            $pkg = $_
-            $summary.Total++
-            if(Test-PackageVersionGreaterThanPublished $pkg) {
-                Invoke-BuildAndTest $pkg.Id $options $vmArgs $summary | % {
-                    if($_.Status="PASSED") {
-                        $summary.Passed++
+        $currentColor = $Host.UI.RawUI.ForegroundColor
+
+        try {
+            Get-BoxstarterPackages | % {
+                $Host.UI.RawUI.ForegroundColor = $currentColor
+                $pkg = $_
+                $summary.Total++
+                if(Test-PackageVersionGreaterThanPublished $pkg) {
+                    Invoke-BuildAndTest $pkg.Id $options $vmArgs $summary | % {
+                        if($_.Status="PASSED") {
+                            $summary.Passed++
+                            $Host.UI.RawUI.ForegroundColor = "Green"
+                        }
+                        else {
+                            $summary.Failed++
+                            $Host.UI.RawUI.ForegroundColor = "Red"
+                        }
+                        Write-Result $pkg $_
                     }
-                    else {
-                        $summary.Failed++
-                    }
-                    Write-Result $pkg $_
                 }
-            }
-            else {
-                $summary.Skipped++
-                Write-Result $pkg
-            }
-        } | Format-Table -Property @{Name="Status";Expression={$_.Status};Width=9},`
-                                   @{Name="Package";Expression={$_.Package};Width=15},`
-                                   @{Name="Computer";Expression={$_.Computer};Width=15},`
-                                   @{Name="Repo Version";Expression={$_.RepoVersion};Width=16},`
-                                   @{Name="Published Version";Expression={$_.PublishedVersion};Width=16}
+                else {
+                    $summary.Skipped++
+                    Write-Result $pkg
+                }
+            } | Format-Table -Property @{Name="Status";Expression={$_.Status};Width=9},`
+                                       @{Name="Package";Expression={$_.Package};Width=15},`
+                                       @{Name="Computer";Expression={$_.Computer};Width=15},`
+                                       @{Name="Repo Version";Expression={$_.RepoVersion};Width=16},`
+                                       @{Name="Published Version";Expression={$_.PublishedVersion};Width=16}
+        }
+        finally{
+            $Host.UI.RawUI.ForegroundColor = $currentColor
+        }
         Write-BoxstarterMessage "Total: $($summary.Total) Passed: $($summary.Passed) Failed: $($summary.Failed) Skipped: $($summary.Skipped)"
     }
 }
