@@ -1,5 +1,4 @@
 function Bootstrap-Boxstarter {
-    gci env: | % { write-host "$($_.key)::$($_.value)" }
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
         Write-Output "Chocolatey not installed. Downloading and installing..."
         $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
@@ -9,18 +8,14 @@ function Bootstrap-Boxstarter {
     }
 
     if(!(Test-Path $env:ChocolateyInstall\lib\Boxstarter.CI*)) { 
-            Write-Host "Boxstarter CI not installed. Installing from $PSScriptRoot"
+            Write-Output "Boxstarter CI not installed. Installing from $PSScriptRoot"
             ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Boxstarter.CI -source "$PSScriptRoot" 
-            Write-Host "Finished Boxstarter.CI Install"
-    }
-    else {
-        Write-Host "Boxstarter.CI already installed"
     }
 
     if(!(Get-Module Boxstarter.Azure)){
         Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.Azure.psd1
     }
-    if(!(Get-Module Boxstarter.Azure)){
+    if(!(Get-Module Boxstarter.CI)){
         Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.CI.psd1
     }
 }
