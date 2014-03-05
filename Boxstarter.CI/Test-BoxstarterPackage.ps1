@@ -131,7 +131,9 @@ function Invoke-BuildAndTest($packageName, $options, $vmArgs, $IncludeOutput) {
         Invoke-BoxstarterBuild $packageName -Quiet
 
         $options.DeploymentTargetNames | % {
-            Write-Progress -Id $progressId -Activity "Testing $packageName" -Status "on Machine: $_"
+            $global:Boxstarter.ProgressArgs=@{Id=$progressId;Activity="Testing $packageName";Status="on Machine: $_"}
+            $a=$global:Boxstarter.ProgressArgs
+            Write-Progress @a
             if($vmArgs) {
                 Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $_  @vmArgs -Verbose:$verbose
             }
@@ -153,7 +155,10 @@ function Invoke-BuildAndTest($packageName, $options, $vmArgs, $IncludeOutput) {
                 Status=$status
             }
         }
-    }finally { $Boxstarter.SuppressLogging = $origLogSetting }
+    }finally { 
+        $Boxstarter.SuppressLogging = $origLogSetting
+        $global:Boxstarter.Remove("ProgressArgs")
+    }
 }
 
 function Test-InstallSuccess ($testResult) {

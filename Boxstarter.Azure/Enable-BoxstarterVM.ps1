@@ -129,8 +129,10 @@ Once that is done, please run Enable-BoxstarterVM again.
             }
 
             if($subscription.CurrentStorageAccountName -eq $null) {
+                Write-BoxstarterMessage "Getting OS Disk" -Verbose
                 $disk=Invoke-RetriableScript { Get-AzureOSDisk -VM $args[0] } $vm
                 $endpoint="http://$($disk.MediaLink.Host)/"
+                Write-BoxstarterMessage "Getting Azure Storage Account" -Verbose
                 $storageAccount=Invoke-RetriableScript { Get-AzureStorageAccount } | ? { $_.Endpoints -contains $endpoint }
                 Set-AzureSubscription -SubscriptionName $subscription.SubscriptionName -CurrentStorageAccountName $storageAccount.Label
             }
@@ -156,16 +158,20 @@ Once that is done, please run Enable-BoxstarterVM again.
                 Install-WinRMCert $vm | Out-Null
             }
 
+            Write-BoxstarterMessage "Getting connection URI" -Verbose
             $uri = Invoke-RetriableScript { Get-AzureWinRMUri -serviceName $args[0] -Name $args[1] } $CloudServiceName $_
             if($uri -eq $null) {
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "WinRM Endpoint is not configured on VM. Use Add-AzureEndpoint to add PowerShell remoting endpoint and use Enable-PSRemoting -Force on the VM to enable PowerShell remoting."
             }
+            Write-BoxstarterMessage "URI: $uri" -Verbose
             $ComputerName=$uri.Host
             Enable-BoxstarterClientRemoting $ComputerName | out-Null
             Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
-            $remotingTest = Invoke-Command $uri { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
-            if(!$remotingTest) {
-                Write-Error "Unable to establish a remote connection with $_. Use Enable-PSRemoting -Force on the VM to enable PowerShell remoting."
+            try {
+                Invoke-Command $uri { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction Stop | Out-Null
+            }
+            catch {
+                Write-BoxstarterMessage "Failed to establish a remote connection with $uri. Use Enable-PSRemoting -Force on the VM to enable PowerShell remoting. Install will continue since this may be a transcient error. The error encountered was $($_.ToString())" -Verbose
             }
         
             if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
@@ -184,6 +190,9 @@ Once that is done, please run Enable-BoxstarterVM again.
 }
 
 function Wait-ReadyState($vmName) {
-    do {Start-Sleep -milliseconds 100} 
+    do {
+        Start-Sleep -milliseconds 100
+        Write-BoxstarterMessage "Checking VM for ReadyRole status...Hey VM!, are you ready to roll?..." -Verbose
+    } 
     until (( Invoke-RetriableScript { (Get-AzureVM -Name $args[0]).Status } $vmName ) -eq "ReadyRole")
 }

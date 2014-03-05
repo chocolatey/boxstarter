@@ -373,8 +373,13 @@ function Get-ComputerNames([URI[]]$ConnectionUris) {
 
     Write-BoxstarterMessage "resolving URIs to computer names..." -Verbose
     $ConnectionUris | %{
-        Write-BoxstarterMessage "$($_ -is [uri]) found $($_.Host) for $($_.ToString())" -Verbose
-        $computerNames+=$_.Host
+        if($_ -eq $null) {
+            Write-BoxstarterMessage "Tried to resolve Null URI" -Verbose
+        }
+        else {
+            Write-BoxstarterMessage "$($_ -is [uri]) found $($_.Host) for $($_.ToString())" -Verbose
+            $computerNames+=$_.Host
+        }
     }
     return $computerNames
 }
@@ -597,11 +602,13 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
 }
 
 function Invoke-RemoteBoxstarter($Package, $Password, $DisableReboots) {
+    Write-BoxstarterMessage "Running remote install..."
     $remoteResult = Invoke-Command -session $session {
-        param($SuppressLogging,$pkg,$password,$DisableReboots, $verbosity)
+        param($SuppressLogging,$pkg,$password,$DisableReboots, $verbosity, $ProgressArgs)
         $global:VerbosePreference=$verbosity
         Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
         $Boxstarter.SuppressLogging=$SuppressLogging
+        $global:Boxstarter.ProgressArgs=$ProgressArgs 
         $result=$null
         try {
             $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -DisableReboots:$DisableReboots
@@ -615,7 +622,7 @@ function Invoke-RemoteBoxstarter($Package, $Password, $DisableReboots) {
         catch{
             throw $_
         }
-    } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Password, $DisableReboots, $global:VerbosePreference
+    } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Password, $DisableReboots, $global:VerbosePreference, $global:Boxstarter.ProgressArgs
     Write-BoxstarterMessage "Result from Remote Boxstarter: $($remoteResult.Result)" -Verbose
     return $remoteResult
 }

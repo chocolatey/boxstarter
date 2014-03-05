@@ -59,11 +59,15 @@ about_boxstarter_logging
         [ConsoleColor]$color=[ConsoleColor]::green,
         [switch]$Verbose
     )
+    if($global:Boxstarter.ProgressArgs -and !$Verbose) {
+        $a=$global:Boxstarter.ProgressArgs
+        Write-Progress @a -CurrentOperation $message 
+    }
     if(!$nologo){$message = "Boxstarter: $message"}
     $fmtTitle = Format-BoxStarterMessage $message
+    Log-BoxstarterMessage $fmtTitle
     if($Verbose){
         Write-Verbose $fmtTitle
-        Log-BoxstarterMessage $fmtTitle
     }
     else {
         #Boxstarter has a Write-host proxy function and it ensures all is logged

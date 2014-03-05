@@ -38,6 +38,7 @@ Remove-AzureVMCheckpoint
 
     $blob=Get-Blob $vm
     $exportPath = "$env:temp\boxstarterAzureCheckpoint$($vm.Name).xml"
+    write-boxstartermessage "Getting OS Disk" -verbose
     $vmOSDisk=Invoke-RetriableScript { Get-AzureOSDisk -VM $args[0] } $VM
 
     Write-BoxstarterMessage "Exporting VM configuration for $($vm.ServiceName) of $serviceName service to $exportPath..."
@@ -50,7 +51,10 @@ Remove-AzureVMCheckpoint
     Invoke-RetriableScript { Remove-AzureVM -ServiceName $args[0].serviceName -Name $args[0].Name } $VM| Out-Null
 
     Write-BoxstarterMessage "Waiting for disk $($vmOSDisk.DiskName) to be free..."
-    do {Start-Sleep -milliseconds 100} 
+    do {
+        write-BoxstarterMessage "Still waiting..." -verbose
+        Start-Sleep -milliseconds 100
+    } 
     until ((Invoke-RetriableScript { (Get-AzureDisk -DiskName $args[0]).AttachedTo } $vmOSDisk.DiskName ) -eq $null)
 
     Write-BoxstarterMessage "Removing disk $($vmOSDisk.DiskName)..."
