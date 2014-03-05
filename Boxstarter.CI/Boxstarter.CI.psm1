@@ -1,5 +1,8 @@
 $unNormalized=(Get-Item "$PSScriptRoot\..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1")
 Import-Module $unNormalized.FullName -global -DisableNameChecking -Force
+$unNormalized=(Get-Item "$PSScriptRoot\..\Boxstarter.Azure\Boxstarter.Azure.psd1")
+Import-Module $unNormalized.FullName -global -DisableNameChecking -Force
+
 Resolve-Path $PSScriptRoot\*-*.ps1 | 
     % { . $_.ProviderPath }
 

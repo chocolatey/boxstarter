@@ -12,4 +12,4 @@ if((Get-Module Azure -ListAvailable) -eq $null) {
 else {
     Import-Module Azure -global
 }
-Export-ModuleMember Enable-BoxstarterVM, Get-AzureVMCheckpoint, Set-AzureVMCheckpoint, Restore-AzureVMCheckpoint, Remove-AzureVMCheckpoint
+Export-ModuleMember Enable-BoxstarterVM, Get-AzureVMCheckpoint, Set-AzureVMCheckpoint, Restore-AzureVMCheckpoint, Remove-AzureVMCheckpoint, Test-VMStarted

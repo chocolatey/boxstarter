@@ -120,8 +120,6 @@ Once that is done, please run Enable-BoxstarterVM again.
 
     Process {
         $VMName | % { 
-            $exportFile= Join-Path $env:temp $_.xml
-
             Write-BoxstarterMessage "Locating Azure VM $_..."
             $vm = Invoke-RetriableScript { Get-AzureVM -ServiceName $args[0] -Name $args[1] } $CloudServiceName $_
             if($vm -eq $null){

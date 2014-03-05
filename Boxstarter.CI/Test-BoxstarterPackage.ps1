@@ -11,9 +11,16 @@ function Test-BoxstarterPackage {
 
     if($options.DeploymentVMProvider -and $options.DeploymentVMProvider -gt 0){
         $vmArgs=@{}
+        $cloudVMStates = @{}
         if($options.DeploymentCloudServiceName){$vmArgs.CloudServiceName=$options.DeploymentCloudServiceName}
         if($options.RestoreCheckpoint){$vmArgs.CheckpointName=$options.RestoreCheckpoint}
         $vmArgs.Provider=$options.DeploymentVMProvider
+        if($options.DeploymentVMProvider -eq "azure") {
+            Write-BoxStarterMessage "Using Azure VMs. Checking to see if these are shutdown..."
+            $options.DeploymentTargetNames | % {
+                $cloudVMStates.$_ = Test-VMStarted $options.DeploymentCloudServiceName $_
+            }
+        }
     }
 
     $summary=@{
@@ -32,6 +39,8 @@ function Test-BoxstarterPackage {
         if($PSBoundParameters["Verbose"] -eq $true) {
             $global:VerbosePreference="Continue"
         }
+
+
         Get-BoxstarterPackages -PackageName $PackageName | % {
             $Host.UI.RawUI.ForegroundColor = $currentColor
             $pkg = $_
@@ -59,6 +68,11 @@ function Test-BoxstarterPackage {
     finally{
         $Host.UI.RawUI.ForegroundColor = $currentColor
         $global:VerbosePreference=$CurrentVerbosity
+
+        $cloudVMStates.Keys | ? { $cloudVMStates.$_ -eq $false } | % {
+            Write-BoxStarterMessage "Stopping $_..."
+            Stop-AzureVM  -ServiceName $options.DeploymentCloudServiceName -Name $_ -Force | Out-Null 
+        }
     }
 
     Write-BoxstarterMessage "Total: $($summary.Total) Passed: $($summary.Passed) Failed: $($summary.Failed) Skipped: $($summary.Skipped)" -Color $summaryColor
