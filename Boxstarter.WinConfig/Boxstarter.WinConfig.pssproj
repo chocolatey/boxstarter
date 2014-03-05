@@ -38,6 +38,7 @@
     <Compile Include="Install-WindowsUpdate.ps1" />
     <Compile Include="Move-LibraryDirectory.ps1" />
     <Compile Include="Restart-Explorer.ps1" />
+    <Compile Include="Set-CornerNavigationOptions.ps1" />
     <Compile Include="Set-ExplorerOptions.ps1" />
     <Compile Include="Set-TaskbarSmall.ps1" />
     <Compile Include="Update-ExecutionPolicy.ps1" />

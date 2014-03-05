@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Get-CheckpointPrefix.ps1" />
+    <Content Include="Test-VMStarted.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
