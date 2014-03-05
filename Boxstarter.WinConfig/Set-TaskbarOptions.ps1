@@ -3,43 +3,51 @@ function Set-TaskbarOptions {
 .SYNOPSIS
 Sets options for the Windows Task Bar
 
-.PARAMETER EnableMakeTaskbarSmall
-Makes the Windows Task Bar skinny
+.PARAMETER Lock
+Changes the lock status of the Windows Task Bar.  Valid inputs are Yes and No.
 
-.PARAMETER DisableMakeTaskbarSmall
-Makes the Windows Task Bar not as skinny, see EnableMakeTaskbarSmall
+.PARAMETER Size
+Changes the size of the Taskbar Icons.  Valid inputs are Small and Large.
 
-.PARAMETER EnableLockTheTaskbar
-Enables the locking of the Windows Task Bar
-
-.PARAMETER DisableLockTheTaskbar
-Disables the locking of the Windows Task Bar, see EnableLockTheTaskbar
+.PARAMETER Dock
+Changes the location in which the Taskbar is docked.  Valid inputs are Top, Left, Bottom and Right.
 
 #>
 	[CmdletBinding()]
 	param(
-		[switch]$EnableMakeTaskbarSmall,
-		[switch]$DisableMakeTaskbarSmall,
-		[switch]$EnableLockTheTaskbar,
-		[switch]$DisableLockTheTaskbar
+		[ValidateSet('Yes','No')]
+		$Lock,
+		[ValidateSet('Small','Large')]
+		$Size,
+		[ValidateSet('Top','Left','Bottom','Right')]
+		$Dock
 	)
 
-	$PSBoundParameters.Keys | % {
-        if($_-like "En*"){ $other="Dis" + $_.Substring(2)}
-        if($_-like "Dis*"){ $other="En" + $_.Substring(3)}
-        if($PSBoundParameters[$_] -and $PSBoundParameters[$other]) {
-            throw new-Object -TypeName ArgumentException "You may not set both $_ and $other. You can only set one."
-        }
-    }
-
 	$key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
+	$dockingKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects2'
 
 	if(Test-Path -Path $key) {
-		if($EnableMakeTaskbarSmall) { Set-ItemProperty $key TaskbarSmallIcons 1 }
-		if($DisableMakeTaskbarSmall) { Set-ItemProperty $key TaskbarSmallIcons 0 }
+		switch ($Lock) 
+		{ 
+			"Yes"  { Set-ItemProperty $key TaskbarSizeMove 0 } 
+			"No"  { Set-ItemProperty $key TaskbarSizeMove 1 } 
+		} 
 
-		if($EnableLockTheTaskbar) { Set-ItemProperty $key TaskbarSizeMove 0 }
-		if($DisableLockTheTaskbar) { Set-ItemProperty $key TaskbarSizeMove 1 }
+		switch ($Size) {
+			"Small" { Set-ItemProperty $key TaskbarSmallIcons 1 }
+			"Large" { Set-ItemProperty $key TaskbarSmallIcons 0 }
+		}
+
+		Restart-Explorer
+	}	
+
+	if(Test-Path -Path $dockingKey) {
+		switch ($Dock) {
+			"Top" { Set-ItemProperty -Path $dockingKey -Name Settings -Value ([byte[]] (0x28,0x00,0x00,0x00,0xff,0xff,0xff,0xff,0x02,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x3e,0x00,0x00,0x00,0x2e,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x80,0x07,0x00,0x00,0x2e,0x00,0x00,0x00)) }
+			"Left" { Set-ItemProperty -Path $dockingKey -Name Settings -Value ([byte[]] (0x28,0x00,0x00,0x00,0xff,0xff,0xff,0xff,0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3e,0x00,0x00,0x00,0x2e,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3e,0x00,0x00,0x00,0xb0,0x04,0x00,0x00)) }
+			"Bottom" { Set-ItemProperty -Path $dockingKey -Name Settings -Value ([byte[]] (0x28,0x00,0x00,0x00,0xff,0xff,0xff,0xff,0x02,0x00,0x00,0x00,0x03,0x00,0x00,0x00,0x3e,0x00,0x00,0x00,0x2e,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x82,0x04,0x00,0x00,0x80,0x07,0x00,0x00,0xb0,0x04,0x00,0x00)) }
+			"Right" { Set-ItemProperty -Path $dockingKey -Name Settings -Value ([byte[]] (0x28,0x00,0x00,0x00,0xff,0xff,0xff,0xff,0x02,0x00,0x00,0x00,0x02,0x00,0x00,0x00,0x3e,0x00,0x00,0x00,0x2e,0x00,0x00,0x00,0x42,0x07,0x00,0x00,0x00,0x00,0x00,0x00,0x80,0x07,0x00,0x00,0xb0,0x04,0x00,0x00)) }
+		}
 
 		Restart-Explorer
 	}
