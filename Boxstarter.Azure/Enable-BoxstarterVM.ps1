@@ -102,7 +102,7 @@ Remove-AzureVMCheckpoint
     Begin {
         $CurrentVerbosity=$global:VerbosePreference
 
-        $subscription=Get-AzureSubscription
+        $subscription=Get-AzureSubscription -Current
         if($subscription -eq $null){
             throw @"
 Your Azure subscription information has not been sent.
