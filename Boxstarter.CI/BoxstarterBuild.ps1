@@ -1,6 +1,7 @@
 param(
     $DeploymentTargetUserName,
-    $DeploymentTargetPassword, 
+    $DeploymentTargetPassword,
+    $FeedAPIKey,
     $AzureSubscriptionName,
     $AzureSubscriptionId,
     $AzureSubscriptionCertificate
@@ -12,6 +13,9 @@ param(
 #Configure our settings
 $Boxstarter.LocalRepo=(Resolve-Path "$PSScriptRoot\..\")
 Set-BoxstarterDeployOptions -DeploymentTargetUserName $DeploymentTargetUserName -DeploymentTargetPassword $DeploymentTargetPassword
+if(![string]::IsNullOrEmpty($FeedAPIKey)) {
+    Set-BoxstarterDeployOptions -DefaultFeedAPIKey $FeedAPIKey
+}
 Set-BoxstarterAzureOptions $AzureSubscriptionName $AzureSubscriptionId $AzureSubscriptionCertificate
 
 #We want to exit with an unsuccesful exit code if any tests fail or not tests are run at all
