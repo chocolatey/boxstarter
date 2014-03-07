@@ -23,12 +23,14 @@ Describe "Get-BoxstarterDeployOptions" {
     }
 
     Context "When Getting existing options" {
+        $key=[guid]::NewGuid()
         Set-BoxstarterDeployOptions -DeploymentTargetNames @("targetvm1","targetvm2") `
                                     -DeploymentVMProvider azure `
                                     -DeploymentCloudServiceName myservice `
                                     -DeploymentTargetPassword passwd `
                                     -DeploymentTargetUserName Admin `
-                                    -DefaultNugetFeed "http://www.myget.org/F/boxstarter/api/v2"
+                                    -DefaultNugetFeed "http://www.myget.org/F/boxstarter/api/v2" `
+                                    -DefaultFeedAPIKey $key
         $result = Get-BoxstarterDeployOptions
 
         it "should get target" {
@@ -54,6 +56,9 @@ Describe "Get-BoxstarterDeployOptions" {
         }
         it "should get default nuget feed" {
             $result.DefaultNugetFeed | should be "http://www.myget.org/F/boxstarter/api/v2"
+        }
+        it "should get default nuget feed API key" {
+            $result.DefaultFeedAPIKey | should be $key 
         }
     }
 }

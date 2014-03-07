@@ -12,7 +12,7 @@ function Get-BoxstarterFeedAPIKey {
         $keys = Import-CliXML $path
     }
 
-    if($keys.ContainsKey($NugetFeed)) {
+    if($NugetFeed -and $keys.ContainsKey($NugetFeed)) {
         return $keys.$NugetFeed
     }
 }
