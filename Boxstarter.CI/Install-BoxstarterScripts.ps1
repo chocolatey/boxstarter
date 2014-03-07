@@ -13,5 +13,5 @@ function Install-BoxstarterScripts {
     Copy-Item "$($Boxstarter.BaseDir)\Boxstarter.CI\bootstrap.ps1" $scriptPath -Force 
     Copy-Item "$($Boxstarter.BaseDir)\Boxstarter.CI\BoxstarterBuild.ps1" $scriptPath -Force 
     Copy-Item "$($Boxstarter.BaseDir)\Boxstarter.CI\boxstarter.proj" $scriptPath -Force 
-    Set-Content "$scriptPath\.gitignore" -Value "*-options.xml" -Force 
+    Set-Content "$scriptPath\.gitignore" -Value "*-options.xml`r`nFeedAPIKeys.xml" -Force 
 }
