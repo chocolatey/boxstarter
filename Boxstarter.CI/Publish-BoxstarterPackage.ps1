@@ -5,6 +5,11 @@ function Publish-BoxstarterPackage {
     )
 
     $PackageName | % {
-        write-Host $_ 
+        [PSCustomObject]@{
+            Package=$null
+            Feed=$null
+            PublishedVersion=$null
+            PulishErrors=$null
+        }
     }
 }
