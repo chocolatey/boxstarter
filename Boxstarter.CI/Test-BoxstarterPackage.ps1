@@ -16,7 +16,7 @@ function Test-BoxstarterPackage {
         if($options.RestoreCheckpoint){$vmArgs.CheckpointName=$options.RestoreCheckpoint}
         $vmArgs.Provider=$options.DeploymentVMProvider
         if($options.DeploymentVMProvider -eq "azure") {
-            Write-BoxStarterMessage "Using Azure VMs. Checking to see if these are shutdown..."
+            Write-BoxStarterMessage "Using Azure VMs. Checking to see if these are shutdown..." -verbose
             $options.DeploymentTargetNames | % {
                 $cloudVMStates.$_ = Test-VMStarted $options.DeploymentCloudServiceName $_
             }
@@ -40,7 +40,6 @@ function Test-BoxstarterPackage {
             $global:VerbosePreference="Continue"
         }
 
-
         Get-BoxstarterPackages -PackageName $PackageName | % {
             $Host.UI.RawUI.ForegroundColor = $currentColor
             $pkg = $_
@@ -58,12 +57,13 @@ function Test-BoxstarterPackage {
                     }
                     Write-Result $pkg $_
                 }
+                if(!$failed) {$publishCandidates += $pkg.Id}
             }
             else {
                 $summary.Skipped++
                 Write-Result $pkg
             }
-        } 
+        }
     }
     finally{
         $Host.UI.RawUI.ForegroundColor = $currentColor

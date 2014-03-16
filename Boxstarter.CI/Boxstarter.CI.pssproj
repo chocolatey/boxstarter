@@ -31,6 +31,10 @@
     <Compile Include="Boxstarter.CI.psm1" />
     <Compile Include="Boxstarter.proj" />
     <Compile Include="BoxstarterBuild.ps1" />
+    <Compile Include="Get-BoxstarterFeedAPIKey.ps1" />
+    <Compile Include="Get-FeedsAPIKeyPath.ps1" />
+    <Compile Include="Publish-BoxstarterPackage.ps1" />
+    <Compile Include="Set-BoxstarterFeedAPIKey.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Bootstrap.ps1" />
