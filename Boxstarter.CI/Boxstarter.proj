@@ -5,6 +5,6 @@
     <PowerShellExe Condition=" '$(PowerShellExe)'=='' ">%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>    
   </PropertyGroup>
   <Target Name="TestBoxstarterPackages">
-    <Exec Command="$(PowerShellExe) -NoProfile -ExecutionPolicy bypass -Command &quot;$(MSBuildProjectDirectory)\BoxstarterBuild.ps1 -DeploymentTargetUserName $(DeploymentTargetUserName) -DeploymentTargetPassword $(DeploymentTargetPassword) -AzureSubscriptionName $(AzureSubscriptionName) -AzureSubscriptionId $(AzureSubscriptionId) -AzureSubscriptionCertificate &apos;$(AzureSubscriptionCertificate)&apos; &apos;$(FeedAPIKey)&apos;&quot;" />
+    <Exec Command="$(PowerShellExe) -NoProfile -ExecutionPolicy bypass -Command &quot;$(MSBuildProjectDirectory)\BoxstarterBuild.ps1 -PublishSuccesfulPackages $(PublishSuccesfulPackages) -DeploymentTargetUserName $(DeploymentTargetUserName) -DeploymentTargetPassword $(DeploymentTargetPassword) -AzureSubscriptionName $(AzureSubscriptionName) -AzureSubscriptionId $(AzureSubscriptionId) -AzureSubscriptionCertificate &apos;$(AzureSubscriptionCertificate)&apos; &apos;$(FeedAPIKey)&apos;&quot;" />
   </Target>
 </Project>

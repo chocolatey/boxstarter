@@ -1,4 +1,5 @@
 param(
+    $PublishSuccesfulPackages,
     $DeploymentTargetUserName,
     $DeploymentTargetPassword,
     $FeedAPIKey,
@@ -21,14 +22,28 @@ Set-BoxstarterAzureOptions $AzureSubscriptionName $AzureSubscriptionId $AzureSub
 #We want to exit with an unsuccesful exit code if any tests fail or not tests are run at all
 $failedTests=0
 $totalTests=0
+$succesfullPackages = @()
+$failedPackages = @()
 Test-BoxstarterPackage -IncludeOutput | % {
     if($_.Package){
         $totalTests++
     }
     if($_.Status -eq "failed"){
         $failedTests++
+        $failedPackages += $_.Package
+    }
+    if($_.Status -eq "passed"){
+        $succesfullPackages += $_.Package
     }
     $_
+}
+
+if($PublishSuccesfulPackages){
+    $succesfullPackages | ? {
+        $failedPackages -notcontains  $_
+    } | % {
+        Publish-BoxstarterPackage $_
+    }
 }
 
 if ($totalTests -eq 0) {
