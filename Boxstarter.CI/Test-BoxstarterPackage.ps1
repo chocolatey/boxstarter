@@ -69,7 +69,7 @@ function Test-BoxstarterPackage {
         $Host.UI.RawUI.ForegroundColor = $currentColor
         $global:VerbosePreference=$CurrentVerbosity
 
-        $cloudVMStates.Keys | ? { $cloudVMStates.$_ -eq $false } | % {
+        $cloudVMStates.Keys | ? { $cloudVMStates.$_ -eq $false -and (Test-VMStarted $options.DeploymentCloudServiceName $_)} | % {
             Write-BoxStarterMessage "Stopping $_..."
             Stop-AzureVM  -ServiceName $options.DeploymentCloudServiceName -Name $_ -Force | Out-Null 
         }

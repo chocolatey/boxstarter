@@ -21,7 +21,9 @@ function Publish-BoxstarterPackage {
         }
         else {
             $err = @()
-            $err += Invoke-NugetPush $pkg 2>&1
+            $nupkg = join-path $Boxstarter.LocalRepo "$_.$($pkg.Version).nupkg"
+            Write-BoxstarterMessage "Calling nuget: push $nupkg $(Get-BoxstarterFeedAPIKey $pkg.Feed) -Source $($pkg.Feed)/package -NonInteractive" -Verbose
+            $err += Invoke-NugetPush $pkg $nupkg 2>&1
             try {
                 $publishedVersion = Get-BoxstarterPackagePublishedVersion $nuspec.package.metadata.id $feedUrl -ErrorAction Stop
             }
@@ -44,7 +46,7 @@ function Publish-BoxstarterPackage {
     }
 }
 
-function Invoke-NugetPush ($pkg) {
+function Invoke-NugetPush ($pkg,$nupkg) {
     $nuget="$env:ChocolateyInstall\chocolateyinstall\Nuget.exe"
-    .$nuget push (join-path $Boxstarter.LocalRepo "$_.$($pkg.RepoVersion).nupkg") (Get-BoxstarterFeedAPIKey $pkg.Feed) -Source $pkg.Feed -NonInteractive
+    .$nuget push $nupkg (Get-BoxstarterFeedAPIKey $pkg.Feed) -Source "$($pkg.Feed)/package" -NonInteractive
 }
