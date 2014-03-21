@@ -14,7 +14,7 @@ function Test-VMStarted {
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
             }
             if($vm.InstanceStatus -eq "ReadyRole"){
-                retun $true
+                return $true
             }
             else {
                 return $false
