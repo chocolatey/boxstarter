@@ -13,7 +13,7 @@ function Select-BoxstarterResultsToPublish {
             if($_.Status -eq "failed"){
                 $failedPackages += $_.Package
             }
-            if($_.Status -eq "passed"){
+            if($_.Status -eq "passed" -and ($succesfullPackages -notcontains $_.Package)){
                 $succesfullPackages += $_.Package
             }
         }
