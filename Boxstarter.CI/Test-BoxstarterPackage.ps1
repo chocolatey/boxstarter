@@ -24,7 +24,6 @@ function Test-BoxstarterPackage {
     }
 
     $summary=@{
-        Total=0
         Passed=0
         Skipped=0
         Failed=0
@@ -43,7 +42,6 @@ function Test-BoxstarterPackage {
         Get-BoxstarterPackages -PackageName $PackageName | % {
             $Host.UI.RawUI.ForegroundColor = $currentColor
             $pkg = $_
-            $summary.Total++
             if($PackageName -or (Test-PackageVersionGreaterThanPublished $pkg)) {
                 Invoke-BuildAndTest $pkg.Id $options $vmArgs $IncludeOutput | % {
                     if($_.Status -eq "PASSED") {
@@ -75,7 +73,7 @@ function Test-BoxstarterPackage {
         }
     }
 
-    Write-BoxstarterMessage "Total: $($summary.Total) Passed: $($summary.Passed) Failed: $($summary.Failed) Skipped: $($summary.Skipped)" -Color $summaryColor
+    Write-BoxstarterMessage "Total: $($summary.Passed + $summary.Failed + $summary.Skipped) Passed: $($summary.Passed) Failed: $($summary.Failed) Skipped: $($summary.Skipped)" -Color $summaryColor
 }
 
 function Write-Result($package, $result) {
