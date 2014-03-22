@@ -19,34 +19,25 @@ if(![string]::IsNullOrEmpty($FeedAPIKey)) {
 }
 Set-BoxstarterAzureOptions $AzureSubscriptionName $AzureSubscriptionId $AzureSubscriptionCertificate
 
+Publish-BoxstarterPassedTestResults
 #We want to exit with an unsuccesful exit code if any tests fail or not tests are run at all
 $failedTests=0
-$totalTests=0
-$succesfullPackages = @()
-$failedPackages = @()
+$testedPackage = @()
 Test-BoxstarterPackage -IncludeOutput | % {
     if($_.Package){
-        $totalTests++
-    }
-    if($_.Status -eq "failed"){
-        $failedTests++
-        $failedPackages += $_.Package
-    }
-    if($_.Status -eq "passed"){
-        $succesfullPackages += $_.Package
+        $testedPackage += $_
+        if($_.Status -eq "failed"){
+            $failedTests++
+        }
     }
     $_
 }
 
 if($PublishSuccesfulPackages){
-    $succesfullPackages | ? {
-        $failedPackages -notcontains  $_
-    } | % {
-        Publish-BoxstarterPackage $_
-    }
+    $testedPackage | Select-BoxstarterResultsToPublish | Publish-BoxstarterPackage
 }
 
-if ($totalTests -eq 0) {
+if ($testedPackage.Count -eq 0) {
     throw "no tests performed. That cant be right."
 }
 Exit $failedTests

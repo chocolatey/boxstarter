@@ -46,6 +46,7 @@
     <Content Include="Get-PackageFeedsPath.ps1" />
     <Content Include="Get-SecretOptionsPath.ps1" />
     <Content Include="Install-BoxstarterScripts.ps1" />
+    <Content Include="Select-BoxstarterResultsToPublish.ps1" />
     <Content Include="Remove-BoxstarterPackageNugetFeed.ps1" />
     <Content Include="Set-BoxstarterDeployOptions.ps1" />
     <Content Include="Set-BoxstarterPackageNugetFeed.ps1" />
