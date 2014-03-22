@@ -30,7 +30,10 @@ Describe "Install-BoxstarterScripts" {
             join-Path $repo "BoxstarterScripts\BoxstarterBuild.ps1" | Should exist
         }
         It "should write ignore file for secrets" {
-            Get-Content "$repo\BoxstarterScripts\.gitignore" | Should be "*-options.xml"
+            "$repo\BoxstarterScripts\.gitignore" | Should contain "-options.xml"
+        }
+        It "should write ignore file for api keys" {
+            "$repo\BoxstarterScripts\.gitignore" | Should contain "FeedAPIKeys.xml"
         }
     }
 
