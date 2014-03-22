@@ -31,7 +31,7 @@ Describe "Publish-BoxstarterPackage" {
             }
         }
 
-        $result = Publish-BoxstarterPackage $pkgName
+        $result = $pkgName | Publish-BoxstarterPackage
 
         it "Should return the name of the published package" {
             $result.Package | should be $pkgName 
