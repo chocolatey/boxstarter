@@ -17,7 +17,7 @@ if(Test-Path $modulePath) {
 Add-Type -Path "$env:ProgramFiles\Microsoft SDKs\Windows Azure\.NET SDK\v2.2\bin\plugins\caching\Microsoft.WindowsAzure.StorageClient.dll"
 
 Describe "Get-AzureVMCheckpoint" {
-    $Boxstarter.SuppressLogging=$false
+    $Boxstarter.SuppressLogging=$true
     Mock Get-Blob
 
     Context "when not specifying a checkpoint and multiple VMs in cloud service" {

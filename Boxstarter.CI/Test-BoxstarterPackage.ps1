@@ -101,7 +101,12 @@ function Test-PackageVersionGreaterThanPublished ($package) {
         return $true 
     }
 
-    $pkgVersion=New-Object -TypeName Version -ArgumentList (Remove-PreRelease $package.Version)
+    try {
+        $pkgVersion=New-Object -TypeName Version -ArgumentList (Remove-PreRelease $package.Version)
+    }
+    catch [System.Management.Automation.MethodInvocationException] {
+        Write-Error "cannot parse version from $(Remove-PreRelease $package.Version)" -Category InvalidOperation
+    }
     $pubVersion=New-Object -TypeName Version -ArgumentList (Remove-PreRelease $package.PublishedVersion)
 
     if($pkgVersion -gt $pubVersion) {

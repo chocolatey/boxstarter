@@ -17,6 +17,7 @@ Describe "Test-BoxstarterPackage" {
     $pkgName1="package1"
     $pkgName2="package2"
     Mock Invoke-BoxstarterBuild
+    Mock Install-BoxstarterPackage
     [Uri]$feed="http://myfeed"
     Mock Get-BoxstarterPackages {
         New-Object PSObject -Property @{
@@ -30,6 +31,25 @@ Describe "Test-BoxstarterPackage" {
             Version = "2.0.0.0"
             PublishedVersion="2.0.0.0"
             Feed=$feed
+        }
+    }
+
+    Context "when testing a package with an invalid version" {
+        $global:Error.Clear()
+        Mock Get-BoxstarterPackages {
+            New-Object PSObject -Property @{
+                Id = "pkg"
+                Version = "2.0.0.0b"
+                PublishedVersion="2.0.0.0"
+                Feed=[Uri]$feed="http://myfeed"
+            }
+        }
+        Set-BoxstarterDeployOptions -DeploymentTargetUserName "user" -DeploymentTargetPassword "pass" -DeploymentTargetNames "target1"
+
+        Test-BoxstarterPackage 2>&1 | out-Null 
+
+        it "Will write InvalidOperation" {
+            $global:Error[0].CategoryInfo.Category | should be "InvalidOperation"
         }
     }
 
