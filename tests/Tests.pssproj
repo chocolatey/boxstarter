@@ -27,6 +27,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Azure\Get-AzureVMCheckpoint.tests.ps1" />
     <Content Include="Chocolatey\Enable-BoxstarterCredSSP.Tests.ps1" />
     <Content Include="CI\Get-BoxstarterDeployOptions.Tests.ps1" />
     <Content Include="CI\Get-BoxstarterPackages.tests.ps1" />

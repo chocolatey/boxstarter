@@ -47,16 +47,20 @@ Restore-AzureVMCheckpoint
     $options = New-Object Microsoft.WindowsAzure.StorageClient.BlobRequestOptions
     $options.BlobListingDetails = "Snapshots,Metadata"
     $options.UseFlatBlobListing = $true
-    $snapshots = $blob.Container.ListBlobs($options);
+    $snapshots = Query-BlobSnapshots $blob $options
 
     return $snapshots | ? { 
-        ($CheckpointName -eq $null -or $CheckpointName.Length -eq 0 -or $_.Metadata["name"] -eq $CheckpointName) -and $_.SnapshotTime -ne $null 
+        ($CheckpointName -eq $null -or $CheckpointName.Length -eq 0 -or $_.Metadata["name"] -eq $CheckpointName) -and $_.SnapshotTime -ne $null
     } | % { 
-        if($_.Metadata["name"].Length -gt (Get-CheckpointPrefix $VM).Length+1) {
+        if($_.Metadata["name"].ToLower().StartsWith((Get-CheckpointPrefix $VM).ToLower())) {
             New-Object PSObject -Prop @{
                 Name=$_.Metadata["name"].Substring((Get-CheckpointPrefix $VM).Length+1)
                 Snapshot=$_
             } 
         }
     }
+ }
+
+ function Query-BlobSnapshots($blob, $options) {
+    return $blob.Container.ListBlobs($options)
  }
