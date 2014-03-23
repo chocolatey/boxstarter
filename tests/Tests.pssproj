@@ -31,6 +31,7 @@
     <Content Include="CI\Get-BoxstarterDeployOptions.Tests.ps1" />
     <Content Include="CI\Get-BoxstarterPackages.tests.ps1" />
     <Content Include="CI\Publish-BoxstarterPackage.Tests.ps1" />
+    <Content Include="CI\Select-BoxstarterResultsToPublish.tests.ps1" />
     <Content Include="CI\Set-BoxstarterPackageNugetFeed.Tests.ps1" />
     <Content Include="CI\Test-BoxstarterPackage.Tests.ps1" />
     <Content Include="HyperV\Enable-BoxstarterVHD.Tests.ps1" />

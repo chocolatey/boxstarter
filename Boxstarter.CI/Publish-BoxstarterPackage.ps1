@@ -27,7 +27,7 @@ function Publish-BoxstarterPackage {
                 Write-BoxstarterMessage "Calling nuget: push $nupkg $(Get-BoxstarterFeedAPIKey $pkg.Feed) -Source $($pkg.Feed)/package -NonInteractive" -Verbose
                 $err += Invoke-NugetPush $pkg $nupkg 2>&1
                 try {
-                    $publishedVersion = Get-BoxstarterPackagePublishedVersion $nuspec.package.metadata.id $pkg.Feed -ErrorAction Stop
+                    $publishedVersion = Get-BoxstarterPackagePublishedVersion $pkg.id $pkg.Feed -ErrorAction Stop
                 }
                 catch{
                     $err += $_
