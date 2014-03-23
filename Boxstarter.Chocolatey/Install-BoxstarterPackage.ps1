@@ -117,7 +117,7 @@ state.
 
 If Boxstarter is not running in an elevated console, it will not attempt 
 to enable CredSSP locally if it is not already enabled. It will also not 
-try to enablr PowerShell remoting if not running as administrator.
+try to enable PowerShell remoting if not running as administrator.
 
 When using a Windows PowerShell session instead of ComputerName or 
 ConnectionURI, Boxstarter will use the authentication mechanism of the 
