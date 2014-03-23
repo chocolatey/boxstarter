@@ -1,4 +1,26 @@
 function Test-VMStarted {
+<#
+.SYNOPSIS
+Checks if an Azure VM is in a running state
+
+.DESCRIPTION
+If the VM is running, Test-VMStarted returns $true
+
+.PARAMETER CloudServiceName
+The name of the Azure Cloud Service associated with the VM.
+
+.PARAMETER VMName
+The name of the VM to enable.
+
+.EXAMPLE
+$isStarted = Test-VMStarted -ServiceName "mycloudService" -Name "MyVM"
+
+$isStarted will be $true if MyVM is running
+
+.LINK
+http://boxstarter.codeplex.com
+Enable-BoxstarterVM
+#>
     [CmdletBinding()]
     param(
         [parameter(Mandatory=$true, Position=0)]
