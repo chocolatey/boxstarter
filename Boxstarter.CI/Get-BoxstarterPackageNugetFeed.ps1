@@ -26,6 +26,7 @@ Retrieves the Nuget feed associated with MyPackageName
 .LINK
 http://boxstarter.codeplex.com
 Set-BoxstarterPackageNugetFeed
+Remove-BoxstarterPackageNugetFeed
 Set-BoxstarterDeployOptions
 Get-BoxstarterDeployOptions
 #>
