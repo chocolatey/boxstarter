@@ -336,6 +336,7 @@ about_boxstarter_chocolatey
             if($ConnectionURI){
                 $ConnectionUri | %{
                     $sessionArgs.ConnectionURI = $_
+                    Write-BoxstarterMessage "Installing $packageName on $($_.ToString())"
                     Install-BoxstarterPackageOnComputer $_.Host $sessionArgs $PackageName $DisableReboots $CredSSPStatus
                 }
             }
@@ -544,13 +545,16 @@ function Invoke-Locally {
 }
 
 function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
-    
     Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
     try { 
         $remotingTest = Invoke-Command @sessionArgs { Get-WmiObject Win32_ComputerSystem } -ErrorAction Stop
     }
     catch {
         Write-BoxstarterMessage $_.ToString() -Verbose
+        $sessionArgs.Keys | % {
+            Write-BoxstarterMessage "session arg key: $_ has value $($sessionArgs[$_])" -Verbose
+        }
+        Write-BoxstarterMessage "using credential username $($sessionArgs.Credential.UserName)" -Verbose
         $global:error.RemoveAt(0)
     }
     if($remotingTest -eq $null){
