@@ -36,9 +36,11 @@ Enable-BoxstarterVM
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
             }
             if($vm.InstanceStatus -eq "ReadyRole"){
+                Write-BoxStarterMessage "Testing service $CloudServiceName vm $_. VM is in ReadyRole." -verbose
                 return $true
             }
             else {
+                Write-BoxStarterMessage "Testing service $CloudServiceName vm $_. VM is not in ReadyRole. Role: $($vm.InstanceStatus)" -verbose
                 return $false
             }
         }
