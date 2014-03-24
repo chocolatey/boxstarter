@@ -10,7 +10,7 @@ function Get-BoxstarterPackagePublishedVersion {
             return $null
         }
         else {
-            $feedUrl="$feed/Packages/?`$filter=Id eq '$($nuspec.package.metadata.id)' and IsLatestVersion&`$select=Version"
+            $feedUrl="$feed/Packages/?`$filter=Id eq '$PackageId' and IsLatestVersion&`$select=Version"
             $publishedPkg=Invoke-RestMethod -Uri $feedUrl -ErrorAction Stop
             return $publishedPkg.Properties.Version
         }
