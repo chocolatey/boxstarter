@@ -12,6 +12,6 @@ function Set-BoxstarterFeedAPIKey {
         $keys = Import-CliXML $path
     }
 
-    $keys.$NugetFeed = $APIKey
+    $keys[$NugetFeed] = $APIKey
     $keys | Export-CliXML ($path)
 }
