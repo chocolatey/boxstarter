@@ -18,7 +18,9 @@ function Test-BoxstarterPackage {
         if($options.DeploymentVMProvider -eq "azure") {
             Write-BoxStarterMessage "Using Azure VMs. Checking to see if these are shutdown..." -verbose
             $options.DeploymentTargetNames | % {
-                $cloudVMStates.$_ = Test-VMStarted $options.DeploymentCloudServiceName $_
+                $thisState = Test-VMStarted $options.DeploymentCloudServiceName $_
+                Write-BoxStarterMessage "Is $_ on: $thisState" -verbose
+                $cloudVMStates.$_ = $thisState
             }
         }
     }
@@ -148,18 +150,29 @@ function Invoke-BuildAndTest($packageName, $options, $vmArgs, $IncludeOutput) {
         Invoke-BoxstarterBuild $packageName -Quiet
 
         $options.DeploymentTargetNames | % {
-            $global:Boxstarter.ProgressArgs=@{Id=$progressId;Activity="Testing $packageName";Status="on Machine: $_"}
+            $target=$_
+            $global:Boxstarter.ProgressArgs=@{Id=$progressId;Activity="Testing $packageName";Status="on Machine: $target"}
             $a=$global:Boxstarter.ProgressArgs
             Write-Progress @a
-            if($vmArgs) {
-                Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $_  @vmArgs -Verbose:$verbose
+            $boxstarterConn=$null
+            $result=$null
+            try {
+                if($vmArgs) {
+                    $vmArgs.Keys | % {
+                        Write-BoxstarterMessage "vm arg key: $_ has value $($vmArgs[$_])" -Verbose
+                    }
+                    Write-BoxstarterMessage "connecting to $target using credential username $($options.DeploymentTargetCredentials.UserName)" -Verbose
+                    $boxstarterConn = Enable-BoxstarterVM -Credential $options.DeploymentTargetCredentials -VMName $target  @vmArgs -Verbose:$verbose
+                }
+                else {
+                    $boxstarterConn = $target
+                }
+                $result = $boxstarterConn | Install-BoxstarterPackage -credential $options.DeploymentTargetCredentials -PackageName $packageName -Force -verbose:$verbose
             }
-            else {
-                $_
+            catch {
+                $result = $_
             }
-        } | 
-        Install-BoxstarterPackage -credential $options.DeploymentTargetCredentials -PackageName $packageName -Force -verbose:$verbose | % {
-            if(Test-InstallSuccess $_) {
+            if(Test-InstallSuccess $result) {
                 $status="PASSED"
             }
             else {
@@ -167,8 +180,8 @@ function Invoke-BuildAndTest($packageName, $options, $vmArgs, $IncludeOutput) {
             }
             new-Object PSObject -Property @{
                 Package=$packageName 
-                TestComputerName=$_.ComputerName
-                ResultDetails=$_
+                TestComputerName=$target
+                ResultDetails=$result
                 Status=$status
             }
         }
