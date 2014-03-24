@@ -119,78 +119,79 @@ Once that is done, please run Enable-BoxstarterVM again.
     }
 
     Process {
-        $VMName | % { 
-            Write-BoxstarterMessage "Locating Azure VM $_..."
-            $vm = Invoke-RetriableScript { Get-AzureVM -ServiceName $args[0] -Name $args[1] } $CloudServiceName $_
-            if($vm -eq $null){
-                throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
-            }
-
-            if($subscription.CurrentStorageAccountName -eq $null) {
-                Write-BoxstarterMessage "Getting OS Disk" -Verbose
-                $disk=Invoke-RetriableScript { Get-AzureOSDisk -VM $args[0] } $vm
-                $endpoint="http://$($disk.MediaLink.Host)/"
-                Write-BoxstarterMessage "Getting Azure Storage Account" -Verbose
-                $storageAccount=Invoke-RetriableScript { Get-AzureStorageAccount } | ? { $_.Endpoints -contains $endpoint }
-                Set-AzureSubscription -SubscriptionName $subscription.SubscriptionName -CurrentStorageAccountName $storageAccount.Label
-            }
-
-            if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
-                $snapshot = Get-AzureVMCheckpoint -VM $vm -CheckpointName $CheckpointName
-                if($snapshot -ne $null) {
-                    Restore-AzureVMCheckpoint -VM $vm -CheckpointName $CheckpointName
-                    $restored=$true
+        try {
+            $VMName | % { 
+                Write-BoxstarterMessage "Locating Azure VM $_..."
+                $vm = Invoke-RetriableScript { Get-AzureVM -ServiceName $args[0] -Name $args[1] } $CloudServiceName $_
+                if($vm -eq $null){
+                    throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"
                 }
-            }
 
-            if($vm.InstanceStatus -ne "ReadyRole"){
-                Write-BoxstarterMessage "Starting Azure VM $_..."
-                Invoke-RetriableScript { Start-AzureVM -Name $args[0] -ServiceName $args[1] } $_ $CloudServiceName | Out-Null
-                Wait-ReadyState -VMName $_
-            }
+                if($subscription.CurrentStorageAccountName -eq $null) {
+                    Write-BoxstarterMessage "Getting OS Disk" -Verbose
+                    $disk=Invoke-RetriableScript { Get-AzureOSDisk -VM $args[0] } $vm
+                    $endpoint="http://$($disk.MediaLink.Host)/"
+                    Write-BoxstarterMessage "Getting Azure Storage Account" -Verbose
+                    $storageAccount=Invoke-RetriableScript { Get-AzureStorageAccount } | ? { $_.Endpoints -contains $endpoint }
+                    Set-AzureSubscription -SubscriptionName $subscription.SubscriptionName -CurrentStorageAccountName $storageAccount.Label
+                }
 
-            if(!(Test-Admin)) {
-                $PSSessionOption = New-PSSessionOption -SkipCACheck -SkipCNCheck
-            }
-            else {
-                Install-WinRMCert $vm | Out-Null
-            }
+                if($CheckpointName -ne $null -and $CheckpointName.Length -gt 0){
+                    $snapshot = Get-AzureVMCheckpoint -VM $vm -CheckpointName $CheckpointName
+                    if($snapshot -ne $null) {
+                        Restore-AzureVMCheckpoint -VM $vm -CheckpointName $CheckpointName
+                        $restored=$true
+                    }
+                }
 
-            Write-BoxstarterMessage "Getting connection URI" -Verbose
-            $uri = Invoke-RetriableScript { Get-AzureWinRMUri -serviceName $args[0] -Name $args[1] } $CloudServiceName $_
-            if($uri -eq $null) {
-                throw New-Object -TypeName InvalidOperationException -ArgumentList "WinRM Endpoint is not configured on VM. Use Add-AzureEndpoint to add PowerShell remoting endpoint and use Enable-PSRemoting -Force on the VM to enable PowerShell remoting."
-            }
-            Write-BoxstarterMessage "URI: $uri" -Verbose
-            $ComputerName=$uri.Host
-            Enable-BoxstarterClientRemoting $ComputerName | out-Null
-            Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
-            try {
-                Invoke-Command $uri { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction Stop | Out-Null
-            }
-            catch {
-                Write-BoxstarterMessage "Failed to establish a remote connection with $uri. Use Enable-PSRemoting -Force on the VM to enable PowerShell remoting. Install will continue since this may be a transcient error. The error encountered was $($_.ToString())" -Verbose
-            }
+                if($vm.InstanceStatus -ne "ReadyRole"){
+                    Write-BoxstarterMessage "Starting Azure VM $_..."
+                    Invoke-RetriableScript { Start-AzureVM -Name $args[0] -ServiceName $args[1] } $_ $CloudServiceName | Out-Null
+                    Wait-ReadyState -ServiceName $CloudServiceName  -VMName $_
+                }
+
+                if(!(Test-Admin)) {
+                    $PSSessionOption = New-PSSessionOption -SkipCACheck -SkipCNCheck
+                }
+                else {
+                    Install-WinRMCert $vm | Out-Null
+                }
+
+                Write-BoxstarterMessage "Getting connection URI" -Verbose
+                $uri = Invoke-RetriableScript { Get-AzureWinRMUri -serviceName $args[0] -Name $args[1] } $CloudServiceName $_
+                if($uri -eq $null) {
+                    throw New-Object -TypeName InvalidOperationException -ArgumentList "WinRM Endpoint is not configured on VM. Use Add-AzureEndpoint to add PowerShell remoting endpoint and use Enable-PSRemoting -Force on the VM to enable PowerShell remoting."
+                }
+                Write-BoxstarterMessage "URI: $uri" -Verbose
+                $ComputerName=$uri.Host
+                Enable-BoxstarterClientRemoting $ComputerName | out-Null
+                Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
+                try {
+                    Invoke-RetriableScript { Invoke-Command $args[0] { Get-WmiObject Win32_ComputerSystem } -Credential $args[1] -ErrorAction Stop | Out-Null } $uri $Credential 
+                }
+                catch {
+                    Write-BoxstarterMessage "Failed to establish a remote connection with $uri. Use Enable-PSRemoting -Force on the VM to enable PowerShell remoting. Install will continue since this may be a transcient error. The error encountered was $($_.ToString())" -Verbose
+                }
         
-            if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
-                Write-BoxstarterMessage "Creating Checkpoint $CheckpointName for service $CloudServiceName VM $_ at $CheckpointFile"
-                Set-AzureVMCheckpoint -VM $vm -CheckpointName $CheckpointName | Out-Null
+                if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
+                    Write-BoxstarterMessage "Creating Checkpoint $CheckpointName for service $CloudServiceName VM $_ at $CheckpointFile"
+                    Set-AzureVMCheckpoint -VM $vm -CheckpointName $CheckpointName | Out-Null
+                }
+
+                $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $uri,$Credential,$PSSessionOption
+                return $res
             }
-
-            $res=new-Object -TypeName BoxstarterConnectionConfig -ArgumentList $uri,$Credential,$PSSessionOption
-            return $res
         }
-    }
-
-    End {
-        $global:VerbosePreference=$CurrentVerbosity
+        finally {
+            $global:VerbosePreference=$CurrentVerbosity
+        }
     }
 }
 
-function Wait-ReadyState($vmName) {
+function Wait-ReadyState($ServiceName, $vmName) {
     do {
         Start-Sleep -milliseconds 100
         Write-BoxstarterMessage "Checking VM for ReadyRole status...Hey VM!, are you ready to roll?..." -Verbose
     } 
-    until (( Invoke-RetriableScript { (Get-AzureVM -Name $args[0]).Status } $vmName ) -eq "ReadyRole")
+    until (( Invoke-RetriableScript { (Get-AzureVM -ServiceName $args[0] -Name $args[1]).InstanceStatus } $ServiceName $vmName ) -eq "ReadyRole")
 }
