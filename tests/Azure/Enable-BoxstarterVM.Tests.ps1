@@ -29,6 +29,7 @@ Describe "Enable-BoxstarterVM.Azure" {
     Mock Set-AzureVMCheckpoint
     Mock Restore-AzureVMCheckpoint
     Mock get-AzureSubscription { return @{CurrentStorageAccountName="sa"} }
+    Mock Invoke-RetriableScript -ParameterFilter {$RetryScript -ne $null -and $RetryScript.ToString() -like "*Get-WMIObject*"}
     Mock Set-AzureSubscription
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
@@ -46,8 +47,7 @@ Describe "Enable-BoxstarterVM.Azure" {
 
     Context "When VM is not running"{
         $vm.InstanceStatus="Stopped"
-        Mock Get-AzureVM { return $vm } -parameterFilter { $ServiceName.Length -gt 0 }
-        Mock Get-AzureVM { return @{Status="ReadyRole"} } -parameterFilter { $ServiceName.Length -eq 0 }
+        Mock Wait-ReadyState
         Mock Start-AzureVM -verifiable
 
         Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -ErrorAction SilentlyContinue | Out-Null

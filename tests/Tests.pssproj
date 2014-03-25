@@ -39,11 +39,13 @@
     <Content Include="HyperV\Enable-BoxstarterVM.Tests.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Azure\" />
     <Folder Include="Chocolatey\" />
     <Folder Include="HyperV\" />
     <Folder Include="CI\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Azure\Enable-BoxstarterVM.Tests.ps1" />
     <Compile Include="Chocolatey\Chocolatey.tests.ps1" />
     <Compile Include="Chocolatey\Enable-BoxstarterClientRemoting.Tests.ps1" />
     <Compile Include="Chocolatey\Get-BoxstarterConfig.tests.ps1" />

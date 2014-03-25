@@ -25,7 +25,7 @@ Describe "Publish-BoxstarterPackage" {
         Mock Get-BoxstarterPackages {
             New-Object PSObject -Property @{
                 Id = $pkgName
-                Version = "2.0.0.0"
+                Version = "3.0.0.0"
                 PublishedVersion=$publishedVersion
                 Feed=$feed
             }
@@ -109,12 +109,12 @@ Describe "Publish-BoxstarterPackage" {
         $global:Error.Clear()
         $pkgName="package1"
         [Uri]$feed="http://myfeed"
+        $key=
         Set-BoxstarterFeedAPIKey $feed ([guid]::NewGuid())
         Mock Get-BoxstarterPackages {
             New-Object PSObject -Property @{
                 Id = $pkgName
-                Version = "2.0.0.0"
-                PublishedVersion="2.0.0.0"
+                Version = "3.0.0.0"
                 Feed=$feed
             }
         }
