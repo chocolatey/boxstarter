@@ -1,4 +1,41 @@
 function Select-BoxstarterResultsToPublish {
+<#
+.SYNOPSIS
+Returns succesful Boxstarter packages from provided test results 
+eligible to be published to a nuget feed.
+
+.DESCRIPTION
+Test-BoxstarterPackages will return a set of test results given an 
+array of ackages or an entire repo. Select-BoxstarterResultsToPublish
+can consume these results and return the package IDs of the packages who 
+had all test machines pass the package install. One could then have
+Publish-BoxstarterPackage consume this output and publish those packages 
+to their respectful feeds.
+
+.PARAMETER Results
+An array of PSObjects returned from Test-BostarterPackages. These 
+objects contain metadata about a ackages' test run on a single test 
+machine. The data will report if the tes tcompleted and if there were 
+any exceptions.
+
+.EXAMPLE
+Test-BoxstarterPackages | Select-BoxstarterResultsToPublish | Publish-BoxstarterPackage
+
+This will test all packages in the Boxstarter local repo that have a 
+repository version greater than its published version. The results of
+the tests will be passed to Select-BoxstarterResultsToPublish to 
+choose the packages which passed on all test machines. 
+Set-BoxstarterDeployOptions can be used to desigbate the achines to 
+be used for testing. The succesfl packages are then piped to 
+Publish-BoxstarterPackage which publishes the packages to their 
+associated nuget feed.
+
+.LINK
+http://boxstarter.codeplex.com
+Test-BoxstarterPackage
+Publish-BoxstarterPackage
+Set-BoxstarterDeployOptions
+#>
     [CmdletBinding()]
     param(
         [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True)]
