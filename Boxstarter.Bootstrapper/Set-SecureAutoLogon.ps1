@@ -286,7 +286,7 @@ process {
         The number of logons that auto logon will be enabled.
         
     .PARAMETER  RemoveLegalPrompt
-        Removes the system banner to ensure interventionless logon.
+        Removes the system banner to ensure intervention-less logon.
         
     .PARAMETER  BackupFile
         If specified the existing settings such as the system banner text will be backed up to the specified file.

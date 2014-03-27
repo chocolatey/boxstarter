@@ -1,7 +1,7 @@
 function Set-BoxStarterConfig {
 <#
 .SYNOPSIS
-Sets persistable Boxstarter configuration settings.
+Sets persist-able Boxstarter configuration settings.
 
 .DESCRIPTION
 Boxstarter stores configuration data in an xml file in the Boxstarter base

@@ -96,7 +96,7 @@ Intercepts Chocolatey call to check for reboots
     $PSBoundParameters.Remove("RebootCodes") | Out-Null
     $packageNames=-split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
-    #backcompat for Chocolatey versions prior to 0.9.8.21
+    #backwards compatibility for Chocolatey versions prior to 0.9.8.21
     if(!$packageNames){$packageNames=$packageName}
     
     foreach($packageName in $packageNames){
@@ -156,7 +156,7 @@ Intercepts Chocolatey call to check for reboots
             if ($ex -ne $null -and ($ex -match "code was '(-?\d+)'")) {
                 $errorCode=$matches[1]
                 if($RebootCodes -contains $errorCode) {
-                    Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code"
+                    Write-BoxstarterMessage "Chocolatey Install returned a reboot-able exit code"
                     Remove-ChocolateyPackageInProgress $packageName
                     Invoke-Reboot
                 }
@@ -222,7 +222,7 @@ function Intercept-Chocolatey {
 function Add-DefaultRebootCodes($codes) {
     if($codes -eq $null){$codes=@()}
     $codes += 3010 #common MSI reboot needed code
-    $codes += -2067919934 #returned by sql server when it needs a reboot
+    $codes += -2067919934 #returned by SQL Server when it needs a reboot
     return $codes
 }
 

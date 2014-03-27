@@ -170,7 +170,7 @@ Once that is done, please run Enable-BoxstarterVM again.
                     Invoke-RetriableScript { Invoke-Command $args[0] { Get-WmiObject Win32_ComputerSystem } -Credential $args[1] -ErrorAction Stop | Out-Null } $uri $Credential 
                 }
                 catch {
-                    Write-BoxstarterMessage "Failed to establish a remote connection with $uri. Use Enable-PSRemoting -Force on the VM to enable PowerShell remoting. Install will continue since this may be a transcient error. The error encountered was $($_.ToString())" -Verbose
+                    Write-BoxstarterMessage "Failed to establish a remote connection with $uri. Use Enable-PSRemoting -Force on the VM to enable PowerShell remoting. Install will continue since this may be a transient error. The error encountered was $($_.ToString())" -Verbose
                 }
         
                 if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {

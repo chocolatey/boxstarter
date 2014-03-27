@@ -32,7 +32,7 @@ This essentially wraps Chocolatey Install and provides these additional features
  - The Chocolatey feed
  - The Boxstarter feed on MyGet
 
-.Parameter Localrepo
+.Parameter LocalRepo
 This is the path to the local boxstarter repository where boxstarter 
 should look for .nupkg files to install. By default this is located 
 in the BuildPackages directory just under the root Boxstarter 
@@ -42,7 +42,7 @@ directory but can be changed with Set-BoxstarterConfig.
 If set, reboots are suppressed.
 
 .PARAMETER Password
-User's password as a Secure string to be used for reboot autologons.
+User's password as a Secure string to be used for reboot autologon's.
 This will suppress the password prompt at the beginning of the 
 Boxstarter installer.
 
@@ -96,16 +96,16 @@ specified share.
 .EXAMPLE
 Invoke-ChocolateyBoxstarter win8Install -LocalRepo \\server\share\boxstarter
 
-This installs the Win8Install .nupkg and specifies that it is ok to 
+This installs the Win8Install .nupkg and specifies that it is OK to 
 reboot the machine if a pending reboot is needed. Boxstarter will look 
 for the Win8Install .nupkg file in the \\serer\share\boxstarter 
 directory.
 
 .EXAMPLE
-Invoke-ChocolateyBoxstarter example -Password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+Invoke-ChocolateyBoxstarter example -Password (ConvertTo-SecureString "mypassword" -AsPlainText -Force)
 
 This installs the example package and uses "mypassword" for any reboot 
-autologins. The user is now not prompted for a password.
+autologon's. The user is now not prompted for a password.
 
 .LINK
 http://boxstarter.codeplex.com
@@ -140,7 +140,7 @@ Set-BoxstarterConfig
             if($DisableReboots){$scriptArgs.DisableReboots = $DisableReboots}
             $script=@"
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
-Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage '$($bootstrapPackage -join ''',''')'"}) $(if($LocalRepo){"-Localrepo $localRepo"})  $(if($DisableReboots){"-DisableReboots"})
+Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage '$($bootstrapPackage -join ''',''')'"}) $(if($LocalRepo){"-LocalRepo $localRepo"})  $(if($DisableReboots){"-DisableReboots"})
 "@
             return Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password -KeepWindowOpen:$KeepWindowOpen -NoPassword:$NoPassword
         }

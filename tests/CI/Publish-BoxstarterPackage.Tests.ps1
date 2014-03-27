@@ -133,7 +133,7 @@ Describe "Publish-BoxstarterPackage" {
         }
     }
 
-    Context "When rest call for pblished version throws an error" {
+    Context "When rest call for published version throws an error" {
         $global:Error.Clear()
         $pkgName="package1"
         [Uri]$feed="http://myfeed"

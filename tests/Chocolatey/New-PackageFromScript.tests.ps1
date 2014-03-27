@@ -33,7 +33,7 @@ Describe "New-PackageFromScript" {
         }
     }
 
-    Context "When Building a script from a url" {
+    Context "When Building a script from a URL" {
         . "$env:ChocolateyInstall\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
         Mock Get-WebFile {return "return"}
 

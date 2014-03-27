@@ -2,7 +2,7 @@ function Invoke-Reboot {
 <#
 .SYNOPSIS
 Reboots the local machine ensuring Boxstarter restarts 
-automatically after reboot and sets up autologin if it a 
+automatically after reboot and sets up autologon if it a 
 password was provided.
 
 .DESCRIPTION
@@ -17,7 +17,7 @@ the package might fail.
 .NOTES
 One can use the $Boxstarter variable's RebootOk to enable/disable
 reboots. If this is set to $False (the default) then Invoke-Reboot
-will not do anything. If Boxstarter was invoked with the -Rebootok
+will not do anything. If Boxstarter was invoked with the -RebootOk
 parameter $Boxstarter.RebootOk is set to True.
 
 .LINK

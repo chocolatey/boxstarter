@@ -133,7 +133,7 @@ Describe "New-BoxstarterPackage" {
         try {New-BoxstarterPackage $packageName $Description} catch { $ex=$_ }
 
         It "Will throw Repo dir exists" {
-            $ex | Should match "A local Repo already exists*"
+            $ex | Should match "A LocalRepo already exists*"
         }
     }    
 

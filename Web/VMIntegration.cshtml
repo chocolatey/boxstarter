@@ -12,7 +12,7 @@
 <ul>
     <li>PowerShell Version 3 Hyper-V Hosts and above. This is automatically installed on Windows 8, 8.1 and Server 2012 and 2012 R2. Windows Server 2008 R2 can be upgraded to Version 3 (or 4) by installing version 3 or 4 of the <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34595">Windows Management Framework</a>.</li>
     <li>Microsoft's Hyper-V virtualization technology comes with Windows Server and also the Windows client operating systems 8 and 8.1 professional and enterprise. It cannot be installed on Home editions of Windows 8 or on any version of Windows 7.</li>
-    <li>If Boxstarter determines that configuration is necessary for PowerShell Remoting, the VHD file of the VM must be accessible and writeable to the user issuing the <code>Enable-BoxstarterVM</code> command.</li>
+    <li>If Boxstarter determines that configuration is necessary for PowerShell Remoting, the VHD file of the VM must be accessible and writable to the user issuing the <code>Enable-BoxstarterVM</code> command.</li>
     <li>Boxstarter's Hyper-V commands must be run on the Hyper-V host machine.</li>
     <li>Hyper-V Guests are subject to the same limitations as any other Boxstarter installation environment: PowerShell v2, .net 4, and OS's Windows 7/Server 2008 R2 and higher.</li>
 </ul>
@@ -124,7 +124,7 @@ Enable-BoxstarterVM -Provider azure -CloudServiceName MyService `
     Install-BoxstarterPackage -PackageName myPackage
 </pre>
 <p>This resets the VM to its BareOS state before Installing the myPackage package.</p>
-<p>Boxstarter leverages Azure Blob snapshots to support this checkpointing functionality. Note that the checkpoints are not visible in the Azure portal. However, if you would like to manage these checkpoints, Boxstarter exposes the following commands:</p>
+<p>Boxstarter leverages Azure Blob snapshots to support this check-pointing functionality. Note that the checkpoints are not visible in the Azure portal. However, if you would like to manage these checkpoints, Boxstarter exposes the following commands:</p>
 <ul>
     <li>Get-AzureVMCheckpoint</li>
     <li>Set-AzureVMCheckpoint</li>
@@ -145,7 +145,7 @@ Get-AzureVMCheckpoint -VM $vm
 </pre>
 
 <h2>Working with other virtualization technologies</h2>
-<p>Boxstarter will very soon provide support for AWS VMs. However, Boxstarter can work with any VM provider using <cose>Install-BoxstarterPackage</cose> as long as the VM has PowerShell remoting enabled and the VM's DNS name is accessible on the network. For "On Premise" VM providers, if they support the VHD file format, you can use the <code>Enable-BoxstarterVHD</code> command to enable WMI, LocalAccountTokenFilterPolicy and retrieve the computer name of the VM running the VHD. The VHD must be accessible and writeable to the user issuing the command and it must contain the system volume (the drive with the Windows folder) of the VM.</p>
+<p>Boxstarter will very soon provide support for AWS VMs. However, Boxstarter can work with any VM provider using <cose>Install-BoxstarterPackage</cose> as long as the VM has PowerShell remoting enabled and the VM's DNS name is accessible on the network. For "On Premise" VM providers, if they support the VHD file format, you can use the <code>Enable-BoxstarterVHD</code> command to enable WMI, LocalAccountTokenFilterPolicy and retrieve the computer name of the VM running the VHD. The VHD must be accessible and writable to the user issuing the command and it must contain the system volume (the drive with the Windows folder) of the VM.</p>
 <pre>
 Enable-BoxstarterVHD -VHDPath "C:\Virtual hard disks\win81diff_F2AE6535-2532-455F-8E5A-0211595221F8.avhdx"
 </pre>

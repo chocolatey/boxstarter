@@ -2,7 +2,7 @@ function Invoke-RetriableScript{
 <#
 .SYNOPSIS
 Retries a script 5 times or until it completes without terminating errors. 
-All Unnamed args will be passed as arguments to the script
+All Unnamed arguments will be passed as arguments to the script
 #>
     param([ScriptBlock]$RetryScript)
     $currentErrorAction=$ErrorActionPreference

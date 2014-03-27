@@ -20,7 +20,7 @@ if(![string]::IsNullOrEmpty($FeedAPIKey)) {
 Set-BoxstarterAzureOptions $AzureSubscriptionName $AzureSubscriptionId $AzureSubscriptionCertificate
 
 Publish-BoxstarterPassedTestResults
-#We want to exit with an unsuccesful exit code if any tests fail or not tests are run at all
+#We want to exit with an unsuccessful exit code if any tests fail or not tests are run at all
 $failedTests=0
 $testedPackage = @()
 Test-BoxstarterPackage -IncludeOutput | % {
