@@ -1,11 +1,11 @@
-function Get-BoxstarterPackages {
+function Get-BoxstarterPackage {
 <#
 .SYNOPSIS
 Retrieves metadata for all packages in the Local Boxstarter repository 
 or an individual package.
 
 .DESCRIPTION
-Get-BoxstarterPackages retrieves information about either a single package 
+Get-BoxstarterPackage retrieves information about either a single package 
 or all packages in the Local Boxstarter repository if no PackageName 
 parameter is provided. This information includes package ID, version, the 
 latest version published to the packages Nuget feed and the feed URI.
@@ -16,12 +16,12 @@ retrieve metadata. If this parameter is not provided then information for
 all packages is provided.
 
 .Example
-Get-BoxstarterPackages MyPackageName
+Get-BoxstarterPackage MyPackageName
 
 Retrieves package metadata for MyPackageName
 
 .Example
-Get-BoxstarterPackages
+Get-BoxstarterPackage
 
 Retrieves package metadata for all packages in the Boxstarter Local repository
 
