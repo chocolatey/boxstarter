@@ -1,13 +1,85 @@
 function Set-BoxstarterDeployOptions {
+<#
+.SYNOPSIS
+Configures settings related to boxstarter package deployment to test 
+machines and Nuget packages.
+
+.DESCRIPTION
+Boxstarter tests Chocolatey packages by deploying and installing the 
+package to a remote machine. The deployment options include settings 
+that control what computers to use to test the packages, the credentials 
+to use, VM checkpoints to snap as well as nuget feed and API key for 
+publishing succesful packages. To read the curent settings for these 
+options, use Get-BoxstarterDeploymentOptions.
+
+.PARAMETER DeploymentTargetCredentials
+The credentials to use for deploying packages to the Deployment Targets
+
+.PARAMETER DeploymentTargetNames
+Names of test targets where packages will be tested. These can be either 
+computer names or VM names if using one of the VM providers.
+
+.PARAMETER DeploymentVMProvider
+The name of the VM provider if the deployment targts are managed using 
+one of the Boxstarter VM Providers: HyperV or Azure.
+
+.PARAMETER DeploymentCloudServiceName
+If using the Azure VM Provider, this is the cloud service that hosts the VM.
+
+.PARAMETER RestoreCheckpoint
+If using one of the VM Provider, this specifies a checkpoint name from which 
+point the package install should begin. If the checkpoint does not exist, 
+it will be saved just before the install.
+
+.PARAMETER DeploymentTargetPassword
+Password to use when authenticating remote sessions on the deployment targets
+
+.PARAMETER DeploymentTargetUserName
+UserName to use when authenticating remote sessions on the deployment targets
+
+.PARAMETER DefaultNugetFeed
+If an individual package has not been assigned to a specific Nugetr feed, 
+Boxstarter will fall back to this feed unless the package was explicitly 
+set to $null.
+
+.PARAMETER DefaultFeedAPIKey
+The API key to use when when publishing a package to the default feed.
+
+.NOTES
+Set-BoxstarterDeployOptions can set one or all possible settings
+
+.EXAMPLE
+$cred=Get-Credential Admin
+Set-BoxstarterDeployOptions -DeploymentTargetCredentials $cred `
+  -DeploymentTargetNames "testVM1","testVM2" `
+  -DeploymentVMProvider Azure -DeploymentCloudServiceName ServiceName `
+  -RestoreCheckpoint clean `
+  -DefaultNugetFeed https://www.myget.org/F/mywackyfeed/api/v2 `
+  -DefaultFeedAPIKey 5cbc38d9-1a94-430d-8361-685a9080a6b8
+
+This configures package deployments for Azure VMs testVM1 and testVM2 
+hosted in the ServiceName service using the Admin credential. Prior to 
+testing a package install, the VM will be restored to the clean 
+checkpoint. If packages are published and are not associated with a
+Nuget feed, they will publish to the mywackyfeed on muget.org using API 
+Key 5cbc38d9-1a94-430d-8361-685a9080a6b8
+
+.LINK
+http://boxstarter.codeplex.com
+Get-BoxstarterDeployOptions 
+#>
     [CmdletBinding()]
     param(
+        [Parameter(ParameterSetName="Credential")]
         [Management.Automation.PsCredential]$DeploymentTargetCredentials,
+        [Parameter(ParameterSetName="UserPass")]
+        [string]$DeploymentTargetPassword,
+        [Parameter(ParameterSetName="UserPass")]
+        [string]$DeploymentTargetUserName,
         [string[]]$DeploymentTargetNames,
         [string]$DeploymentVMProvider,
         [string]$DeploymentCloudServiceName,
         [string]$RestoreCheckpoint,
-        [string]$DeploymentTargetPassword,
-        [string]$DeploymentTargetUserName,
         [Uri]$DefaultNugetFeed,
         [GUID]$DefaultFeedAPIKey
     )
