@@ -10,7 +10,7 @@ Resolve-Path $here\..\..\Boxstarter.CI\*.ps1 |
     ? { $_.Path -like "*-*" } | 
     % { . $_.ProviderPath }
 
-Describe "Get-BoxstarterPackages" {
+Describe "Get-BoxstarterPackage" {
     $Boxstarter.LocalRepo=(Get-PSDrive TestDrive).Root
     $Boxstarter.SuppressLogging=$true
 
@@ -19,7 +19,7 @@ Describe "Get-BoxstarterPackages" {
         New-BoxstarterPackage -name package2
         Mock Invoke-RestMethod
 
-        $result = Get-BoxstarterPackages
+        $result = Get-BoxstarterPackage
 
         it "should return the correct number of packages" {
             $result.Count | should be 2
@@ -52,7 +52,7 @@ Describe "Get-BoxstarterPackages" {
             }
         } -parameterFilter {$Uri -like "*package2*"}
 
-        $result = Get-BoxstarterPackages
+        $result = Get-BoxstarterPackage
 
         it "should return the correct version for package1" {
             $result[0].PublishedVersion | should be "5.5.5"
@@ -67,7 +67,7 @@ Describe "Get-BoxstarterPackages" {
         Set-BoxstarterPackageNugetFeed -PackageName package1 -NugetFeed $null
         Mock Invoke-RestMethod
 
-        $result = Get-BoxstarterPackages
+        $result = Get-BoxstarterPackage
 
         it "should not check the published feed" {
             Assert-MockCalled Invoke-RestMethod  -times 0
@@ -83,7 +83,7 @@ Describe "Get-BoxstarterPackages" {
         New-BoxstarterPackage -name package3
         Mock Invoke-RestMethod
 
-        $result = Get-BoxstarterPackages -PackageName "package1","package3"
+        $result = Get-BoxstarterPackage -PackageName "package1","package3"
 
         it "should return the correct number of packages" {
             $result.Count | should be 2
@@ -104,7 +104,7 @@ Describe "Get-BoxstarterPackages" {
         New-BoxstarterPackage -name package3
         Mock Invoke-RestMethod
 
-        $result = Get-BoxstarterPackages -PackageName "package2"
+        $result = Get-BoxstarterPackage -PackageName "package2"
 
         it "should return the correct number of packages" {
             $result.Count | should be $null

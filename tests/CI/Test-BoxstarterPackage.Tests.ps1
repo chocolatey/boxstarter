@@ -19,7 +19,7 @@ Describe "Test-BoxstarterPackage" {
     Mock Invoke-BoxstarterBuild
     Mock Install-BoxstarterPackage
     [Uri]$feed="http://myfeed"
-    Mock Get-BoxstarterPackages {
+    Mock Get-BoxstarterPackage {
         New-Object PSObject -Property @{
             Id = $pkgName1
             Version = "2.0.0.0"
@@ -36,7 +36,7 @@ Describe "Test-BoxstarterPackage" {
 
     Context "when testing a package with an invalid version" {
         $global:Error.Clear()
-        Mock Get-BoxstarterPackages {
+        Mock Get-BoxstarterPackage {
             New-Object PSObject -Property @{
                 Id = "pkg"
                 Version = "2.0.0.0b"
@@ -121,7 +121,7 @@ Describe "Test-BoxstarterPackage" {
         it "should return 2 results" {
             $results.Count | should be 2
         }
-        it "Will return the names of both packages in the order retuned from Get-BoxstarterPackages" {
+        it "Will return the names of both packages in the order retuned from Get-BoxstarterPackage" {
             $results[0].Package | should be $pkgName1
             $results[1].Package | should be $pkgName2
         }
