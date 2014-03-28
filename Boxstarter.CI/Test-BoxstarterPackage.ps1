@@ -1,8 +1,7 @@
 function Test-BoxstarterPackage {
     [CmdletBinding()]
     param(
-        [string[]]$PackageName,
-        [switch]$IncludeOutput
+        [string[]]$PackageName
     )
     $options = Get-BoxstarterDeployOptions
     if(!$options.DeploymentTargetCredentials){
@@ -41,11 +40,11 @@ function Test-BoxstarterPackage {
             $global:VerbosePreference="Continue"
         }
 
-        Get-BoxstarterPackages -PackageName $PackageName | % {
+        Get-BoxstarterPackage -PackageName $PackageName | % {
             $Host.UI.RawUI.ForegroundColor = $currentColor
             $pkg = $_
             if($PackageName -or (Test-PackageVersionGreaterThanPublished $pkg)) {
-                Invoke-BuildAndTest $pkg.Id $options $vmArgs $IncludeOutput | % {
+                Invoke-BuildAndTest $pkg.Id $options $vmArgs | % {
                     if($_.Status -eq "PASSED") {
                         $summary.Passed++
                         $Host.UI.RawUI.ForegroundColor = "Green"
@@ -131,7 +130,7 @@ function Remove-PreRelease ([string]$versionString) {
     }
 }
 
-function Invoke-BuildAndTest($packageName, $options, $vmArgs, $IncludeOutput) {
+function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
     $origLogSetting=$Boxstarter.SuppressLogging
     if($global:VerbosePreference -eq "Continue") {
         Write-BoxstarterMessage "Verbosity is on" -verbose
@@ -141,7 +140,7 @@ function Invoke-BuildAndTest($packageName, $options, $vmArgs, $IncludeOutput) {
         Write-BoxstarterMessage "Verbosity is off" -verbose
         $verbose = $false 
     }
-    if(!$IncludeOutput -and !$verbose){ 
+    if(!$verbose){ 
         $Boxstarter.SuppressLogging=$true 
     }
     $progressId=5000 #must be a unique int. This is likely not to conflict with anyone else

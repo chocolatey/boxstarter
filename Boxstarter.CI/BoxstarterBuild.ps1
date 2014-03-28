@@ -23,7 +23,7 @@ Publish-BoxstarterPassedTestResults
 #We want to exit with an unsuccesful exit code if any tests fail or not tests are run at all
 $failedTests=0
 $testedPackage = @()
-Test-BoxstarterPackage -IncludeOutput | % {
+Test-BoxstarterPackage -Verbose | % {
     if($_.Package){
         $testedPackage += $_
         if($_.Status -eq "failed"){
