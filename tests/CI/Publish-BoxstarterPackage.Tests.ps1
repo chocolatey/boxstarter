@@ -22,7 +22,7 @@ Describe "Publish-BoxstarterPackage" {
         [Uri]$feed="http://myfeed"
         Set-BoxstarterFeedAPIKey $feed ([guid]::NewGuid())
         $publishedVersion=3.0.0.0
-        Mock Get-BoxstarterPackages {
+        Mock Get-BoxstarterPackage {
             New-Object PSObject -Property @{
                 Id = $pkgName
                 Version = "3.0.0.0"
@@ -64,7 +64,7 @@ Describe "Publish-BoxstarterPackage" {
     Context "When package has no feed" {
         $global:Error.Clear()
         $pkgName="package1"
-        Mock Get-BoxstarterPackages {
+        Mock Get-BoxstarterPackage {
             New-Object PSObject -Property @{
                 Id = $pkgName
                 Version = "2.0.0.0"
@@ -86,7 +86,7 @@ Describe "Publish-BoxstarterPackage" {
         $pkgName="package1"
         [Uri]$feed="http://myfeed"
         $publishedVersion=3.0.0.0
-        Mock Get-BoxstarterPackages {
+        Mock Get-BoxstarterPackage {
             New-Object PSObject -Property @{
                 Id = $pkgName
                 Version = "2.0.0.0"
@@ -111,7 +111,7 @@ Describe "Publish-BoxstarterPackage" {
         [Uri]$feed="http://myfeed"
         $key=
         Set-BoxstarterFeedAPIKey $feed ([guid]::NewGuid())
-        Mock Get-BoxstarterPackages {
+        Mock Get-BoxstarterPackage {
             New-Object PSObject -Property @{
                 Id = $pkgName
                 Version = "3.0.0.0"
@@ -139,7 +139,7 @@ Describe "Publish-BoxstarterPackage" {
         [Uri]$feed="http://myfeed"
         Set-BoxstarterFeedAPIKey $feed ([guid]::NewGuid())
         $publishedVersion=3.0.0.0
-        Mock Get-BoxstarterPackages {
+        Mock Get-BoxstarterPackage {
             New-Object PSObject -Property @{
                 Id = $pkgName
                 Version = "2.0.0.0"

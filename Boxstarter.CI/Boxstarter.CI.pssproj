@@ -41,7 +41,7 @@
     <Content Include="Get-BoxstarterDeployOptions.ps1" />
     <Content Include="Get-BoxstarterPackageNugetFeed.ps1" />
     <Content Include="Get-BoxstarterPackagePublishedVersion.ps1" />
-    <Content Include="Get-BoxstarterPackages.ps1" />
+    <Content Include="Get-BoxstarterPackage.ps1" />
     <Content Include="Get-OptionsPath.ps1" />
     <Content Include="Get-PackageFeedsPath.ps1" />
     <Content Include="Get-SecretOptionsPath.ps1" />

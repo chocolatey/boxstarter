@@ -30,7 +30,7 @@
     <Content Include="Azure\Get-AzureVMCheckpoint.tests.ps1" />
     <Content Include="Chocolatey\Enable-BoxstarterCredSSP.Tests.ps1" />
     <Content Include="CI\Get-BoxstarterDeployOptions.Tests.ps1" />
-    <Content Include="CI\Get-BoxstarterPackages.tests.ps1" />
+    <Content Include="CI\Get-BoxstarterPackage.tests.ps1" />
     <Content Include="CI\Publish-BoxstarterPackage.Tests.ps1" />
     <Content Include="CI\Select-BoxstarterResultsToPublish.tests.ps1" />
     <Content Include="CI\Set-BoxstarterPackageNugetFeed.Tests.ps1" />

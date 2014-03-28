@@ -48,7 +48,7 @@ Set-BoxstarterFeedAPIKey
     process {
         $PackageName | % {
             $err = $null
-            $pkg = Get-BoxstarterPackages $_ 
+            $pkg = Get-BoxstarterPackage $_ 
             if($pkg -eq $null) {
                 $err = "Could not find a pakage with ID $_ in the repository."
                 Write-Error $err -Category InvalidArgument
