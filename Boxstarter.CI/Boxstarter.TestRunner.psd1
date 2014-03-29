@@ -1,7 +1,7 @@
 @{
-Description = 'Provides Cmdlets that can assist in a Continuous Integration environment for Chocolatey packages'
+Description = 'The Boxstarter Test Runner module makes it easy to automate the testing and publishing of Chocolatey packages.'
 # Script module or binary module file associated with this manifest.
-ModuleToProcess = './boxstarter.CI.psm1'
+ModuleToProcess = './Boxstarter.TestRunner.psm1'
 
 # Version number of this module.
 ModuleVersion = '2.3.24'

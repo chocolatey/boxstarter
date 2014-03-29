@@ -90,7 +90,7 @@ Set-BoxstarterPackageNugetFeed
 
     $currentColor = $Host.UI.RawUI.ForegroundColor
     $summaryColor = "Green"
-    Update-FormatData  -PrependPath "$($Boxstarter.BaseDir)\Boxstarter.CI\TestResult.Format.ps1xml"
+    Update-FormatData  -PrependPath "$($Boxstarter.BaseDir)\Boxstarter.TestRunner\TestResult.Format.ps1xml"
     $CurrentVerbosity=$global:VerbosePreference
 
     try {

@@ -29,12 +29,12 @@
   <ItemGroup>
     <Content Include="Azure\Get-AzureVMCheckpoint.tests.ps1" />
     <Content Include="Chocolatey\Enable-BoxstarterCredSSP.Tests.ps1" />
-    <Content Include="CI\Get-BoxstarterDeployOptions.Tests.ps1" />
-    <Content Include="CI\Get-BoxstarterPackage.tests.ps1" />
-    <Content Include="CI\Publish-BoxstarterPackage.Tests.ps1" />
-    <Content Include="CI\Select-BoxstarterResultsToPublish.tests.ps1" />
-    <Content Include="CI\Set-BoxstarterPackageNugetFeed.Tests.ps1" />
-    <Content Include="CI\Test-BoxstarterPackage.Tests.ps1" />
+    <Content Include="TestRunner\Get-BoxstarterDeployOptions.Tests.ps1" />
+    <Content Include="TestRunner\Get-BoxstarterPackage.tests.ps1" />
+    <Content Include="TestRunner\Publish-BoxstarterPackage.Tests.ps1" />
+    <Content Include="TestRunner\Select-BoxstarterResultsToPublish.tests.ps1" />
+    <Content Include="TestRunner\Set-BoxstarterPackageNugetFeed.Tests.ps1" />
+    <Content Include="TestRunner\Test-BoxstarterPackage.Tests.ps1" />
     <Content Include="HyperV\Enable-BoxstarterVHD.Tests.ps1" />
     <Content Include="HyperV\Enable-BoxstarterVM.Tests.ps1" />
   </ItemGroup>
@@ -42,7 +42,7 @@
     <Folder Include="Azure\" />
     <Folder Include="Chocolatey\" />
     <Folder Include="HyperV\" />
-    <Folder Include="CI\" />
+    <Folder Include="TestRunner\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Azure\Enable-BoxstarterVM.Tests.ps1" />
@@ -56,8 +56,8 @@
     <Compile Include="Chocolatey\New-BoxstarterPackage.tests.ps1" />
     <Compile Include="Chocolatey\New-PackageFromScript.tests.ps1" />
     <Compile Include="Chocolatey\Set-BoxstarterShare.Tests.ps1" />
-    <Compile Include="CI\Install-BoxstarterScripts.tests.ps1" />
-    <Compile Include="CI\Set-BoxstarterFeedAPIKey.Tests.ps1" />
+    <Compile Include="TestRunner\Install-BoxstarterScripts.tests.ps1" />
+    <Compile Include="TestRunner\Set-BoxstarterFeedAPIKey.Tests.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />

@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Boxstarter.CI</id>
+    <id>Boxstarter.TestRunner</id>
     <version>$version$</version>
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
-    <title>Boxstarter Continuous Integration Module</title>
+    <title>Boxstarter Test Runner Module</title>
     <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=boxstarter&amp;DownloadId=635599&amp;Build=20006</iconUrl>
     <projectUrl>http://Boxstarter.org</projectUrl>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-    <description>Boxstarter's HyperV module includes functionality for Deploying and testing Chocolatey packages either interactively or as part of an automated build.</description>
-    <tags>Boxstarter bootstrapper environment setup VM virtualization HyperV</tags>
+    <description>Boxstarter's Test Runner module makes it easy to automate the testing and publishing of Chocolatey packages.</description>
+    <tags>Boxstarter testing environment setup</tags>
     <dependencies>
       <dependency id="Boxstarter" version="$version$" />
       <dependency id="Boxstarter.Azure" version="$version$" />
@@ -35,6 +35,6 @@
     <file src="..\..\LICENSE.txt" target="tools"/>
     <file src="..\chocolateyinstall.ps1" target="tools"/>
     <file src="..\Setup.ps1" target="tools"/>    
-    <file src="..\..\Boxstarter.CI\**\*.*" target="tools\Boxstarter.CI"/>
+    <file src="..\..\Boxstarter.TestRunner\**\*.*" target="tools\Boxstarter.TestRunner"/>
   </files>
 </package>

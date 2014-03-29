@@ -7,16 +7,16 @@ function Bootstrap-Boxstarter {
         . "$env:temp\choco.ps1"
     }
 
-    if(!(Test-Path $env:ChocolateyInstall\lib\Boxstarter.CI*)) { 
+    if(!(Test-Path $env:ChocolateyInstall\lib\Boxstarter.TestRunner*)) { 
             Write-Output "Boxstarter CI not installed. Installing from $PSScriptRoot"
-            ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Boxstarter.CI -source "$PSScriptRoot" 
+            ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Boxstarter.TestRunner -source "$PSScriptRoot" 
     }
 
     if(!(Get-Module Boxstarter.Azure)){
         Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.Azure.psd1
     }
-    if(!(Get-Module Boxstarter.CI)){
-        Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.CI.psd1
+    if(!(Get-Module Boxstarter.TestRunner)){
+        Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.TestRunner.psd1
     }
 }
 

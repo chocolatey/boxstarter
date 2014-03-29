@@ -40,10 +40,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{87B9154F
 		BuildScripts\nuget\Boxstarter.Azure.nuspec = BuildScripts\nuget\Boxstarter.Azure.nuspec
 		BuildScripts\nuget\boxstarter.bootstrapper.nuspec = BuildScripts\nuget\boxstarter.bootstrapper.nuspec
 		BuildScripts\nuget\boxstarter.chocolatey.nuspec = BuildScripts\nuget\boxstarter.chocolatey.nuspec
-		BuildScripts\nuget\Boxstarter.CI.nuspec = BuildScripts\nuget\Boxstarter.CI.nuspec
 		BuildScripts\nuget\BoxStarter.Common.nuspec = BuildScripts\nuget\BoxStarter.Common.nuspec
 		BuildScripts\nuget\Boxstarter.HyperV.nuspec = BuildScripts\nuget\Boxstarter.HyperV.nuspec
 		BuildScripts\nuget\boxstarter.nuspec = BuildScripts\nuget\boxstarter.nuspec
+		BuildScripts\nuget\Boxstarter.TestRunner.nuspec = BuildScripts\nuget\Boxstarter.TestRunner.nuspec
 		BuildScripts\nuget\BoxStarter.WinConfig.nuspec = BuildScripts\nuget\BoxStarter.WinConfig.nuspec
 	EndProjectSection
 EndProject
@@ -65,7 +65,7 @@ Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.HyperV", "Boxsta
 EndProject
 Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.Azure", "Boxstarter.Azure\Boxstarter.Azure.pssproj", "{AFE71B90-0CD1-42B8-9E7A-FFB2791AB326}"
 EndProject
-Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.CI", "Boxstarter.CI\Boxstarter.CI.pssproj", "{C950BEFC-B3EE-4DCD-A0A6-A2244584D1E7}"
+Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.TestRunner", "Boxstarter.CI\Boxstarter.TestRunner.pssproj", "{C950BEFC-B3EE-4DCD-A0A6-A2244584D1E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
