@@ -1,7 +1,7 @@
 function Enable-BoxstarterVM {
 <#
 .SYNOPSIS
-Opens WMI ports and LocalAccountTokenFilterPolicy for workgroup Hyper-V VMs
+Opens WMI ports and LocalAccountTokenFilterPolicy for Workgroup Hyper-V VMs
 
 .DESCRIPTION
 Prepares a Hyper-V VM for Boxstarter Installation. Opening WMI 

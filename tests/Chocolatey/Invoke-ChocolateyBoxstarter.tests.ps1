@@ -127,7 +127,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         }
     }
 
-    Context "When specifying a http uri instead of a package" {
+    Context "When specifying a http Uri instead of a package" {
         Mock New-PackageFromScript {return "somePackage"} -ParameterFilter {$source -eq "http://someurl"}
         Mock Chocolatey
         Mock Check-Chocolatey

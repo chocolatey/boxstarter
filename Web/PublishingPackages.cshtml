@@ -43,7 +43,7 @@ Set-BoxstarterConfig -NugetSources "http://www.myget.org/F/MyNugetFeed/api/v2;ht
 <pre>
 ."$env:ChocolateyInstall\ChocolateyInstall\nuget" push MyPackage.1.0.0.nupkg &lt;Your MyGet API Key&gt; -Source https://www.myget.org/F/boxstarter/api/v2/package
 </pre>
-<p>If you want to publish to the Chocolatey feed, Chocolatey has a command, <a href="https://github.com/chocolatey/chocolatey/wiki/CommandsPush">cpush</a>, which will publish your package to Chocolatey without needing to specify the feed URL.</p>
+<p>If you want to publish to the Chocolatey feed, Chocolatey has a command, <a href="https://github.com/chocolatey/chocolatey/wiki/CommandsPush">choco push</a>, which will publish your package to Chocolatey without needing to specify the feed URL.</p>
 <pre>
 cpush MyPackage.1.0.0.nupkg &lt;Your Chocolatey API Key&gt;
 </pre>

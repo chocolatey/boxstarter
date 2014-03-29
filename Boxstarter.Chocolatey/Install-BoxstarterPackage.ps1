@@ -29,7 +29,7 @@ This function wraps a Chocolatey Install and provides these additional features
  PowerShell remoting to establish an interactive session on the remote computer.
  Boxstarter configures all the necessary client side remoting settings necessary if 
  they are not already configured. Boxstarter will prompt the user to verify that 
- this is ok. Using the -Force switch will suppress the prompt. Boxstarter also ensures
+ this is OK. Using the -Force switch will suppress the prompt. Boxstarter also ensures
  that CredSSP authentication is enabled so that any network calls made by a package will 
  forward the users credentials.
 
@@ -48,7 +48,7 @@ This function wraps a Chocolatey Install and provides these additional features
 
  .PARAMETER ConnectionURI
  Specifies one or more Uniform Resource Identifiers (URI) that Boxstarter will use 
- to establish a connection with the remote computers upon which the pakage should 
+ to establish a connection with the remote computers upon which the package should 
  be installed. Use this parameter if you need to use a non default PORT or SSL.
 
  .PARAMETER Session
@@ -87,7 +87,7 @@ Enabling this switch will prevent the command window from closing and
 prompt the user to pres the Enter key before the window closes. This 
 is ideal when not invoking boxstarter from a console.
 
-.Parameter Localrepo
+.Parameter LocalRepo
 This is the path to the local boxstarter repository where boxstarter 
 should look for .nupkg files to install. By default this is located 
 in the BuildPackages directory just under the root Boxstarter 
@@ -202,7 +202,7 @@ Install-BoxstarterPackage -ComputerName MyOtherComputer.mydomain.com -Package My
 
 This installs the MyPackage package on MyOtherComputer.mydomain.com.
 Because the -Force parameter is used, Boxstarter will not prompt the
-user to confirm that it is ok to enable PowerShell remoting if it is 
+user to confirm that it is OK to enable PowerShell remoting if it is 
 not already enabled. It will attempt to enable it without prompts.
 
 .EXAMPLE
@@ -211,12 +211,12 @@ $cred=Get-Credential mwrock
 
 This installs the MyPackage package on computer1 and computer2
 Because the -Force parameter is used, Boxstarter will not prompt the
-user to confirm that it is ok to enable PowerShell remoting if it is 
+user to confirm that it is OK to enable PowerShell remoting if it is 
 not already enabled. It will attempt to enable it without prompts.
 
 Using -Force is especially advisable when installing packages on multiple 
 computers because otherwise, if one computer is not accessible, the command 
-will prompt the user if it is ok to try and configure the computer before 
+will prompt the user if it is OK to try and configure the computer before 
 proceeding to the other computers.
 
 .EXAMPLE
@@ -286,7 +286,7 @@ about_boxstarter_chocolatey
             $global:VerbosePreference="Continue"
         }
 
-        #If no psremoting based params are present, we just run locally
+        #If no PSRemoting based param's are present, we just run locally
         if($PsCmdlet.ParameterSetName -eq "Package"){
             Invoke-Locally @PSBoundParameters
             return
@@ -583,7 +583,7 @@ function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
 
 function Setup-BoxstarterModuleAndLocalRepo($session){
     if($LocalRepo){$Boxstarter.LocalRepo=$LocalRepo}
-    Write-BoxstarterMessage "Copying Boxstarter Modules and local repo packages at $($Boxstarter.BaseDir) to $env:temp on $($Session.ComputerName)..."
+    Write-BoxstarterMessage "Copying Boxstarter Modules and LocalRepo packages at $($Boxstarter.BaseDir) to $env:temp on $($Session.ComputerName)..."
     Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | out-Null }
     Send-File "$($Boxstarter.BaseDir)\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
     Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % { 
@@ -799,7 +799,7 @@ function Should-EnableCredSSP($sessionArgs, $computerName) {
             }
         }
         if($credsspEnabled -eq $null){
-            Write-BoxstarterMessage "Need to enable credssp on server" -Verbose
+            Write-BoxstarterMessage "Need to enable CredSSP on server" -Verbose
             if($global:Error.Count -gt 0){ $global:Error.RemoveAt(0) }
             return $True
         }
@@ -813,7 +813,7 @@ function Should-EnableCredSSP($sessionArgs, $computerName) {
             $sessionArgs.Authentication="CredSSP"
         }
     }
-    Write-BoxstarterMessage "Do not need to enable credssp on server" -Verbose
+    Write-BoxstarterMessage "Do not need to enable CredSSP on server" -Verbose
     return $false
 }
 
@@ -830,7 +830,7 @@ function Enable-RemoteCredSSP($sessionArgs) {
         } -ArgumentList $args[0].Credential
     } $sessionArgs
     $sessionArgs.Authentication="CredSSP"
-    Write-BoxstarterMessage "Creating New session with CredSSP Auth..." -Verbose
+    Write-BoxstarterMessage "Creating New session with CredSSP Authentication..." -Verbose
     try { 
         $session = Invoke-RetriableScript {
             $splat=$args[0]
@@ -841,7 +841,7 @@ function Enable-RemoteCredSSP($sessionArgs) {
     catch {
         $sessionArgs.Remove("Authentication")
         $session=$null
-        Write-BoxstarterMessage "Unable to create credssp session. Error was: $($_.ToString())" -Verbose
+        Write-BoxstarterMessage "Unable to create CredSSP session. Error was: $($_.ToString())" -Verbose
         $global:error.RemoveAt(0)
     }
     return $session
@@ -855,7 +855,7 @@ function Disable-RemoteCredSSP ($sessionArgs){
         Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
         Create-BoxstarterTask $Credential
         $taskResult = Invoke-FromTask "Disable-WSManCredSSP -Role Server"
-        Write-BoxstarterMessage "result from disabling credssp is: $taskResult" -Verbose
+        Write-BoxstarterMessage "result from disabling CredSSP is: $taskResult" -Verbose
         Remove-BoxstarterTask
     } -ArgumentList $sessionArgs.Credential, $Global:VerbosePreference
     Write-BoxstarterMessage "Finished disabling CredSSP Authentication on $ComputerName" -Verbose

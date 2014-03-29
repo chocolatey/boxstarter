@@ -18,11 +18,11 @@ packages.
 The path that points to the root of the Chocolatey package repository.
 
 .Example
-Install-BoxstarterScripts c:\chocolatey-Packges
+Install-BoxstarterScripts c:\chocolatey-Packages
 
 Creates a BoxstarterScripts folder at c:\Chocolatey-Packages\BoxstarterScripts 
 that contains the scripts needed for a build server to call and invoke the 
-testing and publishing of chocolatey pakages.
+testing and publishing of Chocolatey packages.
 
 .LINK
 http://boxstarter.codeplex.com

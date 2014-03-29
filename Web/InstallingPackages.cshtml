@@ -122,7 +122,7 @@ Install-BoxstarterPackage -ComputerName MyTargetMachine -PackagName MyPackage -C
 <p>Boxstarter will use the credential to connect to MyTargetMachine and will copy the Boxstarter modules and your Local Repository packages to its local storage. It will then run the package on that machine. Boxstarter will configure your local machine to be able to connect to the remote machine and it may prompt you for permission to change settings. You can always provide the -Force parameter to silence the prompts and allow boxstarter to freely enable remoting if it is not already enabled.</p>
 <p>Here is a screen shot of Boxstarter installing a Minecraft Server (bukkit) on a AWS EC2 instance:</p>
 <img src="Images/amazon.png"/>
-<p>You can pipe several computernames, URIs or Windows PowerShell sessions to <code>Install-BoxstarterPackage</code>. Boxstarter will attempt to install the package on each machine and return a PSObject result for each machine.</p>
+<p>You can pipe several computer names, URIs or Windows PowerShell sessions to <code>Install-BoxstarterPackage</code>. Boxstarter will attempt to install the package on each machine and return a PSObject result for each machine.</p>
 <pre>
 $cred=Get-Credential=MyTargetMachine\myusername
 $result = "thing1","thing2" | Install-BoxstarterPackage -PackagName MyPackage -Credential $cred
@@ -152,7 +152,7 @@ $result = (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList machine
 </pre>
 <h3>Troubleshooting Remote Installations</h3>
 <h4>Establishing remote connections with servers not on the local subnet</h4>
-<p>By default,  server versions of Windows have a firewall rule restricting traffic that is not on the local subnet. There may be circumstances where you might want to connect over the public internet to another machine. This can be done by manually enabling the "WINRM-HTTP-In-TCP-PUBLIC" firewall rule using the Powershell 3.0 <code>Set-NetFirewallRule</code> or the command line <code>netsh advfirewall</code> command.</p>
+<p>By default,  server versions of Windows have a firewall rule restricting traffic that is not on the local subnet. There may be circumstances where you might want to connect over the public Internet to another machine. This can be done by manually enabling the "WINRM-HTTP-In-TCP-PUBLIC" firewall rule using the Powershell 3.0 <code>Set-NetFirewallRule</code> or the command line <code>netsh advfirewall</code> command.</p>
 <p>Client versions of Windows will only allow PSRemoting on Private and Domain networks. Clients on PowerShell 3.0 and higher can provide the <code>-SkipNetorkProfileCheck</code> to Enable-PSRemoting to allow connections to public computers on the local subnet. Boxstarter uses this parameter when enabling Remoting on clients. Like with Server versions, you can enable a firewall rule to work around the local subnet restriction. </p>
 <p>Windows 7 OSs running PowerShell 2.0 can not enable PSRemoting when on a public network connection. You will need to change your connection type to a private or Domain based connection.</p>
 

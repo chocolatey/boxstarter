@@ -16,6 +16,6 @@ function Get-BoxstarterPackagePublishedVersion {
         }
     }
     catch {
-        Write-BoxstarterMessage "Error occured querying $feed for published version of $packageId : $($_.Message)" -Verbose
+        Write-BoxstarterMessage "Error occurred querying $feed for published version of $packageId : $($_.Message)" -Verbose
     }
 }

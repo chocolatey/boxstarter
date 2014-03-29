@@ -114,10 +114,10 @@ Describe "Install-BoxstarterPackage" {
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force | Out-Null
 
         It "will Enable CredSSP on Remote"{
-            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"} -Times 0
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | Out-Null`"*"} -Times 0
         }
         It "will disable CredSSP when done"{
-            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server | out-Null`"*"} -Times 0
+            Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server | Out-Null`"*"} -Times 0
         }        
     }
 
@@ -131,7 +131,7 @@ Describe "Install-BoxstarterPackage" {
         Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds -Force | Out-Null
 
         It "will Enable CredSSP on Remote on both computers"{
-            Assert-MockCalled Invoke-RetriableScript -ParameterFilter {$RetryScript.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | out-Null`"*"} -Times 2
+            Assert-MockCalled Invoke-RetriableScript -ParameterFilter {$RetryScript.ToString() -like "*Invoke-FromTask `"Enable-WSManCredSSP -Role Server -Force | Out-Null`"*"} -Times 2
         }
         It "will disable CredSSP when done on both computers"{
             Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server*"} -Times 2
@@ -182,19 +182,19 @@ Describe "Install-BoxstarterPackage" {
 
         Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
 
-        It "will disable credssp when done"{
+        It "will disable CredSSP when done"{
             Assert-MockCalled Disable-WSManCredSSP -ParameterFilter {$Role -eq "client"}
         }        
     }
 
-    Context "When credssp is enabled but not for given computer" {
+    Context "When CredSSP is enabled but not for given computer" {
         Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah","")}
         Mock Confirm-Choice {return $False}
         Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
 
-        It "will enable credssp when done for current computer"{
+        It "will enable CredSSP when done for current computer"{
             Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$Role -eq "client" -and $DelegateComputer -eq "blahblah"}
         }
         It "will disable/reset when done"{
@@ -202,17 +202,17 @@ Describe "Install-BoxstarterPackage" {
         }
     }    
 
-    Context "When credssp is enabled for only one given computer" {
+    Context "When CredSSP is enabled for only one given computer" {
         Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blah2","")}
         Mock Confirm-Choice {return $False}
         Mock Invoke-Command { New-Object System.Object }
 
         Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
 
-        It "will enable credssp for unenabled computer"{
+        It "will enable CredSSP for non-enabled computer"{
             Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$Role -eq "client" -and $DelegateComputer -eq "blah"}
         }
-        It "will enable credssp when done for current computer"{
+        It "will enable CredSSP when done for current computer"{
             Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$Role -eq "client" -and $DelegateComputer -eq "blah2"}
         }
         It "will disable/reset when done"{
@@ -286,7 +286,7 @@ Describe "Install-BoxstarterPackage" {
         }
     }    
 
-    Context "When entries in trusted hosts contain global wildcard" {
+    Context "When entries in trusted hosts contain global wild card" {
         Mock Get-Item {@{Value="*"}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
         Mock Invoke-Command { New-Object System.Object }
 
@@ -304,7 +304,7 @@ Describe "Install-BoxstarterPackage" {
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds 2>&1 | Out-Null
 
-        It "will Confirm ok to enable remoting"{
+        It "will Confirm OK to enable remoting"{
             Assert-MockCalled Confirm-Choice -ParameterFilter {$message -like "*Remoting is not enabled on Remote computer*"}
         }
     }
@@ -316,7 +316,7 @@ Describe "Install-BoxstarterPackage" {
 
         Install-BoxstarterPackage -computerName blah -PackageName test -Credential $mycreds -Force | Out-Null
 
-        It "will not Confirm ok to enable remoting"{
+        It "will not Confirm OK to enable remoting"{
             Assert-MockCalled Confirm-Choice -Times 0
         }
         It "will run the cookbook script"{
@@ -522,7 +522,7 @@ Describe "Install-BoxstarterPackage" {
         It "will not try to enable remote side remoting"{
             Assert-MockCalled Enable-RemotingOnRemote -Times 0
         }
-        It "will reconnect with the correct uri"{
+        It "will reconnect with the correct Uri"{
             Assert-MockCalled New-PSSession -ParameterFilter { $ConnectionURI -like "http://localhost:5985/wsman?PSVersion=*"}
         }
     }

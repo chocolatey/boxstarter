@@ -17,7 +17,7 @@ Describe "Enable-BoxstarterCredSSP" {
     Mock Enable-WSManCredSSP
     Mock Disable-WSManCredSSP
 
-    Context "When credssp is not enabled at all" {
+    Context "When CredSSP is not enabled at all" {
         Mock Get-WSManCredSSP {return @("The machine is not","")}
         Mock Confirm-Choice {return $False}
 
@@ -28,7 +28,7 @@ Describe "Enable-BoxstarterCredSSP" {
         }
     }
 
-    Context "When credssp is enabled but not for given computer" {
+    Context "When CredSSP is enabled but not for given computer" {
         Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah","")}
         Mock Confirm-Choice {return $False}
 

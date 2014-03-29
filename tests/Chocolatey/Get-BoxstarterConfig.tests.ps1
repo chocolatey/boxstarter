@@ -9,7 +9,7 @@ Describe "Get-BoxstarterConfig" {
     [xml]$configXml = Get-Content (Join-Path $Boxstarter.BaseDir BoxStarter.config)
     $Boxstarter.BaseDir = $testRoot
 
-    Context "When No Local Repo is explicitly configured" {
+    Context "When No LocalRepo is explicitly configured" {
         Copy-Item "$currentBase\Boxstarter.Config" $testRoot
         
         $result = Get-BoxstarterConfig

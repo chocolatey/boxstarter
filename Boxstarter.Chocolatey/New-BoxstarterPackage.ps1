@@ -50,7 +50,7 @@ Get-PackageRoot
     }
     $pkgDir = Join-Path $Boxstarter.LocalRepo $Name
     if(test-path $pkgDir) {
-        throw "A local Repo already exists at $($boxstarter.LocalRepo)\$name. Delete the directory before calling New-BoxstarterPackage"
+        throw "A LocalRepo already exists at $($boxstarter.LocalRepo)\$name. Delete the directory before calling New-BoxstarterPackage"
     }
     MkDir $pkgDir | out-null
     Pushd $pkgDir

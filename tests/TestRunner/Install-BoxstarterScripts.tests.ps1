@@ -32,7 +32,7 @@ Describe "Install-BoxstarterScripts" {
         It "should write ignore file for secrets" {
             "$repo\BoxstarterScripts\.gitignore" | Should contain "-options.xml"
         }
-        It "should write ignore file for api keys" {
+        It "should write ignore file for API keys" {
             "$repo\BoxstarterScripts\.gitignore" | Should contain "FeedAPIKeys.xml"
         }
     }

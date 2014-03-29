@@ -16,7 +16,7 @@ function DISM { return; }
 Describe "Getting-Chocolatey" {
     Mock Call-Chocolatey {$global:LASTEXITCODE=0}
 
-    Context "When a reboot is pending and reboots are ok" {
+    Context "When a reboot is pending and reboots are OK" {
         Mock Test-PendingReboot {$true}
         $boxstarter.RebootOk=$true
         Mock Invoke-Reboot
@@ -26,12 +26,12 @@ Describe "Getting-Chocolatey" {
         it "will Invoke-Reboot" {
             Assert-MockCalled Invoke-Reboot -times 1
         }
-        it "will not get chocolatry" {
+        it "will not get Chocolatey" {
             Assert-MockCalled Call-Chocolatey -times 0
         }        
     }
 
-    Context "When a reboot is pending but reboots are not ok" {
+    Context "When a reboot is pending but reboots are not OK" {
         Mock Test-PendingReboot {$true}
         $boxstarter.RebootOk=$false
         Mock Invoke-Reboot
@@ -41,7 +41,7 @@ Describe "Getting-Chocolatey" {
         it "will not Invoke-Reboot" {
             Assert-MockCalled Invoke-Reboot -times 0
         }
-        it "will get chocolatry" {
+        it "will get Chocolatey" {
             Assert-MockCalled Call-Chocolatey -times 1
         }        
     }
@@ -55,7 +55,7 @@ Describe "Getting-Chocolatey" {
         it "will not Invoke-Reboot" {
             Assert-MockCalled Invoke-Reboot -times 0
         }
-        it "will get chocolatry" {
+        it "will get Chocolatey" {
             Assert-MockCalled Call-Chocolatey -times 1
         }        
     }
@@ -75,7 +75,7 @@ Describe "Getting-Chocolatey" {
         }        
     }
 
-    Context "When chocolatey writes a reboot error and reboots are ok" {
+    Context "When chocolatey writes a reboot error and reboots are OK" {
         Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true
         Mock Remove-Item
@@ -93,7 +93,7 @@ Describe "Getting-Chocolatey" {
         }
     }
 
-    Context "When chocolatey writes a negative reboot error and reboots are ok" {
+    Context "When chocolatey writes a negative reboot error and reboots are OK" {
         Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true
         Mock Remove-Item

@@ -98,7 +98,7 @@ Invoke-Reboot
         if($script:BoxstarterPassword -eq $null) {
             $boxstarter.NoPassword=$True
         }
-        Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and rebootok is set to $($Boxstarter.RebootOk) and the nopassword parameter passed was $NoPassword" -verbose
+        Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and RebootOk is set to $($Boxstarter.RebootOk) and the NoPassword parameter passed was $NoPassword" -verbose
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
         $credPassword = $BoxstarterPassword
