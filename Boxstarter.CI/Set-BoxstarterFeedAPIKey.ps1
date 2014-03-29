@@ -17,6 +17,9 @@ The URI of a Nuget feed for which the API key is being associated.
 .PARAMETER APIKey
 The GUID API Key to assiciate with the feed.
 
+.NOTES
+These keys are persisted to a file in encrypted format.
+
 .Example
 Set-BoxstarterFeedAPIKey -NugetFeed "http://chocolatey.org/api/v2" `
   -APIKey 5cbc38d9-1a94-430d-8361-685a9080a6b8

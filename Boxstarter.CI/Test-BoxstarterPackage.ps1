@@ -1,4 +1,62 @@
 function Test-BoxstarterPackage {
+<#
+.SYNOPSIS
+Tests a set of Boxstarter Packages or all changed packages in the 
+Boxstarter Local Repository.
+
+.DESCRIPTION
+Test-BoxstarterPackage can be called with an array of packages which 
+boxstarter will then build their .nupkg files and attempt to install 
+them on the deployment targets specified with 
+Set-BoxstarterDeploymentOptions. Boxstrtr will use the credentials 
+provided in the deployment options. You can provide several targets to 
+Set-BoxstarterDeploymentOptions. One may wish to supply different 
+machines running different versions of windows. If a package install runs 
+to completion with no exceptions or returned error codes, Boxstarter 
+considers the install a PASSED test. If Test-BoxstarterPackage is called 
+with no packages specified, Boxstarter will iterate over each package in 
+its local repository. It will build the nupkg and compare its version to 
+the version on the package's published feed. If the version in the repo 
+is greater then the published version, Boxstarter will initiate a test on 
+the deployment targets otherwise the package test will be skipped.
+
+If any of the deployment targets are Azure VMs in a stopped state, Boxstarter
+will shutdown those machines when all testing is complete.
+
+.PARAMETER
+One or more package names of packages located in Boxstarter's local 
+repository to test. If no package names are provided, all packages with a 
+version greater than the package's published version will be tested.
+
+.EXAMPLE
+Set-BoxstarterConfig -LocalRepo c:\dev\boxstarterRepo
+$cred=Get-Credential Admin
+Set-BoxstarterDeployOptions -DeploymentTargetCredentials $cred `
+  -DeploymentTargetNames "testVM1","testVM2" `
+  -DeploymentVMProvider Azure -DeploymentCloudServiceName ServiceName `
+  -RestoreCheckpoint clean `
+  -DefaultNugetFeed https://www.myget.org/F/myfeed/api/v2 `
+Test-BoxstarterPackage
+
+All chocolatey packages in c:\dev\boxstarterRepo are built and their 
+versions are evaluated against the versions published on the myFeed feed 
+at MyGet.org. Those with a local version higher than the one published will
+be installed on testVM1 and testVM2.
+
+.EXAMPLE
+Test-BoxstarterPackage MyPackage
+
+The MyPackage package in the local boxstarter repo is built and installed on 
+the configured deployment target machines regardless of the version of 
+MyPackage.
+
+.LINK
+http://boxstarter.codeplex.com
+Set-BoxstarterDeployOptions 
+Set-BoxstarterFeedAPIKey
+Set-BoxstarterPackageNugetFeed
+
+#>
     [CmdletBinding()]
     param(
         [string[]]$PackageName

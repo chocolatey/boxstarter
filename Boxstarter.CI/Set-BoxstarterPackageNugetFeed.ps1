@@ -21,6 +21,10 @@ feed should be associated.
 .PARAMETER NugetFeed
 The Nuget feed to associate with the Chocolatey package.
 
+.NOTES
+These feed associations are persisted to a file so thet they can be 
+reused in all subsequent sessions.
+
 .Example
 set-BoxstarterPackageNugetFeed -PackageName MyPackage `
   -NugetFeed https://www.myget.org/F/mywackyfeed/api/v2

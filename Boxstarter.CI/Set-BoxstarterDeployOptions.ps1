@@ -32,10 +32,16 @@ point the package install should begin. If the checkpoint does not exist,
 it will be saved just before the install.
 
 .PARAMETER DeploymentTargetPassword
-Password to use when authenticating remote sessions on the deployment targets
+Password to use when authenticating remote sessions on the deployment 
+targets. Using the DeploymentTargetCredentials is preferred but explicitly 
+providing a username and password may be necesary for some build server 
+scenarios.
 
 .PARAMETER DeploymentTargetUserName
-UserName to use when authenticating remote sessions on the deployment targets
+UserName to use when authenticating remote sessions on the deployment 
+targets. Using the DeploymentTargetCredentials is preferred but explicitly 
+providing a username and password may be necesary for some build server 
+scenarios.
 
 .PARAMETER DefaultNugetFeed
 If an individual package has not been assigned to a specific Nugetr feed, 
@@ -46,7 +52,11 @@ set to $null.
 The API key to use when when publishing a package to the default feed.
 
 .NOTES
-Set-BoxstarterDeployOptions can set one or all possible settings
+Set-BoxstarterDeployOptions can set one or all possible settings. These 
+settings are persisted to a file and all credential and API key is 
+encrypted. Using the DeploymentTargetCredentials is preferred over explicitly
+providing a username and password. But the later may be necesary for a 
+very limited set of build server scenarios.
 
 .EXAMPLE
 $cred=Get-Credential Admin
