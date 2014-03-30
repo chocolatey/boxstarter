@@ -11,7 +11,9 @@ Resolve-Path $here\..\..\Boxstarter.TestRunner\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "Get-BoxstarterDeployOptions" {
-    $Boxstarter.LocalRepo=(Get-PSDrive TestDrive).Root
+    $Boxstarter.BaseDir=(Get-PSDrive TestDrive).Root
+    $Boxstarter.LocalRepo=Join-Path $Boxstarter.BaseDir LocalRepo
+    MKDIR $Boxstarter.LocalRepo | Out-Null
     $Boxstarter.SuppressLogging=$true
 
     Context "When Getting options that have not been set" {
@@ -19,6 +21,21 @@ Describe "Get-BoxstarterDeployOptions" {
 
         it "should return the chocolatey feed as the default nuget feed" {
             $result.DefaultNugetFeed | should be "http://chocolatey.org/api/v2"
+        }
+    }
+
+   Context "When secrets are in the default localrepo and not the localrepo" {
+        $Boxstarter.LocalRepo=Join-Path $Boxstarter.BaseDir BuildPackages
+        MKDIR $Boxstarter.LocalRepo | Out-Null
+        Set-BoxstarterDeployOptions -DeploymentTargetPassword passwd `
+                                    -DeploymentTargetUserName Admin
+        $Boxstarter.LocalRepo=Join-Path $Boxstarter.BaseDir LocalRepo
+    
+        $result = Get-BoxstarterDeployOptions
+
+        it "should return the credential in the default repo" {
+            $result.DeploymentTargetCredentials.UserName | should be "Admin"
+            $result.DeploymentTargetCredentials.GetNetworkCredential().Password | should be "passwd"
         }
     }
 

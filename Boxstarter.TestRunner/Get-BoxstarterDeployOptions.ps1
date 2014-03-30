@@ -17,6 +17,7 @@ Set-BoxstarterDeployOptions
 #>
     $path = Get-OptionsPath
     $secretPath = Get-SecretOptionsPath
+    $fallbackSecretPath = "$($Boxstarter.BaseDir)\BuildPackages\BoxstarterScripts\$env:ComputerName-$env:username-Options.xml"
     if(!(Test-Path $path)) { 
         $options = @{
             DeploymentTargetNames=$null
@@ -34,6 +35,10 @@ Set-BoxstarterDeployOptions
 
     if(Test-Path $secretPath) { 
         $options.DeploymentTargetCredentials = Import-CliXML $secretPath
+    }
+    elseif(Test-Path $fallbackSecretPath) {
+        Write-BoxstarterMessage "Falling back to default local repo for secrets" -Verbose
+        $options.DeploymentTargetCredentials = Import-CliXML $fallbackSecretPath
     }
 
     $options.DefaultFeedAPIKey = Get-BoxstarterFeedAPIKey -NugetFeed $options.DefaultNugetFeed

@@ -29,11 +29,16 @@ Set-BoxstarterFeedAPIKey
     )
 
     $path=Get-FeedsAPIKeyPath
-    if(!(Test-Path $path)) { 
-        $keys =  @{}
+    $fallbackPath = "$($Boxstarter.BaseDir)\BuildPackages\BoxstarterScripts\FeedAPIKeys.xml"
+
+    if(Test-Path $path) {
+        $keys = Import-CliXML $path
+    }
+    elseif(Test-Path $fallbackPath) {
+        $keys = Import-CliXML $fallbackPath
     }
     else {
-        $keys = Import-CliXML $path
+        $keys =  @{}
     }
 
     if($NugetFeed -and $keys.ContainsKey($NugetFeed)) {

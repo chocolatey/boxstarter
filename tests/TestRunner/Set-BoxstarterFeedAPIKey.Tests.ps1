@@ -12,7 +12,9 @@ Resolve-Path $here\..\..\Boxstarter.TestRunner\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "Set-BoxstarterFeedAPIKey" {
-    $Boxstarter.LocalRepo=(Get-PSDrive TestDrive).Root
+    $Boxstarter.BaseDir=(Get-PSDrive TestDrive).Root
+    $Boxstarter.LocalRepo=Join-Path $Boxstarter.BaseDir LocalRepo
+    MKDIR $Boxstarter.LocalRepo | Out-Null
     $Boxstarter.SuppressLogging=$true
 
     Context "Feed has a key" {
@@ -23,7 +25,22 @@ Describe "Set-BoxstarterFeedAPIKey" {
         $result = Get-BoxstarterFeedAPIKey -NugetFeed $feed
 
         it "should return the key that was set" {
-            $result | should be $key
+            $key | should be $result
+        }
+    }
+
+   Context "When secrets keys are in the default localrepo and not the localrepo" {
+        $Boxstarter.LocalRepo=Join-Path $Boxstarter.BaseDir BuildPackages
+        MKDIR $Boxstarter.LocalRepo | Out-Null
+        $key = [GUID]::NewGuid()
+        [Uri]$feed="http://myfeed2"
+        Set-BoxstarterFeedAPIKey -NugetFeed $feed -APIKey $key
+        $Boxstarter.LocalRepo=Join-Path $Boxstarter.BaseDir LocalRepo
+
+        $result = Get-BoxstarterFeedAPIKey -NugetFeed $feed
+
+        it "should return the key the default repo" {
+            $key | should be $result
         }
     }
 
