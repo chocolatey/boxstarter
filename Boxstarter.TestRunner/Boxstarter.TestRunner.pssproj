@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Bootstrap.ps1" />
+    <Content Include="en-US\about_Boxstarter_TestRunner.help.txt" />
     <Content Include="Get-BoxstarterDeployOptions.ps1" />
     <Content Include="Get-BoxstarterPackageNugetFeed.ps1" />
     <Content Include="Get-BoxstarterPackagePublishedVersion.ps1" />
@@ -53,6 +54,9 @@
     <Content Include="Set-BoxstarterPackageNugetFeed.ps1" />
     <Content Include="Test-BoxstarterPackage.ps1" />
     <Content Include="TestResult.Format.ps1xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="en-US\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
