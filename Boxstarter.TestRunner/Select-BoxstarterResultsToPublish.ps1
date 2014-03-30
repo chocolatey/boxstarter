@@ -5,7 +5,7 @@ Returns successful Boxstarter packages from provided test results
 eligible to be published to a nuget feed.
 
 .DESCRIPTION
-Test-BoxstarterPackages will return a set of test results given an 
+Test-BoxstarterPackage will return a set of test results given an 
 array of packages or an entire repository. Select-BoxstarterResultsToPublish
 can consume these results and return the package IDs of the packages who 
 had all test machines pass the package install. One could then have
