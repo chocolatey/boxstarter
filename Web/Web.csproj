@@ -131,6 +131,7 @@
     <Content Include="UnderstandingPackages.cshtml" />
     <Content Include="UsingBoxstarter.cshtml" />
     <Content Include="VMIntegration.cshtml" />
+    <Content Include="TestingPackages.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
