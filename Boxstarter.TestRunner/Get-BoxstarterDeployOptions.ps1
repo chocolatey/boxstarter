@@ -20,7 +20,7 @@ Set-BoxstarterDeployOptions
     $fallbackSecretPath = "$($Boxstarter.BaseDir)\BuildPackages\BoxstarterScripts\$env:ComputerName-$env:username-Options.xml"
     if(!(Test-Path $path)) { 
         $options = @{
-            DeploymentTargetNames=$null
+            DeploymentTargetNames="localhost"
             DeploymentTargetCredentials=$null
             DeploymentVMProvider=$null
             DeploymentCloudServiceName=$null

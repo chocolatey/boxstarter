@@ -518,7 +518,7 @@ function Invoke-Locally {
         [switch]$DisableReboots,
         [switch]$KeepWindowOpen
     )
-    if($PSBoundParameters.ContainsKey("Credential")){
+    if($PSBoundParameters.ContainsKey("Credential") -and ($Credential -ne $null)){
         $PSBoundParameters.Add("Password",$PSBoundParameters["Credential"].Password)
         $PSBoundParameters.Remove("Credential") | out-Null
     }

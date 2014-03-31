@@ -62,7 +62,7 @@ Set-BoxstarterPackageNugetFeed
         [string[]]$PackageName
     )
     $options = Get-BoxstarterDeployOptions
-    if(!$options.DeploymentTargetCredentials){
+    if(!$options.DeploymentTargetCredentials -and ($options.DeploymentTargetNames -ne "localhost")){
         throw "No DeploymentTargetCredentials has been sent. Use Set-BoxstarterBuildOptions to set DeploymentTargetCredentials"
     }
 
@@ -224,7 +224,12 @@ function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
                 else {
                     $boxstarterConn = $target
                 }
-                $result = $boxstarterConn | Install-BoxstarterPackage -credential $options.DeploymentTargetCredentials -PackageName $packageName -Force -verbose:$verbose
+                if($boxstarterConn -ne "localhost") {
+                    $result = $boxstarterConn | Install-BoxstarterPackage -credential $options.DeploymentTargetCredentials -PackageName $packageName -Force -verbose:$verbose
+                }
+                else {
+                    $result = Install-BoxstarterPackage -DisableReboots -PackageName $packageName -Force -verbose:$verbose
+                }
             }
             catch {
                 $result = $_

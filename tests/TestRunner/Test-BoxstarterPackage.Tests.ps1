@@ -88,6 +88,16 @@ Describe "Test-BoxstarterPackage" {
         }
     }
 
+    Context "when testing locally" {
+        Set-BoxstarterDeployOptions -DeploymentTargetCredentials $null -DeploymentTargetNames "localhost"
+
+        $results = Test-BoxstarterPackage $pkgName2
+
+        it "Will install package with reboots disabled" {
+            Assert-MockCalled Install-BoxstarterPackage -ParameterFilter { $DisableReboots -eq $true}
+        }
+    }
+
     Context "when a package test fails" {
         Set-BoxstarterDeployOptions -DeploymentTargetUserName "user" -DeploymentTargetPassword "pass" -DeploymentTargetNames "target1"
         Mock Install-BoxstarterPackage {

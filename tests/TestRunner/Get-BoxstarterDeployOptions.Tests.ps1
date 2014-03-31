@@ -22,6 +22,9 @@ Describe "Get-BoxstarterDeployOptions" {
         it "should return the chocolatey feed as the default nuget feed" {
             $result.DefaultNugetFeed | should be "http://chocolatey.org/api/v2"
         }
+        it "should return localhost as the default deployment target" {
+            $result.DeploymentTargetNames | should be "localhost"
+        }
     }
 
    Context "When secrets are in the default localrepo and not the localrepo" {
