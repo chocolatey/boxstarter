@@ -35,7 +35,7 @@ http://boxstarter.codeplex.com
     )
     
     $scriptPath = Join-Path $RepoRootPath BoxstarterScripts
-    Write-BoxstarterMessage "Copying Boxstarter CI scripts to $scriptPath"
+    Write-BoxstarterMessage "Copying Boxstarter TestRunner scripts to $scriptPath"
 
     if(!(Test-Path $scriptPath)) { Mkdir $scriptPath | Out-Null }
     Copy-Item "$($Boxstarter.BaseDir)\Boxstarter.TestRunner\bootstrap.ps1" $scriptPath -Force 

@@ -7,3 +7,306 @@
     <p class="lead">Boxstarter can detect which packages have changed and test their installations on one or more deployment targets. Boxstarter can automate publishing successful packages to their feed.</p>
 }
 
+<p>
+The Boxstarter TestRunner module can test <a href="http://chocolatwey.org">Chocolatey</a> package installs
+on one or more deployment targets and evaluate whether the installation
+was successful. The TestRunner module can also be used to automate
+the publishing of Chocolatey packages to a <a href="http://nuget.org">Nuget</a> feed. That may be
+the public chocolatey feed or a private feed.
+</p>
+
+<h3>Configuring the Local Boxstarter Repository</h3>
+<p>
+    Boxstarter needs to know where your repository of chocolatey packages
+    is located. The Boxstarter repository is a single directory on disk
+    that contains one subdirectory per package. By default, Boxstarter
+    maintains this directory in a directory called <code>BuildPackages</code> inside
+    the same root directory where the Boxstarter modules reside. See <a href="CreatingPackages.cshtml">Creating Packages</a> 
+    for detailed information on using Boxstarter commands to simplify package creation. All
+    Boxstarter commands that create and build packages act within this
+    directory. The repository location can be found using the <code>$boxstarter</code>
+    settings variable in <code>$Boxstarter.LocalRepo</code>.
+</p>
+<img src="Images/repoDir.png" />
+<p>This location can be changed using the <code>Set-BoxstarterConfig</code> command.</p>
+<pre>Set-BoxStarterConfig -LocalRepo "c:\dev\Chocolatey-Packages"</pre>
+<p>
+    By changing the location of the
+    boxstarter repository with <code>Set-BoxstarterConfig</code> all future
+    interactions with the Boxstarter repository will act on this location.
+    To temporarily change the repository location just for the current
+    powershell session, one can change the value of <code>$Boxstarter.LocalRepo</code>
+    directly.
+</p>
+<pre>$Boxstarter.LocalRepo = "c:\dev\Chocolatey-Packages"</pre>
+<h3>Configuring Boxstarter Testing Options</h3>
+<p>
+    Boxstarter tests Chocolatey packages by deploying and installing the
+    package to one or more deployment targets. The deployment options include
+    settings that control what computers to use to test the packages, the
+    credentials to use, VM checkpoints to restore as well as nuget feed and
+    API key for publishing successful packages.
+</p>
+<p>
+    To read the current settings for these options, use
+    <code>Get-BoxstarterDeploymentOptions</code>. To set these options use
+    <code>Set-BoxstarterDeploymentOptions</code>.
+</p>
+<pre>
+$cred=Get-Credential Admin
+Set-BoxstarterDeployOptions -DeploymentTargetCredentials $cred `
+  -DeploymentTargetNames "testVM1","testVM2" `
+  -DeploymentVMProvider Azure -DeploymentCloudServiceName ServiceName `
+  -RestoreCheckpoint clean `
+  -DefaultNugetFeed https://www.myget.org/F/mywackyfeed/api/v2 `
+  -DefaultFeedAPIKey 5cbc38d9-1a94-430d-8361-685a9080a6b8
+</pre>
+<p>
+    This configures package deployments for Azure VMs testVM1 and testVM2
+    hosted in the ServiceName cloud service using the Admin credential. Prior to
+    testing a package install, the VM will be restored to the clean
+    checkpoint. If packages are published using <code>Publish-BoxstarterPackage</code> and are not associated with a
+    Nuget feed, they will publish to the mywackyfeed on <a href="http://myget.org">myget.org</a> using API
+    Key 5cbc38d9-1a94-430d-8361-685a9080a6b8.
+</p>
+<p>
+    Currently the available Boxstarter VM providers are Azure and HyperV. Any VM regardless of hypervisor 
+    implementation can be used by passing in the names of the computers as the deployment targets. However, 
+    use of Boxstarter VM providers are necessary in order to take advantage of checkpoints. 
+</p>
+<p>
+    The default deployment options deploy locally using the credentials of the current user and publish to the public chocolatey feed.
+</p>
+<p>
+    Individual packages in a Boxstarter repository
+    can be published to different feeds. The nuget feed and API Key configured
+    using <code>Set-BoxstarterDeploymentOptions</code> are default settings used if a package
+    has not been individually assigned to its own feed.
+</p>
+<p>
+    To assign a package to an individual feed, use <code>Set-BoxstarterPackageNugetFeed</code>.
+</p>
+<pre>
+Set-BoxstarterPackageNugetFeed -PackageName MyPackage -NugetFeed https://www.myget.org/F/myotherfeed/api/v2
+</pre>
+<p>
+    When using multiple feeds, if one needs to use the <code>Publish-BoxstarterPackage</code>
+    command to publish the package to its feed, an API key for each feed must be
+    set. This can be accomplished by using the <code>Set-BoxstarterFeedAPIKey</code>.
+</p>
+<pre>
+Set-BoxstarterFeedAPIKey -NugetFeed https://www.myget.org/F/myotherfeed/api/v2 -APIKey 5cbc38d9-1a94-430d-8361-685a9080a6b8
+</pre>
+<h3>Testing Chocolatey Packages</h3>
+<p>
+    <code>Test-BoxstarterPackage</code> can be called with an array of packages.
+</p>
+<pre>
+Test-BoxstarterPackage -PackageName "MyPackage1","MyPackage2"
+</pre>
+<p>
+    Boxstarter will build their .nupkg files and attempt to install
+    them on the deployment targets specified with
+    <code>Set-BoxstarterDeploymentOptions</code>. Boxstarter will use the credentials
+    provided in the deployment options. You can provide several targets to
+    <code>Set-BoxstarterDeploymentOptions</code>. One may wish to supply different
+    machines running different versions of windows. If a package install runs
+    to completion with no exceptions or returned error codes, Boxstarter
+    considers the install a PASSED test. If <code>Test-BoxstarterPackage</code> is called
+    with no packages specified, Boxstarter will iterate over each package in
+    its local repository. It will build the nupkg and compare its version to
+    the version on the package published feed. If the version in the repo
+    is greater than the published version, Boxstarter will initiate a test on
+    the deployment targets otherwise the package test will be skipped.
+</p>
+<img src="Images/CI.png" />
+<h3>Publishing Successful Packages</h3>
+<p>
+    <code>Test-BoxstarterPackage</code> will return a set of test results. One can then use
+    <code>Select-BoxstarterResultsToPublish</code> to consume these results and return the
+    package IDs of the packages who had all deployment targets pass the package
+    install. These IDs can then be passed to <code>Publish-BoxstarterPackage</code> to
+    publish those packages to their associated feeds.
+</p>
+<pre>
+Test-BoxstarterPackage | Select-BoxstarterResultsToPublish | Publish-BoxstarterPackage
+</pre>
+<h3>Conserving Cloud Resources</h3>
+<p>
+    If the Azure Boxstarter module is used as a VM provider and any of the Azure
+    VMs are not running when the tests begin, Boxstarter will shut down each VM
+    that was not initially running once the testing is completed.
+</p>
+<h3>Including Testing and Publishing in Continuous Integration</h3>
+<p>
+    The Boxstarter TestRunner can be plugged into modern Build systems and
+    respond to source control commits. The Boxstarter local repo can be
+    setup under a source control system like GIT, Mercurial, TFS, SVN etc.
+    Build servers like TeamCity, TFS, Jenkins and others can be configured
+    to listen for changes to the Boxstarter repo. For instance, if the
+    repository is under git source control and pushed to a remote server
+    monitored by a build server, the build server can execute the Boxstarter
+    TestRunner commands to test the packages that have been changed and
+    publish them to their feeds if the tests pass.
+</p>
+<p>
+    The TestRunner module includes an Install-BoxstarterScripts command that
+    embeds a MSBuild file, a bootstrapper and a PowerShell script into a
+    repository that can run the tests and publish successful packages.
+</p>
+<pre>
+PS C:\dev> git clone https://github.com/mwrock/Chocolatey-Packages.git
+Cloning into 'Chocolatey-Packages'...
+remote: Reusing existing pack: 2963, done.
+Receiving objects: 100% (2963/2963), 3.93 MiB |
+Resolving deltas: 100% (961/961), done.
+Checking connectivity... done.
+Checking out files: 100% (2491/2491), done.
+PS C:\dev> Install-BoxstarterScripts -RepoRootPath .\Chocolatey-Packages
+Boxstarter: Copying Boxstarter TestRunner scripts to .\Chocolatey-Packages\BoxstarterScripts
+PS C:\dev> dir .\Chocolatey-Packages\BoxstarterScripts
+    Directory: C:\dev\Chocolatey-Packages\BoxstarterScripts
+Mode                LastWriteTime     Length Name
+----                -------------     ------ ----
+-a---         3/30/2014  11:02 PM         32 .gitignore
+-a---         3/30/2014  10:53 PM       3471 bootstrap.ps1
+-a---         3/30/2014  10:53 PM        887 boxstarter.proj
+-a---         3/30/2014  10:53 PM       1305 BoxstarterBuild.ps1
+</pre>
+    <p>
+        There are two primary usage patterns for running tests from a build server:
+    </p>
+    <h4>Dedicated Build Server</h4>
+    <p>
+        Here, tests are run in a build environment on a server that is under
+        your direct ownership and full control. The key differentiator here is
+        that you can set your deployment options on this machine and be
+        confident that they will remain on every build from build to build.
+    </p>
+    <h4>Hosted or Shared Build Server</h4>
+    <p>
+        This is often a build server that you do not own or control outside of
+        your individual builds. If you set your deployment options on the server,
+        they may likely be gone on your next build. The Visual Studio Online
+        build services would land in this category.
+    </p>
+    <h3>Configuring a Dedicated Build Server</h3>
+    <p>
+        If you administer your own build server, there is some one time setup that
+        you need to perform to integrate Boxstarter TestRunner tests and
+        automatic package publishing. This must be performed on the build machine
+        that will run the builds (a remote powershell session is acceptable). In
+        many build systems, this may be a different machine from the central server,
+        in TFS it would be the build "controller" or in TeamCity the build "agent."
+        Also, these steps must be performed using the credentials of the SAME USER
+        ACCOUNT that your build server runs under.
+    </p>
+    <ol>
+        <li>
+            Install the Boxstarter TestRunner module on the build machine. You can
+            use Chocolatey and run <code>cinst Boxstarter.TestRunner</code> or launch
+            http://boxstarter.org/package/nr/boxstarter.testrunner from IE.
+        </li>
+        <li>
+            <p>
+                Although many of the deployment options are stored in a file inside the
+                repository and will be available when your build server gets the latest
+                repository code, the "secret" options are not kept in source control to
+                prevent this information from being publicly disclosed. These secrets
+                include the deployment target credentials and feed API keys. So you
+                can use Set-BoxstarterDeployOptions and Set-BoxstarterFeedAPIKey to set
+                these secrets. The Credential passwords are encrypted and can only be
+                unencrypted on the same build server by the same user account setting
+                the options. You may also add these settings as msbuild parameters in
+                step 4 described below.
+            </p>
+            <pre>
+$cred=Get-Credential Admin
+Set-BoxstarterDeployOptions -DeploymentTargetCredentials $cred `
+  -DefaultFeedAPIKey 5cbc38d9-1a94-430d-8361-685a9080a6b8
+            </pre>
+        </li>
+        <li>
+            If you will be performing the package test installations on Azure VMs,
+            you will need to configure your Azure subscription. Run
+            <pre>Get-AzurePublishSettingsFile</pre>
+            to download your subscription file from Azure and then
+            <pre>Import-AzurePublishSettingsFile -PublishSettingsFile "C:\saved\subscription\file.publishsettings"</pre>
+            You may also add the Azure management key as a MSBuild parameter
+            described next. See <a href="VMIntegration.cshtml#azure">these instructions</a> for setting up an Azure subscription for more details.
+        </li>
+        <li>
+            <p>
+                Configure the build configuration of your build server to call the
+                Boxstarter.proj MSBuild file as a step in your build. This file is
+                located in the BoxstarterScripts directory of your repo which
+                Boxstarter creates when you run Install-BoxstarterScripts. This script
+                will invoke a bootstrapper which will install everything needed for
+                the TestRunner to run including the TestRunner itself if not present.
+                On dedicated build servers, where the TestRunner is preinstalled, the
+                bootstrapper will be skipped.
+            </p>
+            <p>
+                The script can take the following parameters:
+            </p>
+            <ul>
+                <li>
+                    <code>PublishSuccesfulPackages</code> - Set this to true if you would like successful packages published.
+                </li>
+                <li>
+                    <code>DeploymentTargetUserName</code> - Username to use when initiating connections to the deployment targets.
+                </li>
+                <li>
+                    <code>DeploymentTargetPassword</code> - Password to use when initiating connections to the deployment targets.
+                </li>
+                <li>
+                    <code>FeedAPIKey</code> - API key to use when publishing packages. AzureSubscriptionName - Name of the azure subscription to use when using Azure VMs as deployment targets.
+                </li>
+                <li>
+                    <code>AzureSubscriptionId</code> - The Azure subscription ID Guid to use when using Azure VMs as deployment targets.
+                </li>
+                <li>
+                    <code>AzureSubscriptionCertificate</code> - The Azure subscription certificate to use when using Azure VMs as deployment targets. This is the Base64 encoded content of the certificate and can be found in the ManagementCertificate attribute of your Azure publish settings file.
+                </li>
+            </ul>
+            <img src="Images/tfs.png"/>
+            <p>
+                NOTE: All of these MSBuild script parameters are optional for dedicated
+                builds as long as the values were provided in steps 2 and 3 above which
+                may be preferable over having plain text parameter values fed to your
+                build.
+            </p>
+        </li>
+    </ol>
+
+    <h3>Configuring a Hosted or Shared Build Server</h3>
+    <p>
+        If your build server environment is shared and may be built from scratch
+        on every build then you cannot preinstall the TestRunner and configure
+        necessary settings up front. Instead the runner must be installed during
+        the build process and the settings passed via MSBuild parameters. When
+        you run <code>Install-BoxstarterScripts</code> on your Chocolatey repository, a
+    bootstrapper is added to your repo that can take care of installing the
+    Test Runner and its dependencies. Additionally, you can pass the following
+    MSBuild parameters to the BoxstarterBuild.proj script:
+</p>
+    <ul>
+        <li>
+            <code>PublishSuccesfulPackages</code> - Set this to true if you would like successful packages published.
+        </li>
+        <li>
+            <code>DeploymentTargetUserName</code> - Username to use when initiating connections to the deployment targets.
+        </li>
+        <li>
+            <code>DeploymentTargetPassword</code> - Password to use when initiating connections to the deployment targets.
+        </li>
+        <li>
+            <code>FeedAPIKey</code> - API key to use when publishing packages. AzureSubscriptionName - Name of the azure subscription to use when using Azure VMs as deployment targets.
+        </li>
+        <li>
+            <code>AzureSubscriptionId</code> - The Azure subscription ID Guid to use when using Azure VMs as deployment targets.
+        </li>
+        <li>
+            <code>AzureSubscriptionCertificate</code> - The Azure subscription certificate to use when using Azure VMs as deployment targets. This is the Base64 encoded content of the certificate and can be found in the ManagementCertificate attribute of your Azure publish settings file.
+        </li>
+    </ul>

@@ -80,6 +80,7 @@
     <Content Include="Images\boxLogo.png" />
     <Content Include="Images\boxLogo_sm.ico" />
     <Content Include="Images\boxLogo_sm.png" />
+    <Content Include="Images\CI.PNG" />
     <Content Include="Images\console.PNG" />
     <Content Include="Images\Elevate.PNG" />
     <Content Include="Images\gist1.PNG" />
@@ -90,10 +91,12 @@
     <Content Include="Images\installed.PNG" />
     <Content Include="Images\launch.PNG" />
     <Content Include="Images\publishAzure.PNG" />
+    <Content Include="Images\repoDir.PNG" />
     <Content Include="Images\runanyway.PNG" />
     <Content Include="Images\setup.PNG" />
     <Content Include="Images\shell.PNG" />
     <Content Include="Images\shortcut.PNG" />
+    <Content Include="Images\tfs.PNG" />
     <Content Include="Images\win7admin.png" />
     <Content Include="Images\win8admin.PNG" />
     <Content Include="Launch\.gitattributes" />
