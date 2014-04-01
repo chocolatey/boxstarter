@@ -208,5 +208,5 @@ function Get-VMGuestComputerName($vmName) {
 
 function Wait-HeartBeat($vmName) {
     do {Start-Sleep -milliseconds 100} 
-    until ((Get-VMIntegrationService -VMName $vmName | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
+    until ((Get-VMIntegrationService -VMName $vmName | ?{$_.id.endswith("\\84EAAE65-2F2E-45F5-9BB5-0E857DC8EB47") -or ($_.name -eq "Heartbeat")}).PrimaryStatusDescription -eq "OK")
 }
