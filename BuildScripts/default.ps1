@@ -166,7 +166,7 @@ task Update-Homepage {
 
 task Get-ClickOnceStats {
     $creds = Get-Credential
-    mkdir "$basedir\sitelogs"
+    mkdir "$basedir\sitelogs" -ErrorAction silentlycontinue
     pushd "$basedir\sitelogs"
     $ftpScript = @"
 user $($creds.UserName) $($creds.GetNetworkCredential().Password)
