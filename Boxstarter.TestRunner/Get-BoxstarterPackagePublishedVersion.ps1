@@ -11,7 +11,12 @@ function Get-BoxstarterPackagePublishedVersion {
         }
         else {
             $feedUrl="$feed/Packages/?`$filter=Id eq '$PackageId' and IsLatestVersion&`$select=Version"
-            $publishedPkg=Invoke-RestMethod -Uri $feedUrl -ErrorAction Stop
+            $downloader=new-object net.webclient
+            $wp=[system.net.WebProxy]::GetDefaultProxy()
+            $wp.UseDefaultCredentials=$true
+            $downloader.Proxy=$wp
+            [xml]$response = $downloader.DownloadString($feedUrl )
+            $publishedPkg=$response.feed.entry
             return $publishedPkg.Properties.Version
         }
     }
