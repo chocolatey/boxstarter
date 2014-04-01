@@ -48,3 +48,8 @@
 
 <h3>Convenience commands to automate Nuget Package Creation</h3>
 <p>Boxstarter provides commands that can auto generate both the *.nuspec file and provide a skeletal ChocolateyInstall.ps1 file. You can even point Boxstarter to a single script file and it will generate a *.nupkg file that will execute that script.</p>
+
+<h3>Testing Packages and Build Server Integration</h3>
+<p>Boxstarter can test <a href="http://chocolatwey.org">Chocolatey</a> package installs
+    on one or more deployment targets and evaluate whether the installation
+    was successful. It can also automate the publishing of packages to its <a href="http://nuget.org">Nuget</a> feed. This functionality can be plugged into a Continuous Integration server so that packages can be tested and published when committed to version control.</p>
