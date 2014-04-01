@@ -5,14 +5,16 @@ param(
     $FeedAPIKey,
     $AzureSubscriptionName,
     $AzureSubscriptionId,
-    $AzureSubscriptionCertificate
+    $AzureSubscriptionCertificate,
+    $debug
 )
+$here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 #Download everything we need and import modules
 . .\Bootstrap.ps1
 
 #Configure our settings
-$Boxstarter.LocalRepo=(Resolve-Path "$PSScriptRoot\..\")
+$Boxstarter.LocalRepo=(Resolve-Path "$here\..\")
 Set-BoxstarterDeployOptions -DeploymentTargetUserName $DeploymentTargetUserName -DeploymentTargetPassword $DeploymentTargetPassword
 if(![string]::IsNullOrEmpty($FeedAPIKey)) {
     Set-BoxstarterDeployOptions -DefaultFeedAPIKey $FeedAPIKey
