@@ -1,9 +1,10 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
+import-module "$here\..\..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1" -Force
 
 Describe "Get-PackageRoot" {
     $testRoot=(Get-PSDrive TestDrive).Root
-    Import-Module "$here\..\..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1"
+    $Boxstarter.SuppressLogging=$false
 
     Context "When Calling from ChocolateyInstall" {
         MkDir "$testRoot\tools" | Out-Null
@@ -17,7 +18,7 @@ Describe "Get-PackageRoot" {
         }
     }
 
-        Context "When Not Calling from ChocolateyInstall" {
+    Context "When Not Calling from ChocolateyInstall" {
         $install = Join-Path $testRoot "Install.ps1"
         New-Item $install -type file -value "return Get-PackageRoot `$MyInvocation" | Out-Null
 
