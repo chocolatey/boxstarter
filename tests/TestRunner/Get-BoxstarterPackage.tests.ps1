@@ -17,7 +17,7 @@ Describe "Get-BoxstarterPackage" {
     Context "When Getting all packages in repo" {
         New-BoxstarterPackage -name package1
         New-BoxstarterPackage -name package2
-        Mock Invoke-RestMethod
+        Mock Get-BoxstarterPackagePublishedVersion
 
         $result = Get-BoxstarterPackage
 
@@ -37,20 +37,8 @@ Describe "Get-BoxstarterPackage" {
     Context "When Getting published packages in repo" {
         New-BoxstarterPackage -name package1
         New-BoxstarterPackage -name package2
-        Mock Invoke-RestMethod {
-            @{
-                Properties= @{
-                    Version="5.5.5"
-                }
-            }
-        } -parameterFilter {$Uri -like "*package1*"}
-        Mock Invoke-RestMethod {
-            @{
-                Properties= @{
-                    Version="6.6.6"
-                }
-            }
-        } -parameterFilter {$Uri -like "*package2*"}
+        Mock Get-BoxstarterPackagePublishedVersion {"5.5.5"} -parameterFilter {$PackageId -eq "package1"}
+        Mock Get-BoxstarterPackagePublishedVersion {"6.6.6"} -parameterFilter {$PackageId -eq "package2"}
 
         $result = Get-BoxstarterPackage
 
@@ -65,12 +53,12 @@ Describe "Get-BoxstarterPackage" {
     Context "When a package feed is null or empty" {
         New-BoxstarterPackage -name package1
         Set-BoxstarterPackageNugetFeed -PackageName package1 -NugetFeed $null
-        Mock Invoke-RestMethod
+        Mock Get-BoxstarterPackagePublishedVersion
 
         $result = Get-BoxstarterPackage
 
-        it "should not check the published feed" {
-            Assert-MockCalled Invoke-RestMethod  -times 0
+        it "should have a null published version" {
+            $result[0].PublishedVersion | should be $null
         }
         it "should have no feed" {
             $result[0].Feed | should be $null
@@ -81,7 +69,7 @@ Describe "Get-BoxstarterPackage" {
         New-BoxstarterPackage -name package1
         New-BoxstarterPackage -name package2
         New-BoxstarterPackage -name package3
-        Mock Invoke-RestMethod
+        Mock Get-BoxstarterPackagePublishedVersion
 
         $result = Get-BoxstarterPackage -PackageName "package1","package3"
 
@@ -102,7 +90,7 @@ Describe "Get-BoxstarterPackage" {
         New-BoxstarterPackage -name package1
         New-BoxstarterPackage -name package2
         New-BoxstarterPackage -name package3
-        Mock Invoke-RestMethod
+        Mock Get-BoxstarterPackagePublishedVersion
 
         $result = Get-BoxstarterPackage -PackageName "package2"
 
