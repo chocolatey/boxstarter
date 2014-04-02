@@ -5,7 +5,7 @@ Import-Module $here\Boxstarter.Common\Boxstarter.Common.psd1 -Function Test-Admi
 
 if(!(Test-Admin)) {
     Write-BoxstarterMessage "Not running with administrative rights. Attempting to elevate..."
-    $command = "-ExecutionPolicy bypass -noexit -command &$here\BoxstarterShell.ps1"
+    $command = "-ExecutionPolicy bypass -noexit -command &'$here\BoxstarterShell.ps1'"
     Start-Process powershell -verb runas -argumentlist $command
     Exit
 }
