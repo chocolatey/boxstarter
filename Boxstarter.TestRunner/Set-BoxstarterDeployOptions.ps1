@@ -78,7 +78,7 @@ Key 5cbc38d9-1a94-430d-8361-685a9080a6b8
 http://boxstarter.codeplex.com
 Get-BoxstarterDeployOptions 
 #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='Credential')]
     param(
         [Parameter(ParameterSetName="Credential")]
         [Management.Automation.PsCredential]$DeploymentTargetCredentials,

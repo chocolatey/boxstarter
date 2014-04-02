@@ -16,7 +16,7 @@ Changes the size of the Taskbar Icons.  Valid inputs are Small and Large.
 Changes the location in which the Taskbar is docked.  Valid inputs are Top, Left, Bottom and Right.
 
 #>
-	[CmdletBinding()]
+	[CmdletBinding(DefaultParameterSetName='unlock')]
 	param(
         [Parameter(ParameterSetName='lock')]
         $Lock,
