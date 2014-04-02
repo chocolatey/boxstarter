@@ -4,7 +4,10 @@ function Set-TaskbarOptions {
 Sets options for the Windows Task Bar
 
 .PARAMETER Lock
-Changes the lock status of the Windows Task Bar.  Valid inputs are Yes and No.
+Locks the taskbar
+
+.PARAMETER UnLock
+Unlocks the taskbar
 
 .PARAMETER Size
 Changes the size of the Taskbar Icons.  Valid inputs are Small and Large.
@@ -15,8 +18,10 @@ Changes the location in which the Taskbar is docked.  Valid inputs are Top, Left
 #>
 	[CmdletBinding()]
 	param(
-		[ValidateSet('Yes','No')]
-		$Lock,
+        [Parameter(ParameterSetName='lock')]
+        $Lock,
+        [Parameter(ParameterSetName='unlock')]
+        $UnLock,
 		[ValidateSet('Small','Large')]
 		$Size,
 		[ValidateSet('Top','Left','Bottom','Right')]
@@ -27,10 +32,12 @@ Changes the location in which the Taskbar is docked.  Valid inputs are Top, Left
 	$dockingKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects2'
 
 	if(Test-Path -Path $key) {
-		switch ($Lock) 
+		if($Lock) 
 		{ 
-			"Yes"  { Set-ItemProperty $key TaskbarSizeMove 0 } 
-			"No"  { Set-ItemProperty $key TaskbarSizeMove 1 } 
+			Set-ItemProperty $key TaskbarSizeMove 0
+        }
+        if($UnLock){
+			Set-ItemProperty $key TaskbarSizeMove 1 
 		} 
 
 		switch ($Size) {

@@ -37,13 +37,6 @@ Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
 </pre>
 <p>This moves the Personal library (aka Documents) to the documents folder off of the default SkyDrive directory.</p>
 
-<h3>Set-ExplorerOptions</h3>
-<p>Sets options on the Windows Explorer shell</p>
-<p><strong>NOTE:</strong> This function is now deprecated.  Please use Set-WindowsExplorerOptions instead.</p>
-<pre>
-Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
-</pre>
-
 <h3>Set-StartScreenOptions</h3>
 <p>Sets options for the Start Screen in Windows 8/8.1</p>
 <pre>
@@ -74,18 +67,14 @@ Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowProtec
 Set-WindowsExplorerOptions -DisableShowHiddenFilesFoldersDrives -DisableShowProtectedOSFiles -DisableShowFileExtensions -DisableShowFullPathInTitleBar
 </pre>
 
-<h3>Set-TaskbarSmall</h3>
-<p>Makes the windows task bar skinny</p>
-<p><strong>NOTE:</strong> This function is now deprecated.  Please use Set-TaskbarOptions instead.</p>
-
 <h3>Set-TaskbarOptions</h3>
 <p>Sets options on the Windows Taskbar</p>
 <pre>
-Set-TaskbarOptions -Size Small -Lock Yes -Dock Top
+Set-TaskbarOptions -Size Small -Lock -Dock Top
 </pre>
 <p>It is also possible to do the converse actions, if required.</p>
 <pre>
-    Set-TaskbarOptions -Size Large -Lock No -Dock Bottom
+    Set-TaskbarOptions -Size Large -UnLock -Dock Bottom
 </pre>
 
 <h3>Update-ExecutionPolicy</h3>
