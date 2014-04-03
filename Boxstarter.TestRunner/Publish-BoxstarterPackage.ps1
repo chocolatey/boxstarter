@@ -67,7 +67,12 @@ Set-BoxstarterFeedAPIKey
                 Write-BoxstarterMessage "Calling nuget: push $nupkg $(Get-BoxstarterFeedAPIKey $pkg.Feed) -Source $($pkg.Feed)/package -NonInteractive" -Verbose
                 $err += Invoke-NugetPush $pkg $nupkg 2>&1
                 try {
-                    $publishedVersion = Get-BoxstarterPackagePublishedVersion $pkg.id $pkg.Feed -ErrorAction Stop
+                    for($count = 1; $count -le 5; $count++) {
+                        $publishedVersion = Get-BoxstarterPackagePublishedVersion $pkg.id $pkg.Feed -ErrorAction Stop
+                        if($publishedVersion.length -gt 0) { break }
+                        Write-BoxstarterMessage "no published version found, Trying again." -Verbose
+                        Start-Sleep -seconds 10
+                    }
                 }
                 catch{
                     $err += $_
