@@ -7,9 +7,9 @@ function Bootstrap-Boxstarter {
         . "$env:temp\choco.ps1"
     }
 
-    if(!(Test-Path $env:ChocolateyInstall\lib\Boxstarter.TestRunner*)) { 
+    if(!(Get-Module -ListAvailable -Name boxstarter.testrunner -ErrorAction SilentlyContinue)) { 
             Write-Output "Boxstarter TestRunner not installed. Installing..."
-            if($debug) {
+            if($debug.length -gt 0) {
                 ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Boxstarter.TestRunner -source "$PSScriptRoot" 
             }
             ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Boxstarter.TestRunner
@@ -19,7 +19,7 @@ function Bootstrap-Boxstarter {
         Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.Azure.psd1
     }
     if(!(Get-Module Boxstarter.TestRunner)){
-        Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.TestRunner.psd1
+        Import-Module $env:AppData\Boxstarter\Boxstarter.TestRunner\Boxstarter.TestRunner.psd1
     }
 }
 

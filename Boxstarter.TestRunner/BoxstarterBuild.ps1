@@ -15,13 +15,17 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 #Configure our settings
 $Boxstarter.LocalRepo=(Resolve-Path "$here\..\")
-Set-BoxstarterDeployOptions -DeploymentTargetUserName $DeploymentTargetUserName -DeploymentTargetPassword $DeploymentTargetPassword
-if(![string]::IsNullOrEmpty($FeedAPIKey)) {
+if($DeploymentTargetUserName.length -gt 0) {
+    Set-BoxstarterDeployOptions -DeploymentTargetUserName $DeploymentTargetUserName -DeploymentTargetPassword $DeploymentTargetPassword
+}
+if($FeedAPIKey.length -gt 0) {
     Set-BoxstarterDeployOptions -DefaultFeedAPIKey $FeedAPIKey
 }
-Set-BoxstarterAzureOptions $AzureSubscriptionName $AzureSubscriptionId $AzureSubscriptionCertificate
 
-Publish-BoxstarterPassedTestResults
+if($AzureSubscriptionName.length -gt 0) {
+    Set-BoxstarterAzureOptions $AzureSubscriptionName $AzureSubscriptionId $AzureSubscriptionCertificate
+}
+
 #We want to exit with an unsuccessful exit code if any tests fail or not tests are run at all
 $failedTests=0
 $failedPubs=0
@@ -36,7 +40,7 @@ Test-BoxstarterPackage -Verbose | % {
     $_
 }
 
-if($PublishSuccesfulPackages){
+if($PublishSuccesfulPackages.length -gt 0){
     $testedPackage | Select-BoxstarterResultsToPublish | Publish-BoxstarterPackage | % {
         if($_.PublishErrors -ne $null) { $failedPubs++ }
         $_
