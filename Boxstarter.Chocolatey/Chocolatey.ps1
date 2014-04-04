@@ -166,6 +166,9 @@ Intercepts Chocolatey call to check for reboots
 }
 
 function Call-Chocolatey {
+    if($PSBoundParameters.Keys -notcontains "Source"){
+        $PSBoundParameters.Source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
+    }
     ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
 }
 
