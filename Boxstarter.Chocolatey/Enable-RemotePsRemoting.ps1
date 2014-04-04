@@ -50,7 +50,7 @@ param(
     ## Create a task that will run with full network privileges.
     ## In this task, we call Enable-PsRemoting
     schtasks /CREATE /TN 'Temp Enable Remoting' /SC WEEKLY /RL HIGHEST ``
-        /RU $username /RP $password ``
+        /RU $username /RP "$password" ``
         /TR "powershell -noprofile -command Enable-PsRemoting -Force | Out-File (Join-Path `$env:TEMP Enable-PSRemoting.txt)" /F |
         Out-String
 
@@ -59,12 +59,12 @@ param(
     [xml]`$xml = schtasks /QUERY /TN 'Temp Enable Remoting' /XML
     `$xml.Task.Settings.Priority="4"
     `$xml.Save(`$taskFile)
-    schtasks /CREATE /TN 'Enable Remoting' /RU $username /RP $password /XML "`$taskFile" /F | Out-String
+    schtasks /CREATE /TN 'Enable Remoting' /RU $username /RP "$password" /XML "`$taskFile" /F | Out-String
     schtasks /DELETE /TN 'Temp Enable Remoting' /F | Out-String
 
     schtasks /RUN /TN 'Enable Remoting' | Out-String
 
-    `$securePass = ConvertTo-SecureString $password -AsPlainText -Force
+    `$securePass = ConvertTo-SecureString "$password" -AsPlainText -Force
     `$credential =
         New-Object Management.Automation.PsCredential $username,`$securepass
 
