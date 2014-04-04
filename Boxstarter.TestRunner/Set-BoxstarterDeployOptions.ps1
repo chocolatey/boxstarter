@@ -17,7 +17,8 @@ The credentials to use for deploying packages to the Deployment Targets
 
 .PARAMETER DeploymentTargetNames
 Names of test targets where packages will be tested. These can be either 
-computer names or VM names if using one of the VM providers.
+computer names or VM names if using one of the VM providers. The default 
+is localhost. When testing locally, Reboots are disabled.
 
 .PARAMETER DeploymentVMProvider
 The name of the VM provider if the deployment targts are managed using 
