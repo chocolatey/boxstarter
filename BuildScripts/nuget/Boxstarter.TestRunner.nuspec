@@ -16,19 +16,31 @@
       <dependency id="Boxstarter.Azure" version="$version$" />
     </dependencies>
     <releaseNotes>
-      - report an exception if chocolatey faied to find package
-      - Do not attempt to install windows updates that require user interaction
-      - Fix Windows Update from breaking when reseting the windows update service if it was stopped prior to running
-      - Load VM Plugins relative to current path and not by module name in case module is not in PSModulePath
-      - Fix pipeline input of VM names broken by function proxy
-      - Can supply multiple packages to Install-BoxstarterPackage and Launch URLs
-      - Boxstarter.Azure now globally imports the Windows Azure module
-      - Fixed issues with using the Boxstarter Web launcher to install Boxstarter
-      - Fixed errors when installing Boxstarter with Chocolatey in the same session after installing Chocolatey
-      - Adds Windows Azure VM Integration
-      - Supports VM Checkpoints using Azure Blob Snapshots
-      - Adds Graceful failure to Enable-RemoteDesktop for Home versions of Windows 7
-      - Adds support for unattended install of Boxstarter
+      - Add the following windows config features:
+      - Enable/Disable showing charms when mouse is in the upper right corner
+      - Enable/Disable switching apps when pointing in the upper left corner
+      - Enable/Disable the option to launch powershell from win-x
+      - Enable/Disable boot to desktop
+      - Enable/Disable desktop background on the start screen
+      - Enable/Disable showing the start screen on the active display
+      - Enable/Disable showing the Apps View by default on the start screen
+      - Enable/Disable searching everywhere in apps view. Not just apps.
+      - Enable/Disable showing desktop apps first in results
+      - Lock/Unlock task bar
+      - Change taskbar icon size
+      - Change location of taskbar docking
+      - Add test and publish automation that can point to remote deployment targets
+      - Provide build scripts for integration of tests and publishing in CI servers
+      - Include configured nuget sources and local repo to all chocolatey install calls and not just the initial package
+      - Fix enabling powershell remoting via WMI when password has ampersands
+      - Avoid explorer.exe crashes when configuring explorer options
+      - Fix Hyper-V heartbeat check in non US locales
+      - Fix Azure module loading in 32 bit consoles
+      - Fix shell shortcuts when user name has a space
+      - Fix Azure VM Checkpoint listing when there are more than one VM in a service
+      - Install .net 4.5 ONLY without affecting IIS settings when .net 4 is not present
+      - Fix Azure VM integration when multiple subscriptions are present
+      - Allow remote installs to be run by a non amin user
     </releaseNotes>
   </metadata>
   <files>
