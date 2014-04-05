@@ -16,6 +16,8 @@
       <dependency id="Boxstarter.WinConfig" version="$version$" />      
     </dependencies>
     <releaseNotes>
+      - Fixing .net 4.5 install for local installs
+      - Fixing TestRunner module loading for PSv2 clients
       - Add the following windows config features:
       - Enable/Disable showing charms when mouse is in the upper right corner
       - Enable/Disable switching apps when pointing in the upper left corner
