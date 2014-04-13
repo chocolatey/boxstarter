@@ -1,0 +1,33 @@
+﻿@using System.Security.Policy
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    var absPath = Request.Url.AbsolutePath;
+    var thisPage = absPath.ToLower().Substring(absPath.LastIndexOf('/')+1);
+    PageData[thisPage + "Style"] = "active";
+    PageData["Learn"] = "active";
+}
+
+@section styles {
+    @RenderSection("styles", required: false)
+}
+
+
+<div class="row">
+    <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="list-group">
+            <a href="WebLauncher" class="list-group-item @PageData["weblauncherStyle"]">Run with a Gist</a>
+            <a href="SimplePackage" class="list-group-item @PageData["simplepackageStyle"]">Simple package creation</a>
+        </div>
+    </div>
+    <div class="col-md-9" role="main">
+        <div class="media">
+            <a class="pull-right" href="#">
+                <img class="media-object" src="~/images/boxlogo_sm.png"/>
+            </a>
+            <div class="media-body">
+                @RenderSection("headerBody")
+            </div>
+        </div>
+        @RenderBody()
+    </div>
+</div>

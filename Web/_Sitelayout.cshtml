@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="shortcut icon" href="~/favicon.ico">
 
     <title>Boxstarter</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="content/bootstrap.min.css" rel="stylesheet">
+    <link href="~/content/bootstrap.min.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -52,12 +52,13 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li class="@PageData["Documentation"]"><a href="/WhyBoxstarter">Documentation</a></li>
+                <li class="@PageData["Documentation"]"><a href="~/WhyBoxstarter">Docs</a></li>
+                <li class="@PageData["Learn"]"><a href="~/Learn/WebLauncher">Learn</a></li>
                 <li><a href="https://boxstarter.codeplex.com/workitem/list/basic">Issues</a></li>
                 <li><a href="https://boxstarter.codeplex.com/discussions">Discussion</a></li>
                 <li><a href="http://boxstarter.codeplex.com/SourceControl/latest">Source Code</a></li>
-                <li class="@PageData["Blog"]"><a href="/blog">Blog</a></li>
-                <li class="@PageData["License"]"><a href="/license">License</a></li>
+                <li class="@PageData["Blog"]"><a href="~/blog">Blog</a></li>
+                <li class="@PageData["License"]"><a href="~/license">License</a></li>
             </ul>
             <a class="btn btn-primary btn-navbar" role="button" href="downloads/Boxstarter.@( Helper.Version() ).zip"><span class="glyphicon glyphicon-cloud-download"></span> Download v@(Helper.Version())</a>
             <ul class="nav navbar-nav navbar-right">
@@ -85,8 +86,8 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="scripts/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script
+    <script src="~/scripts/bootstrap.min.js"></script>
     <script type="text/javascript">
 
       var _gaq = _gaq || [];
