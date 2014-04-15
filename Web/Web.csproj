@@ -90,6 +90,8 @@
     <Content Include="Images\install.PNG" />
     <Content Include="Images\installed.PNG" />
     <Content Include="Images\launch.PNG" />
+    <Content Include="Images\NugetServer.PNG" />
+    <Content Include="Images\NugetServerWeb.PNG" />
     <Content Include="Images\publishAzure.PNG" />
     <Content Include="Images\repoDir.PNG" />
     <Content Include="Images\runanyway.PNG" />
@@ -197,6 +199,7 @@
     <Content Include="Launch\Application Files\Boxstarter.WebLaunch_2_4_4_0\LICENSE.txt.deploy" />
     <Content Include="Learn\_ContentLayout.cshtml" />
     <Content Include="Learn\SimplePackage.cshtml" />
+    <Content Include="Learn\RemotePackageWithArtifacts.cshtml" />
     <None Include="Properties\PublishProfiles\boxstarter.pubxml" />
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
