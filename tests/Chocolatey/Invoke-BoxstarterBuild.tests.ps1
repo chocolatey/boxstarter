@@ -69,18 +69,4 @@ Describe "Invoke-BoxstarterBuild" {
             $ex | Should be "Cannot find $($Boxstarter.LocalRepo)\$packageName\$packageName.nuspec"
         }
     }
-
-    Context "When No nuspec is in a directory when building all" {
-        Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}
-        Mock Check-Chocolatey
-        Mkdir (Join-Path $Boxstarter.LocalRepo "pkg1") | Out-Null
-        Mkdir (Join-Path $Boxstarter.LocalRepo "pkg2") | Out-Null
-
-        try {Invoke-BoxstarterBuild -all} catch { $ex=$_ }
-
-        It "Will throw No Nuspec" {
-            $ex | Should be "Cannot find nuspec for pkg1"
-        }
-        [GC]::Collect() #pester test drive kept bombing on cleanup without this
-    }
 }

@@ -20,7 +20,8 @@ http://boxstarter.codeplex.com
 about_boxstarter_chocolatey
 Invoke-BoxstarterBuild
 New-BoxstarterPackage
-#>    
+#>
+    [CmdletBinding()]
     param(
         [Parameter(Position=0,ParameterSetName='name')]
         [string]$name,
@@ -51,12 +52,11 @@ New-BoxstarterPackage
                 Get-ChildItem . | ? { $_.PSIsContainer } | % {
                     $directoriesExist=$true
                     Write-BoxstarterMessage "Found directory $($_.name). Looking for $($_.name).nuspec"
-                    if(!(Test-Path (join-path $_.name "$($_.name).nuspec"))){
-                        throw "Cannot find nuspec for $_"
-                    }
-                    .$choco Pack (join-path . "$($_.Name)\$($_.Name).nuspec") | out-null
-                    if(!$quiet){
-                        Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Install-BoxstarterPackage $($_.Name) will run this package." -nologo                        
+                    if(Test-Path (join-path $_.name "$($_.name).nuspec")){
+                        .$choco Pack (join-path . "$($_.Name)\$($_.Name).nuspec") | out-null
+                        if(!$quiet){
+                            Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Install-BoxstarterPackage $($_.Name) will run this package." -nologo                        
+                        }
                     }
                 }
                 if($directoriesExist -eq $null){
