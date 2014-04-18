@@ -19,21 +19,23 @@
       <dependency id="Boxstarter.HyperV" version="$version$" />
     </dependencies>
     <releaseNotes>
+      - When building packages, skip folders without a nuspec instead of throwing an error
+      - Only restart the explore process of the current user when calling windows config functions
       - Fixing .net 4.5 install for local installs
       - Fixing TestRunner module loading for PSv2 clients
       - Add the following windows config features:
-        - Enable/Disable showing charms when mouse is in the upper right corner
-        - Enable/Disable switching apps when pointing in the upper left corner
-        - Enable/Disable the option to launch powershell from win-x
-        - Enable/Disable boot to desktop
-        - Enable/Disable desktop background on the start screen
-        - Enable/Disable showing the start screen on the active display
-        - Enable/Disable showing the Apps View by default on the start screen
-        - Enable/Disable searching everywhere in apps view. Not just apps.
-        - Enable/Disable showing desktop apps first in results
-        - Lock/Unlock task bar
-        - Change taskbar icon size
-        - Change location of taskbar docking
+      - Enable/Disable showing charms when mouse is in the upper right corner
+      - Enable/Disable switching apps when pointing in the upper left corner
+      - Enable/Disable the option to launch powershell from win-x
+      - Enable/Disable boot to desktop
+      - Enable/Disable desktop background on the start screen
+      - Enable/Disable showing the start screen on the active display
+      - Enable/Disable showing the Apps View by default on the start screen
+      - Enable/Disable searching everywhere in apps view. Not just apps.
+      - Enable/Disable showing desktop apps first in results
+      - Lock/Unlock task bar
+      - Change taskbar icon size
+      - Change location of taskbar docking
       - Add test and publish automation that can point to remote deployment targets
       - Provide build scripts for integration of tests and publishing in CI servers
       - Include configured nuget sources and local repo to all chocolatey install calls and not just the initial package

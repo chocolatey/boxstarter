@@ -16,6 +16,8 @@
       <dependency id="Boxstarter.WinConfig" version="$version$" />      
     </dependencies>
     <releaseNotes>
+      - When building packages, skip folders without a nuspec instead of throwing an error
+      - Only restart the explore process of the current user when calling windows config functions
       - Fixing .net 4.5 install for local installs
       - Fixing TestRunner module loading for PSv2 clients
       - Add the following windows config features:
