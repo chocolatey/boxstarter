@@ -58,7 +58,6 @@ function Enable-Net40 {
         Write-Host "Downloading .net 4.5..."
         Get-HttpToFile "http://download.microsoft.com/download/b/a/4/ba4a7e71-2906-4b2d-a0e1-80cf16844f5f/dotnetfx45_full_x86_x64.exe" "$env:temp\net45.exe"
         Write-Host "Installing .net 4.5..."
-        #$proc = Start-Process "$env:temp\net45.exe"  -wait -verb runas -argumentList "/quiet /norestart /log $env:temp\net45.log" -PassThru 
         $pinfo = New-Object System.Diagnostics.ProcessStartInfo
         $pinfo.FileName = "$env:temp\net45.exe"
         $pinfo.Verb="runas"
