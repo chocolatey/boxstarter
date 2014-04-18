@@ -10,13 +10,16 @@ function Cleanup-Boxstarter {
         Enable-UAC
     }
     if(!$Boxstarter.IsRebooting) { 
+        Write-BoxstarterMessage "Cleaning up and not rebooting" -Verbose
         $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
         if( Test-Path "$Startup\boxstarter-post-restart.bat") {
+            Write-BoxstarterMessage "Cleaning up restart file" -Verbose
             remove-item "$Startup\boxstarter-post-restart.bat"
             remove-item "$(Get-BoxstarterTempDir)\Boxstarter.Script"
             $promptToExit=$true
         }
         if(!$Boxstarter.NoPassword) {
+            Write-BoxstarterMessage "Cleaning up autologon registry keys" -Verbose
             $winLogonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
             $winlogonProps = Get-ItemProperty -Path $winLogonKey
             if($winlogonProps.DefaultUserName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultUserName" -ErrorAction SilentlyContinue}
@@ -24,7 +27,6 @@ function Cleanup-Boxstarter {
             if($winlogonProps.DefaultPassword){Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction SilentlyContinue}
             if($winlogonProps.AutoAdminLogon){Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue}
         }
-        Write-Debug "Cleaned up logon registry and restart file"
         if($promptToExit -or $KeepWindowOpen){
             Read-Host 'Type ENTER to exit'
         }
