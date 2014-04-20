@@ -16,6 +16,7 @@
       <dependency id="Boxstarter.WinConfig" version="$version$" />      
     </dependencies>
     <releaseNotes>
+      - Fix issues when Chocolatey packages create a new module and call chocolatey functions from that module
       - When building packages, skip folders without a nuspec instead of throwing an error
       - Only restart the explore process of the current user when calling windows config functions
       - Fixing .net 4.5 install for local installs
