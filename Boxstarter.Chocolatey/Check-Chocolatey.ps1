@@ -14,7 +14,7 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
             $Boxstarter.SuppressLogging = $currentLogging
         }
     }
-    Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
+    Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1 -Global 
     if(!$BoxstarterIntrercepting)
     {
         Write-BoxstarterMessage "Chocolatey installed, setting up interception of Chocolatey methods." -Verbose
