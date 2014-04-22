@@ -413,7 +413,7 @@ function Start-Record($computerName) {
         Errors = @()
         FinishTime = $null
     }
-    return (New-Object PSObject –Prop $props)
+    return (New-Object PSObject -Prop $props)
 }
 
 function Finish-Record($obj) {
