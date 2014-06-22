@@ -60,8 +60,8 @@ task Publish-ClickOnce {
 
 Task Test -depends Create-ModuleZipForRemoting {
     pushd "$baseDir"
-    $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
-    if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}
+    $pesterDir = "$env:ChocolateyInstall\lib\Pester.2.0.2"
+    #if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}
     if($testName){
         exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -testName $testName}
     }
