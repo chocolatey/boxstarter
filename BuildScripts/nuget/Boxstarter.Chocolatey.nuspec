@@ -17,6 +17,12 @@
       <dependency id="Boxstarter.Bootstrapper" version="$version$" />  
     </dependencies>
     <releaseNotes>
+      - Fixing typo param name in redirect call to set-WindowsExplorerOptions
+      - Fix InvalidArgument from Set-TaskbarOptions when using lock or unlock params
+      - Fix issues where explorer terminates and cannot restart after caling one of the winconfig functions
+      - Import azure module from the pipeline to avoid errors when loading Boxstarter.azure
+      - Suppress errors when reenabling windows update in case they had alrady been reenabled
+      - Fix mis encoded dash in Install-Boxstarterackage
       - Fix issues when Chocolatey packages create a new module and call chocolatey functions from that module
       - When building packages, skip folders without a nuspec instead of throwing an error
       - Only restart the explore process of the current user when calling windows config functions
