@@ -29,11 +29,14 @@ Describe "Invoke-FromTask" {
 
     Context "When Invoking a task with output"{
         Remove-Item $env:temp\test.txt -ErrorAction SilentlyContinue
+        Mock write-host {
+            $script:out += $object
+            Microsoft.PowerShell.Utility\Write-Host @PSBoundParameters
+        }
 
-        $result=Invoke-FromTask "Write-Output 'here is some output'" -Credential $mycreds -IdleTimeout 0
-
+        Invoke-FromTask "Write-Output 'here is some output'" -IdleTimeout 0 -verbose
         It "Should invoke the command"{
-            $result | should be "here is some output"
+            $script:out | should be "here is some output`r`n"
         }
     }
 
