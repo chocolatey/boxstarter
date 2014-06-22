@@ -25,7 +25,7 @@ http://boxstarter.codeplex.com
 	Write-Warning "This command is deprecated, use Set-WindowsExplorerOptions instead."
 	Write-Warning "Your call to this function will now be routed to the Set-WindowsExplorerOptions function."
 
-	if($showHidenFilesFoldersDrives) { Set-WindowsExplorerOptions -EnableShowHidenFilesFoldersDrives }
+	if($showHidenFilesFoldersDrives) { Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives }
     if($showFileExtensions) { Set-WindowsExplorerOptions -EnableShowProtectedOSFiles }
     if($showProtectedOSFiles) { Set-WindowsExplorerOptions -EnableShowFileExtensions }
 }
