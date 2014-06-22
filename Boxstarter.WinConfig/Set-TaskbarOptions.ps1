@@ -19,9 +19,9 @@ Changes the location in which the Taskbar is docked.  Valid inputs are Top, Left
 	[CmdletBinding(DefaultParameterSetName='unlock')]
 	param(
         [Parameter(ParameterSetName='lock')]
-        $Lock,
+        [switch]$Lock,
         [Parameter(ParameterSetName='unlock')]
-        $UnLock,
+        [switch]$UnLock,
 		[ValidateSet('Small','Large')]
 		$Size,
 		[ValidateSet('Top','Left','Bottom','Right')]
