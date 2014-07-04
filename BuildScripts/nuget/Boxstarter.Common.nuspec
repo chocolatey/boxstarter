@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
     <releaseNotes>
+      - Correcting fallback Chocolatey install path to match release 0.9.8.24
       - Fixing typo param name in redirect call to set-WindowsExplorerOptions
       - Fix InvalidArgument from Set-TaskbarOptions when using lock or unlock params
       - Fix issues where explorer terminates and cannot restart after caling one of the winconfig functions
