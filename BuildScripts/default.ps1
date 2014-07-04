@@ -18,8 +18,9 @@ Task default -depends Build
 Task Build -depends Build-Clickonce, Build-Web, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
-Task Push-Public -depends Push-Codeplex, Push-Chocolatey
+Task Push-Public -depends Push-Chocolatey, Push-Codeplex
 Task All-Tests -depends Test, Integration-Test
+Task Quick-Deploy -depends Build-Clickonce, Package, Publish-Clickonce
 
 task Create-ModuleZipForRemoting {
     if (Test-Path "$basedir\Boxstarter.Chocolatey\Boxstarter.zip") {
