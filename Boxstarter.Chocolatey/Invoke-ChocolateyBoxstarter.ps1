@@ -146,7 +146,6 @@ Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage '$($boots
         }
         if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
         $Boxstarter.ProgramFiles86="$programFiles86"
-        $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
         $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
         Check-Chocolatey -ShouldIntercept
         del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
@@ -179,7 +178,7 @@ function Download-Package([string[]]$bootstrapPackage) {
     $Boxstarter.Package=$bootstrapPackage
     if($bootstrapPackage.Count -eq 1){
         Write-BoxstarterMessage "Deleting previous $bootstrapPackage package" -Verbose
-        del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
+        del "$env:programdata\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
         $force=$true
     }
     $source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"

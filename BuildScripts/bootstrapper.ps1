@@ -32,7 +32,7 @@ function Check-Chocolatey {
                 Write-Warning ".net install returned $exitCode. You likely need to reboot your computer before proceeding with the install."
                 return $false
             }
-            $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
+            $env:ChocolateyInstall = "$env:programdata\chocolatey"
             New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
             $url="http://chocolatey.org/api/v2/package/chocolatey/"
             $wc=new-object net.webclient
@@ -41,7 +41,7 @@ function Check-Chocolatey {
             $wc.Proxy=$wp
             iex ($wc.DownloadString("http://chocolatey.org/install.ps1"))
             Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
-            $env:path="$env:path;$env:systemdrive\chocolatey\bin"
+            $env:path="$env:path;$env:ChocolateyInstall\bin"
         }
         else{
             return $false
