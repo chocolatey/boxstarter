@@ -7,6 +7,19 @@ Returns $True if the current PowerShell session is running remotely
 http://boxstarter.codeplex.com
 
 #>    
-    $res =  $PSSenderInfo -ne $null
-	return $res
+    if($PSSenderInfo -ne $null) {return $true}
+    else {
+        return Test-ChildOfWinrs
+    }
 }
+
+function Test-ChildOfWinrs($ID = $PID) {
+   $parent = (Get-WmiObject -Class Win32_Process -Filter "ProcessID=$ID").ParentProcessID 
+    if($parent -eq $null) { return $false } else {
+    	$parentProc = Get-WmiObject -Class Win32_Process -Filter "ProcessID=$parent"
+    	if($parentProc.Name -eq "winrshost.exe") {return $true} 
+    	else {
+    		return Test-ChildOfWinrs $parent
+    	}
+    }
+} 

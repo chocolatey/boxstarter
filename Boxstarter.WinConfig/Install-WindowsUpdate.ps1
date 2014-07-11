@@ -135,6 +135,10 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         }
         else{Write-BoxstarterMessage "There is no update applicable to this machine"}    
     }
+    catch {
+        Write-BoxstarterMessage "There were problems installing updates: $($_.ToString())"
+        throw
+    }
     finally {
         if($origAUVal){
             Set-ItemProperty -Path HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU -Name UseWuServer -Value $origAUVal -ErrorAction SilentlyContinue

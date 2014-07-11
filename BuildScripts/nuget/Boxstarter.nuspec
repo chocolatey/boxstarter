@@ -19,6 +19,9 @@
       <dependency id="Boxstarter.HyperV" version="$version$" />
     </dependencies>
     <releaseNotes>
+      - Bubble up errors from windows update
+      - Provide the same scheduled task wrapping for winrm as we do for ps remoting
+      - fix explorer restart when there is no explorer process
       - Correcting fallback Chocolatey install path to match release 0.9.8.24
       - Fixing typo param name in redirect call to set-WindowsExplorerOptions
       - Fix InvalidArgument from Set-TaskbarOptions when using lock or unlock params
