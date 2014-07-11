@@ -162,7 +162,7 @@ Process
 						#If $ErrorLog, log the file to a user specified location/path
 						If ($ErrorLog)
 							{
-								Out-File -InputObject "$Computer`,$_" -FilePath $ErrorLog -Append
+								Out-File -InputObject "$Computer`,$_.ToString()" -FilePath $ErrorLog -Append
 							}#End If ($ErrorLog)
 							
 					}#End Catch

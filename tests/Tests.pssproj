@@ -41,6 +41,7 @@
   <ItemGroup>
     <Folder Include="Azure\" />
     <Folder Include="Chocolatey\" />
+    <Folder Include="Common\" />
     <Folder Include="HyperV\" />
     <Folder Include="TestRunner\" />
   </ItemGroup>
@@ -56,6 +57,7 @@
     <Compile Include="Chocolatey\New-BoxstarterPackage.tests.ps1" />
     <Compile Include="Chocolatey\New-PackageFromScript.tests.ps1" />
     <Compile Include="Chocolatey\Set-BoxstarterShare.Tests.ps1" />
+    <Compile Include="Common\Invoke-FromTask.tests.ps1" />
     <Compile Include="TestRunner\Install-BoxstarterScripts.tests.ps1" />
     <Compile Include="TestRunner\Set-BoxstarterFeedAPIKey.Tests.ps1" />
   </ItemGroup>
