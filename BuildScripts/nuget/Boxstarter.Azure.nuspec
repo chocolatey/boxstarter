@@ -17,6 +17,7 @@
       <dependency id="WindowsAzureLibsForNet" version="2.2" />
     </dependencies>
     <releaseNotes>
+      - when accessing a 64 bit machine from a 32bit process, the windowsupdate reg key is hidden so skip it
       - Bubble up errors from windows update
       - Provide the same scheduled task wrapping for winrm as we do for ps remoting
       - fix explorer restart when there is no explorer process

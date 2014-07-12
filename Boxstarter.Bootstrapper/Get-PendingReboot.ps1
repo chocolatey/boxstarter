@@ -118,9 +118,11 @@ Process
 							
 						#Query WUAU from the registry
 						$RegWUAU = $RegCon.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\")
-						$RegWUAURebootReq = $RegWUAU.GetSubKeyNames()
-						$WUAURebootReq = $RegWUAURebootReq -contains "RebootRequired"
-						
+                        if($RegWUAU -ne $null) {
+						    $RegWUAURebootReq = $RegWUAU.GetSubKeyNames()
+						    $WUAURebootReq = $RegWUAURebootReq -contains "RebootRequired"
+						}
+
 						#Query PendingFileRenameOperations from the registry
 						$RegSubKeySM = $RegCon.OpenSubKey("SYSTEM\CurrentControlSet\Control\Session Manager\")
 						$RegValuePFRO = $RegSubKeySM.GetValue("PendingFileRenameOperations",$null)
