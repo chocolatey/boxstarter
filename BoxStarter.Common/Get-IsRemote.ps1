@@ -18,6 +18,7 @@ function Test-ChildOfWinrs($ID = $PID) {
     if($parent -eq $null) { return $false } else {
     	$parentProc = Get-WmiObject -Class Win32_Process -Filter "ProcessID=$parent"
     	if($parentProc.Name -eq "winrshost.exe") {return $true} 
+        elseif($parentProc.Name -eq "services.exe") {return $false} 
     	else {
     		return Test-ChildOfWinrs $parent
     	}
