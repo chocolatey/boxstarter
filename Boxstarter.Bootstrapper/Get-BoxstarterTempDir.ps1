@@ -1,4 +1,11 @@
 function Get-BoxstarterTempDir {
-    if(!(test-path "$env:LocalAppData\Boxstarter")){mkdir "$env:LocalAppData\Boxstarter" | out-null}
-    return "$env:LocalAppData\Boxstarter"
+    if($env:LocalAppData -and $env:LocalAppData.StartsWith("$env:SystemDrive\Users")){
+        $dir = $env:LocalAppData
+    }
+    else {
+        $dir = $env:ProgramData
+    }
+
+if(!(Test-Path "$dir\Boxstarter")){mkdir "$dir\Boxstarter" | out-null}
+    return "$dir\Boxstarter"
 }
