@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
     <releaseNotes>
+      - System user logs to programdata
       - when accessing a 64 bit machine from a 32bit process, the windowsupdate reg key is hidden so skip it
       - Bubble up errors from windows update
       - Provide the same scheduled task wrapping for winrm as we do for ps remoting
