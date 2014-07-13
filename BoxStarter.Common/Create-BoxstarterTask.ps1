@@ -35,7 +35,7 @@ Remove-BoxstarterTask
         schtasks /CREATE /TN 'Boxstarter Task' /RU "$($Credential.UserName)" /IT /RP $Credential.GetNetworkCredential().Password /XML "$taskFile" /F | Out-Null
         schtasks /DELETE /TN 'Temp Boxstarter Task' /F | Out-Null
     }
-    else { #For testing
+    elseif(!((schtasks /QUERY /TN 'Boxstarter Task' /FO LIST 2>&1) -contains 'Logon Mode:    Interactive/Background')) { #For testing
         schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
                 /RU "$($Credential.UserName)" /IT `
         /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
