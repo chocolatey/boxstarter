@@ -37,6 +37,11 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         if(Test-PendingReboot){
             Invoke-Reboot
         }
+        #If we are in a remote 32 bit process, Test-Pending reboot cant read
+        #the wsus registry reboot needed key so check the output of the install task
+        Get-Content $env:TEMP\BoxstarterOutput.stream | % {
+            if($_ -contains "A Restart is Required.") { Invoke-Reboot }
+        }
         return
     }
 
