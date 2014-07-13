@@ -19,6 +19,7 @@
       <dependency id="Boxstarter.HyperV" version="$version$" />
     </dependencies>
     <releaseNotes>
+      - Check scheduled task output for pending reboots after a remote windows update since 32 bit processes cant read the wsus registry keys
       - Fix Remote check when running as a servise
       - System user logs to programdata
       - when accessing a 64 bit machine from a 32bit process, the windowsupdate reg key is hidden so skip it

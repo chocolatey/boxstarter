@@ -5,7 +5,7 @@ function Get-Boxstarter {
     Write-Output "Welcome to the Boxstarter Module installer!"
     if(Check-Chocolatey -Force:$Force){
         Write-Output "Chocolatey installed, Installing Boxstarter Modules."
-        cinst Boxstarter -version 2.4.35
+        cinst Boxstarter -version 2.4.39
         $Message = "Boxstarter Module Installer completed"
     }
     else {
