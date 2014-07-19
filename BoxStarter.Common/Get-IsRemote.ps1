@@ -7,9 +7,10 @@ Returns $True if the current PowerShell session is running remotely
 http://boxstarter.codeplex.com
 
 #>    
-    if($PSSenderInfo -ne $null) {return $true}
+    if($env:IsRemote -or $PSSenderInfo -ne $null) {return $true}
     else {
-        return Test-ChildOfWinrs
+        $env:IsRemote =  Test-ChildOfWinrs
+        return $env:IsRemote
     }
 }
 
