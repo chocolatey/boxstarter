@@ -18,7 +18,7 @@ http://boxstarter.codeplex.com
 function Test-ChildOfWinrs($ID = $PID) {
    $parent = (Get-WmiObject -Class Win32_Process -Filter "ProcessID=$ID").ParentProcessID 
     if($parent -eq $null) { return $false } else {
-    	$parentProc = Get-WmiObject -Class Win32_Process -Filter "ProcessID=$parent"
+    	$parentProc = Get-Process -ID $parent -ErrorAction SilentlyContinue
     	if($parentProc.Name -eq "winrshost.exe") {return $true} 
         elseif($parentProc.Name -eq "services.exe") {return $false} 
     	else {
