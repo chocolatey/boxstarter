@@ -11,7 +11,7 @@ http://boxstarter.codeplex.com
     if($PSSenderInfo -ne $null) {return $true}
     else {
         $env:IsRemote = Test-ChildOfWinrs
-        return $env:IsRemote
+        return [bool]::Parse($env:IsRemote)
     }
 }
 
