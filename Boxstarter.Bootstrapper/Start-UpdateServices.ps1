@@ -1,7 +1,7 @@
 function Start-UpdateServices {
     write-boxstartermessage "Enabling Automatic Updates from Windows Update"
-    Remove-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -name 'NoAutoUpdate' -force -ErrorAction SilentlyContinue
-    Remove-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -name 'NoAutoRebootWithLoggedOnUsers' -force -ErrorAction SilentlyContinue
+    try { Remove-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -name 'NoAutoUpdate' -force -ErrorAction Stop } catch {$global:error.RemoveAt(0)}
+    try {Remove-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -name 'NoAutoRebootWithLoggedOnUsers' -force -ErrorAction Stop} catch{$global:error.RemoveAt(0)}
     Start-CCMEXEC
 }
 

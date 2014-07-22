@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
     <releaseNotes>
+      - Silencing some handled errors and keep them from leaking to the pipeline
       - Reduce WMI calls and Improve performance of testing if the current session is remote
       - When forcing the install of the outer boxstarter package, make sure to delete the last install from the right repo
       - Check scheduled task output for pending reboots after a remote windows update since 32 bit processes cant read the wsus registry keys
