@@ -11,7 +11,7 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
             $currentLogging=$Boxstarter.Suppresslogging
             if($VerbosePreference -eq "SilentlyContinue"){$Boxstarter.Suppresslogging=$true}
             . "$env:temp\choco.ps1"
-            if($error[0].CategoryInfo.Activity -eq 'Remove-Module'){ $global:error.RemoveAt(0) } #this is so terrible
+            if($global:error[0].CategoryInfo.Activity -eq 'Remove-Module'){ $global:error.RemoveAt(0) } #this is so terrible
             $Boxstarter.SuppressLogging = $currentLogging
         }
     }
