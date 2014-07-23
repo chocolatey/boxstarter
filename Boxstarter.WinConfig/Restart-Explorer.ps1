@@ -1,14 +1,19 @@
 function Restart-Explorer {
 
     try{
-        #Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name AutoRestartShell -Value 1 | out-Null
         $user = Get-CurrentUser
-        Get-Process -Name explorer -ErrorAction SilentlyContinue -IncludeUserName | ? { $_.UserName -eq "$($user.Domain)\$($user.Name)"} | Stop-Process -Force -ErrorAction Stop | Out-Null
+        try { $explorer = Get-Process -Name explorer -ErrorAction stop -IncludeUserName } 
+        catch {$global:error.RemoveAt(0)}
+        
+        if($explorer -ne $null) { 
+            $explorer | ? { $_.UserName -eq "$($user.Domain)\$($user.Name)"} | Stop-Process -Force -ErrorAction Stop | Out-Null
+        }
 
         Start-Sleep 1
 
         if(!(Get-Process -Name explorer -ErrorAction SilentlyContinue)) {
-            start-Process -Name explorer
+            $global:error.RemoveAt(0)
+            start-Process -FilePath explorer
         }
-    } catch {}
+    } catch {$global:error.RemoveAt(0)}
 }
