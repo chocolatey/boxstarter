@@ -18,6 +18,7 @@ Describe "Install-BoxstarterPackage" {
     Mock Invoke-ChocolateyBoxstarter
     Mock Enable-PSRemoting
     Mock Enable-WSManCredSSP
+    Mock Restart-Computer
     Mock Test-WSMan { return ([Xml]"<response><node/></response>").response } -ParameterFilter { $Credential -ne $null }
     Mock Disable-WSManCredSSP
     Mock Set-Item -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
