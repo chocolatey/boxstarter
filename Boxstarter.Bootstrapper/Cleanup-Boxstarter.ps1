@@ -33,7 +33,7 @@ function Cleanup-Boxstarter {
         return
     } 
 
-    if(!(Get-IsRemote)){
+    if(!(Get-IsRemote -PowershellRemoting)){
         if(Get-UAC){
             Write-BoxstarterMessage "UAC Enabled. Disabling..."
             Disable-UAC
@@ -41,7 +41,7 @@ function Cleanup-Boxstarter {
         }
     }
 
-    if(!(Get-IsRemote) -and $BoxstarterPassword.Length -gt 0) {
+    if(!(Get-IsRemote -PowershellRemoting) -and $BoxstarterPassword.Length -gt 0) {
         $currentUser=Get-CurrentUser
         Write-BoxstarterMessage "Securely Storing $($currentUser.Domain)\$($currentUser.Name) credentials for automatic logon"
         Set-SecureAutoLogon $currentUser.Name $BoxstarterPassword $currentUser.Domain

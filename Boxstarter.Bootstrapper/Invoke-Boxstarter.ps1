@@ -150,7 +150,7 @@ function InitAutologon([System.Security.SecureString]$password){
     if($autoLogon) {
         $autoLogon = $autoLogon.AutoAdminLogon
         if($autoLogon -gt 0) {
-            $autoLogonCount=Get-ItemProperty -Path $autologonKey -Name "AutoLogonCount" -ErrorAction SilentlyContinue
+            try { $autoLogonCount=Get-ItemProperty -Path $autologonKey -Name "AutoLogonCount" -ErrorAction stop } catch {$global:error.RemoveAt(0)}
             if($autoLogonCount) {$autoLogon=$autoLogonCount.autoLogonCount}
         }
     } else {$autoLogon=0}

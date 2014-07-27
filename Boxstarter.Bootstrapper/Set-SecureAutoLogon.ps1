@@ -253,7 +253,7 @@ process {
         if ($AutoLogonCount) {
             Set-ItemProperty -Path $WinlogonPath -Name AutoLogonCount -Value $AutoLogonCount -Force
         } else {
-            Remove-ItemProperty -Path $WinlogonPath -Name AutoLogonCount -ErrorAction SilentlyContinue
+            try {Remove-ItemProperty -Path $WinlogonPath -Name AutoLogonCount -ErrorAction stop } catch {$global:error.RemoveAt(0)}
         }
 
         if ($RemoveLegalPrompt) {

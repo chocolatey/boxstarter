@@ -1,4 +1,7 @@
 function Get-IsRemote {
+param (
+    [switch]$PowershellRemoting
+)
 <#
 .SYNOPSIS
 Returns $True if the current PowerShell session is running remotely
@@ -7,8 +10,9 @@ Returns $True if the current PowerShell session is running remotely
 http://boxstarter.codeplex.com
 
 #>    
-    if($env:IsRemote -ne $null) { return [bool]::Parse($env:IsRemote) }
     if($PSSenderInfo -ne $null) {return $true}
+    if($PowershellRemoting) {return $false}
+    if($env:IsRemote -ne $null) { return [bool]::Parse($env:IsRemote) }
     else {
         $env:IsRemote = Test-ChildOfWinrs
         return [bool]::Parse($env:IsRemote)
