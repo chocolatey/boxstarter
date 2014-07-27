@@ -16,6 +16,9 @@
       <dependency id="Boxstarter.Azure" version="$version$" />
     </dependencies>
     <releaseNotes>
+      - Greatly improve progress messaging during windows updates runs
+      - Fix hang scenarios when waiting for remote machine to reboot and landing in a pending reboot state shortly after reboot
+      - Support for auto login and restart in winrm sessions
       - Fix issue with remote check causing an indefinite loop
       - Silencing some handled errors and keep them from leaking to the pipeline
       - Reduce WMI calls and Improve performance of testing if the current session is remote
