@@ -48,8 +48,6 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
     try{
         $searchSession=Start-TimedSection "Checking for updates..."        
         $updateSession =new-object -comobject "Microsoft.Update.Session"
-        $updatesToDownload =new-Object -com "Microsoft.Update.UpdateColl"
-        $updatesToInstall =new-object -com "Microsoft.Update.UpdateColl"
         $Downloader =$updateSession.CreateUpdateDownloader()
         $Installer =$updateSession.CreateUpdateInstaller()
         $Searcher =$updatesession.CreateUpdateSearcher()
@@ -72,56 +70,38 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
 
         $Result = $Searcher.Search($criteria)
         Stop-TimedSection $searchSession
+        $totalUpdates = $Result.updates.count
 
-        If ($Result.updates.count -ne 0)
+        If ($totalUpdates -ne 0)
         {
             Out-BoxstarterLog "$($Result.updates.count) Updates found"
+            $currentCount = 0
             foreach($update in $result.updates) {
-                if ($update.isDownloaded -ne "true" -and ($update.InstallationBehavior.CanRequestUserInput -eq $false )) {
-                    Out-BoxstarterLog " * Adding $($update.title) to list of updates to download"
-                    $updatesToDownload.add($update) | Out-Null
+                ++$currentCount
+                if(!($update.EulaAccepted)){
+                    if($acceptEula) {
+                        $update.AcceptEula()
+                    }
+                    else {
+                        Out-BoxstarterLog " * $($update.title) has a user agreement that must be accepted. Call Install-WindowsUpdate with the -AcceptEula parameter to accept all user agreements. This update will be ignored."
+                        continue
+                    }
+                }
+
+                $Result= $null
+                if ($update.isDownloaded -eq "true" -and ($update.InstallationBehavior.CanRequestUserInput -eq $false )) {
+                    Out-BoxstarterLog " * $($update.title) already downloaded"
+                    $result = install-Update $update $currentCount $totalUpdates
                 }
                 elseif($update.InstallationBehavior.CanRequestUserInput -eq $true) {
                     Out-BoxstarterLog " * $($update.title) Requires user input and will not be downloaded"
                 }
-                else {Out-BoxstarterLog " * $($update.title) already downloaded"}
-            }
-
-            If ($updatesToDownload.Count -gt 0) {
-                $downloadSession=Start-TimedSection "Downloading $($updatesToDownload.Count) updates"
-                $Downloader.Updates = $updatesToDownload
-                $Downloader.Download() | Out-Null
-                Stop-TimedSection $downloadSession
-            }
-            
-            foreach($update in $result.updates) {
-                if($update.InstallationBehavior.CanRequestUserInput -eq $false) {
-                    if(!($update.EulaAccepted) -and $acceptEula){
-                        $update.AcceptEula()
-                    }
-                    $updatesToinstall.add($update) | Out-Null
-                }
-            }
-
-            $installSession=Start-TimedSection "Installing Updates"
-            Out-BoxstarterLog "This may take several minutes..."
-            if($UpdatesToInstall.Count -gt 0) {
-                $Installer.updates = $UpdatesToInstall
-                try { $result = $Installer.Install() } catch {
-                    if(!($SuppressReboots) -and (test-path function:\Invoke-Reboot)){
-                        if(Test-PendingReboot){Invoke-Reboot}
-                    }
-                    # Check for WU_E_INSTALL_NOT_ALLOWED  
-                    if($_.Exception.HResult -eq -2146233087) {
-                        Out-BoxstarterLog "There is either an update in progress or there is a pending reboot blocking the install."
-                        Out-BoxstarterLog "If you are using the Bootstrapper or Chocolatey module, try using:"
-                        Out-BoxstarterLog "if(Test-PendingReboot){Invoke-Reboot}"
-                        Out-BoxstarterLog "This will perform a reboot if reboots are pending."
-                    }
-                    throw
+                else {
+                    Download-Update $update
+                    $result = Install-Update $update $currentCount $totalUpdates
                 }
 
-                if($result.rebootRequired) {
+                if($result -ne $null -and $result.rebootRequired) {
                     if($SuppressReboots) {
                         Out-BoxstarterLog "A Restart is Required."
                     } else {
@@ -135,8 +115,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
                         }
                     }
                 }
-            }
-            Stop-TimedSection $installSession
+            }            
         }
         else{Write-BoxstarterMessage "There is no update applicable to this machine"}    
     }
@@ -155,4 +134,35 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
             stop-service wuauserv -ErrorAction SilentlyContinue
         }
     }
+}
+
+function Download-Update($update) {
+    $downloadSession=Start-TimedSection "Download of $($update.Title)"
+    $updates= new-Object -com "Microsoft.Update.UpdateColl"
+    $updates.Add($update) | out-null
+    $Downloader.Updates = $updates
+    $Downloader.Download() | Out-Null
+    Stop-TimedSection $downloadSession
+}
+
+function Install-Update($update, $currentCount, $totalUpdates) {
+    $installSession=Start-TimedSection "Install $currentCount of $totalUpdates updates: $($update.Title)"
+    $updates= new-Object -com "Microsoft.Update.UpdateColl"
+    $updates.Add($update) | out-null
+    $Installer.updates = $Updates
+    try { $result = $Installer.Install() } catch {
+        if(!($SuppressReboots) -and (test-path function:\Invoke-Reboot)){
+            if(Test-PendingReboot){Invoke-Reboot}
+        }
+        # Check for WU_E_INSTALL_NOT_ALLOWED  
+        if($_.Exception.HResult -eq -2146233087) {
+            Out-BoxstarterLog "There is either an update in progress or there is a pending reboot blocking the install."
+            Out-BoxstarterLog "If you are using the Bootstrapper or Chocolatey module, try using:"
+            Out-BoxstarterLog "if(Test-PendingReboot){Invoke-Reboot}"
+            Out-BoxstarterLog "This will perform a reboot if reboots are pending."
+        }
+        throw
+    }
+    Stop-TimedSection $installSession
+    return $result
 }

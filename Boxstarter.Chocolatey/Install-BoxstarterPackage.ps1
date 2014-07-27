@@ -720,12 +720,12 @@ function Test-Reconnection($Session, $sessionPID) {
     }
     #if the session is pending a reboot but not in the middle of a system shutdown, 
     #try to invoke a reboot to prevent us from hanging while waiting
-    elseif($response -eq $true){
+    elseif($response -eq $true -and !(Test-ShutDownInProgress $session)){
         Write-BoxstarterMessage "Attempting to restart $($session.ComputerName)" -Verbose
         Invoke-Command -Session $session { 
             Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 
             $Boxstarter.RebootOK=$true
-            if(Test-PendingReboot){Invoke-Reboot}
+            if(Test-PendingReboot){restart-Computer -Force }
         } -ErrorAction SilentlyContinue
     }
 
