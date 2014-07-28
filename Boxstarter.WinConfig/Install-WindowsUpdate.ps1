@@ -37,11 +37,6 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         if(Test-PendingReboot){
             Invoke-Reboot
         }
-        #If we are in a remote 32 bit process, Test-Pending reboot cant read
-        #the wsus registry reboot needed key so check the output of the install task
-        Get-Content $env:TEMP\BoxstarterOutput.stream | % {
-            if($_ -contains "A Restart is Required.") { Invoke-Reboot }
-        }
         return
     }
 
@@ -100,22 +95,22 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
                     Download-Update $update
                     $result = Install-Update $update $currentCount $totalUpdates
                 }
+            }
 
-                if($result -ne $null -and $result.rebootRequired) {
-                    if($SuppressReboots) {
-                        Out-BoxstarterLog "A Restart is Required."
+            if($result -ne $null -and $result.rebootRequired) {
+                if($SuppressReboots) {
+                    Out-BoxstarterLog "A Restart is Required."
+                } else {
+                    $Rebooting=$true
+                    Write-BoxstarterMessage "Restart Required. Restarting now..."
+                    Stop-TimedSection $installSession
+                    if(test-path function:\Invoke-Reboot) {
+                        return Invoke-Reboot
                     } else {
-                        $Rebooting=$true
-                        Write-BoxstarterMessage "Restart Required. Restarting now..."
-                        Stop-TimedSection $installSession
-                        if(test-path function:\Invoke-Reboot) {
-                            return Invoke-Reboot
-                        } else {
-                            Restart-Computer -force
-                        }
+                        Restart-Computer -force
                     }
                 }
-            }            
+            }
         }
         else{Write-BoxstarterMessage "There is no update applicable to this machine"}    
     }
