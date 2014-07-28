@@ -26,8 +26,8 @@ function Test-ChildOfWinrs($ID = $PID) {
             $global:error.RemoveAt(0)
             return $false
         }
-    	if($parentProc.Name -eq "winrshost.exe") {return $true} 
-        elseif($parentProc.Name -eq "services.exe") {return $false} 
+    	if($parentProc.Name -eq "winrshost") {return $true} 
+        elseif($parentProc.Name -eq "services") {return $false} 
     	else {
     		return Test-ChildOfWinrs $parent
     	}
