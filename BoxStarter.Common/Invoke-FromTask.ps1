@@ -57,7 +57,7 @@ Remove-BoxstarterTask
 
     Wait-ForTask $waitProc $idleTimeout $totalTimeout
 
-    try{$errorStream=Import-CLIXML $env:temp\BoxstarterError.stream} catch {}
+    try{$errorStream=Import-CLIXML $env:temp\BoxstarterError.stream} catch {$global:error.RemoveAt(0)}
     $str=($errorStream | Out-String)
     if($str.Length -gt 0){
         throw $errorStream
