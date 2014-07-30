@@ -59,7 +59,10 @@ Get-PackageRoot
             popd
             throw "$path could not be found"
         }
-        Copy-Item $path . -recurse
+        if(test-path "$Path\$Name.nuspec") {
+            Copy-Item "$path\*" . -recurse
+        }
+        else { Copy-Item $path . -recurse }
     }
     $pkgFile = Join-Path $pkgDir "$name.nuspec"
     if(!(test-path $pkgFile)){
