@@ -12,6 +12,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
     <releaseNotes>
+      - copy the root path passed to New_BoxstarerPackage
+      - add a DisableRestart parameter which will suppress the restart file and UAC enabling
       - Greatly improve progress messaging during windows updates runs
       - Fix hang scenarios when waiting for remote machine to reboot and landing in a pending reboot state shortly after reboot
       - Support for auto login and restart in winrm sessions
