@@ -1,5 +1,7 @@
 function Cleanup-Boxstarter {
-    param([switch]$KeepWindowOpen)
+    param(
+        [switch]$KeepWindowOpen,
+        [switch]$DisableRestart)
     if(Get-IsRemote){ 
         Remove-BoxstarterTask
     }
@@ -33,7 +35,7 @@ function Cleanup-Boxstarter {
         return
     } 
 
-    if(!(Get-IsRemote -PowershellRemoting)){
+    if(!(Get-IsRemote -PowershellRemoting) -and !$DisableRestart){
         if(Get-UAC){
             Write-BoxstarterMessage "UAC Enabled. Disabling..."
             Disable-UAC

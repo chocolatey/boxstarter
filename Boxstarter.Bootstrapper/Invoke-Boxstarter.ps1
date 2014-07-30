@@ -68,7 +68,9 @@ Invoke-Reboot
       [Parameter(Position=4,Mandatory=0)]
       [switch]$KeepWindowOpen,
       [Parameter(Position=5,Mandatory=0)]
-      [switch]$NoPassword
+      [switch]$NoPassword,
+      [Parameter(Position=6,Mandatory=0)]
+      [switch]$DisableRestart
     )
     $BoxStarter.IsRebooting = $false
     $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
@@ -89,6 +91,7 @@ Invoke-Reboot
         if(!(Get-IsRemote)){ Write-BoxstarterLogo }
         $session=Start-TimedSection "Installation session." -Verbose
         if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
+        if($DisableRestart){$Boxstarter.DisableRestart=$DisableRestart}
         if($encryptedPassword){$password = ConvertTo-SecureString -string $encryptedPassword}
         if(!$NoPassword){
             Write-BoxstarterMessage "NoPassword is false checking autologin" -verbose
@@ -113,7 +116,7 @@ Invoke-Reboot
        throw $_
     }
     finally{
-        Cleanup-Boxstarter -KeepWindowOpen:$KeepWindowOpen
+        Cleanup-Boxstarter -KeepWindowOpen:$KeepWindowOpen -DisableRestart:$DisableRestart
         Stop-TimedSection $session
         if($BoxStarter.IsRebooting) {
             RestartNow

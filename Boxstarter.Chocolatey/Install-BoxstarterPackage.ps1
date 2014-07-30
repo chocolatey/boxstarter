@@ -277,7 +277,8 @@ about_boxstarter_chocolatey
         [switch]$DisableReboots,
         [parameter(ParameterSetName="Package")]
         [switch]$KeepWindowOpen,
-        [string]$LocalRepo
+        [string]$LocalRepo,
+        [switch]$DisableRestart
     )
     $CurrentVerbosity=$global:VerbosePreference
     try {
@@ -516,7 +517,8 @@ function Invoke-Locally {
         [Management.Automation.PsCredential]$Credential,
         [switch]$Force,
         [switch]$DisableReboots,
-        [switch]$KeepWindowOpen
+        [switch]$KeepWindowOpen,
+        [switch]$DisableRestart
     )
     if($PSBoundParameters.ContainsKey("Credential")){
         if($Credential -ne $null) {
@@ -607,7 +609,7 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
     }
 }
 
-function Invoke-RemoteBoxstarter($Package, $Password, $DisableReboots) {
+function Invoke-RemoteBoxstarter($Package, $Password, $DisableReboots, $session) {
     Write-BoxstarterMessage "Running remote install..."
     $remoteResult = Invoke-Command -session $session {
         param($SuppressLogging,$pkg,$password,$DisableReboots, $verbosity, $ProgressArgs)
@@ -737,7 +739,7 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
     while($session.Availability -eq "Available") {
         $sessionPID = Invoke-Command -Session $session { return $PID }
         Write-BoxstarterMessage "Session's process ID is $sessionPID" -verbose
-        $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential.Password $DisableReboots
+        $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential.Password $DisableReboots $session
 
         if(Test-RebootingOrDisconnected $remoteResult) {
             Wait-ForSessionToClose $session
