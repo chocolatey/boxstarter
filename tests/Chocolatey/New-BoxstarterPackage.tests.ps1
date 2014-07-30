@@ -76,8 +76,8 @@ Describe "New-BoxstarterPackage" {
             join-path (Join-Path $Boxstarter.LocalRepo "$packageName\tools") "ChocolateyInstall.ps1" | Should Exist
         }
         It "Will Copy existing items" {
-            join-path (Join-Path $Boxstarter.LocalRepo $packageName) "test.txt" | Should Exist
-            join-path (Join-Path $Boxstarter.LocalRepo "$packageName\dir1") "test1.txt" | Should Exist
+            join-path (Join-Path $Boxstarter.LocalRepo "$packageName\mypkg") "test.txt" | Should Exist
+            join-path (Join-Path $Boxstarter.LocalRepo "$packageName\mypkg\dir1") "test1.txt" | Should Exist
         }        
     }    
 
@@ -93,10 +93,11 @@ Describe "New-BoxstarterPackage" {
         }
     }
 
-    Context "When a Path is provided that has a chocolateyInstall" {
+    Context "When a Path is provided that has a chocolateyInstall and nuspec" {
         Mock Check-Chocolatey
         mkdir (Join-Path $boxstarter.BaseDir "mypkg\tools") |out-null
         New-Item (Join-Path $boxstarter.BaseDir "mypkg\tools\chocolateyInstall.ps1") -type file -value "my install" | out-null
+        New-Item (Join-Path $boxstarter.BaseDir "mypkg\pkg.nuspec") -type file -value "my nuspec" | out-null
 
         New-BoxstarterPackage $packageName $Description (Join-Path $boxstarter.BaseDir "mypkg") | out-null
 

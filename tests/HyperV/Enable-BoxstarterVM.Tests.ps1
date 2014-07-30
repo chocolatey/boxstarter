@@ -24,6 +24,7 @@ Describe "Enable-BoxstarterVM" {
     Mock Enable-BoxstarterClientRemoting {return $True}
     Mock Invoke-Command
     Mock Checkpoint-VM
+    mock Restart-Computer
     Mock Set-VM
     Mock Get-VMIntegrationService { return @{ id="microsoft:blah\\84EAAE65-2F2E-45F5-9BB5-0E857DC8EB47";Name="Heartbeat";PrimaryStatusDescription="OK"} }
     Mock Get-VMGuestComputerName { "SomeComputer" }

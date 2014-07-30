@@ -31,6 +31,7 @@ Describe "Enable-BoxstarterVM.Azure" {
     Mock get-AzureSubscription { return @{CurrentStorageAccountName="sa"} }
     Mock Invoke-RetriableScript -ParameterFilter {$RetryScript -ne $null -and $RetryScript.ToString() -like "*Get-WMIObject*"}
     Mock Set-AzureSubscription
+    Mock Restart-computer
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 

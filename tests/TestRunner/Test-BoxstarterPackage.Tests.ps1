@@ -18,6 +18,7 @@ Describe "Test-BoxstarterPackage" {
     $pkgName2="package2"
     Mock Invoke-BoxstarterBuild
     Mock Install-BoxstarterPackage
+    Mock Restart-Computer
     [Uri]$feed="http://myfeed"
     Mock Get-BoxstarterPackage {
         New-Object PSObject -Property @{
