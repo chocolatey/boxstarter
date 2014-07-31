@@ -3,6 +3,9 @@ Import-Module $unNormalized.FullName -global -DisableNameChecking -Force
 Resolve-Path $PSScriptRoot\*-*.ps1 | 
     % { . $_.ProviderPath }
 
+#There is a bug where the storage module will not load if loaded after the azure module
+Get-Module Storage -ListAvailable | Import-Module -global
+
 $azureMod = Get-Module Azure -ListAvailable
 if(!$azureMod) {
     if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
