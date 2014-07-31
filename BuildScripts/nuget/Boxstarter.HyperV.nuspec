@@ -16,6 +16,7 @@
       <dependency id="Boxstarter.Chocolatey" version="$version$" />
     </dependencies>
     <releaseNotes>
+      - load storage module before azure to workaround bug with the storage module loading
       - copy the root path passed to New_BoxstarerPackage
       - add a DisableRestart parameter which will suppress the restart file and UAC enabling
       - Greatly improve progress messaging during windows updates runs
