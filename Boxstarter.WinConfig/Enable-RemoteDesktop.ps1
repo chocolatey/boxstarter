@@ -7,6 +7,7 @@ Allows Remote Desktop access to machine and enables Remote Desktop firewall rule
 http://boxstarter.codeplex.com
 
 #>
+    Write-BoxstarterMessage "Enabling Remote Desktop..."
     $obj = Get-WmiObject -Class "Win32_TerminalServiceSetting" -Namespace root\cimv2\terminalservices
     if($obj -eq $null) {
         Write-BoxstarterMessage "Unable to locate terminalservices namespace. Remote Desktop is not enabled"

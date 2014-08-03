@@ -56,6 +56,8 @@ http://boxstarter.codeplex.com
     $advancedKey = "$key\Advanced"
 	$cabinetStateKey = "$key\CabinetState"
 
+    Write-BoxstarterMessage "Setting Windows Explorer options..."
+
 	if(Test-Path -Path $advancedKey) {
 		if($EnableShowHiddenFilesFoldersDrives) {Set-ItemProperty $advancedKey Hidden 1}
 		if($DisableShowHiddenFilesFoldersDrives) {Set-ItemProperty $advancedKey Hidden 0}

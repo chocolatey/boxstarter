@@ -1,6 +1,7 @@
 function Restart-Explorer {
 
     try{
+        Write-BoxstarterMessage "Restarting the Windows Explorer process..."
         $user = Get-CurrentUser
         try { $explorer = Get-Process -Name explorer -ErrorAction stop -IncludeUserName } 
         catch {$global:error.RemoveAt(0)}
