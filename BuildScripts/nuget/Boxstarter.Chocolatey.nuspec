@@ -17,6 +17,9 @@
       <dependency id="Boxstarter.Bootstrapper" version="$version$" />  
     </dependencies>
     <releaseNotes>
+      - Improve initial connectin performance by skipping remoting check if it has already been tested in enable-BoxstarterVM
+      - provide messaging for some winconfig functions
+      - fix the setting of azure storage account by looking for https endpoints
       - load storage module before azure to workaround bug with the storage module loading
       - copy the root path passed to New_BoxstarerPackage
       - add a DisableRestart parameter which will suppress the restart file and UAC enabling
