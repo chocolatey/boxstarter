@@ -130,7 +130,7 @@ Once that is done, please run Enable-BoxstarterVM again.
                 if($subscription.CurrentStorageAccountName -eq $null) {
                     Write-BoxstarterMessage "Getting OS Disk" -Verbose
                     $disk=Invoke-RetriableScript { Get-AzureOSDisk -VM $args[0] } $vm
-                    $endpoint="http://$($disk.MediaLink.Host)/"
+                    $endpoint="https://$($disk.MediaLink.Host)/"
                     Write-BoxstarterMessage "Getting Azure Storage Account" -Verbose
                     $storageAccount=Invoke-RetriableScript { Get-AzureStorageAccount } | ? { $_.Endpoints -contains $endpoint }
                     Set-AzureSubscription -SubscriptionName $subscription.SubscriptionName -CurrentStorageAccountName $storageAccount.Label
