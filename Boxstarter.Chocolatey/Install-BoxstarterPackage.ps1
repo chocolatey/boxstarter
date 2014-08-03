@@ -350,7 +350,7 @@ about_boxstarter_chocolatey
                     if($_.PSSessionOption){
                         $sessionArgs.SessionOption = $_.PSSessionOption
                     }
-                    Install-BoxstarterPackageOnComputer $_.ConnectionURI.Host $sessionArgs $PackageName $DisableReboots $CredSSPStatus
+                    Install-BoxstarterPackageOnComputer $_.ConnectionURI.Host $sessionArgs $PackageName $DisableReboots $CredSSPStatus $false
                 }
             }
             else {
@@ -433,10 +433,10 @@ function Finish-Record($obj) {
     Write-BoxstarterMessage "object written..." -Verbose
 }
 
-function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots, $CredSSPStatus){
+function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots, $CredSSPStatus, $TestRemoting = $true){
     $record = Start-Record $ComputerName
     try {
-        if(!(Enable-RemotingOnRemote $sessionArgs $ComputerName)){
+        if($TestRemoting -and !(Enable-RemotingOnRemote $sessionArgs $ComputerName)){
             Write-Error "Unable to access remote computer via PowerShell Remoting or WMI. You can enable it by running: Enable-PSRemoting -Force from an Administrator PowerShell console on the remote computer."
             $record.Completed=$false
             return
