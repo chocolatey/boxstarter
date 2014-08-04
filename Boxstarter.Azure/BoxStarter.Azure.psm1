@@ -4,7 +4,7 @@ Resolve-Path $PSScriptRoot\*-*.ps1 |
     % { . $_.ProviderPath }
 
 #There is a bug where the storage module will not load if loaded after the azure module
-Get-Module Storage -ListAvailable | Import-Module -global
+try {Get-Module Storage -ListAvailable | Import-Module -global} catch { Log-BoxstarterMessage $_ }
 
 $azureMod = Get-Module Azure -ListAvailable
 if(!$azureMod) {
