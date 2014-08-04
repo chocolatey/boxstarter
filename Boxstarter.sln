@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{926019EE-3404-4C43-BD39-B1AC5C7A2111}"
 	ProjectSection(SolutionItems) = preProject
@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildScripts", "BuildScript
 		BuildScripts\chocolateyinstall.ps1 = BuildScripts\chocolateyinstall.ps1
 		BuildScripts\default.ps1 = BuildScripts\default.ps1
 		BuildScripts\Microsoft.WebApplication.targets = BuildScripts\Microsoft.WebApplication.targets
+		BuildScripts\releaseNotes.xml = BuildScripts\releaseNotes.xml
 		BuildScripts\setup.bat = BuildScripts\setup.bat
 		BuildScripts\setup.ps1 = BuildScripts\setup.ps1
 	EndProjectSection
