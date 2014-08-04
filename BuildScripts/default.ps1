@@ -111,7 +111,7 @@ Task Pack-Nuget -depends Clean-Artifacts -description 'Packs the modules and exa
     }
 
     PackDirectory "$baseDir\BuildPackages"
-    PackDirectory "$baseDir\BuildScripts\nuget"
+    PackDirectory "$baseDir\BuildScripts\nuget" -AddReleaseNotes
     Move-Item "$baseDir\BuildScripts\nuget\*.nupkg" "$basedir\buildArtifacts"
 }
 
@@ -183,10 +183,20 @@ bye
     del "$basedir\sitelogs" -Recurse -Force
 }
 
-function PackDirectory($path){
+function PackDirectory($path, [switch]$AddReleaseNotes){
     exec { 
+        [xml]$releaseNotes = Get-Content "$baseDir\BuildScripts\releaseNotes.xml"
         Get-ChildItem $path -Recurse -include *.nuspec | 
-            % { .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $version }
+            % { 
+                 if($AddReleaseNotes) {
+                   [xml]$nuspec = Get-Content $_
+                   $oldReleaseNotes = $nuspec.package.metadata.ChildNodes| ? { $_.Name -eq 'releaseNotes' }
+                   $newReleaseNotes = $nuspec.ImportNode($releaseNotes.DocumentElement, $true)
+                   $nuspec.package.metadata.ReplaceChild($newReleaseNotes, $oldReleaseNotes) | Out-Null 
+                   $nuspec.Save($_)
+                 }
+                 .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $version 
+              }
     }
 }
 
