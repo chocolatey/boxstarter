@@ -69,9 +69,9 @@ Set-BoxstarterFeedAPIKey
                 try {
                     for($count = 1; $count -le 5; $count++) {
                         $publishedVersion = Get-BoxstarterPackagePublishedVersion $pkg.id $pkg.Feed -ErrorAction Stop
-                        if($publishedVersion.length -gt 0) { break }
+                        if($publishedVersion.length -gt 0 -and ($publishedVersion -eq $pkg.Version) ) { break }
                         Write-BoxstarterMessage "no published version found, Trying again." -Verbose
-                        Start-Sleep -seconds 10
+                        if(!$script:testing){Start-Sleep -seconds 10}
                     }
                 }
                 catch{

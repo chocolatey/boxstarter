@@ -21,7 +21,7 @@ Describe "Publish-BoxstarterPackage" {
         $pkgName="package1"
         [Uri]$feed="http://myfeed"
         Set-BoxstarterFeedAPIKey $feed ([guid]::NewGuid())
-        $publishedVersion=3.0.0.0
+        $publishedVersion="3.0.0.0"
         Mock Get-BoxstarterPackage {
             New-Object PSObject -Property @{
                 Id = $pkgName
@@ -40,7 +40,7 @@ Describe "Publish-BoxstarterPackage" {
             $result.Feed | should be $feed 
         }
         it "Should have matching repo and published versions" {
-            $result.PulishedVersion | should be $publishedVersion
+            $result.PublishedVersion | should be $publishedVersion
         }
     }
 
@@ -85,7 +85,7 @@ Describe "Publish-BoxstarterPackage" {
         $global:Error.Clear()
         $pkgName="package1"
         [Uri]$feed="http://myfeed"
-        $publishedVersion=3.0.0.0
+        $publishedVersion="3.0.0.0"
         Mock Get-BoxstarterPackage {
             New-Object PSObject -Property @{
                 Id = $pkgName
@@ -111,6 +111,7 @@ Describe "Publish-BoxstarterPackage" {
         [Uri]$feed="http://myfeed"
         $key=
         Set-BoxstarterFeedAPIKey $feed ([guid]::NewGuid())
+        $script:testing=$true
         Mock Get-BoxstarterPackage {
             New-Object PSObject -Property @{
                 Id = $pkgName
@@ -138,7 +139,7 @@ Describe "Publish-BoxstarterPackage" {
         $pkgName="package1"
         [Uri]$feed="http://myfeed"
         Set-BoxstarterFeedAPIKey $feed ([guid]::NewGuid())
-        $publishedVersion=3.0.0.0
+        $publishedVersion="3.0.0.0"
         Mock Get-BoxstarterPackage {
             New-Object PSObject -Property @{
                 Id = $pkgName
@@ -157,6 +158,33 @@ Describe "Publish-BoxstarterPackage" {
         }
         it "Should include error in Publish errors" {
             $result.PublishErrors | should be $restException.Message
+        }
+    }
+
+    Context "When rest call for published version returns previous version" {
+        $global:Error.Clear()
+        $pkgName="package1"
+        [Uri]$feed="http://myfeed"
+        Set-BoxstarterFeedAPIKey $feed ([guid]::NewGuid())
+        $publishedVersion="2.0.0.0"
+        Mock Get-BoxstarterPackage {
+            New-Object PSObject -Property @{
+                Id = $pkgName
+                Version = "3.0.0.0"
+                PublishedVersion=$publishedVersion
+                Feed=$feed
+            }
+        }
+        $Script:counter=0
+        Mock Get-BoxstarterPackagePublishedVersion { 
+            $Script:counter += 1
+            if($Script:counter -lt 3) {return "2.0.0.0"}else{return "3.0.0.0"}
+        }
+
+        $result = Publish-BoxstarterPackage $pkgName
+
+        it "Should have matching repo and published versions" {
+            $result.PublishedVersion | should be "3.0.0.0"
         }
     }
 }
