@@ -16,6 +16,7 @@
       <dependency id="Boxstarter.Azure" version="$version$" />
     </dependencies>
     <releaseNotes>
+  - fixing issue where auto login is not disabled after boxstarter run
   - fixing wait for published version to retry for a minute if the new version is not yet marked published
   - Improve initial connectin performance by skipping remoting check if it has already been tested in enable-BoxstarterVM
   - provide messaging for some winconfig functions
