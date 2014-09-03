@@ -118,11 +118,11 @@ Describe "Enable-BoxstarterVM.Azure" {
         Mock Get-AzureStorageAccount {@(
             @{
                 Label="acct1"
-                Endpoints=@("http://acct1.net/","http://acct1.org/")
+                Endpoints=@("https://acct1.net/","https://acct1.org/")
             },
             @{
                 Label="acct2"
-                Endpoints=@("http://storage.net/","http://storage.org/")
+                Endpoints=@("https://storage.net/","https://storage.org/")
             }
         )}
 
