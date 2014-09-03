@@ -38,6 +38,43 @@ Describe "Invoke-Boxstarter" {
             }
     } -ParameterFilter {$Name -eq "wuauserv"}
 
+    Context "When not rebooting and populated autologon backup exists" {
+        Mock Start-Process
+        Mock Stop-UpdateServices
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        Mock Get-UAC
+        Mock Remove-ItemProperty
+        Mock Set-ItemProperty -ParameterFilter {$Path -eq "$(Get-BoxstarterTempDir)\Boxstarter.autologon"}
+        Mock Get-ItemProperty -ParameterFilter { $path -eq $winLogonKey } -MockWith {@{
+            DefaultUserName = "user"
+            DefaultDomainName = "domain"
+            DefaultPassword = "pass"
+            AutoAdminLogon = 1
+        }}
+        @{
+            DefaultUserName = "user"
+            DefaultDomainName = "domain"
+            DefaultPassword = "pass"
+            AutoAdminLogon = 1
+        } | Export-CLIXML "$(Get-BoxstarterTempDir)\Boxstarter.autologon" -Force | Out-Null
+
+        Invoke-Boxstarter {return} -RebootOk | Out-Null
+
+        it "will reset autologon DefaultUserName" {
+            Assert-MockCalled Set-ItemProperty -ParameterFilter { $path -eq $winLogonKey -and $Name -eq "DefaultUserName" -and $value -eq "user" }
+        }
+        it "will reset autologon DefaultDomainName" {
+            Assert-MockCalled Set-ItemProperty -ParameterFilter { $path -eq $winLogonKey -and $Name -eq "DefaultDomainName" -and $value -eq "domain" }
+        }
+        it "will reset autologon DefaultPassword" {
+            Assert-MockCalled Set-ItemProperty -ParameterFilter { $path -eq $winLogonKey -and $Name -eq "DefaultPassword" -and $value -eq "pass" }
+        }
+        it "will reset autologon AutoAdminLogon" {
+            Assert-MockCalled Set-ItemProperty -ParameterFilter { $path -eq $winLogonKey -and $Name -eq "AutoAdminLogon" -and $value -eq 1 }
+        }
+    }
+
     Context "When not rebooting and empty autologon backup exists" {
         Mock Start-Process
         Mock Stop-UpdateServices
@@ -46,11 +83,11 @@ Describe "Invoke-Boxstarter" {
         Mock Get-UAC
         Mock Remove-ItemProperty
         Mock Remove-Item -ParameterFilter {$Path -eq "$(Get-BoxstarterTempDir)\Boxstarter.autologon"}
-        Mock Get-ItemProperty -ParameterFilter { $path -eq $winUpdateKey } -MockWith {@{
-            DefaultUserName = $true
-            DefaultDomainName = $true
-            DefaultPassword = $true
-            AutoAdminLogon = $true
+        Mock Get-ItemProperty -ParameterFilter { $path -eq $winLogonKey } -MockWith {@{
+            DefaultUserName = $false
+            DefaultDomainName = $false
+            DefaultPassword = $false
+            AutoAdminLogon = $false
         }}
         @{} | Export-CLIXML "$(Get-BoxstarterTempDir)\Boxstarter.autologon" -Force | Out-Null
 

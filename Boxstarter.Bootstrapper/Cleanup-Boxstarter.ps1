@@ -24,10 +24,14 @@ function Cleanup-Boxstarter {
             Write-BoxstarterMessage "Cleaning up autologon registry keys" -Verbose
             $winLogonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
             $winlogonProps = Import-CLIXML -Path "$(Get-BoxstarterTempDir)\Boxstarter.autologon"
-            if(!$winlogonProps.DefaultUserName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultUserName" -ErrorAction SilentlyContinue}
-            if(!$winlogonProps.DefaultDomainName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultDomainName" -ErrorAction SilentlyContinue}
-            if(!$winlogonProps.DefaultPassword){Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction SilentlyContinue}
-            if(!$winlogonProps.AutoAdminLogon){Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue}
+            @("DefaultUserName","DefaultDomainName","DefaultPassword","AutoAdminLogon") | % {
+                if(!$winlogonProps.ContainsKey($_)){
+                  Remove-ItemProperty -Path $winLogonKey -Name $_ -ErrorAction SilentlyContinue
+                }
+                else {
+                  Set-ItemProperty -Path $winLogonKey -Name $_ -Value $winlogonProps[$_]
+                }
+            }
             Remove-Item -Path "$(Get-BoxstarterTempDir)\Boxstarter.autologon"
         }
         if($promptToExit -or $KeepWindowOpen){
