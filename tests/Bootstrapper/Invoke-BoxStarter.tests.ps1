@@ -45,6 +45,7 @@ Describe "Invoke-Boxstarter" {
         Mock Read-AuthenticatedPassword
         Mock Get-UAC
         Mock Remove-ItemProperty
+        Mock Remove-Item -ParameterFilter {$Path -eq "$(Get-BoxstarterTempDir)\Boxstarter.autologon"}
         Mock Get-ItemProperty -ParameterFilter { $path -eq $winUpdateKey } -MockWith {@{
             DefaultUserName = $true
             DefaultDomainName = $true
@@ -67,7 +68,10 @@ Describe "Invoke-Boxstarter" {
         it "will remove autologon AutoAdminLogon" {
             Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winLogonKey -and $Name -eq "AutoAdminLogon" }
         }
-    }    
+        it "will delete the autologon file" {
+            Assert-MockCalled  Remove-Item -ParameterFilter {$Path -eq "$(Get-BoxstarterTempDir)\Boxstarter.autologon"}
+        }
+    }
 
     Context "When rebooting and a Password is set" {
         Mock Stop-UpdateServices

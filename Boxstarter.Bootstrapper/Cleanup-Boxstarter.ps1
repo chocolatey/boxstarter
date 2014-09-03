@@ -28,6 +28,7 @@ function Cleanup-Boxstarter {
             if(!$winlogonProps.DefaultDomainName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultDomainName" -ErrorAction SilentlyContinue}
             if(!$winlogonProps.DefaultPassword){Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction SilentlyContinue}
             if(!$winlogonProps.AutoAdminLogon){Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue}
+            Remove-Item -Path "$(Get-BoxstarterTempDir)\Boxstarter.autologon"
         }
         if($promptToExit -or $KeepWindowOpen){
             Read-Host 'Type ENTER to exit'
