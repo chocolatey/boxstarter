@@ -36,6 +36,24 @@ Describe "Invoke-Boxstarter" {
             }
     } -ParameterFilter {$Name -eq "wuauserv"}
 
+    Context "When no password is provided, reboot is ok and autologon is toggled" {
+        Mock Set-SecureAutoLogon
+        Mock Restart
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        Mock get-UAC
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoLogonCount" -Value 1
+
+        Invoke-Boxstarter {Invoke-Reboot} -RebootOk | Out-Null
+
+        it "will not read host for the password" {
+            Assert-MockCalled Read-AuthenticatedPassword -times 0
+        }
+        Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
+        Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoLogonCount"
+    }
+
     Context "When Configuration Service is installed" {
         Mock Get-Service {new-Object -TypeName PSObject -Property @{CanStop=$True}} -ParameterFilter {$include -eq "CCMEXEC"}
 
@@ -143,22 +161,6 @@ Describe "Invoke-Boxstarter" {
         it "will read host for the password" {
             Assert-MockCalled Set-SecureAutoLogon -ParameterFilter {$password -eq $pass}
         }
-    }
-
-    Context "When no password is provided, reboot is ok and autologon is toggled" {
-        Mock Set-SecureAutoLogon
-        Mock Restart
-        Mock RestartNow
-        Mock Read-AuthenticatedPassword
-        Mock get-UAC
-        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
-
-        Invoke-Boxstarter {Invoke-Reboot} -RebootOk | Out-Null
-
-        it "will not read host for the password" {
-            Assert-MockCalled Read-AuthenticatedPassword -times 0
-        }
-        Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
     }
 
     Context "When no script is passed on command line but script file exists" {
@@ -316,7 +318,7 @@ Describe "Invoke-Boxstarter" {
         Invoke-Boxstarter {$Boxstarter.IsRebooting=$true} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
 
         it "will Set AutoLogin" {
-            Assert-MockCalled Set-SecureAutoLogon
+            Assert-MockCalled Set-SecureAutoLogon -ParameterFilter {$BackupFile -eq "$(Get-BoxstarterTempDir)\boxstarter.autologon"}
         }
     }
 
@@ -392,4 +394,35 @@ Describe "Invoke-Boxstarter" {
             Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"} -times 0
         }
     }
+
+    Context "When not rebooting and empty autologon backup exists" {
+        Mock Start-Process
+        Mock Stop-UpdateServices
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        Mock Get-UAC
+        Mock Remove-ItemProperty
+        Mock Get-ItemProperty -ParameterFilter { $path -eq $winUpdateKey } -MockWith {@{
+            DefaultUserName = $true
+            DefaultDomainName = $true
+            DefaultPassword = $true
+            AutoAdminLogon = $true
+        }}
+        New-Item "$(Get-BoxstarterTempDir)\Boxstarter.autologon" -type file -Force | Out-Null
+
+        Invoke-Boxstarter {return} -RebootOk | Out-Null
+
+        it "will remove autologon DefaultUserName" {
+            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey -and $Name -eq "DefaultUserName" }
+        }
+        it "will remove autologon DefaultDomainName" {
+            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey -and $Name -eq "DefaultDomainName" }
+        }
+        it "will remove autologon DefaultPassword" {
+            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey -and $Name -eq "DefaultPassword" }
+        }
+        it "will remove autologon AutoAdminLogon" {
+            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey -and $Name -eq "AutoAdminLogon" }
+        }
+    }    
 }
