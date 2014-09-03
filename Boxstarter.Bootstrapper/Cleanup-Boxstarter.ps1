@@ -20,14 +20,14 @@ function Cleanup-Boxstarter {
             remove-item "$(Get-BoxstarterTempDir)\Boxstarter.Script"
             $promptToExit=$true
         }
-        if(!$Boxstarter.NoPassword) {
+        if(Test-Path "$(Get-BoxstarterTempDir)\Boxstarter.autologon") {
             Write-BoxstarterMessage "Cleaning up autologon registry keys" -Verbose
             $winLogonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
-            $winlogonProps = Get-ItemProperty -Path $winLogonKey
-            if($winlogonProps.DefaultUserName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultUserName" -ErrorAction SilentlyContinue}
-            if($winlogonProps.DefaultDomainName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultDomainName" -ErrorAction SilentlyContinue}
-            if($winlogonProps.DefaultPassword){Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction SilentlyContinue}
-            if($winlogonProps.AutoAdminLogon){Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue}
+            $winlogonProps = Import-CLIXML -Path "$(Get-BoxstarterTempDir)\Boxstarter.autologon"
+            if(!$winlogonProps.DefaultUserName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultUserName" -ErrorAction SilentlyContinue}
+            if(!$winlogonProps.DefaultDomainName){Remove-ItemProperty -Path $winLogonKey -Name "DefaultDomainName" -ErrorAction SilentlyContinue}
+            if(!$winlogonProps.DefaultPassword){Remove-ItemProperty -Path $winLogonKey -Name "DefaultPassword" -ErrorAction SilentlyContinue}
+            if(!$winlogonProps.AutoAdminLogon){Remove-ItemProperty -Path $winLogonKey -Name "AutoAdminLogon" -ErrorAction SilentlyContinue}
         }
         if($promptToExit -or $KeepWindowOpen){
             Read-Host 'Type ENTER to exit'
@@ -46,7 +46,7 @@ function Cleanup-Boxstarter {
     if(!(Get-IsRemote -PowershellRemoting) -and $BoxstarterPassword.Length -gt 0) {
         $currentUser=Get-CurrentUser
         Write-BoxstarterMessage "Securely Storing $($currentUser.Domain)\$($currentUser.Name) credentials for automatic logon"
-        Set-SecureAutoLogon $currentUser.Name $BoxstarterPassword $currentUser.Domain
+        Set-SecureAutoLogon $currentUser.Name $BoxstarterPassword $currentUser.Domain -BackupFile "$(Get-BoxstarterTempDir)\Boxstarter.autologon"
         Write-BoxstarterMessage "Logon Set"
     }
 }

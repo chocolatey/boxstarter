@@ -24,7 +24,7 @@ param (
     [switch]
     $RemoveLegalPrompt,
     
-    [System.IO.FileInfo]
+    [string]
     $BackupFile
 )
 

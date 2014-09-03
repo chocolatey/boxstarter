@@ -12,6 +12,8 @@ $Boxstarter.BaseDir=(split-path -parent (split-path -parent $here))
 Describe "Invoke-Boxstarter" {
     $testRoot = (Get-PSDrive TestDrive).Root
     $winUpdateKey="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
+    $winLogonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+    Remove-item "$(Get-BoxstarterTempDir)\Boxstarter.autologon" -ErrorAction SilentlyContinue
     Mock New-Item -ParameterFilter {$path -like "$env:appdata\*"}
     Mock New-ItemProperty -ParameterFilter { $path -eq $winUpdateKey }
     Mock Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey }
@@ -35,6 +37,50 @@ Describe "Invoke-Boxstarter" {
                 return new-Object -TypeName PSObject -Property @{CanStop=$True;Status="Running"}
             }
     } -ParameterFilter {$Name -eq "wuauserv"}
+
+    Context "When not rebooting and empty autologon backup exists" {
+        Mock Start-Process
+        Mock Stop-UpdateServices
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        Mock Get-UAC
+        Mock Remove-ItemProperty
+        Mock Get-ItemProperty -ParameterFilter { $path -eq $winUpdateKey } -MockWith {@{
+            DefaultUserName = $true
+            DefaultDomainName = $true
+            DefaultPassword = $true
+            AutoAdminLogon = $true
+        }}
+        @{} | Export-CLIXML "$(Get-BoxstarterTempDir)\Boxstarter.autologon" -Force | Out-Null
+
+        Invoke-Boxstarter {return} -RebootOk | Out-Null
+
+        it "will remove autologon DefaultUserName" {
+            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winLogonKey -and $Name -eq "DefaultUserName" }
+        }
+        it "will remove autologon DefaultDomainName" {
+            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winLogonKey -and $Name -eq "DefaultDomainName" }
+        }
+        it "will remove autologon DefaultPassword" {
+            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winLogonKey -and $Name -eq "DefaultPassword" }
+        }
+        it "will remove autologon AutoAdminLogon" {
+            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winLogonKey -and $Name -eq "AutoAdminLogon" }
+        }
+    }    
+
+    Context "When rebooting and a Password is set" {
+        Mock Stop-UpdateServices
+        Mock RestartNow
+        Mock Read-AuthenticatedPassword
+        Mock Set-SecureAutoLogon
+
+        Invoke-Boxstarter {$Boxstarter.IsRebooting=$true} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
+
+        it "will Set AutoLogin" {
+            Assert-MockCalled Set-SecureAutoLogon -ParameterFilter {$BackupFile.EndsWith("\Boxstarter.autologon")}
+        }
+    }
 
     Context "When no password is provided, reboot is ok and autologon is toggled" {
         Mock Set-SecureAutoLogon
@@ -309,19 +355,6 @@ Describe "Invoke-Boxstarter" {
         }
     }
 
-    Context "When rebooting and a Password is set" {
-        Mock Stop-UpdateServices
-        Mock RestartNow
-        Mock Read-AuthenticatedPassword
-        Mock Set-SecureAutoLogon
-
-        Invoke-Boxstarter {$Boxstarter.IsRebooting=$true} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null
-
-        it "will Set AutoLogin" {
-            Assert-MockCalled Set-SecureAutoLogon -ParameterFilter {$BackupFile -eq "$(Get-BoxstarterTempDir)\boxstarter.autologon"}
-        }
-    }
-
     Context "When rebooting and a Password is set and in remote session" {
         Mock Stop-UpdateServices
         Mock RestartNow
@@ -394,35 +427,4 @@ Describe "Invoke-Boxstarter" {
             Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"} -times 0
         }
     }
-
-    Context "When not rebooting and empty autologon backup exists" {
-        Mock Start-Process
-        Mock Stop-UpdateServices
-        Mock RestartNow
-        Mock Read-AuthenticatedPassword
-        Mock Get-UAC
-        Mock Remove-ItemProperty
-        Mock Get-ItemProperty -ParameterFilter { $path -eq $winUpdateKey } -MockWith {@{
-            DefaultUserName = $true
-            DefaultDomainName = $true
-            DefaultPassword = $true
-            AutoAdminLogon = $true
-        }}
-        New-Item "$(Get-BoxstarterTempDir)\Boxstarter.autologon" -type file -Force | Out-Null
-
-        Invoke-Boxstarter {return} -RebootOk | Out-Null
-
-        it "will remove autologon DefaultUserName" {
-            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey -and $Name -eq "DefaultUserName" }
-        }
-        it "will remove autologon DefaultDomainName" {
-            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey -and $Name -eq "DefaultDomainName" }
-        }
-        it "will remove autologon DefaultPassword" {
-            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey -and $Name -eq "DefaultPassword" }
-        }
-        it "will remove autologon AutoAdminLogon" {
-            Assert-MockCalled Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey -and $Name -eq "AutoAdminLogon" }
-        }
-    }    
 }
