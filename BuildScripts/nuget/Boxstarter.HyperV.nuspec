@@ -16,6 +16,7 @@
       <dependency id="Boxstarter.Chocolatey" version="$version$" />
     </dependencies>
     <releaseNotes>
+  - Fix for all write-host calls being logged to Boxstarter log file even when there is no install session in progress
   - fixing issue where auto login is not disabled after boxstarter run
   - fixing wait for published version to retry for a minute if the new version is not yet marked published
   - Improve initial connectin performance by skipping remoting check if it has already been tested in enable-BoxstarterVM
