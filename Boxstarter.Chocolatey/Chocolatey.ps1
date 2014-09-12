@@ -26,7 +26,8 @@ param(
   [Parameter(Mandatory=$false)][ConsoleColor] $BackgroundColor,
   [Parameter(Mandatory=$false)][Object] $Separator
 )
-    Log-BoxStarterMessage $Object
+    if($Boxstarter.ScriptToCall -ne $null) { Log-BoxStarterMessage $object }
+
     if($Boxstarter.SuppressLogging){
         $caller = (Get-Variable MyInvocation -Scope 1).Value.MyCommand.Name
         if("Describe","Context","write-PesterResult" -contains $caller) {
