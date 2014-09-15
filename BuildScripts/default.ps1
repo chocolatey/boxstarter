@@ -2,7 +2,7 @@ $psake.use_exit_on_error = $true
 properties {
     $baseDir = (Split-Path -parent $psake.build_script_dir)
     if(Get-Command Git -ErrorAction SilentlyContinue) {
-        $versionTag = git describe --abbrev=0 --tags
+        $versionTag = git tag | ? { $_ -match '^[0-9\.]*$' } | Select-Object -Last 1
         $version = $versionTag + "."
         $version += (git log $($version + '..') --pretty=oneline | measure-object).Count
         $changeset=(git log -1 $($versionTag + '..') --pretty=format:%H)
