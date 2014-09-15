@@ -27,8 +27,9 @@
 
 <h3>Install-WindowsUpdate</h3>
 <p>Finds, downloads and installs all Windows Updates. By default, only critical updates will be searched. However the command takes a <code>-Criteria</code> argument allowing one to pass a custom Windows Update query.</p>
-<p>For details about the <code>Install-WindowsUpdate</code> command, see the <a href="http://boxstarter.codeplex.com/wikipage?title=Install-WindowsUpdate">Boxstarter Command Reference at CodePlex</a>.</p>
-
+<p>For details about the <code>Install-WindowsUpdate</code> command, run:</p>
+<pre>Help Install-WindowsUpdate -Full</pre>
+ 
 <h3>Move-LibraryDirectory</h3>
 <p>Libraries are special folders that map to a specific location on disk. These are usually found somewhere under $env:userprofile. This function can be used to redirect the library folder to a new location on disk. If the new location does not already exist, the directory will be created. Any content in the former library directory will be moved to the new location unless the DoNotMoveOldContent switch is used. Use Get-LibraryNames to discover the names of different libraries and their current physical directories.</p>
 
