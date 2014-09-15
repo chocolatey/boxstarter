@@ -7,7 +7,7 @@ Repeatable, reboot resilient windows environment installations made easy using C
 * Remote machine deployments
 * Integrates with Hyper-V and Windows Azure VMs supporting checkpoint restore and creation
 * Installation packages build on top of [Chocolatey Nuget](http://chocolatey.org) package management
-* Easily install with just a [Gist and the Boxstarter Web Launcher](http://boxstarter.org/WebLauncher) or [create a private repo on a Thumb drive or network share](http://boxstarter.org/InstallingPackages)
+* Easily install with just a [Gist and the Boxstarter Web Launcher](http://boxstarter.org/WebLauncher) or [create a private repo on a Thumb drive or network share](http://boxstarter.org/InstallingPackages#InstallFromShare)
 * Works on Window 7/2008 R2 and up with Powershell 2.0 and higher
 * Lots of Windows configuration utilities including installing critical updates, changing windows explorer options, and more.
 
