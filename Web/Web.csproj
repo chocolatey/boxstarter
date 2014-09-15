@@ -94,10 +94,12 @@
     <Content Include="Images\NugetServerWeb.PNG" />
     <Content Include="Images\publishAzure.PNG" />
     <Content Include="Images\repoDir.PNG" />
+    <Content Include="Images\result.png" />
     <Content Include="Images\runanyway.PNG" />
     <Content Include="Images\setup.PNG" />
     <Content Include="Images\shell.PNG" />
     <Content Include="Images\shortcut.PNG" />
+    <Content Include="Images\start.png" />
     <Content Include="Images\tfs.PNG" />
     <Content Include="Images\win7admin.png" />
     <Content Include="Images\win8admin.PNG" />
