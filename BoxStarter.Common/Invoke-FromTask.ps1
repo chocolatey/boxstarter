@@ -35,7 +35,7 @@ This will use DISM.exe to install the telnet client and will kill
 the task if it becomes idle for more that 20 seconds.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Create-BoxstarterTask
 Remove-BoxstarterTask
 #>

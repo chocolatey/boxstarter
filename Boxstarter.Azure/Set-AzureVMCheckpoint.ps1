@@ -20,7 +20,7 @@ Set-AzureVMCheckpoint -VM $VM -CheckpointName "Clean"
 Checkpoints MyVM with the label "clean" which can restore the VM to its current state
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Get-AzureVMCheckpoint
 Remove-AzureVMCheckpoint
 Restore-AzureVMCheckpoint

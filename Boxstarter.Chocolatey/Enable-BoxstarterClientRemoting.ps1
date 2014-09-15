@@ -21,7 +21,7 @@ if PowerShell Remoting was successfully completed.
 Enable-BoxstarterClientRemoting box1,box2
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Install-BoxstarterPackage
 
 #>

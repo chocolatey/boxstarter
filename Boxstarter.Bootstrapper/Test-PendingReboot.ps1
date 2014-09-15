@@ -16,7 +16,7 @@ reboot. If this command returns $true, one may want to
 call Invoke-Reboot to restart the local machine.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 http://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542 
 Invoke-Reboot
 about_boxstarter_bootstrapper

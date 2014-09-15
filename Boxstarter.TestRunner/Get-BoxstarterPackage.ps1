@@ -27,7 +27,7 @@ Retrieves package metadata for all packages in the Boxstarter Local repository
 
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 #>
     [CmdletBinding()]
     param(

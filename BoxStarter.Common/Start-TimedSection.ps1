@@ -77,7 +77,7 @@ logging messages will be suppressed and not sent to the console or the
 log.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Stop-TimedSection
 about_boxstarter_logging
 #>

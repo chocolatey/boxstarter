@@ -253,7 +253,7 @@ directory.
 
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 about_boxstarter_chocolatey
 #>
     [CmdletBinding(DefaultParameterSetName="Package")]

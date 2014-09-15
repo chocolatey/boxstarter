@@ -100,7 +100,7 @@ WINDOWS CONFIGURATION UTILITIES
 
 SEE ALSO
 
-	http://boxstarter.codeplex.com
+	http://boxstarter.org
 	about_boxstarter_logging
 	Invoke-Boxstarter
 	Invoke-Reboot

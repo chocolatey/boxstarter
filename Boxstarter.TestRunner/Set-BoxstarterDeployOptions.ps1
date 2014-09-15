@@ -76,7 +76,7 @@ Nuget feed, they will publish to the mywackyfeed on myget.org using API
 Key 5cbc38d9-1a94-430d-8361-685a9080a6b8
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Get-BoxstarterDeployOptions 
 #>
     [CmdletBinding(DefaultParameterSetName='Credential')]

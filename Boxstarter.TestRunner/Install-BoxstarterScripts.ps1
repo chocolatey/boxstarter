@@ -25,7 +25,7 @@ that contains the scripts needed for a build server to call and invoke the
 testing and publishing of Chocolatey packages.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 #>
     [CmdletBinding()]
     param(

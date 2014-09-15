@@ -40,7 +40,7 @@ List desktop apps first in the Apps view when it's sorted by category
 Disables the ability to list desktop apps first when sorted by category, see enableListDesktopAppsFirst
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 
 #>    
     [CmdletBinding()]

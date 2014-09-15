@@ -27,7 +27,7 @@ Get-AzureVMCheckpoint -VM $VM
 Retrieves all checkpoints associated with the MyVM VM
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Set-AzureVMCheckpoint
 Remove-AzureVMCheckpoint
 Restore-AzureVMCheckpoint

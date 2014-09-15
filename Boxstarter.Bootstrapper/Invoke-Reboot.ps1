@@ -21,7 +21,7 @@ will not do anything. If Boxstarter was invoked with the -RebootOk
 parameter $Boxstarter.RebootOk is set to True.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Test-PendingReeboot
 Invoke-Boxstarter
 about_boxstarter_bootstrapper

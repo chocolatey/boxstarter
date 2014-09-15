@@ -34,7 +34,7 @@ Set-BoxstarterShare -Accounts "corp\mwrock","corp\gmichaels"
 Shares the Boxstarter root as Boxstarter to mwrock and gmichaels in the corp domain.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 about_boxstarter_chocolatey
 Invoke-ChocolateyBoxstarter
 New-BoxstarterPackage

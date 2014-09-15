@@ -39,7 +39,7 @@ Get-PackageRoot is intended to be called from ChocolateyInstall.ps1
 and will throw if it is called from another file.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 about_boxstarter_chocolatey
 New_BoxstarterPackage
 Invoke-ChocolateyBoxstarter

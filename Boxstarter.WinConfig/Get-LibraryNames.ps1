@@ -7,7 +7,7 @@ Lists all Windows Library folders (My Pictures, personal, downloads, etc)
 Libraries are special folders that map to a specific location on disk. These are usually found somewhere under $env:userprofile. This function can be used to discover the existing libraries and then use Move-LibraryDirectory to move the path of a library if desired.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Move-LibraryDirectory
 
 #>

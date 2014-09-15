@@ -32,7 +32,7 @@ set-BoxstarterPackageNugetFeed -PackageName MyPackage `
 Sets the package MyPackage to the MyGet.org mywackyfeed 
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Get-BoxstarterPackageNugetFeed
 Remove-BoxstarterPackageNugetFeed
 Set-BoxstarterDeployOptions

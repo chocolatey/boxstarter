@@ -4,7 +4,7 @@ function Enable-RemoteDesktop {
 Allows Remote Desktop access to machine and enables Remote Desktop firewall rule
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 
 #>
     Write-BoxstarterMessage "Enabling Remote Desktop..."

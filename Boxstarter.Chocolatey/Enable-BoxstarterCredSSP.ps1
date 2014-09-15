@@ -26,7 +26,7 @@ A list of the original trusted hosts on the local machine.
 Enable-BoxstarterCredSSP box1,box2
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Install-BoxstarterPackage
 
 #>

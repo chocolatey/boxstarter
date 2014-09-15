@@ -210,7 +210,7 @@ Configuring a Hosted or Shared Build Server
 
 SEE ALSO
 
-	http://boxstarter.codeplex.com
+	http://boxstarter.org
 	Set-BoxstarterConfig
     Test-BoxstarterPackage
     Publish-BoxstarterPackage

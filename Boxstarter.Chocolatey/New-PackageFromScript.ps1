@@ -42,7 +42,7 @@ Creates a Package from the gist located at
 https://gist.github.com/mwrock/6771863/raw/b579aa269c791a53ee1481ad01711b60090db1e2/gistfile1.txt
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 about_boxstarter_chocolatey
 #>        
     [CmdletBinding()]

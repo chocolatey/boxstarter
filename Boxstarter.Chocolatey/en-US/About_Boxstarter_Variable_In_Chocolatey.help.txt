@@ -41,7 +41,7 @@ BOXSTARTER VARIABLE SETTINGS
 		argument.
 
 SEE ALSO
-	http://boxstarter.codeplex.com
+	http://boxstarter.org
 	About_Boxstarter_Variable_In_Bootstrapper
 	Invoke-ChocolateyBoxstarter
 	Set-BoxstarterConfig

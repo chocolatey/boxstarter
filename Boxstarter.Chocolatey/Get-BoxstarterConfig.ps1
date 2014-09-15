@@ -9,7 +9,7 @@ directory. The Get-BoxstarterConfig function is a convenience function
 for reading those settings.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey
 Set-BoxstarterConfig

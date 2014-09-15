@@ -16,7 +16,7 @@ The title of the dialog window that is presented in environments that present
 the prompt in its own window. If not provided, the Message is used.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 
 #>
     param (

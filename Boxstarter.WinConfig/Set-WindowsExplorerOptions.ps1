@@ -28,7 +28,7 @@ Setting this switch will cause Windows Explorer to show the full folder path in 
 Disables the showing of the full path in Windows Explorer Title Bar, see EnableShowFullPathInTitleBar
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 
 #>   
 

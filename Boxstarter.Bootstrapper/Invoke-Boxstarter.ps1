@@ -50,7 +50,7 @@ will prompt the user to enter a password which will be used for
 automatic logins in the event a restart is required.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 about_boxstarter_variable_in_bootstrapper
 about_boxstarter_bootstrapper
 Invoke-Reboot

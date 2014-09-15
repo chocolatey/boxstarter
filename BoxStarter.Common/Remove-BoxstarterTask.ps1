@@ -8,7 +8,7 @@ Deletes the Boxstarter task. Boxstarter calls this when an
 installation session completes.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Create-BoxstarterTask
 Invoke-BoxstarterTask
 

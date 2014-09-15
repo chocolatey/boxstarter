@@ -4,7 +4,7 @@ function Get-IsMicrosoftUpdateEnabled {
 Returns $True if Microsoft Update is currently enabled
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 
 #>    
 	# Default response to false, unless proven otherwise

@@ -32,7 +32,7 @@ Publish-BoxstarterPackage is called for MyPackage, it is published to the
 MyFeed feed on MyGet.org using 2d2cfb67-8203-45d8-8a00-4e737f517c79.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Get-BoxstarterPackageNugetFeed
 Set-BoxstarterPackageNugetFeed
 Remove-BoxstarterPackageNugetFeed

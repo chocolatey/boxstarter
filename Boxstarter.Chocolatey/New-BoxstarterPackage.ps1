@@ -26,7 +26,7 @@ Description of the package to be written to the nuspec
 Optional path whose contents will be copied to the repository
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 New-PackageFromScript
 about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey

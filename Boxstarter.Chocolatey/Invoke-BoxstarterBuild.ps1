@@ -16,7 +16,7 @@ The name of the package to pack
 Indicates that all package directories in the repository should be packed
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 about_boxstarter_chocolatey
 Invoke-BoxstarterBuild
 New-BoxstarterPackage

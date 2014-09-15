@@ -20,7 +20,7 @@ Get-BoxstarterFeedAPIKey "http://chocolatey.org/api/v2"
 Retrieves the API Key used with the public Chocolatey feed
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Set-BoxstarterFeedAPIKey
 #>
     [CmdletBinding()]

@@ -53,7 +53,7 @@ Some more stuff happens here.
 Note that the number of '+' chars indicate nesting level.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Start-TimedSection
 about_boxstarter_logging
 

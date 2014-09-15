@@ -7,7 +7,7 @@ param (
 Returns $True if the current PowerShell session is running remotely
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 
 #>    
     if($PSSenderInfo -ne $null) {return $true}

@@ -23,7 +23,7 @@ Remove-BoxstarterPackageNugetFeed MyPackageName
 Removes the Nuget feed associated with MyPackageName
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Set-BoxstarterPackageNugetFeed
 Get-BoxstarterPackageNugetFeed
 Set-BoxstarterDeployOptions

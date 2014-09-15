@@ -12,7 +12,7 @@ publishing successful packages. To change these options, use
 Set-BoxstarterDeploymentOptions.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Set-BoxstarterDeployOptions
 #>
     $path = Get-OptionsPath

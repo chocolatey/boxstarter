@@ -51,7 +51,7 @@ the configured deployment target machines regardless of the version of
 MyPackage.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Set-BoxstarterDeployOptions 
 Set-BoxstarterFeedAPIKey
 Set-BoxstarterPackageNugetFeed

@@ -63,7 +63,7 @@ Enable-BoxstarterVM -Provider HyperV -VMName MyVM $cred NewSnapshot | Install-Bo
 Prepares MyVM, Creates a new snapshot named NewSnapshot and then installs MyPackage
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Enable-BoxstarterVHD
 Install-BoxstarterPackage
 #>

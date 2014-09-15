@@ -26,7 +26,7 @@ cmdlet and the Netstat command line utility to the screen
 as well as th boxstarter log.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 about_boxstarter_logging
 
 #>
@@ -56,7 +56,7 @@ Out-BoxstarterLog "This can be seen on the screen and in the log file"
 "This can be seen on the screen and in the log file" | Out-BoxstarterLog
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 about_boxstarter_logging
 
 #>    

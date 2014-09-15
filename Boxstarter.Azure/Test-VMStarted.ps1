@@ -18,7 +18,7 @@ $isStarted = Test-VMStarted -ServiceName "mycloudService" -Name "MyVM"
 $isStarted will be $true if MyVM is running
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Enable-BoxstarterVM
 #>
     [CmdletBinding()]

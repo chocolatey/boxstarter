@@ -47,7 +47,7 @@ BOXSTARTER VARIABLE SETTINGS
 
 SEE ALSO
 
-	http://boxstarter.codeplex.com
+	http://boxstarter.org
 	Invoke-Boxstarter
 	Write-BoxstarterMessage
 	Start-TimedSection

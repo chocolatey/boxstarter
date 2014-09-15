@@ -31,7 +31,7 @@ Publish-BoxstarterPackage which publishes the packages to their
 associated nuget feed.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Test-BoxstarterPackage
 Publish-BoxstarterPackage
 Set-BoxstarterDeployOptions

@@ -39,7 +39,7 @@ $ComputerName = Enable-BoxstarterVHD $pathToVHD -IgnoreLocalAccountTokenFilterPo
 Enables WMI ports in the Windows registry
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 
 #>
     [CmdletBinding()]

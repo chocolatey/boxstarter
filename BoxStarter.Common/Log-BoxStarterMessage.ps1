@@ -13,7 +13,7 @@ $Boxstarter.Log.
 The message to be logged.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 about_boxstarter_logging
 
 #>

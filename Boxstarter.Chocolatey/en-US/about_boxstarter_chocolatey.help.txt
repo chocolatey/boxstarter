@@ -130,7 +130,7 @@ Package Authoring Considerations
 
 SEE ALSO
 
-	http://boxstarter.codeplex.com
+	http://boxstarter.org
 	Install-BoxstarterPackage
 	Invoke-ChocolateyBoxstarter
 	about_boxstarter_logging

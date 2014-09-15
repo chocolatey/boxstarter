@@ -14,7 +14,7 @@ does not run the task. It simply creates it.
 The credentials under which the task will run.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Invoke-FromTask
 Remove-BoxstarterTask
 

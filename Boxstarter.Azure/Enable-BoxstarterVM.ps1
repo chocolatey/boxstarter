@@ -79,7 +79,7 @@ Gets MyVM's ConnectionURI, creates a new snapshot named NewSnapshot and
 then installs MyPackage
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Install-BoxstarterPackage
 Set-AzureVMCheckpoint
 Get-AzureVMCheckpoint

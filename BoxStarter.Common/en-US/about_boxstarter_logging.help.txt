@@ -38,7 +38,7 @@ DESCRIPTION
 
 SEE ALSO
 
-	http://boxstarter.codeplex.com
+	http://boxstarter.org
 	Write-BoxstarterMessage
 	Out-BoxtarterLog
 	Enter-BoxstarterLogable

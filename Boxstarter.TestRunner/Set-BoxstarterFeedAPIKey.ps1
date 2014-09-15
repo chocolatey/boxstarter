@@ -28,7 +28,7 @@ Sets the API Key used with the public Chocolatey feed to
 5cbc38d9-1a94-430d-8361-685a9080a6b8.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 Get-BoxstarterFeedAPIKey
 #>
     [CmdletBinding()]

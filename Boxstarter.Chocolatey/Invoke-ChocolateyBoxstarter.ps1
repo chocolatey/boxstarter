@@ -108,7 +108,7 @@ This installs the example package and uses "mypassword" for any reboot
 autologon's. The user is now not prompted for a password.
 
 .LINK
-http://boxstarter.codeplex.com
+http://boxstarter.org
 about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey
 Set-BoxstarterConfig
