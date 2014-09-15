@@ -78,7 +78,7 @@ Install-BoxstarterPackage -PackageName MyPackage -DisableReboots | Out-Null
 </pre>
 <h4>Boxstarter Log File</h4>
 <p>Boxstarter always logs verbose output to <code>$Boxstarter.Log</code> which is usually located at $env:LocalAppData\Boxstarter\Boxstarter.log. Installations on remote machines will produce a log file at this location on the remote machine and the local log file will contain just the messages that ran locally.</p>
-<h3>Running an Install from a network share or external media</h3>
+<h3 id="InstallFromShare">Running an Install from a network share or external media</h3>
 <p>You may want to place the Boxstarter modules and local repo on a network share so that others on your network can invoke Boxstarter installs with nothing installed. Or you may want to save them on a thumb drive, SD, or Micro SD card so you can always have Boxstarter and your packages handy. Boxstarter provides a batch file wrapper that can be called to facilitate these scenarios.</p>
 <pre>
 Copy-Item $Boxstarter.BaseDir E:\ -Recurse
