@@ -6,7 +6,7 @@
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
     <title>Boxstarter Test Runner Module</title>
-    <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=boxstarter&amp;DownloadId=635599&amp;Build=20006</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <projectUrl>http://Boxstarter.org</projectUrl>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <description>Boxstarter's Test Runner module makes it easy to automate the testing and publishing of Chocolatey packages.</description>
