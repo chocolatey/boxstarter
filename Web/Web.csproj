@@ -203,15 +203,11 @@
     <Content Include="Launch\Application Files\Boxstarter.WebLaunch_2_4_93_0\Boxstarter.WinConfig\Update-ExecutionPolicy.ps1.deploy" />
     <Content Include="Launch\Application Files\Boxstarter.WebLaunch_2_4_93_0\LICENSE.txt.deploy" />
     <None Include="Properties\PublishProfiles\boxstarter.pubxml" />
-    <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\jquery-1.9.1.js" />
-    <Content Include="Scripts\jquery-1.9.1.min.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.9.1.min.map" />
     <Content Include="WebLauncher.cshtml">
       <SubType>Code</SubType>
     </Content>
