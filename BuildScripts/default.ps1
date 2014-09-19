@@ -18,7 +18,7 @@ Task default -depends Build
 Task Build -depends Build-Clickonce, Build-Web, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
-Task Push-Public -depends Push-Chocolatey, Push-Codeplex
+Task Push-Public -depends Push-Chocolatey, Push-Github
 Task All-Tests -depends Test, Integration-Test
 Task Quick-Deploy -depends Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage
 
@@ -143,20 +143,23 @@ Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
     }
 }
 
-Task Push-Codeplex {
-    Add-Type -Path "$basedir\BuildScripts\CodePlexClientAPI\CodePlex.WebServices.Client.dll"
-     $releaseService=New-Object CodePlex.WebServices.Client.ReleaseService
-     $releaseService.Credentials = Get-Credential -Message "Codeplex credentials" -username "mwrock"
-     $releaseService.CreateARelease("boxstarter","Boxstarter $version","Running the Setup.bat file will install Chocolatey if not present and then install the Boxstarter modules.",[DateTime]::Now,[CodePlex.WebServices.Client.ReleaseStatus]::Beta, $true, $true)
-     $releaseFile = New-Object CodePlex.WebServices.Client.releaseFile
-     $releaseFile.Name="Boxstarter $version"
-     $releaseFile.MimeType="application/zip"
-     $releaseFile.FileName="boxstarter.$version.zip"
-     $releaseFile.FileType=[CodePlex.WebServices.Client.ReleaseFileType]::RuntimeBinary
-     $releaseFile.FileData=[System.IO.File]::ReadAllBytes("$basedir\BuildArtifacts\Boxstarter.$version.zip")
-     $fileList=new-object "System.Collections.Generic.List``1[[CodePlex.WebServices.Client.ReleaseFile]]"
-     $fileList.Add($releaseFile)
-     $releaseService.UploadReleaseFiles("boxstarter", "Boxstarter $version", $fileList)
+Task Push-Github {
+    $headers = @{
+        Authorization = 'Basic ' + [Convert]::ToBase64String(
+            [Text.Encoding]::ASCII.GetBytes("mwrock:$($env:github_api)"));
+    }
+
+    $releaseNotes = Get-ReleaseNotes
+    $postParams = ConvertTo-Json @{
+        tag_name="v$version"
+        target_commitish=$changeset
+        name="v$version"
+        body=$releaseNotes.DocumentElement.'#text'
+    } -Compress
+
+    $response = Invoke-RestMethod -Uri "https://api.github.com/repos/mwrock/boxstarter/releases" -Method POST -Body $postParams -Headers $headers
+    $uploadUrl = $response.upload_url.replace("{?name}","?name=boxstarter.$version.zip")
+    Invoke-RestMethod -Uri $uploadUrl -Method POST -ContentType "application/zip" -InFile "$basedir\BuildArtifacts\Boxstarter.$version.zip" -Headers $headers
 }
 
 task Update-Homepage {
@@ -185,7 +188,7 @@ bye
 
 function PackDirectory($path, [switch]$AddReleaseNotes){
     exec { 
-        [xml]$releaseNotes = Get-Content "$baseDir\BuildScripts\releaseNotes.xml"
+        $releaseNotes = Get-ReleaseNotes
         Get-ChildItem $path -Recurse -include *.nuspec | 
             % { 
                  if($AddReleaseNotes) {
@@ -198,6 +201,10 @@ function PackDirectory($path, [switch]$AddReleaseNotes){
                  .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $version 
               }
     }
+}
+
+function Get-ReleaseNotes {
+    [xml](Get-Content "$baseDir\BuildScripts\releaseNotes.xml")
 }
 
 function PushDirectory($path){
