@@ -63,7 +63,6 @@ task Publish-Web {
     exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:boxstarter_publish_password }
 }
 
-}
 Task Test -depends Create-ModuleZipForRemoting {
     pushd "$baseDir"
     $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
