@@ -18,7 +18,7 @@ Task default -depends Build
 Task Build -depends Build-Clickonce, Build-Web, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
-Task Push-Public -depends Push-Chocolatey, Push-Github
+Task Push-Public -depends Push-Chocolatey, Push-Github, Publish-Web
 Task All-Tests -depends Test, Integration-Test
 Task Quick-Deploy -depends Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage
 
@@ -59,6 +59,11 @@ task Publish-ClickOnce {
     Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\web\Launch" -Recurse -Force
 }
 
+task Publish-Web {
+    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:boxstarter_publish_password }
+}
+
+}
 Task Test -depends Create-ModuleZipForRemoting {
     pushd "$baseDir"
     $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
