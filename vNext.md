@@ -46,6 +46,7 @@ I'm considering rewriting the core of boxstarter in GO for these reasons.
 Once some design decisions have been ironed out, it may make more sense to remain in pure powershell and then port to GO later after the basic structure is stable or maybe not. Regardless, there will be a powershell module to wrap the core so users can still call boxstarter via powershell commands.
 
 ## Thoughts on revised execution flow
+### Boxstarter core as entry point
 
 ```
 Invoke-Boxstarter(includes install boxstarter package) -> 
@@ -56,9 +57,10 @@ Invoke-ChocolateyBoxstarter(or other  provisioner(s))
 * Possibly the script that boxstarter runs and not the arguments instruct which provisioner to load and run.
 * Much simpler
 
-### Problems
+**Problems**
 * If provisionr to use is based on CLI args, `Invoke-Boxstarter` arguments need to work accross provisioners which could be limiting.
 
+### Provisioner defines entry point
 ```
 Invoke-ChocolateyBoxstarter -> 
 Invoke-Boxstarter
@@ -67,5 +69,5 @@ Invoke-Boxstarter
 * The provisioner is the entry point that adheres to an interface defined by boxstarter core and calls its API 
 * Allows for a calling syntax that cators to the specifics of the provisioner
 
-## Problems
+**Problems**
 * Only makes sense if using a single provisioner
