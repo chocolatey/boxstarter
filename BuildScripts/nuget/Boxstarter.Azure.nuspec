@@ -17,6 +17,7 @@
       <dependency id="WindowsAzureLibsForNet" version="2.2" />
     </dependencies>
     <releaseNotes>
+  - Fixes Invoke-Reboot from a nested package and bubbles up the reboot signal
   - Update docs to reflect github as repo home and remove all codeplex links
   - Fix for all write-host calls being logged to Boxstarter log file even when there is no install session in progress
   - fixing issue where auto login is not disabled after boxstarter run
