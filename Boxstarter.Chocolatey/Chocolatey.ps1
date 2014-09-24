@@ -112,7 +112,7 @@ Intercepts Chocolatey call to check for reboots
                 $winFeature=$true
             }
         }
-        if((Test-PendingReboot) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
+        if((Test-PendingReboot) -and $Boxstarter.RebootOk -or $Boxstarter.IsRebooting) {return Invoke-Reboot}
         $session=Start-TimedSection "Calling Chocolatey to install $packageName. This may take several minutes to complete..."
         try {
                 if($winFeature -eq $true -and (Get-IsRemote)){

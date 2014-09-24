@@ -31,6 +31,21 @@ Describe "Getting-Chocolatey" {
         }        
     }
 
+    Context "When Boxstarter is restarting from a nested package" {
+        $Boxstarter.IsRebooting=$true
+        $boxstarter.RebootOk=$true
+        Mock Invoke-Reboot
+        
+        Chocolatey Install pkg
+
+        it "will Invoke-Reboot" {
+            Assert-MockCalled Invoke-Reboot -times 1
+        }
+        it "will not get Chocolatey" {
+            Assert-MockCalled Call-Chocolatey -times 0
+        }        
+    }
+
     Context "When a reboot is pending but reboots are not OK" {
         Mock Test-PendingReboot {$true}
         $boxstarter.RebootOk=$false
