@@ -43,7 +43,8 @@ Describe "Getting-Chocolatey" {
         }
         it "will not get Chocolatey" {
             Assert-MockCalled Call-Chocolatey -times 0
-        }        
+        }
+        $Boxstarter.IsRebooting=$false
     }
 
     Context "When a reboot is pending but reboots are not OK" {
@@ -199,6 +200,7 @@ Describe "Getting-Chocolatey" {
         Mock Test-PendingReboot {return $false}
         Mock Invoke-Reboot
         Mock Call-Chocolatey {$global:LASTEXITCODE=1}
+        $Boxstarter.IsRebooting=$false
         
         $error = Chocolatey Install pkg 2>&1
 
@@ -206,8 +208,4 @@ Describe "Getting-Chocolatey" {
             $error| should match "Chocolatey reported an unsuccessful exit code of 1"
         }
     }
-
-    #Not sure why I need to do this but pester test drive cleanup
-    #does not properly cleanup without it
-    #Remove-Item $TestDrive -recurse -force
 }
