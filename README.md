@@ -37,7 +37,7 @@ Install-BoxstarterPackage -ComputerName win7 `
 
 ![Remote Install](Web/Images/result.png)
 
-NOTE: Powerhell Remoting must be enabled on the remote machine. Launch a Powershell Console as administrator:
+NOTE: PowerShell Remoting must be enabled on the remote machine. Launch a Powershell Console as administrator:
 ```powershell
 Enable-PSRemoting -Force
 ```
