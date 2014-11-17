@@ -14,12 +14,14 @@ http://boxstarter.org
     if($PowershellRemoting) {return $false}
     if($env:IsRemote -ne $null) { return [bool]::Parse($env:IsRemote) }
     else {
+        $script:recursionLevel = 0
         $env:IsRemote = Test-ChildOfWinrs
         return [bool]::Parse($env:IsRemote)
     }
 }
 
 function Test-ChildOfWinrs($ID = $PID) {
+   if(++$script:recursionLevel -gt 20) { return $false }
    $parent = (Get-WmiObject -Class Win32_Process -Filter "ProcessID=$ID").ParentProcessID 
     if($parent -eq $null) { return $false } else {
     	try {$parentProc = Get-Process -ID $parent -ErrorAction Stop} catch {
