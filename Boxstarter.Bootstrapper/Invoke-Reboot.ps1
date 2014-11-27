@@ -38,9 +38,12 @@ about_boxstarter_variable_in_bootstrapper
         $restartScript="Call PowerShell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$($Boxstarter.BaseDir)\Boxstarter.Bootstrapper\boxstarter.bootstrapper.psd1';Invoke-Boxstarter -RebootOk -NoPassword:`$$($Boxstarter.NoPassword.ToString())`""
         New-Item "$startup\boxstarter-post-restart.bat" -type file -force -value $restartScript | Out-Null
     }
-    if(Get-Module Bitlocker -ListAvailable){
-        Get-BitlockerVolume | ? {$_.ProtectionStatus -eq "On"  -and $_.VolumeType -eq "operatingSystem"} | Suspend-Bitlocker -RebootCount 1 | out-null
+    try {
+        if(Get-Module Bitlocker -ListAvailable){
+            Get-BitlockerVolume | ? {$_.ProtectionStatus -eq "On"  -and $_.VolumeType -eq "operatingSystem"} | Suspend-Bitlocker -RebootCount 1 | out-null
+        }
     }
+    catch {} # There are several reports of the bitlocker module throwing errors
     $Boxstarter.IsRebooting=$true
     Restart
 }

@@ -52,4 +52,22 @@ Describe "Invoke-Reboot" {
             if(get-module bitlocker -ListAvailable){Assert-MockCalled Suspend-Bitlocker}
         }
     }
+
+    Context "When Get-BitlockerVolume throws an error" {
+        $Boxstarter.RebootOk=$true
+        $Boxstarter.IsRebooting=$false
+        Mock Get-BitlockerVolume { throw "some crazy error." }
+
+        Invoke-Reboot
+
+        it "will create Restart file" {
+            Assert-MockCalled New-Item
+        }
+        it "will restart" {
+            Assert-MockCalled Restart
+        }
+        it "will toggle reboot" {
+            $Boxstarter.IsRebooting | should be $true
+        }
+    }
 }
