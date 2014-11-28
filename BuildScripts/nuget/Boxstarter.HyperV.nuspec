@@ -16,6 +16,7 @@
       <dependency id="Boxstarter.Chocolatey" version="$version$" />
     </dependencies>
     <releaseNotes>
+  - Fixes failures from exceptions thrown from bitlocker module even when bitlocker is not in use.
   - Fixes Invoke-Reboot from a nested package and bubbles up the reboot signal
   - Update docs to reflect github as repo home and remove all codeplex links
   - Fix for all write-host calls being logged to Boxstarter log file even when there is no install session in progress
