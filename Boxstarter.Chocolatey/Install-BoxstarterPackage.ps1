@@ -655,7 +655,7 @@ function Wait-ForSessionToClose($session) {
 
 function Test-ShutDownInProgress($Session) {
     $response=Invoke-Command -Session $Session { 
-        $systemMetrics = Add-Type -TypeDefinition @'
+        $systemMetrics = Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
 public static class SystemMetrics
@@ -671,7 +671,7 @@ public static class SystemMetrics
     }
 
 }
-'@ -PassThru
+"@ -PassThru
         return $systemMetrics::IsShuttingdown()
     }
 
