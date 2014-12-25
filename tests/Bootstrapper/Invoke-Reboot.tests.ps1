@@ -35,7 +35,10 @@ Describe "Invoke-Reboot" {
     Context "When reboots are not suppressed" {
         $Boxstarter.RebootOk=$true
         $Boxstarter.IsRebooting=$false
-        Mock Get-BitlockerVolume {@{ProtectionStatus="On";VolumeType="operatingSystem"}}
+        $bitlockerCommand = Get-Command -Name 'get-bitlockervolume' -ErrorAction SilentlyContinue
+        if($bitlockerCommand){
+            Mock Get-BitlockerVolume {@{ProtectionStatus="On";VolumeType="operatingSystem"}}
+        }
 
         Invoke-Reboot
 
@@ -56,7 +59,10 @@ Describe "Invoke-Reboot" {
     Context "When Get-BitlockerVolume throws an error" {
         $Boxstarter.RebootOk=$true
         $Boxstarter.IsRebooting=$false
-        Mock Get-BitlockerVolume { throw "some crazy error." }
+        $bitlockerCommand = Get-Command -Name 'get-bitlockervolume' -ErrorAction SilentlyContinue
+        if($bitlockerCommand){
+            Mock Get-BitlockerVolume { throw "some crazy error." }
+        }
 
         Invoke-Reboot
 
