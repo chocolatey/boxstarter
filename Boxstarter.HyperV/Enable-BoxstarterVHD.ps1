@@ -66,9 +66,9 @@ http://boxstarter.org
         if((Get-ItemProperty $VHDPath -Name IsReadOnly).IsReadOnly){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD is Read-Only"
         }    
-        $before = (Get-Volume).DriveLetter
+        $before = (Get-Volume).DriveLetter | ? { $_ -ne $null }
         mount-vhd $VHDPath
-        $after = (Get-Volume).DriveLetter
+        $after = (Get-Volume).DriveLetter | ? { $_ -ne $null }
         $winVolume = compare $before $after -Passthru
         Write-BoxstarterMessage "Drives added after mount are $($winVolume)" -Verbose
         $winVolume | % { new-PSDrive -Name $_ -PSProvider FileSystem -Root "$($_):\" -ErrorAction SilentlyContinue | out-null}

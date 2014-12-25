@@ -12,6 +12,7 @@ Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 |
 $Boxstarter.SuppressLogging=$true
 
 Describe "Enable-BoxstarterCredSSP" {
+    New-Item "HKCU:\SOFTWARE\Pester\temp" -Force | out-null
     $regRoot="HKCU:\SOFTWARE\Pester\temp"
     Mock Get-CredentialDelegationKey { $regRoot }
     Mock Enable-WSManCredSSP

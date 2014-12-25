@@ -3,9 +3,9 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 function Mount-TestVHD {
     $testRoot="$env:temp\Boxstarter.tests"
     Get-PSDrive | Out-Null
-    $before = (Get-Volume).DriveLetter
+    $before = (Get-Volume).DriveLetter | ? { $_ -ne $null }
     Mount-VHD $testRoot\test.vhdx
-    $after = (Get-Volume).DriveLetter
+    $after = (Get-Volume).DriveLetter | ? { $_ -ne $null }
     $winVolume = compare $before $after -Passthru
     Get-PSDrive | Out-Null
     reg load HKLM\VHDSYS "$($winVolume):\windows\system32\config\system" 2>&1 | out-null
@@ -58,7 +58,6 @@ Describe "Enable-BoxstarterVHD" {
             reg unload HKLM\VHDSOFTWARE | out-null
             Dismount-VHD $testRoot\test.vhdx
             Get-PSDrive | Out-Null
-
             $result = Enable-BoxstarterVHD $testRoot\test.vhdx
 
             Mount-TestVHD
@@ -85,7 +84,7 @@ Describe "Enable-BoxstarterVHD" {
             $current=Get-CurrentControlSet
             Disable-FireWallRule WMI-RPCSS-In-TCP
             Disable-FireWallRule WMI-WINMGMT-In-TCP
-            Remove-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy
+            Remove-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy -ErrorAction SilentlyContinue
             Set-ItemProperty -path "HKLM:\VHDSYS\ControlSet00$current\Control\ComputerName\ComputerName" -Name ComputerName -value "$computerName"
             [GC]::Collect()
             reg unload HKLM\VHDSYS | out-null
@@ -197,9 +196,9 @@ Describe "Enable-BoxstarterVHD" {
         Context "When the vhd is not a system volume" {
             $testRoot="$env:temp\Boxstarter.tests"
             Get-PSDrive | Out-Null
-            $before = (Get-Volume).DriveLetter
+            $before = (Get-Volume).DriveLetter | ? { $_ -ne $null }
             Mount-VHD $testRoot\test.vhdx
-            $after = (Get-Volume).DriveLetter
+            $after = (Get-Volume).DriveLetter | ? { $_ -ne $null }
             $winVolume = compare $before $after -Passthru
             Remove-Item "$($winVolume):\Windows\System32\config" -recurse -Force
             Dismount-VHD $testRoot\test.vhdx
