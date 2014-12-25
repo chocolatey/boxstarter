@@ -65,8 +65,7 @@ task Publish-Web {
 
 Task Test -depends Create-ModuleZipForRemoting {
     pushd "$baseDir"
-    $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
-    if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}
+    $pesterDir = "$env:ChocolateyInstall\lib\Pester.2.1.0"
     if($testName){
         exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -testName $testName}
     }
@@ -78,8 +77,7 @@ Task Test -depends Create-ModuleZipForRemoting {
 
 Task Integration-Test -depends Pack-Nuget {
     pushd "$baseDir"
-    $pesterDir = (dir $env:ChocolateyInstall\lib\Pester*)
-    if($pesterDir.length -gt 0) {$pesterDir = $pesterDir[-1]}
+    $pesterDir = "$env:ChocolateyInstall\lib\Pester.2.1.0"
     if($testName){
         exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/IntegrationTests -testName $testName}
     }
