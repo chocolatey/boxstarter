@@ -1,13 +1,14 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 Remove-Module boxstarter.*
-Resolve-Path $here\..\..\Boxstarter.Azure\*.ps1 | 
-    % { . $_.ProviderPath }
 Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 | 
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
     % { . $_.ProviderPath }
+Resolve-Path $here\..\..\Boxstarter.Azure\*.ps1 | 
+    % { . $_.ProviderPath }
+
 Remove-Item alias:\Enable-BoxstarterVM
 
 Describe "Enable-BoxstarterVM.Azure" {
