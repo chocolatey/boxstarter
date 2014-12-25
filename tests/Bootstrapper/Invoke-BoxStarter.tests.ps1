@@ -45,6 +45,7 @@ Describe "Invoke-Boxstarter" {
         Mock Read-AuthenticatedPassword
         Mock Get-UAC
         Mock Remove-ItemProperty
+        Mock Set-ItemProperty -ParameterFilter {$Path -eq $winLogonKey}
         Mock Set-ItemProperty -ParameterFilter {$Path -eq "$(Get-BoxstarterTempDir)\Boxstarter.autologon"}
         Mock Get-ItemProperty -ParameterFilter { $path -eq $winLogonKey } -MockWith {@{
             DefaultUserName = "user"
@@ -213,6 +214,7 @@ Describe "Invoke-Boxstarter" {
         Mock Set-SecureAutoLogon
         Mock Restart
         Mock RestartNow
+        Mock New-Item -ParameterFilter {$Path -eq "$(Get-BoxstarterTempDir)\boxstarter.script"}
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
 
         Invoke-Boxstarter {Invoke-Reboot} -RebootOk -password (ConvertTo-SecureString "mypassword" -asplaintext -force) | Out-Null

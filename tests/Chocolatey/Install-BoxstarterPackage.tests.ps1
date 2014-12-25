@@ -140,6 +140,7 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When calling locally" {
+        Mock Invoke-ChocolateyBoxstarter -ParameterFilter {$BootstrapPackage -eq "test"}
 
         $result = Install-BoxstarterPackage -PackageName test -DisableReboots -KeepWindowOpen -LocalRepo "myRepo"
 
