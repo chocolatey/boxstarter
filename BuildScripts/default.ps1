@@ -60,7 +60,7 @@ task Publish-ClickOnce -depends Install-MSBuild {
     Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\web\Launch" -Recurse -Force
 }
 
-task Publish-Web -depends Install-MSBuild {
+task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:boxstarter_publish_password }
 }
 
@@ -201,6 +201,10 @@ task Install-WebAppTargets {
     if(!(Test-Path "$env:ChocolateyInstall\lib\MSBuild.Microsoft.VisualStudio.Web.targets.12.0.4\tools\VSToolsPath\WebApplications\Microsoft.WebApplication.targets")) { 
         cinst MSBuild.Microsoft.VisualStudio.Web.targets -source http://packages.nuget.org/v1/FeedService.svc/ -version '12.0.4'
     }
+}
+
+task Install-WebDeploy {
+    if(!(Test-Path "$env:ProgramW6432\IIS\Microsoft Web Deploy V3")) { cinst webdeploy }
 }
 
 function PackDirectory($path, [switch]$AddReleaseNotes){
