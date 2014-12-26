@@ -12,6 +12,7 @@ properties {
     }
     $nugetExe = "$env:ChocolateyInstall\ChocolateyInstall\nuget"
     $ftpHost="waws-prod-bay-001.ftp.azurewebsites.windows.net"
+    $msbuildExe="$env:ProgramFiles\MSBuild\12.0\Bin\msbuild.exe"
 }
 
 Task default -depends Build
@@ -41,26 +42,26 @@ task Create-ModuleZipForRemoting {
 
 task Build-ClickOnce {
     Update-AssemblyInfoFiles $version $changeset
-    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
-    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
+    exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
+    exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
 }
 
-task Build-Web {
-    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
-    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /t:Build /v:minimal /p:DownloadNuGetExe="true" }
+task Build-Web -depends Install-MSBuild {
+    exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
+    exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Build /v:minimal /p:DownloadNuGetExe="true" }
     copy-Item "$baseDir\packages\bootstrap.3.0.2\content\*" "$baseDir\Web" -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-task Publish-ClickOnce {
-    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version.0" }
+task Publish-ClickOnce -depends Install-MSBuild {
+    exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version.0" }
     Remove-Item "$basedir\web\Launch" -Recurse -Force -ErrorAction SilentlyContinue
     MkDir "$basedir\web\Launch"
     Set-Content "$basedir\web\Launch\.gitattributes" -Value "* -text"
     Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\web\Launch" -Recurse -Force
 }
 
-task Publish-Web {
-    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:boxstarter_publish_password }
+task Publish-Web -depends Install-MSBuild {
+    exec { .$msbuildExe "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:boxstarter_publish_password }
 }
 
 Task Test -depends Create-ModuleZipForRemoting {
@@ -186,6 +187,10 @@ bye
     .$logparser -i:w3c "SELECT Date, EXTRACT_VALUE(cs-uri-query,'package') as package, COUNT(*) as count FROM * where cs-uri-stem = '/launch/Boxstarter.WebLaunch.Application' Group by Date, package Order by Date, package" -rtp:-1
     popd
     del "$basedir\sitelogs" -Recurse -Force
+}
+
+task Install-MSBuild {
+    if(!(Test-Path "$env:ProgramFiles\MSBuild\12.0\Bin\msbuild.exe")) { cinst microsoft-build-tools }
 }
 
 function PackDirectory($path, [switch]$AddReleaseNotes){
