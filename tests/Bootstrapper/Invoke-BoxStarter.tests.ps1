@@ -11,10 +11,11 @@ $Boxstarter.BaseDir=(split-path -parent (split-path -parent $here))
 
 Describe "Invoke-Boxstarter" {
     $testRoot = (Get-PSDrive TestDrive).Root
-    $winUpdateKey="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
+    $winUpdateKey="HKLM:SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\au"
     $winLogonKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
     Remove-item "$(Get-BoxstarterTempDir)\Boxstarter.autologon" -ErrorAction SilentlyContinue
     Mock New-Item -ParameterFilter {$path -like "$env:appdata\*"}
+    Mock New-Item -ParameterFilter { $path -eq $winUpdateKey }
     Mock New-ItemProperty -ParameterFilter { $path -eq $winUpdateKey }
     Mock Remove-ItemProperty -ParameterFilter { $path -eq $winUpdateKey }
     Mock Stop-Service
@@ -140,6 +141,16 @@ Describe "Invoke-Boxstarter" {
         }
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon"
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoLogonCount"
+    }
+
+    Context "When win update key does not exist" {
+        Mock Test-Path {$False} -ParameterFilter { $path -eq $winUpdateKey }
+
+        Invoke-Boxstarter {return} | Out-Null
+
+        it "will create WUA key" {
+            Assert-MockCalled New-Item -ParameterFilter { $path -eq $winUpdateKey }
+        }
     }
 
     Context "When Configuration Service is installed" {

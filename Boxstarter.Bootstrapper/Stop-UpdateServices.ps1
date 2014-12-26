@@ -1,7 +1,9 @@
 function Stop-UpdateServices {
     write-boxstartermessage "Disabling Automatic Updates from Windows Update"
-    try {New-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -name 'NoAutoUpdate' -value '1' -propertyType "DWord" -force -ErrorAction Stop | Out-Null}catch { $global:error.RemoveAt(0) }
-    try {New-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -name 'NoAutoRebootWithLoggedOnUsers' -value '1' -propertyType "DWord" -force -ErrorAction Stop | Out-Null}catch { $global:error.RemoveAt(0) }
+    $winUpdateKey = "HKLM:SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\au"
+    if(!(Test-Path $winUpdateKey) ) { New-Item $winUpdateKey -Type Folder -Force}
+    try {New-ItemProperty -Path $winUpdateKey -name 'NoAutoUpdate' -value '1' -propertyType "DWord" -force -ErrorAction Stop | Out-Null}catch { $global:error.RemoveAt(0) }
+    try {New-ItemProperty -Path $winUpdateKey -name 'NoAutoRebootWithLoggedOnUsers' -value '1' -propertyType "DWord" -force -ErrorAction Stop | Out-Null}catch { $global:error.RemoveAt(0) }
     Stop-CCMEXEC
 }
 
