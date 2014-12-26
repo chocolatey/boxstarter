@@ -40,7 +40,7 @@ task Create-ModuleZipForRemoting {
     Move-Item "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.chocolatey\Boxstarter.zip"
 }
 
-task Build-ClickOnce {
+task Build-ClickOnce -depends Install-MSBuild, Install-Win8SDK {
     Update-AssemblyInfoFiles $version $changeset
     exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
     exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
@@ -191,6 +191,10 @@ bye
 
 task Install-MSBuild {
     if(!(Test-Path "$env:ProgramFiles\MSBuild\12.0\Bin\msbuild.exe")) { cinst microsoft-build-tools }
+}
+
+task Install-Win8SDK {
+    if(!(Test-Path "$env:ProgramFiles\Windows Kits\8.1\bin\x64\signtool.exe")) { cinst windows-sdk-8.1 }
 }
 
 function PackDirectory($path, [switch]$AddReleaseNotes){
