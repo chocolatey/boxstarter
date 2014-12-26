@@ -29,7 +29,7 @@
 <h4><span class="text-primary">Create the Package</span></h4>
 <p>Lets assume that you saved the above Visual Studio project to c:\dev\NugetServer. You can now create a package with the artifacts of this project embedded in the package:</p>
 <pre>
-New-BoxstarterPackage -Name NugetFeedApp
+New-BoxstarterPackage -Name NugetServer
 Copy-Item c:\dev\NugetServer "$($Boxstarter.LocalRepo)\NugetServer" -Recurse -Force
 </pre>
 <p>This creates a skeleton Chocolatey package with the contents of your NugetServer application embedded in the package. You will need to complete the ChocolateyInstall.ps1 file.</p>
