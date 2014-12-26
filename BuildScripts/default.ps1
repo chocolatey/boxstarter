@@ -41,18 +41,18 @@ task Create-ModuleZipForRemoting {
 
 task Build-ClickOnce {
     Update-AssemblyInfoFiles $version $changeset
-    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
-    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
+    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
+    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
 }
 
 task Build-Web {
-    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
-    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /t:Build /v:minimal /p:DownloadNuGetExe="true" }
+    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
+    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /t:Build /v:minimal /p:DownloadNuGetExe="true" }
     copy-Item "$baseDir\packages\bootstrap.3.0.2\content\*" "$baseDir\Web" -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 task Publish-ClickOnce {
-    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version.0" }
+    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version.0" }
     Remove-Item "$basedir\web\Launch" -Recurse -Force -ErrorAction SilentlyContinue
     MkDir "$basedir\web\Launch"
     Set-Content "$basedir\web\Launch\.gitattributes" -Value "* -text"
@@ -60,7 +60,7 @@ task Publish-ClickOnce {
 }
 
 task Publish-Web {
-    exec { ."C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:boxstarter_publish_password }
+    exec { ."$env:ProgramFiles\MSBuild\12.0\Bin\msbuild" "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:boxstarter_publish_password }
 }
 
 Task Test -depends Create-ModuleZipForRemoting {
