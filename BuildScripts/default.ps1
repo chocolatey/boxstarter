@@ -46,7 +46,7 @@ task Build-ClickOnce -depends Install-MSBuild, Install-Win8SDK {
     exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
 }
 
-task Build-Web -depends Install-MSBuild {
+task Build-Web -depends Install-MSBuild, Install-WebAppTargets {
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Build /v:minimal /p:DownloadNuGetExe="true" }
     copy-Item "$baseDir\packages\bootstrap.3.0.2\content\*" "$baseDir\Web" -Recurse -Force -ErrorAction SilentlyContinue
@@ -195,6 +195,12 @@ task Install-MSBuild {
 
 task Install-Win8SDK {
     if(!(Test-Path "$env:ProgramFiles\Windows Kits\8.1\bin\x64\signtool.exe")) { cinst windows-sdk-8.1 }
+}
+
+task Install-WebAppTargets {
+    if(!(Test-Path "$env:ChocolateyInstall\lib\MSBuild.Microsoft.VisualStudio.Web.targets.12.0.4\tools\VSToolsPath\WebApplications\Microsoft.WebApplication.targets")) { 
+        cinst MSBuild.Microsoft.VisualStudio.Web.targets -source http://packages.nuget.org/v1/FeedService.svc/ -version '12.0.4'
+    }
 }
 
 function PackDirectory($path, [switch]$AddReleaseNotes){
