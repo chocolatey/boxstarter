@@ -17,6 +17,7 @@
       <dependency id="WindowsAzureLibsForNet" version="2.2" />
     </dependencies>
     <releaseNotes>
+  - Fixes issue where windows update reboots maching in the midst of a run.
   - Fixes failures from exceptions thrown from bitlocker module even when bitlocker is not in use.
   - Fixes Invoke-Reboot from a nested package and bubbles up the reboot signal
   - Update docs to reflect github as repo home and remove all codeplex links
