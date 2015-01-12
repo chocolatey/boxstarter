@@ -115,38 +115,38 @@ Intercepts Chocolatey call to check for reboots
         if(((Test-PendingReboot) -or $Boxstarter.IsRebooting) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
         $session=Start-TimedSection "Calling Chocolatey to install $packageName. This may take several minutes to complete..."
         try {
-                if($winFeature -eq $true -and (Get-IsRemote)){
-                    #DISM Output is more confusing than helpful.
-                    $currentLogging=$Boxstarter.Suppresslogging
-                    if($VerbosePreference -eq "SilentlyContinue"){$Boxstarter.Suppresslogging=$true}
-                    Invoke-FromTask @"
+            if($winFeature -eq $true -and (Get-IsRemote)){
+                #DISM Output is more confusing than helpful.
+                $currentLogging=$Boxstarter.Suppresslogging
+                if($VerbosePreference -eq "SilentlyContinue"){$Boxstarter.Suppresslogging=$true}
+                Invoke-FromTask @"
 ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" $(Expand-Splat $PSBoundParameters)
 "@
-                    $Boxstarter.SuppressLogging = $currentLogging
-                }
-                else{
-                    Call-Chocolatey @PSBoundParameters
-                    Write-BoxstarterMessage "Exit Code: $LastExitCode" -Verbose
-                    if($LastExitCode -ne 0) {
-                        Write-Error "Chocolatey reported an unsuccessful exit code of $LastExitCode"
-                    }
+                $Boxstarter.SuppressLogging = $currentLogging
+            }
+            else{
+                Call-Chocolatey @PSBoundParameters
+                Write-BoxstarterMessage "Exit Code: $LastExitCode" -Verbose
+                if($LastExitCode -ne 0) {
+                    Write-Error "Chocolatey reported an unsuccessful exit code of $LastExitCode"
                 }
             }
-            catch { 
-                Write-BoxstarterMessage "There was an error calling chocolatey" -Verbose
-                $ex=$_
-                Log-BoxstarterMessage $_
-                #Only write the error to the error stream if it was not previously
-                #written by chocolatey
-                if($global:error.Count -gt 1){
-                    if(($global:error[1].Exception.Message | Out-String).Contains($_.Exception.Message)){
-                        $errorWritten=$true
-                    }
-                }
-                if(!$errorWritten){
-                    Write-Error $_
+        }
+        catch { 
+            Write-BoxstarterMessage "There was an error calling chocolatey" -Verbose
+            $ex=$_
+            Log-BoxstarterMessage $_
+            #Only write the error to the error stream if it was not previously
+            #written by chocolatey
+            if($global:error.Count -gt 1){
+                if(($global:error[1].Exception.Message | Out-String).Contains($_.Exception.Message)){
+                    $errorWritten=$true
                 }
             }
+            if(!$errorWritten){
+                Write-Error $_
+            }
+        }
         Stop-Timedsection $session
         if(!$Boxstarter.rebootOk) {continue}
         if($Boxstarter.IsRebooting){
