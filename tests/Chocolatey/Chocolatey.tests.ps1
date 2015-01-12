@@ -91,14 +91,14 @@ Describe "Getting-Chocolatey" {
         }        
     }
 
-    Context "When chocolatey writes a reboot error and reboots are OK" {
+    Context "When chocolatey throws a reboot error and reboots are OK" {
         Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true
         Mock Remove-Item
         Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
         Mock Invoke-Reboot
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'."}
-        
+
         Chocolatey Install pkg -RebootCodes @(56,3010,654) 2>&1 | out-null
 
         it "will Invoke-Reboot" {
@@ -109,13 +109,13 @@ Describe "Getting-Chocolatey" {
         }
     }
 
-    Context "When chocolatey writes a negative reboot error and reboots are OK" {
+    Context "When chocolatey writes a reboot error and reboots are OK" {
         Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true
         Mock Remove-Item
         Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
         Mock Invoke-Reboot
-        Mock Call-Chocolatey {throw "[ERROR] Exit code was '-654'."}
+        Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '-654'."}
         
         Chocolatey Install pkg -RebootCodes @(56,3010,-654) 2>&1 | out-null
 
@@ -150,7 +150,7 @@ Describe "Getting-Chocolatey" {
         $boxstarter.RebootOk=$true
         Mock Invoke-Reboot
         Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '3020'." 2>&1 | out-null}
-        
+
         Chocolatey Install pkg -RebootCodes @(56,3010,654) | out-null
 
         it "will not Invoke-Reboot" {

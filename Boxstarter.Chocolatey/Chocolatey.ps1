@@ -114,6 +114,8 @@ Intercepts Chocolatey call to check for reboots
         }
         if(((Test-PendingReboot) -or $Boxstarter.IsRebooting) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
         $session=Start-TimedSection "Calling Chocolatey to install $packageName. This may take several minutes to complete..."
+        $currentErrorCount = $global:error.Count
+        $rebootable = $false
         try {
             if($winFeature -eq $true -and (Get-IsRemote)){
                 #DISM Output is more confusing than helpful.
@@ -133,18 +135,36 @@ Intercepts Chocolatey call to check for reboots
             }
         }
         catch { 
-            Write-BoxstarterMessage "There was an error calling chocolatey" -Verbose
-            $ex=$_
-            Log-BoxstarterMessage $_
             #Only write the error to the error stream if it was not previously
             #written by chocolatey
-            if($global:error.Count -gt 1){
-                if(($global:error[1].Exception.Message | Out-String).Contains($_.Exception.Message)){
-                    $errorWritten=$true
+            $chocoErrors = $global:error.Count - $currentErrorCount
+            if($chocoErrors -gt 0){
+                $idx = 0
+                $errorWritten = $false
+                while($idx -lt $chocoErrors){
+                    if(($global:error[$idx].Exception.Message | Out-String).Contains($_.Exception.Message)){
+                        $errorWritten = $true
+                    }
+                    if(!$errorWritten){
+                        Write-Error $_
+                    }
+                    $idx += 1
                 }
             }
-            if(!$errorWritten){
-                Write-Error $_
+        }
+        $chocoErrors = $global:error.Count - $currentErrorCount
+        if($chocoErrors -gt 0){
+            Write-BoxstarterMessage "There was an error calling chocolatey" -Verbose
+            $idx = 0
+            while($idx -lt $chocoErrors){
+                Log-BoxstarterMessage "Error from chocolatey: $($global:error[$idx].Exception | fl * -Force | Out-String)"
+                if($global:error[$idx] -match "code was '(-?\d+)'") {
+                    $errorCode=$matches[1]
+                    if($RebootCodes -contains $errorCode) {
+                       $rebootable = $true
+                    }
+                }
+                $idx += 1
             }
         }
         Stop-Timedsection $session
@@ -153,15 +173,10 @@ Intercepts Chocolatey call to check for reboots
             Remove-ChocolateyPackageInProgress $packageName
             return
         }
-        if($global:error.count -gt 0) {
-            if ($ex -ne $null -and ($ex -match "code was '(-?\d+)'")) {
-                $errorCode=$matches[1]
-                if($RebootCodes -contains $errorCode) {
-                    Write-BoxstarterMessage "Chocolatey Install returned a reboot-able exit code"
-                    Remove-ChocolateyPackageInProgress $packageName
-                    Invoke-Reboot
-                }
-            }
+        if($rebootable) {
+            Write-BoxstarterMessage "Chocolatey Install returned a reboot-able exit code"
+            Remove-ChocolateyPackageInProgress $packageName
+            Invoke-Reboot
         }
     }
 }
