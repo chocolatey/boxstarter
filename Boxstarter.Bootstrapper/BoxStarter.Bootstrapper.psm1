@@ -10,4 +10,5 @@ Export-ModuleMember Invoke-BoxStarter, `
                     Start-TimedSection, `
                     Stop-TimedSection, `
                     Out-Boxstarter, `
-                    Enter-BoxstarterLogable
+                    Enter-BoxstarterLogable, `
+                    Get-BoxstarterTempDir
