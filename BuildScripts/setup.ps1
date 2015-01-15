@@ -41,7 +41,7 @@ PS:>Get-Help Boxstarter
 "@
     Write-Host $successMsg
 
-    if($ModuleName -eq "Boxstarter.Chocolatey") {
+    if($ModuleName -eq "Boxstarter.Chocolatey" -and !$env:appdata.StartsWith($env:windir)) {
         $desktop = $([System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::DesktopDirectory))
         $startMenu=$("$env:appdata\Microsoft\Windows\Start Menu\Programs\Boxstarter")
         if(!(Test-Path $startMenu)){
@@ -58,7 +58,6 @@ PS:>Get-Help Boxstarter
 
         Set-Content -Path "$binPath\BoxstarterShell.bat" -Force -Value "$target $TargetArgs"
     }
-
 }
 
 function Create-Shortcut($location, $target, $targetArgs, $boxstarterPath) {
