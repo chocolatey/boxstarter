@@ -19,6 +19,7 @@
       <dependency id="Boxstarter.HyperV" version="$version$" />
     </dependencies>
     <releaseNotes>
+  - Work around nuget.exe limitations of handling files in system profile directory
   - Provide improved error logging of chocolatey errors.
   - Fixes issue where windows update reboots maching in the midst of a run.
   - Fixes failures from exceptions thrown from bitlocker module even when bitlocker is not in use.
