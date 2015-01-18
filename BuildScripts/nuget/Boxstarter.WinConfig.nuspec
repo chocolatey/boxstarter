@@ -16,6 +16,7 @@
       <dependency id="Boxstarter.Common" version="$version$" />
     </dependencies>
     <releaseNotes xmlns="">
+  - Suppress caught errors in Invoke-FromScheduledTask from bubbling up to final result
   - Work around nuget.exe limitations of handling files in system profile directory
   - Provide improved error logging of chocolatey errors.
   - Fixes issue where windows update reboots maching in the midst of a run.
