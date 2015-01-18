@@ -51,8 +51,10 @@ Remove-BoxstarterTask
 
     if($taskProc -ne $null){
         write-debug "Command launched in process $taskProc"
-        $waitProc=get-process -id $taskProc -ErrorAction SilentlyContinue
-        Write-Debug "Waiting on $($waitProc.Id)"
+        try { 
+            $waitProc=get-process -id $taskProc -ErrorAction Stop 
+            Write-Debug "Waiting on $($waitProc.Id)"
+        } catch { $global:error.RemoveAt(0) }
     }
 
     Wait-ForTask $waitProc $idleTimeout $totalTimeout
@@ -69,20 +71,20 @@ function Get-ChildProcessMemoryUsage {
     [int]$res=0
     Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
         if($_.ProcessID -ne $null) {
-            $proc = Get-Process -ID $_.ProcessID -ErrorAction SilentlyContinue
-            if($proc -ne $null){
+            try {
+                $proc = Get-Process -ID $_.ProcessID -ErrorAction Stop
                 $res += $proc.PrivateMemorySize + $proc.WorkingSet
                 Write-Debug "$($_.Name) $($proc.PrivateMemorySize + $proc.WorkingSet)"
-            }
+            } catch { $global:error.RemoveAt(0) }
         }
     }
     Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
         if($_.ProcessID -ne $null) {
-            $proc = Get-Process -ID $_.ProcessID -ErrorAction SilentlyContinue
-            if($proc -ne $null){
+            try {
+                $proc = Get-Process -ID $_.ProcessID -ErrorAction Top
                 $res += Get-ChildProcessMemoryUsage $_.ProcessID;
                 Write-Debug "$($_.Name) $($proc.PrivateMemorySize + $proc.WorkingSet)"
-            }
+            } catch { $global:error.RemoveAt(0) }
         }
     }
     $res
@@ -193,10 +195,14 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
 function KillTree($id){
     Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
         if($_.ProcessID -ne $null) {
-            kill $_.ProcessID -ErrorAction SilentlyContinue -Force
+            Invoke-SilentKill $_.ProcessID
             Write-Debug "Killing $($_.Name)"
             KillTree $_.ProcessID
         }
     }
-    Kill $id -ErrorAction SilentlyContinue -Force
+    Invoke-SilentKill $id
+}
+
+function Invoke-SilentKill($id) {
+    try {Kill $id -ErrorAction Stop -Force } catch { $global:error.RemoveAt(0) }
 }
