@@ -1,4 +1,4 @@
-function Install-Boxstarter($here, $ModuleName) {
+function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
     $boxstarterPath=Join-Path $env:AppData Boxstarter
     if(!(test-Path $boxstarterPath)){
         mkdir $boxstarterPath
@@ -50,9 +50,10 @@ PS:>Get-Help Boxstarter
         $target="powershell.exe"
         $targetArgs="-ExecutionPolicy bypass -NoExit -Command `"&'$boxstarterPath\BoxstarterShell.ps1'`""
 
-        $link = Join-Path $desktop "Boxstarter Shell.lnk"
-        Create-Shortcut $link $target $targetArgs $boxstarterPath
-
+		if($installArgs -inotcontains "nodesktopicon") {
+			$link = Join-Path $desktop "Boxstarter Shell.lnk"
+			Create-Shortcut $link $target $targetArgs $boxstarterPath
+		}
         $link = Join-Path $startMenu "Boxstarter Shell.lnk"
         Create-Shortcut $link $target $targetArgs $boxstarterPath
 
