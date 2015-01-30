@@ -1,7 +1,7 @@
 function Set-DesktopOptions {
 <#
 .SYNOPSIS
-Sets options for the Windows Task Bar
+Sets options for the Windows Desktop
 
 .PARAMETER Hide
 Hides Desktop Icons
