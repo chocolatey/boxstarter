@@ -149,7 +149,6 @@ Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage '$($boots
         $Boxstarter.ProgramFiles86="$programFiles86"
         $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
         Check-Chocolatey -ShouldIntercept
-        del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
         if($bootstrapPackage -ne $null){
             Download-Package $bootstrapPackage
         }
