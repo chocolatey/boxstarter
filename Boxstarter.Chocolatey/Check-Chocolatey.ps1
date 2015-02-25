@@ -16,13 +16,10 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
         }
     }
 
-    @(
-        "$env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1",
-        "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1"
-    ) | % {
-        if(Test-Path $_) {
-            Write-BoxstarterMessage "Importing Chocolatey module from $_" -Verbose
-            Import-Module $_ -Global 
+        $mod_install = "$env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1"
+        if(Test-Path $mod_install) {
+            Write-BoxstarterMessage "Importing Chocolatey module from $mod_install" -Verbose
+            Import-Module $mod_install -Global 
         }
     }
     if(!$BoxstarterIntrercepting)
