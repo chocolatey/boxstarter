@@ -16,12 +16,6 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
         }
     }
 
-        $mod_install = "$env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1"
-        if(Test-Path $mod_install) {
-            Write-BoxstarterMessage "Importing Chocolatey module from $mod_install" -Verbose
-            Import-Module $mod_install -Global 
-        }
-    }
     if(!$BoxstarterIntrercepting)
     {
         Write-BoxstarterMessage "Chocolatey installed, setting up interception of Chocolatey methods." -Verbose
