@@ -5,7 +5,8 @@ param(
   [string] $silentArgs = '',
   [string] $file,
   $validExitCodes = @(0)
-)    
+)
+    write-output "i am here"
     Wait-ForMSIEXEC
     if(Get-IsRemote){
         Invoke-FromTask @"
@@ -35,10 +36,11 @@ param(
         }
         return;
     }
-    if(get-Module chocolateyInstaller){
+    try {
         chocolateyInstaller\Write-Host @PSBoundParameters
     }
-    else {
+    catch {
+        $global:error.RemoveAt(0)
         Microsoft.PowerShell.Utility\Write-Host @PSBoundParameters
     }
 }
@@ -53,7 +55,7 @@ Intercepts Chocolatey call to check for reboots
 
 #>    
     param([int[]]$RebootCodes=@())
-    chocolatey Install @PSBoundParameters
+    chocolatey Install @PSBoundParameters @args
 }
 
 function choco {
@@ -63,7 +65,7 @@ Intercepts Chocolatey call to check for reboots
 
 #>    
     param([int[]]$RebootCodes=@())
-    chocolatey @PSBoundParameters
+    chocolatey @PSBoundParameters @args
 }
 
 function cup {
@@ -73,7 +75,7 @@ Intercepts Chocolatey call to check for reboots
 
 #>    
     param([int[]]$RebootCodes=@())
-    chocolatey Update @PSBoundParameters
+    chocolatey Update @PSBoundParameters @args
 }
 
 function cinstm {
@@ -83,7 +85,7 @@ Intercepts Chocolatey call to check for reboots
 
 #>    
     param([int[]]$RebootCodes=@())
-    chocolatey InstallMissing @PSBoundParameters
+    chocolatey InstallMissing @PSBoundParameters @args
 }
 
 function chocolatey {
@@ -92,14 +94,15 @@ function chocolatey {
 Intercepts Chocolatey call to check for reboots
 
 #>  
-    param([int[]]$RebootCodes=@())
+    param([string]$command,[string]$packageNames,[string]$packageName,[string]$source,[int[]]$RebootCodes=@())
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
     $PSBoundParameters.Remove("RebootCodes") | Out-Null
     $packageNames=-split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
     #backwards compatibility for Chocolatey versions prior to 0.9.8.21
     if(!$packageNames){$packageNames=$packageName}
-    
+    $PSBoundParameters.Remove("packageName")
+
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
         if($source -eq "WindowsFeatures"){
@@ -127,9 +130,9 @@ Intercepts Chocolatey call to check for reboots
                 $Boxstarter.SuppressLogging = $currentLogging
             }
             else{
-                Call-Chocolatey @PSBoundParameters
+                Call-Chocolatey @PSBoundParameters @args
                 Write-BoxstarterMessage "Exit Code: $LastExitCode" -Verbose
-                if($LastExitCode -ne 0) {
+                if($LastExitCode -ne $null -and $LastExitCode -ne 0) {
                     Write-Error "Chocolatey reported an unsuccessful exit code of $LastExitCode"
                 }
             }
@@ -182,51 +185,83 @@ Intercepts Chocolatey call to check for reboots
 }
 
 function Call-Chocolatey {
-    if($PSBoundParameters.Keys -notcontains "Source"){
-        $PSBoundParameters.Source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
+    param($command, $packageNames)
+
+    $psChoco = "$env:ChocolateyInstall\chocolateeyinstall\chocolatey.ps1"
+    $exeChoco = "$env:ChocolateyInstall\choco.exe"
+
+    if(Test-Path $psChoco) {
+        $chocoArgs = Format-Args $args
+        ."$psChoco" @PSBoundParameters @chocoArgs
     }
-    ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
+    elseif(Test-Path $exeChoco) {
+        $chocoArgs = @($command, $packageNames)
+        $chocoArgs += Format-ExeArgs $args
+        if(!$global:choco){
+            $global:choco = New-Object -TypeName Boxstarter.ChocolateyWrapper -ArgumentList $Boxstarter.BaseDir
+        }
+        Enter-BoxstarterLogable {
+            $global:choco.Run($chocoArgs)
+        }
+    }
+}
+
+function Format-Args {
+    $newArgs = @()
+    $args | % {
+        if($_ -is [string] -and $_.StartsWith("-") -and $_.EndsWith(":")) { $_ = $_.Substring(0,$_.length-1)}
+        if($_ -eq "-source") {$hasSrc = $true}
+        $newArgs += $_
+    }
+
+    if(!$hasSrc){
+        $newArgs += "-Source"
+        $newArgs += "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
+    }
+    $newArgs
+}
+
+function Format-ExeArgs {
+    $newArgs = @()
+    Format-Args $args | % {
+        if($onForce){
+            $onForce = $false
+            if($_ -eq $true) {$_ = ""}
+        }
+        if($_ -eq "-force"){
+            $_ = "-f"
+            $onForce = $true
+        }
+        $newArgs += $_
+    }
+    $newArgs
 }
 
 function Intercept-Command {
     param(
         $commandName, 
-        $targetCommand = "$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1",
         [switch]$omitCommandParam
     )
-    $metadata=Get-MetaData $targetCommand
+    Write-BoxstarterMessage "Intercepting $commandName" -Verbose
     $srcMetadata=Get-MetaData $commandName
-    if($commandName.Split("\").Length -eq 2){
-        $commandName = $commandName.Substring($commandName.IndexOf("\")+1)
-    }
-    $metadata.Parameters.Remove("Verbose") | out-null
-    $metadata.Parameters.Remove("Debug") | out-null
-    $metadata.Parameters.Remove("ErrorAction") | out-null
-    $metadata.Parameters.Remove("WarningAction") | out-null
-    $metadata.Parameters.Remove("ErrorVariable") | out-null
-    $metadata.Parameters.Remove("WarningVariable") | out-null
-    $metadata.Parameters.Remove("OutVariable") | out-null
-    $metadata.Parameters.Remove("OutBuffer") | out-null
-    if($omitCommandParam) {
-        $metadata.Parameters.Remove("command") | out-null
-    }
-    $params = [Management.Automation.ProxyCommand]::GetParamBlock($metadata)    
     if($srcMetadata.Parameters.count -gt 0) {
         $srcParams = [Management.Automation.ProxyCommand]::GetParamBlock($srcMetadata)    
-        $params += ",`r`n" + $srcParams
     }
-    $cmdLetBinding = [Management.Automation.ProxyCommand]::GetCmdletBindingAttribute($metadata)
+    else {
+        $srcParams = "`$a"
+    }
     $strContent = (Get-Content function:\$commandName).ToString()
     if($strContent -match "param\(.+\)") {
         $strContent = $strContent.Replace($matches[0],"")
     }
-    Set-Item Function:\$commandName -value "$cmdLetBinding `r`n param ( $params )Process{ `r`n$strContent}" -force
+    Set-Item Function:\$commandName -value "param ( $srcParams )Process{ `r`n$strContent}" -force
 }
 
 function Get-MetaData ($command){
     $cmdDef = Get-Command $command | ? {$_.CommandType -ne "Application"}
     return New-Object System.Management.Automation.CommandMetaData ($cmdDef)
 }
+
 function Intercept-Chocolatey {
     if($Script:BoxstarterIntrercepting){return}
     Intercept-Command cinst -omitCommandParam
@@ -292,6 +327,7 @@ function Resolve-SplatValue($val){
 }
 
 function Wait-ForMSIEXEC{
+    Write-BoxstarterMessage "Checking for other running MSIEXEC installers..." -Verbose
     Do{
         Get-Process | ? {$_.Name -eq "MSIEXEC"} | % {
             if(!($_.HasExited)){
