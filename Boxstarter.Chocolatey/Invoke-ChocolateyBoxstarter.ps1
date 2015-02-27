@@ -183,8 +183,10 @@ function Download-Package([string[]]$bootstrapPackage) {
             $chocoRoot = "$env:programdata\chocolatey"
         }
         Write-BoxstarterMessage "Deleting $chocoRoot\lib\$bootstrapPackage.*" -verbose
-        del "$chocoRoot\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
-        Write-BoxstarterMessage "Deleted $chocoRoot\lib\$bootstrapPackage.*" -verbose
+        if(Test-Path "$chocoRoot\lib"){
+            del "$chocoRoot\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
+            Write-BoxstarterMessage "Deleted $chocoRoot\lib\$bootstrapPackage.*" -verbose
+        }
         $force=$true
     }
     $source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
