@@ -6,7 +6,6 @@ param(
   [string] $file,
   $validExitCodes = @(0)
 )
-    write-output "i am here"
     Wait-ForMSIEXEC
     if(Get-IsRemote){
         Invoke-FromTask @"
@@ -198,10 +197,10 @@ function Call-Chocolatey {
         $chocoArgs = @($command, $packageNames)
         $chocoArgs += Format-ExeArgs $args
         if(!$global:choco){
-            $global:choco = New-Object -TypeName Boxstarter.ChocolateyWrapper -ArgumentList $Boxstarter.BaseDir
+            $global:choco = New-Object -TypeName boxstarter.choco.ChocolateyWrapper -ArgumentList @($Boxstarter.BaseDir, $host)
         }
         Enter-BoxstarterLogable {
-            $global:choco.Run($chocoArgs)
+            $global:choco.Run($chocoArgs, $Boxstarter)
         }
     }
 }
@@ -233,6 +232,10 @@ function Format-ExeArgs {
             $onForce = $true
         }
         $newArgs += $_
+    }
+
+    if($global:VerbosePreference -eq "Continue") {
+        $newArgs += "-Verbose"
     }
     $newArgs
 }
@@ -327,7 +330,7 @@ function Resolve-SplatValue($val){
 }
 
 function Wait-ForMSIEXEC{
-    Write-BoxstarterMessage "Checking for other running MSIEXEC installers..." -Verbose
+    Write-BoxstarterMessage "Checking for other running MSIEXEC installers..."
     Do{
         Get-Process | ? {$_.Name -eq "MSIEXEC"} | % {
             if(!($_.HasExited)){
