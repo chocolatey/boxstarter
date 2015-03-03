@@ -21,9 +21,6 @@ function Install-Chocolatey($pkgUrl) {
   $toolsFolder = Join-Path $tempDir "tools"
   $chocInstallPS1 = Join-Path $toolsFolder "chocolateyInstall.ps1"
 
-  & $chocInstallPS1
-
-  write-host 'Ensuring chocolatey commands are on the path'
   $chocInstallVariableName = "ChocolateyInstall"
   $chocoPath = [Environment]::GetEnvironmentVariable($chocInstallVariableName, [System.EnvironmentVariableTarget]::User)
   $chocoExePath = 'C:\ProgramData\Chocolatey\bin'
@@ -31,6 +28,17 @@ function Install-Chocolatey($pkgUrl) {
     $chocoExePath = Join-Path $chocoPath 'bin'
   }
 
+  # The chocoExePath will only already exist if we are installing
+  # old PS choco over new c# choco. If thats the case, we do not
+  # want to wipe out the new shims so delete these old-style ones
+  # before the choco inmstaller copies them over
+  if(Test-Path $chocoExePath) {
+    Remove-Item -Path "$toolsFolder\ChocolateyInstall\Redirects\*"
+  }
+
+  & $chocInstallPS1
+
+  write-host 'Ensuring chocolatey commands are on the path'
   if ($($env:Path).ToLower().Contains($($chocoExePath).ToLower()) -eq $false) {
     $env:Path = [Environment]::GetEnvironmentVariable('Path',[System.EnvironmentVariableTarget]::Machine)
   }
