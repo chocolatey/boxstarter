@@ -71,7 +71,7 @@ about_boxstarter_chocolatey
     if(Test-Path "$($boxstarter.LocalRepo)\$PackageName"){
         Remove-Item "$($boxstarter.LocalRepo)\$PackageName" -recurse -force
     }
-    New-BoxstarterPackage $PackageName -quiet
+    New-BoxstarterPackage $PackageName -quiet | Out-Null
     Set-Content "$($boxstarter.LocalRepo)\$PackageName\tools\ChocolateyInstall.ps1" -value $text
     Invoke-BoxstarterBuild $PackageName -quiet
 
