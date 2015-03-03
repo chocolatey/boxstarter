@@ -65,9 +65,9 @@ Describe "Invoke-FromTask" {
     }
 
     Context "When Invoking Task that is idle longer than idle timeout"{
-        try { Invoke-FromTask "Start-Process calc.exe -Wait" -Credential $mycreds -IdleTimeout 2} catch {$err=$_}
+        try { Invoke-FromTask "Start-Process journal.exe -Wait" -Credential $mycreds -IdleTimeout 2} catch {$err=$_}
         $origId=Get-WmiObject -Class Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
-        $id=Get-WmiObject -Class Win32_Process -Filter "Name='calc.exe'" | select ProcessId | % { $_.ProcessId }
+        $id=Get-WmiObject -Class Win32_Process -Filter "Name='journal.exe'" | select ProcessId | % { $_.ProcessId }
         start-sleep -seconds 2
 
         It "Should timeout"{
