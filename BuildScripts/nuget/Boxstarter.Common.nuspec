@@ -12,6 +12,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
     <releaseNotes xmlns="">
+  - Pin to last PS chocolatey version until we finih new choco compatibility
+  - Fix running gists from weblauncher more than once in win7 and 2008 R2 
   - Suppress caught errors in Invoke-FromScheduledTask from bubbling up to final result
   - Work around nuget.exe limitations of handling files in system profile directory
   - Provide improved error logging of chocolatey errors.
