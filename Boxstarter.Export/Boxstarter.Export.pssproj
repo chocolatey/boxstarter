@@ -32,7 +32,8 @@
     <Compile Include="Boxstarter.Export.psm1" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Export-WindowsExplorerOptions.ps1" />
+    <Compile Include="Export-InternetExplorerESC.ps1" />
+    <Compile Include="Export-WindowsExplorerOptions.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
