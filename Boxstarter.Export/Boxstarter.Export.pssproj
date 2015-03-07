@@ -38,6 +38,9 @@
   <ItemGroup>
     <Compile Include="Export-StartScreenOptions.ps1" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Export-CornerNavigationOptions.ps1" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
 </Project>
