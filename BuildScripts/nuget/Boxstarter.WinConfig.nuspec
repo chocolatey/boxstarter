@@ -16,6 +16,7 @@
       <dependency id="Boxstarter.Common" version="$version$" />
     </dependencies>
     <releaseNotes xmlns="">
+  - Fix installing modules via the c# based chocolatey
   - Pin to last PS chocolatey version until we finih new choco compatibility
   - Fix running gists from weblauncher more than once in win7 and 2008 R2 
   - Suppress caught errors in Invoke-FromScheduledTask from bubbling up to final result
