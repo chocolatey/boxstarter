@@ -28,6 +28,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Export-BoxstarterScript.ps1" />
     <Compile Include="Boxstarter.Export.psd1" />
     <Compile Include="Boxstarter.Export.psm1" />
   </ItemGroup>
