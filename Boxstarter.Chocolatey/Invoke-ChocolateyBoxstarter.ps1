@@ -148,7 +148,6 @@ Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage '$($boots
         if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
         $Boxstarter.ProgramFiles86="$programFiles86"
         $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
-        Check-Chocolatey -ShouldIntercept
         if($bootstrapPackage -ne $null){
             Download-Package $bootstrapPackage
         }

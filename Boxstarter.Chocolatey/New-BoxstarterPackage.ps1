@@ -43,7 +43,6 @@ Get-PackageRoot
     if(!$boxstarter -or !$boxstarter.LocalRepo){
         throw "No Local Repository has been set in `$Boxstarter.LocalRepo."
     }
-    Check-Chocolatey
     $nugetExe = "$env:ChocolateyInstall\ChocolateyInstall\nuget.exe"
     if(!($name -match "^\w+(?:[_.-]\w+)*$") -or ($name.length -gt 100)){
         throw "Invalid Package ID"

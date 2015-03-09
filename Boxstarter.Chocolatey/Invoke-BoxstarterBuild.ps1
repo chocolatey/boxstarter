@@ -29,7 +29,6 @@ New-BoxstarterPackage
         [switch]$all,
         [switch]$quiet
     )
-    Check-Chocolatey
     $choco="$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1"
     if(!$boxstarter -or !$boxstarter.LocalRepo){
         throw "No Local Repository has been set in `$Boxstarter.LocalRepo."

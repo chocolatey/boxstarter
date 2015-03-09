@@ -53,7 +53,6 @@ about_boxstarter_chocolatey
     )
 
     if(!(test-path function:\Get-WebFile)){
-        Check-Chocolatey
         . "$env:ChocolateyInstall\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
     }
     if($source -like "*://*"){
