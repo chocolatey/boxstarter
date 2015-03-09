@@ -35,8 +35,9 @@ param(
         }
         return;
     }
-    if(get-Module chocolateyInstaller){
-        chocolateyInstaller\Write-Host @PSBoundParameters
+    $chocoWriteHost = Get-Command -Module chocolateyInstaller | ? { $_.Name -eq "Write-Host" }
+    if($chocoWriteHost){
+        &($chocoWriteHost) @PSBoundParameters
     }
     else {
         Microsoft.PowerShell.Utility\Write-Host @PSBoundParameters
