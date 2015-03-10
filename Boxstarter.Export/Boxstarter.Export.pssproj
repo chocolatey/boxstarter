@@ -33,6 +33,7 @@
     <Compile Include="Boxstarter.Export.psm1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Export-Chocolatey.ps1" />
     <Compile Include="Export-InternetExplorerESC.ps1" />
     <Compile Include="Export-WindowsExplorerOptions.ps1" />
   </ItemGroup>

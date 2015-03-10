@@ -25,8 +25,8 @@ http://boxstarter.org
     )
 
     $result = @()
-    Get-Command -Module Boxstarter.Export | % {
-        $obj = & $_
+    Get-Command -Module Boxstarter.Export| % {
+        $obj = Invoke-Command $_
         
         $command = $obj.Command
         $args = $obj.Arguments
@@ -36,12 +36,16 @@ http://boxstarter.org
         }
 
         if ($command -ne $null) {
-            $result += $($obj.Command + " " + $args) | Write-Host
+            if ($command.Count -gt 1) {
+                $result += $command | % { $_ }
+            } else {
+                $result += $($obj.Command + " " + $args) | Write-Host
+            }
         }
     }
 
     # TODO: write the result to file
-    # $result
+    $result
 
 }
 
