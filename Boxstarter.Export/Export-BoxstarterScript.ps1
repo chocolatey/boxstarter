@@ -26,27 +26,34 @@ http://boxstarter.org
 
     $result = @()
     Get-Command -Module Boxstarter.Export| % {
-        $obj = Invoke-Command $_
+        $obj = & $_
         
         $command = $obj.Command
         $args = $obj.Arguments
 
         if ($args -ne $null) {
-            $args = ($obj.Arguments | % { "-" + $_ })
+            $args = $args | % { $("-" + $_) }
         }
 
         if ($command -ne $null) {
             if ($command.Count -gt 1) {
                 $result += $command | % { $_ }
             } else {
-                $result += $($obj.Command + " " + $args) | Write-Host
+                $result += $($obj.Command + " " + $args)
             }
         }
     }
 
-    # TODO: write the result to file
-    $result
+    
+    if (Test-Path -Path $outputFileName) {
+        if (-not (Confirm-Choice ("The file '" + $outputFileName + "' already exists. Do you want to overwrite it?"))) {
+            Write-BoxstarterMessage ("Export cancelled!") -color Yellow
+            return
+        }
+    }
 
+    $result | Out-File $outputFileName
+    Write-BoxstarterMessage ("Export completed! Your Boxstarter script is located at: '" + $outputFileName + "'")
 }
 
-Export-BoxstarterScript -outputFileName "foo"
+Export-BoxstarterScript -outputFileName "D:\boxstarter.ps1"
