@@ -100,6 +100,7 @@ Intercepts Chocolatey call to check for reboots
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
     #backwards compatibility for Chocolatey versions prior to 0.9.8.21
     if(!$packageNames){$packageNames=$packageName}
+    $PSBoundParameters.yes = $true
     
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
