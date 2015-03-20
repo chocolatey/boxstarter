@@ -207,6 +207,8 @@ Describe "Invoke-Boxstarter" {
     Context "When install is remote and invokes task" {
         Mock Get-IsRemote {$true}
 
+        $currentUser=Get-CurrentUser
+        Create-BoxstarterTask (New-Object Management.Automation.PsCredential ("$($currentUser.Domain)\$($currentUser.Name)", (New-Object System.Security.SecureString)))
         Invoke-Boxstarter { Invoke-FromTask "add-content $env:temp\test.txt -value '`$pid'" } -NoPassword | Out-Null
         $boxProc=get-Content $env:temp\test.txt
         Remove-item $env:temp\test.txt
