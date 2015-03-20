@@ -100,7 +100,9 @@ Intercepts Chocolatey call to check for reboots
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
     #backwards compatibility for Chocolatey versions prior to 0.9.8.21
     if(!$packageNames){$packageNames=$packageName}
-    $PSBoundParameters.yes = $true
+    if($Script:NewChoco) {
+        $PSBoundParameters.yes = $true
+    }
     
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
@@ -209,6 +211,9 @@ function Intercept-Command {
     $metadata.Parameters.Remove("WarningVariable") | out-null
     $metadata.Parameters.Remove("OutVariable") | out-null
     $metadata.Parameters.Remove("OutBuffer") | out-null
+    if($metadata.Parameters.ContainsKey("yes")){
+        $Script:NewChoco=$true
+    }
     if($omitCommandParam) {
         $metadata.Parameters.Remove("command") | out-null
     }
