@@ -613,7 +613,11 @@ function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $sessio
     $remoteResult = Invoke-Command -session $session {
         param($SuppressLogging,$pkg,$Credential,$DisableReboots, $verbosity, $ProgressArgs)
         $global:VerbosePreference=$verbosity
-        Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1
+        Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
+        if($Credential -eq $null){
+            $currentUser = Get-CurrentUser
+            $credential = (New-Object Management.Automation.PsCredential ("$($currentUser.Domain)\$($currentUser.Name)", (New-Object System.Security.SecureString)))
+        }
         Create-BoxstarterTask $Credential
         Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
         $Boxstarter.SuppressLogging=$SuppressLogging
