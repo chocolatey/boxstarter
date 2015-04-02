@@ -1,4 +1,5 @@
 <releaseNotes>
+  - Dont throw exception when removing the scheduled task and it did not exist
   - Fix remote installs on win 7 and 2008R2 by creating scheduled task before importing remote chocolatey module
   - Pass -y to chocolatey if the new one is installed to avoid red output looking like an error
   - Fix installing modules via the c# based chocolatey
