@@ -60,7 +60,13 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
             if($origStartupType -eq "Disabled"){
                 Set-Service wuauserv -StartupType Automatic
             }
-            Start-Service wuauserv
+            Write-BoxstarterMessage "Starting windows update service" -verbose
+            Start-Service -Name wuauserv
+        }
+        else {
+            # Restart in case updates are running in the background
+            Write-BoxstarterMessage "Restarting windows update service" -verbose
+            Restart-Service -Name wuauserv -Force
         }
 
         $Result = $Searcher.Search($criteria)
