@@ -66,7 +66,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         else {
             # Restart in case updates are running in the background
             Out-BoxstarterLog "Restarting windows update service" -verbose
-            Remove-BoxstarterError { Restart-Service -Name wuauserv -Force }
+            Remove-BoxstarterError { Restart-Service -Name wuauserv -Force -WarningAction SilentlyContinue }
         }
 
         $Result = $Searcher.Search($criteria)
@@ -132,7 +132,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         {
             Out-BoxstarterLog "Stopping win update service and setting its startup type to $origStartupType" -verbose
             Set-Service wuauserv -StartupType $origStartupType
-            Remove-BoxstarterError { stop-service wuauserv }
+            Remove-BoxstarterError { stop-service wuauserv -WarningAction SilentlyContinue }
         }
     }
 }
