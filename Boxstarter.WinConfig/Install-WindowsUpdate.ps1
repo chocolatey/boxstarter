@@ -60,13 +60,13 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
             if($origStartupType -eq "Disabled"){
                 Set-Service wuauserv -StartupType Automatic
             }
-            Write-BoxstarterMessage "Starting windows update service" -verbose
+            Out-BoxstarterLog "Starting windows update service" -verbose
             Start-Service -Name wuauserv
         }
         else {
             # Restart in case updates are running in the background
-            Write-BoxstarterMessage "Restarting windows update service" -verbose
-            Restart-Service -Name wuauserv -Force
+            Out-BoxstarterLog "Restarting windows update service" -verbose
+            Remove-BoxstarterError { Restart-Service -Name wuauserv -Force }
         }
 
         $Result = $Searcher.Search($criteria)
@@ -108,7 +108,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
                     Out-BoxstarterLog "A Restart is Required."
                 } else {
                     $Rebooting=$true
-                    Write-BoxstarterMessage "Restart Required. Restarting now..."
+                    Out-BoxstarterLog "Restart Required. Restarting now..."
                     Stop-TimedSection $installSession
                     if(test-path function:\Invoke-Reboot) {
                         return Invoke-Reboot
@@ -118,10 +118,10 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
                 }
             }
         }
-        else{Write-BoxstarterMessage "There is no update applicable to this machine"}    
+        else{Out-BoxstarterLog "There is no update applicable to this machine"}    
     }
     catch {
-        Write-BoxstarterMessage "There were problems installing updates: $($_.ToString())"
+        Out-BoxstarterLog "There were problems installing updates: $($_.ToString())"
         throw
     }
     finally {
@@ -130,9 +130,9 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         }
         if($origStatus -eq "Stopped")
         {
-            Write-BoxstarterMessage "Stopping win update service and setting its startup type to $origStartupType" -verbose
+            Out-BoxstarterLog "Stopping win update service and setting its startup type to $origStartupType" -verbose
             Set-Service wuauserv -StartupType $origStartupType
-            stop-service wuauserv -ErrorAction SilentlyContinue
+            Remove-BoxstarterError { stop-service wuauserv }
         }
     }
 }
@@ -153,16 +153,17 @@ function Install-Update($update, $currentCount, $totalUpdates) {
     $Installer.updates = $Updates
     try { $result = $Installer.Install() } catch {
         if(!($SuppressReboots) -and (test-path function:\Invoke-Reboot)){
-            if(Test-PendingReboot){Invoke-Reboot}
+            if(Test-PendingReboot){
+                $global:error.RemoveAt(0)            
+                Invoke-Reboot
+            }
         }
         # Check for WU_E_INSTALL_NOT_ALLOWED  
         if($_.Exception.HResult -eq -2146233087) {
             Out-BoxstarterLog "There is either an update in progress or there is a pending reboot blocking the install."
-            Out-BoxstarterLog "If you are using the Bootstrapper or Chocolatey module, try using:"
-            Out-BoxstarterLog "if(Test-PendingReboot){Invoke-Reboot}"
-            Out-BoxstarterLog "This will perform a reboot if reboots are pending."
+            $global:error.RemoveAt(0)
         }
-        throw
+        else { throw }
     }
     Stop-TimedSection $installSession
     return $result
