@@ -39,6 +39,7 @@
     <Compile Include="Log-BoxStarterMessage.ps1" />
     <Compile Include="Out-BoxstarterLog.ps1" />
     <Compile Include="Remove-BoxstarterTask.ps1" />
+    <Compile Include="Remove-BoxstarterError.ps1" />
     <Compile Include="Start-TimedSection.ps1" />
     <Compile Include="Stop-TimedSection.ps1" />
     <Compile Include="Test-Admin.ps1" />
