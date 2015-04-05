@@ -4,7 +4,7 @@ Description = 'Provides Cmdlets that will install a Boxstarter package on a Hype
 ModuleToProcess = './boxstarter.HyperV.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.4.196'
+ModuleVersion = '2.4.205'
 
 # ID used to uniquely identify this module
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e58'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = 'ced4442e1cb6480bb9a34d5cd4d60cd2377df031'
+PrivateData = '47e936e7ffe97111ed97f180da21f620ae1c87bc'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
