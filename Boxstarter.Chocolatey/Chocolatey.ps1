@@ -132,6 +132,14 @@ Intercepts Chocolatey call to check for reboots
             }
             else{
                 Call-Chocolatey @PSBoundParameters
+
+                # chocolatey reassembles environment variables after an install
+                # but does not add the machine PSModule value to the user Online
+                $machineModPath = [System.Environment]::GetEnvironmentVariable("PSModulePath","Machine")
+                if(!$env:PSModulePath.EndsWith($machineModPath)) {
+                    $env:PSModulePath += ";" + $machineModPath
+                }
+
                 Write-BoxstarterMessage "Exit Code: $LastExitCode" -Verbose
                 if($LastExitCode -ne 0) {
                     Write-Error "Chocolatey reported an unsuccessful exit code of $LastExitCode"

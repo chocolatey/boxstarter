@@ -62,6 +62,21 @@ Describe "Getting-Chocolatey" {
         }        
     }
 
+    Context "When chocolatry strips the machine module path" {
+        Mock Test-PendingReboot {return $false}
+        Mock Invoke-Reboot
+        Mock Call-Chocolatey {
+            $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath","User")
+            $global:LASTEXITCODE=0
+        }
+
+        Chocolatey Install pkg
+
+        it "will append machine module path" {
+            $env:PSModulePath.EndsWith([System.Environment]::GetEnvironmentVariable("PSModulePath","Machine")) | should be $true
+        }        
+    }
+
     Context "When a reboot is not pending" {
         Mock Test-PendingReboot {return $false}
         Mock Invoke-Reboot
