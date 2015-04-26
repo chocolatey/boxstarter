@@ -34,6 +34,12 @@ function Install-Chocolatey($pkgUrl) {
   # before the choco inmstaller copies them over
   if(Test-Path $chocoExePath) {
     Remove-Item -Path "$toolsFolder\ChocolateyInstall\Redirects\*"
+
+    # This is a shameful hack to avoid a PSv2 bug hit if installing
+    # boxstarter after installing the c# choco where the bug causes
+    # a PS prompt but choco wires up PS in such a way that prompts
+    # are hidden and thus the install hangs
+    Set-Content -Path "$toolsFolder\ChocolateyInstall\Redirects\empty.exe" -Value ""
   }
 
   & $chocInstallPS1
