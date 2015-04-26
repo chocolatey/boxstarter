@@ -19,6 +19,8 @@
       <dependency id="Boxstarter.HyperV" version="$version$" />
     </dependencies>
     <releaseNotes>
+  - Fixes boxstarte install hangs on PSv2 when installing boxstarter after the new chocolatey
+  - Fixes PSModulePath that has the machine environment value stripped after chocolatey package installs
   - Restart Windows Updates service before beginning installation in case updates are already running in the background
   - Dont throw exception when removing the scheduled task and it did not exist
   - Fix remote installs on win 7 and 2008R2 by creating scheduled task before importing remote chocolatey module
