@@ -10,7 +10,7 @@ properties {
     else {
         $version="1.0.0"
     }
-    $nugetExe = "$env:ChocolateyInstall\ChocolateyInstall\nuget"
+    $nugetExe = "$env:ChocolateyInstall\bin\nuget.exe"
     $ftpHost="waws-prod-bay-001.ftp.azurewebsites.windows.net"
     $msbuildExe="${env:ProgramFiles(x86)}\MSBuild\12.0\Bin\msbuild.exe"
 }
