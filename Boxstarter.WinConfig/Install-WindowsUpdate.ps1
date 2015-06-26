@@ -26,7 +26,7 @@ http://boxstarter.org
         [switch]$getUpdatesFromMS, 
         [switch]$acceptEula, 
         [switch]$SuppressReboots,
-        [string]$criteria="IsHidden=0 and IsInstalled=0 and Type='Software'"
+        [string]$criteria="IsHidden=0 and IsInstalled=0 and Type='Software' and BrowseOnly=0"
     )
 
     if(Get-IsRemote){
