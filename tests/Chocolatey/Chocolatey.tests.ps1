@@ -9,7 +9,7 @@ $Boxstarter.BaseDir=(split-path -parent (split-path -parent $here))
 $Boxstarter.SuppressLogging=$true
 Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
     % { . $_.ProviderPath }
-Intercept-Chocolatey
+Check-Chocolatey -ShouldIntercept
 
 function DISM { return; }
 
