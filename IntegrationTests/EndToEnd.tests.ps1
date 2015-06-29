@@ -8,7 +8,7 @@ Describe "Invoke-ChocolateyBoxstarter via bootstrapper.bat (end to end)" {
 
     Context "When installing a local package" {
         remove-Item "$env:ChocolateyInstall\lib\test-package.*" -force -recurse
-        Add-Content "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -Value "______ test-package v1.0.0 ______" -force
+        Add-Content "$($Boxstarter.VendoredChocoPath)\ChocolateyInstall\ChocolateyInstall.log" -Value "______ test-package v1.0.0 ______" -force
 
         ."$here\..\boxstarter.bat" test-package -LocalRepo "$testRoot\Repo" -DisableReboots
 
@@ -16,7 +16,7 @@ Describe "Invoke-ChocolateyBoxstarter via bootstrapper.bat (end to end)" {
             Test-Path "$env:ChocolateyInstall\lib\test-package.*" | Should Be $true
         }
         it "should have cleared previous logs" {
-            $installLines = get-content "$env:ChocolateyInstall\ChocolateyInstall\Install.log" | ? { $_ -like "Successfully installed 'test-package*" } 
+            $installLines = get-content "$($Boxstarter.VendoredChocoPath)\ChocolateyInstall\Install.log" | ? { $_ -like "Successfully installed 'test-package*" } 
             $installLines.Count | Should Be 1
         }          
     }

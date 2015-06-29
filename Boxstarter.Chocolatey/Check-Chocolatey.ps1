@@ -1,10 +1,8 @@
 function Check-Chocolatey ([switch]$ShouldIntercept){
     Enable-Net40
-    $mod_install = "$env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1"
-    if(-not $env:ChocolateyInstall -or -not (Test-Path $mod_install)){
-        Write-BoxstarterMessage "Chocolatey not installed. Downloading and installing..."
-        $env:ChocolateyInstall = "$env:programdata\chocolatey"
-        New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
+    $mod_install = "$($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\chocolateyInstaller.psm1"
+    if(-not (Test-Path $mod_install)){
+        Write-BoxstarterMessage "Boxstarter will use its own private version of Chocolatey..."
         $config = Get-BoxstarterConfig
         $url=$config.ChocolateyPackage
         Enter-BoxstarterLogable {

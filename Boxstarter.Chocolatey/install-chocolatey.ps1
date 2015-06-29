@@ -1,51 +1,45 @@
 function Install-Chocolatey($pkgUrl) {
-  $chocTempDir = Join-Path $env:TEMP "chocolatey"
-  $tempDir = Join-Path $chocTempDir "chocInstall"
-  if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir)}
-  $file = Join-Path $tempDir "chocolatey.zip"
+  try {
+    $currentChocoInstall = $env:ChocolateyInstall
+    $env:ChocolateyInstall = $Boxstarter.VendoredChocoPath
+    $chocTempDir = Join-Path $env:TEMP "chocolatey"
+    $tempDir = Join-Path $chocTempDir "chocInstall"
+    if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir)}
+    $file = Join-Path $tempDir "chocolatey.zip"
 
-  # download the package
-  Get-HttpToFile $pkgUrl $file
+    # download the package
+    Get-HttpToFile $pkgUrl $file
 
-  # download 7zip
-  Write-Host "Download 7Zip commandline tool"
-  $7zaExe = Join-Path $tempDir '7za.exe'
-  Get-HttpToFile 'https://chocolatey.org/7za.exe' "$7zaExe"
+    # download 7zip
+    Write-Host "Download 7Zip commandline tool"
+    $7zaExe = Join-Path $tempDir '7za.exe'
+    Get-HttpToFile 'https://chocolatey.org/7za.exe' "$7zaExe"
 
-  # unzip the package
-  Write-Host "Extracting $file to $tempDir..."
-  Start-Process "$7zaExe" -ArgumentList "x -o`"$tempDir`" -y `"$file`"" -Wait -NoNewWindow
+    # unzip the package
+    Write-Host "Extracting $file to $tempDir..."
+    Start-Process "$7zaExe" -ArgumentList "x -o`"$tempDir`" -y `"$file`"" -Wait -NoNewWindow
 
-  # call chocolatey install
-  Write-Host "Installing chocolatey on this machine"
-  $toolsFolder = Join-Path $tempDir "tools"
-  $chocInstallPS1 = Join-Path $toolsFolder "chocolateyInstall.ps1"
+    # call chocolatey install
+    Write-Output "Installing chocolatey on this machine"
+    Write-Output "This is separate chocolatey install used only by Boxstarter"
+    $toolsFolder = Join-Path $tempDir "tools"
+    $chocInstallModule = Join-Path $toolsFolder "chocolateySetup.psm1"
 
-  $chocInstallVariableName = "ChocolateyInstall"
-  $chocoPath = [Environment]::GetEnvironmentVariable($chocInstallVariableName, [System.EnvironmentVariableTarget]::User)
-  $chocoExePath = 'C:\ProgramData\Chocolatey\bin'
-  if ($chocoPath -ne $null) {
-    $chocoExePath = Join-Path $chocoPath 'bin'
+    if ($currentChocoInstall -eq $null) {
+      $currentChocoInstall = "$env:programdata\chocolatey"
+    }
+
+    $PSModuleAutoLoadingPreference = "All"
+    Import-Module $chocInstallModule
+    Initialize-Chocolatey $Boxstarter.VendoredChocoPath
+    Set-Content -Path (Join-Path $Boxstarter.VendoredChocoPath 'ChocolateyInstall/functions/boxstarter_patch.ps1') -value @"
+`$nugetExePath = "$(Join-Path $currentChocoInstall 'bin')"
+`$nugetLibPath = "$(Join-Path $currentChocoInstall 'lib')"
+`$badLibPath = "$(Join-Path $currentChocoInstall 'lib-bad')"
+"@
   }
-
-  # The chocoExePath will only already exist if we are installing
-  # old PS choco over new c# choco. If thats the case, we do not
-  # want to wipe out the new shims so delete these old-style ones
-  # before the choco inmstaller copies them over
-  if(Test-Path $chocoExePath) {
-    Remove-Item -Path "$toolsFolder\ChocolateyInstall\Redirects\*"
-
-    # This is a shameful hack to avoid a PSv2 bug hit if installing
-    # boxstarter after installing the c# choco where the bug causes
-    # a PS prompt but choco wires up PS in such a way that prompts
-    # are hidden and thus the install hangs
-    Set-Content -Path "$toolsFolder\ChocolateyInstall\Redirects\empty.exe" -Value ""
-  }
-
-  & $chocInstallPS1
-
-  write-host 'Ensuring chocolatey commands are on the path'
-  if ($($env:Path).ToLower().Contains($($chocoExePath).ToLower()) -eq $false) {
-    $env:Path = [Environment]::GetEnvironmentVariable('Path',[System.EnvironmentVariableTarget]::Machine)
+  finally {
+    $env:ChocolateyInstall = $currentChocoInstall
+    [Environment]::SetEnvironmentVariable("ChocolateyInstall", $currentChocoInstall, 'Machine')
   }
 }

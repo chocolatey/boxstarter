@@ -53,7 +53,7 @@ about_boxstarter_chocolatey
     )
 
     if(!(test-path function:\Get-WebFile)){
-        . "$env:ChocolateyInstall\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
+        . "$($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
     }
     if($source -like "*://*"){
         try {$text = Get-WebFile -url $Source -passthru } catch{

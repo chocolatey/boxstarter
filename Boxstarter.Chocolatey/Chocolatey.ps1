@@ -9,7 +9,7 @@ param(
     Wait-ForMSIEXEC
     if(Get-IsRemote){
         Invoke-FromTask @"
-Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1 -Global
+Import-Module $($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\chocolateyInstaller.psm1 -Global
 Install-ChocolateyInstallPackage $(Expand-Splat $PSBoundParameters)
 "@
     }
@@ -117,7 +117,7 @@ Intercepts Chocolatey call to check for reboots
             }
         }
         if(((Test-PendingReboot) -or $Boxstarter.IsRebooting) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
-        $session=Start-TimedSection "Calling Chocolatey to install $packageName. This may take several minutes to complete..."
+        $session=Start-TimedSection "Calling Boxstarter's vendored Chocolatey to install $packageName. This may take several minutes to complete..."
         $currentErrorCount = $global:error.Count
         $rebootable = $false
         try {
@@ -126,7 +126,7 @@ Intercepts Chocolatey call to check for reboots
                 $currentLogging=$Boxstarter.Suppresslogging
                 if($VerbosePreference -eq "SilentlyContinue"){$Boxstarter.Suppresslogging=$true}
                 Invoke-FromTask @"
-."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" $(Expand-Splat $PSBoundParameters)
+."$($Boxstarter.VendoredChocoPath)\chocolateyinstall\chocolatey.ps1" $(Expand-Splat $PSBoundParameters)
 "@
                 $Boxstarter.SuppressLogging = $currentLogging
             }
@@ -197,13 +197,13 @@ function Call-Chocolatey {
     if($PSBoundParameters.Keys -notcontains "Source"){
         $PSBoundParameters.Source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
     }
-    ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
+    ."$($Boxstarter.VendoredChocoPath)\chocolateyinstall\chocolatey.ps1" @PSBoundParameters
 }
 
 function Intercept-Command {
     param(
         $commandName, 
-        $targetCommand = "$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1",
+        $targetCommand = "$($Boxstarter.VendoredChocoPath)\chocolateyinstall\chocolatey.ps1",
         [switch]$omitCommandParam
     )
     $metadata=Get-MetaData $targetCommand
