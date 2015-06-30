@@ -16,10 +16,10 @@ Describe "Invoke-FromTask" {
     Context "When Invoking Task Normally"{
         Remove-Item $env:temp\test.txt -ErrorAction SilentlyContinue
 
-        Invoke-FromTask "new-Item $env:temp\test.txt -value 'this is a test' -type file | Out-Null" -Credential $mycreds -IdleTimeout 0
+        Invoke-FromTask "new-Item $env:temp\test.txt -value `"this is a test from `$PWD`" -type file | Out-Null" -Credential $mycreds -IdleTimeout 0
 
         It "Should invoke the command"{
-            Get-Content $env:temp\test.txt | should be "this is a test"
+            Get-Content $env:temp\test.txt | should be "this is a test from $PWD"
         }
         It "Should delete the task"{
             schtasks /query /TN 'Ad-Hoc Task' 2>&1 | out-null
