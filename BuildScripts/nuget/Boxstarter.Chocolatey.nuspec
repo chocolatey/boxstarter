@@ -17,6 +17,7 @@
       <dependency id="Boxstarter.Bootstrapper" version="$version$" />
     </dependencies>
     <releaseNotes>
+- Ensure choco bin is ahead of boxstarter vendored choco bin on the path and dont copy redirect shims to choco bin even if choco is not preinstalled.
 - Provide better isolation between Boxstarter and User Chocolatey installations.
 - Run scheduled tasks in the same directory where it is invoked.
 - Default Windows Update criteria now only installs critical updates.
