@@ -42,16 +42,14 @@ function Install-Chocolatey($pkgUrl) {
 "@
 
     if(!(Test-Path $chocoBinPath)){
-        Copy-Item -Path $boxBinPath -Destination $chocoBinPath -Recurse
+        New-Item -Path $chocoBinPath -ItemType Directory
     }
 
     $currentEnv = [Environment]::GetEnvironmentVariable('path', 'Machine')
-    $newEnv = $currentEnv.Replace($boxBinPath, '')
-    if($newEnv.IndexOf($chocoBinPath) -eq -1) {
-        $newEnv += $chocoBinPath + ';'
+    if($currentEnv.IndexOf($chocoBinPath) -eq -1) {
+        $currentEnv = $currentEnv.replace($boxBinPath, "$chocoBinPath;$boxBinPath")
     }
-    $newEnv = $newEnv.Replace(';;', ';')
-    [Environment]::SetEnvironmentVariable("path", $newEnv, 'Machine')
+    [Environment]::SetEnvironmentVariable("path", $currentEnv, 'Machine')
   }
   finally {
     $env:ChocolateyInstall = $currentChocoInstall
