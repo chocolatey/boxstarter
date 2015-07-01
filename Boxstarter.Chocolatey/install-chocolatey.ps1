@@ -30,13 +30,28 @@ function Install-Chocolatey($pkgUrl) {
     }
 
     $PSModuleAutoLoadingPreference = "All"
+    $boxBinPath = Join-Path $Boxstarter.VendoredChocoPath 'bin'
+    $chocoBinPath = Join-Path $currentChocoInstall 'bin'
+
     Import-Module $chocInstallModule
     Initialize-Chocolatey $Boxstarter.VendoredChocoPath
     Set-Content -Path (Join-Path $Boxstarter.VendoredChocoPath 'ChocolateyInstall/functions/boxstarter_patch.ps1') -value @"
-`$nugetExePath = "$(Join-Path $currentChocoInstall 'bin')"
+`$nugetExePath = "$chocoBinPath"
 `$nugetLibPath = "$(Join-Path $currentChocoInstall 'lib')"
 `$badLibPath = "$(Join-Path $currentChocoInstall 'lib-bad')"
 "@
+
+    if(!(Test-Path $chocoBinPath)){
+        Copy-Item -Path $boxBinPath -Destination $chocoBinPath -Recurse
+    }
+
+    $currentEnv = [Environment]::GetEnvironmentVariable('path', 'Machine')
+    $newEnv = $currentEnv.Replace($boxBinPath, '')
+    if($newEnv.IndexOf($chocoBinPath) -eq -1) {
+        $newEnv += $chocoBinPath + ';'
+    }
+    $newEnv = $newEnv.Replace(';;', ';')
+    [Environment]::SetEnvironmentVariable("path", $newEnv, 'Machine')
   }
   finally {
     $env:ChocolateyInstall = $currentChocoInstall
