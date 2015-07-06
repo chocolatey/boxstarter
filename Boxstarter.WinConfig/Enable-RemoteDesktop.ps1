@@ -13,5 +13,10 @@ http://boxstarter.org
         Write-BoxstarterMessage "Unable to locate terminalservices namespace. Remote Desktop is not enabled"
         return
     }
-    $obj.SetAllowTsConnections(1,1) | out-null
+    try {
+        $obj.SetAllowTsConnections(1,1) | out-null
+    }
+    catch {
+        throw "There was a problem enabling remote desktop. Make sure your operating system supports remote desktop and there is no group policy preventing you from enabling it."
+    }
 }
