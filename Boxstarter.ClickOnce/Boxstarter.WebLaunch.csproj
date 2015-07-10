@@ -65,7 +65,7 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>38EE6C843632E1B33BB262CB3272A5759118D897</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>6e7a730d2d8672b9491ff5cf0761a6f5645aef60</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>
@@ -132,7 +132,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(WindowsSDK80Path)bin\x64\signtool.exe" sign /n "Open Source Developer, Boxstarter.org" "$(ProjectDir)obj\debug\Boxstarter.WebLaunch.exe"</PostBuildEvent>
+    <PostBuildEvent>"$(WindowsSDK80Path)bin\x64\signtool.exe" sign /n "Open Source Developer, Matthew Wrock" "$(ProjectDir)obj\debug\Boxstarter.WebLaunch.exe"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
