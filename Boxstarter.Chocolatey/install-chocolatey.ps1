@@ -35,6 +35,13 @@ function Install-Chocolatey($pkgUrl) {
 
     Import-Module $chocInstallModule
     Initialize-Chocolatey $Boxstarter.VendoredChocoPath
+
+    $chocoInstallPath = Join-Path $currentChocoInstall 'ChocolateyInstall'
+    if(!(Test-Path $chocoInstallPath)){
+        New-Item -Path $chocoInstallPath -ItemType Directory
+    }
+    Copy-Item (Join-Path $Boxstarter.VendoredChocoPath 'ChocolateyInstall/tools') $chocoInstallPath -recurse -force
+
     Set-Content -Path (Join-Path $Boxstarter.VendoredChocoPath 'ChocolateyInstall/functions/boxstarter_patch.ps1') -value @"
 `$nugetExePath = "$chocoBinPath"
 `$nugetLibPath = "$(Join-Path $currentChocoInstall 'lib')"
