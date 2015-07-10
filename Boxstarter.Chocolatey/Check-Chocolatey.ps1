@@ -18,6 +18,18 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
             Import-Module $mod_install -Global -Force -DisableNameChecking
         }
     }
+
+    # patching existing installs with tools\7zip
+    $currentChocoInstall = $env:ChocolateyInstall
+    if($currentChocoInstall -eq $null) {
+        $currentChocoInstall = "$env:programdata\chocolatey"
+    }
+    $chocoInstallPath = Join-Path $currentChocoInstall 'ChocolateyInstall'
+    if(!(Test-Path $chocoInstallPath)){
+        New-Item -Path $chocoInstallPath -ItemType Directory
+    }
+    Copy-Item (Join-Path $Boxstarter.VendoredChocoPath 'ChocolateyInstall/tools') $chocoInstallPath -recurse -force
+
     if(!$BoxstarterIntrercepting)
     {
         Write-BoxstarterMessage "Chocolatey installed, setting up interception of Chocolatey methods." -Verbose
