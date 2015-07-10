@@ -16,6 +16,8 @@
       <dependency id="Boxstarter.WinConfig" version="$version$" />
     </dependencies>
     <releaseNotes>
+- Return a more actionable error message when Enable-RemoteDesktop fails
+- Fix 7zip installed in private chocolatey install
 - Ensure choco bin is ahead of boxstarter vendored choco bin on the path and dont copy redirect shims to choco bin even if choco is not preinstalled.
 - Provide better isolation between Boxstarter and User Chocolatey installations.
 - Run scheduled tasks in the same directory where it is invoked.
