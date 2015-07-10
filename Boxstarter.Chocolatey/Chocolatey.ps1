@@ -9,7 +9,7 @@ param(
     Wait-ForMSIEXEC
     if(Get-IsRemote){
         Invoke-FromTask @"
-Import-Module $($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\chocolateyInstaller.psm1 -Global
+Import-Module $($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\chocolateyInstaller.psm1 -Global -DisableNameChecking
 Install-ChocolateyInstallPackage $(Expand-Splat $PSBoundParameters)
 "@
     }

@@ -15,7 +15,7 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
 
         if(Test-Path $mod_install) {
             Write-BoxstarterMessage "Importing Chocolatey module from $mod_install" -Verbose
-            Import-Module $mod_install -Global -Force
+            Import-Module $mod_install -Global -Force -DisableNameChecking
         }
     }
     if(!$BoxstarterIntrercepting)
