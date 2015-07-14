@@ -29,7 +29,7 @@ Invoke-FromTask Install-WindowsUpdate -AcceptEula
 This will install Windows Updates in a scheduled task
 
 .EXAMPLE
-Invoke-FromTask "DISM /Online /Online /NoRestart /Enable-Feature /Telnet-Client" -IdleTimeout 20
+Invoke-FromTask "DISM /Online /NoRestart /Enable-Feature:TelnetClient" -IdleTimeout 20
 
 This will use DISM.exe to install the telnet client and will kill 
 the task if it becomes idle for more that 20 seconds.
