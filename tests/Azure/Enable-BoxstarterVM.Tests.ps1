@@ -8,6 +8,7 @@ Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\Boxstarter.Azure\*.ps1 | 
     % { . $_.ProviderPath }
+Import-AzureModule
 
 Remove-Item alias:\Enable-BoxstarterVM
 

@@ -9,7 +9,7 @@ $Boxstarter.BaseDir=(split-path -parent (split-path -parent $here))
 $Boxstarter.SuppressLogging=$true
 Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
     % { . $_.ProviderPath }
-Intercept-Chocolatey
+Check-Chocolatey -ShouldIntercept
 
 function DISM { return; }
 
@@ -59,6 +59,21 @@ Describe "Getting-Chocolatey" {
         }
         it "will get Chocolatey" {
             Assert-MockCalled Call-Chocolatey -times 1
+        }        
+    }
+
+    Context "When chocolatry strips the machine module path" {
+        Mock Test-PendingReboot {return $false}
+        Mock Invoke-Reboot
+        Mock Call-Chocolatey {
+            $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath","User")
+            $global:LASTEXITCODE=0
+        }
+
+        Chocolatey Install pkg
+
+        it "will append machine module path" {
+            $env:PSModulePath.EndsWith([System.Environment]::GetEnvironmentVariable("PSModulePath","Machine")) | should be $true
         }        
     }
 

@@ -15,7 +15,7 @@ if(!(Test-Path $env:ChocolateyInstall\lib\7zip.CommandLine*)) { cinst 7zip.Comma
 if(!(Test-Path $env:ChocolateyInstall\lib\pester*)) { cinst pester }
 if(!(Test-Path $env:ChocolateyInstall\lib\WindowsAzurePowershell*)) { cinst WindowsAzurePowershell }
 if(!(Test-Path $env:ChocolateyInstall\lib\WindowsAzureLibsForNet*)) { cinst WindowsAzureLibsForNet }
-
+if(!(Test-Path $env:ChocolateyInstall\bin\nuget.exe)) { cinst nuget.commandline }
 
 if($Help){ 
   try {

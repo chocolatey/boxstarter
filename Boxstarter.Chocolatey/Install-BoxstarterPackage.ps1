@@ -605,21 +605,26 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
             $configXml.config.RemoveChild(($configXml.config.ChildNodes | ? { $_.Name -eq "LocalRepo"}))
             $configXml.Save((Join-Path $env:temp\Boxstarter BoxStarter.config))
         }
-        Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
     }
 }
 
-function Invoke-RemoteBoxstarter($Package, $Password, $DisableReboots, $session) {
+function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $session) {
     Write-BoxstarterMessage "Running remote install..."
     $remoteResult = Invoke-Command -session $session {
-        param($SuppressLogging,$pkg,$password,$DisableReboots, $verbosity, $ProgressArgs)
+        param($SuppressLogging,$pkg,$Credential,$DisableReboots, $verbosity, $ProgressArgs)
         $global:VerbosePreference=$verbosity
+        Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
+        if($Credential -eq $null){
+            $currentUser = Get-CurrentUser
+            $credential = (New-Object Management.Automation.PsCredential ("$($currentUser.Domain)\$($currentUser.Name)", (New-Object System.Security.SecureString)))
+        }
+        Create-BoxstarterTask $Credential
         Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
         $Boxstarter.SuppressLogging=$SuppressLogging
         $global:Boxstarter.ProgressArgs=$ProgressArgs 
         $result=$null
         try {
-            $result = Invoke-ChocolateyBoxstarter $pkg -Password $password -DisableReboots:$DisableReboots
+            $result = Invoke-ChocolateyBoxstarter $pkg -Password $Credential.password -DisableReboots:$DisableReboots
             if($Boxstarter.IsRebooting){
                 return @{Result="Rebooting"}
             }
@@ -630,7 +635,7 @@ function Invoke-RemoteBoxstarter($Package, $Password, $DisableReboots, $session)
         catch{
             throw $_
         }
-    } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Password, $DisableReboots, $global:VerbosePreference, $global:Boxstarter.ProgressArgs
+    } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Credential, $DisableReboots, $global:VerbosePreference, $global:Boxstarter.ProgressArgs
     Write-BoxstarterMessage "Result from Remote Boxstarter: $($remoteResult.Result)" -Verbose
     return $remoteResult
 }
@@ -654,7 +659,8 @@ function Wait-ForSessionToClose($session) {
 }
 
 function Test-ShutDownInProgress($Session) {
-    $response=Invoke-Command -Session $Session { 
+    $response=Invoke-Command -Session $Session {
+        try {
         $systemMetrics = Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
@@ -671,8 +677,11 @@ public static class SystemMetrics
     }
 
 }
-"@ -PassThru
-        return $systemMetrics::IsShuttingdown()
+"@ -PassThru            
+        } catch {}
+        if ($systemMetrics){
+            return $systemMetrics::IsShuttingdown()            
+        }
     }
 
     if($response -eq $false) {
@@ -739,7 +748,7 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
     while($session.Availability -eq "Available") {
         $sessionPID = Invoke-Command -Session $session { return $PID }
         Write-BoxstarterMessage "Session's process ID is $sessionPID" -verbose
-        $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential.Password $DisableReboots $session
+        $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential $DisableReboots $session
 
         if(Test-RebootingOrDisconnected $remoteResult) {
             Wait-ForSessionToClose $session

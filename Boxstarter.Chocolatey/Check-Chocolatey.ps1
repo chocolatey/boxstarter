@@ -1,20 +1,34 @@
 function Check-Chocolatey ([switch]$ShouldIntercept){
     Enable-Net40
-    if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
-        Write-BoxstarterMessage "Chocolatey not installed. Downloading and installing..."
-        $env:ChocolateyInstall = "$env:programdata\chocolatey"
-        New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
+    $mod_install = "$($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\chocolateyInstaller.psm1"
+    if(-not (Test-Path $mod_install)){
+        Write-BoxstarterMessage "Boxstarter will use its own private version of Chocolatey..."
         $config = Get-BoxstarterConfig
         $url=$config.ChocolateyPackage
         Enter-BoxstarterLogable {
-            Get-HttpToFile $config.ChocolateyRepo "$env:temp\choco.ps1"
             $currentLogging=$Boxstarter.Suppresslogging
             if($VerbosePreference -eq "SilentlyContinue"){$Boxstarter.Suppresslogging=$true}
-            . "$env:temp\choco.ps1"
+            Install-Chocolatey $url
             if($global:error[0].CategoryInfo.Activity -eq 'Remove-Module'){ $global:error.RemoveAt(0) } #this is so terrible
             $Boxstarter.SuppressLogging = $currentLogging
         }
+
+        if(Test-Path $mod_install) {
+            Write-BoxstarterMessage "Importing Chocolatey module from $mod_install" -Verbose
+            Import-Module $mod_install -Global -Force -DisableNameChecking
+        }
     }
+
+    # patching existing installs with tools\7zip
+    $currentChocoInstall = $env:ChocolateyInstall
+    if($currentChocoInstall -eq $null) {
+        $currentChocoInstall = "$env:programdata\chocolatey"
+    }
+    $chocoInstallPath = Join-Path $currentChocoInstall 'ChocolateyInstall'
+    if(!(Test-Path $chocoInstallPath)){
+        New-Item -Path $chocoInstallPath -ItemType Directory
+    }
+    Copy-Item (Join-Path $Boxstarter.VendoredChocoPath 'ChocolateyInstall/tools') $chocoInstallPath -recurse -force
 
     if(!$BoxstarterIntrercepting)
     {

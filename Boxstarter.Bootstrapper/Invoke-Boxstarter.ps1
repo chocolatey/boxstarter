@@ -104,10 +104,6 @@ Invoke-Reboot
         Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and RebootOk is set to $($Boxstarter.RebootOk) and the NoPassword parameter passed was $NoPassword" -verbose
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
-        $credPassword = $BoxstarterPassword
-        if($credPassword -eq $null) {$credPassword=(New-Object System.Security.SecureString)}
-        $currentUser=Get-CurrentUser
-        if(Get-IsRemote){ Create-BoxstarterTask (New-Object Management.Automation.PsCredential ("$($currentUser.Domain)\$($currentUser.Name)",$credPassword)) }
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
         return $true
     }

@@ -29,7 +29,7 @@ Invoke-FromTask Install-WindowsUpdate -AcceptEula
 This will install Windows Updates in a scheduled task
 
 .EXAMPLE
-Invoke-FromTask "DISM /Online /Online /NoRestart /Enable-Feature /Telnet-Client" -IdleTimeout 20
+Invoke-FromTask "DISM /Online /NoRestart /Enable-Feature:TelnetClient" -IdleTimeout 20
 
 This will use DISM.exe to install the telnet client and will kill 
 the task if it becomes idle for more that 20 seconds.
@@ -93,7 +93,7 @@ function Get-ChildProcessMemoryUsage {
 function Add-TaskFiles($command) {
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("`$ProgressPreference='SilentlyContinue';$command"))
     $fileContent=@"
-Start-Process powershell -Wait -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
+Start-Process powershell -Wait -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -WorkingDirectory '$PWD' -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
 Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
 "@
     Set-Content $env:temp\BoxstarterTask.ps1 -value $fileContent -force

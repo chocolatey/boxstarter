@@ -4,7 +4,7 @@ Description = 'Provides common functionality used by multiple Boxstarter Modules
 ModuleToProcess = './boxstarter.common.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.4.159'
+ModuleVersion = '2.5.10'
 
 # ID used to uniquely identify this module
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e51'
@@ -13,7 +13,7 @@ GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e51'
 Author = 'Matt Wrock'
 
 # Copyright statement for this module
-Copyright = '(c) 2014 Matt Wrock.'
+Copyright = '(c) 2015 Matt Wrock.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '2.0'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = '0f23c441d831ad8aca2908176e08af86b42f38ae'
+PrivateData = '8d0e740ab9deb04fb2acb4634928975519ead6f1'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

@@ -16,73 +16,13 @@
       <dependency id="Boxstarter.WinConfig" version="$version$" />
     </dependencies>
     <releaseNotes>
-  - Suppress caught errors in Invoke-FromScheduledTask from bubbling up to final result
-  - Work around nuget.exe limitations of handling files in system profile directory
-  - Provide improved error logging of chocolatey errors.
-  - Fixes issue where windows update reboots maching in the midst of a run.
-  - Fixes failures from exceptions thrown from bitlocker module even when bitlocker is not in use.
-  - Fixes Invoke-Reboot from a nested package and bubbles up the reboot signal
-  - Update docs to reflect github as repo home and remove all codeplex links
-  - Fix for all write-host calls being logged to Boxstarter log file even when there is no install session in progress
-  - fixing issue where auto login is not disabled after boxstarter run
-  - fixing wait for published version to retry for a minute if the new version is not yet marked published
-  - Improve initial connectin performance by skipping remoting check if it has already been tested in enable-BoxstarterVM
-  - provide messaging for some winconfig functions
-  - fix the setting of azure storage account by looking for https endpoints
-  - load storage module before azure to workaround bug with the storage module loading
-  - copy the root path passed to New_BoxstarerPackage
-  - add a DisableRestart parameter which will suppress the restart file and UAC enabling
-  - Greatly improve progress messaging during windows updates runs
-  - Fix hang scenarios when waiting for remote machine to reboot and landing in a pending reboot state shortly after reboot
-  - Support for auto login and restart in winrm sessions
-  - Fix issue with remote check causing an indefinite loop
-  - Silencing some handled errors and keep them from leaking to the pipeline
-  - Reduce WMI calls and Improve performance of testing if the current session is remote
-  - When forcing the install of the outer boxstarter package, make sure to delete the last install from the right repo
-  - Check scheduled task output for pending reboots after a remote windows update since 32 bit processes cant read the wsus registry keys
-  - Fix Remote check when running as a servise
-  - System user logs to programdata
-  - when accessing a 64 bit machine from a 32bit process, the windowsupdate reg key is hidden so skip it
-  - Bubble up errors from windows update
-  - Provide the same scheduled task wrapping for winrm as we do for ps remoting
-  - fix explorer restart when there is no explorer process
-  - Correcting fallback Chocolatey install path to match release 0.9.8.24
-  - Fixing typo param name in redirect call to set-WindowsExplorerOptions
-  - Fix InvalidArgument from Set-TaskbarOptions when using lock or unlock params
-  - Fix issues where explorer terminates and cannot restart after caling one of the winconfig functions
-  - Import azure module from the pipeline to avoid errors when loading Boxstarter.azure
-  - Suppress errors when reenabling windows update in case they had alrady been reenabled
-  - Fix mis encoded dash in Install-Boxstarterackage
-  - Fix issues when Chocolatey packages create a new module and call chocolatey functions from that module
-  - When building packages, skip folders without a nuspec instead of throwing an error
-  - Only restart the explore process of the current user when calling windows config functions
-  - Fixing .net 4.5 install for local installs
-  - Fixing TestRunner module loading for PSv2 clients
-  - Add the following windows config features:
-  - Enable/Disable showing charms when mouse is in the upper right corner
-  - Enable/Disable switching apps when pointing in the upper left corner
-  - Enable/Disable the option to launch powershell from win-x
-  - Enable/Disable boot to desktop
-  - Enable/Disable desktop background on the start screen
-  - Enable/Disable showing the start screen on the active display
-  - Enable/Disable showing the Apps View by default on the start screen
-  - Enable/Disable searching everywhere in apps view. Not just apps.
-  - Enable/Disable showing desktop apps first in results
-  - Lock/Unlock task bar
-  - Change taskbar icon size
-  - Change location of taskbar docking
-  - Add test and publish automation that can point to remote deployment targets
-  - Provide build scripts for integration of tests and publishing in CI servers
-  - Include configured nuget sources and local repo to all chocolatey install calls and not just the initial package
-  - Fix enabling powershell remoting via WMI when password has ampersands
-  - Avoid explorer.exe crashes when configuring explorer options
-  - Fix Hyper-V heartbeat check in non US locales
-  - Fix Azure module loading in 32 bit consoles
-  - Fix shell shortcuts when user name has a space
-  - Fix Azure VM Checkpoint listing when there are more than one VM in a service
-  - Install .net 4.5 ONLY without affecting IIS settings when .net 4 is not present
-  - Fix Azure VM integration when multiple subscriptions are present
-  - Allow remote installs to be run by a non amin user
+- Return a more actionable error message when Enable-RemoteDesktop fails
+- Fix 7zip installed in private chocolatey install
+- Ensure choco bin is ahead of boxstarter vendored choco bin on the path and dont copy redirect shims to choco bin even if choco is not preinstalled.
+- Provide better isolation between Boxstarter and User Chocolatey installations.
+- Run scheduled tasks in the same directory where it is invoked.
+- Default Windows Update criteria now only installs critical updates.
+- Force elevated shell during setup.bat installer.
 </releaseNotes>
   </metadata>
   <files>

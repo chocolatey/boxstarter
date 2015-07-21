@@ -34,7 +34,7 @@ Describe "New-PackageFromScript" {
     }
 
     Context "When Building a script from a URL" {
-        . "$env:ChocolateyInstall\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
+        . "$($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
         Mock Get-WebFile {return "return"}
 
         ($result = New-PackageFromScript "file://$($boxstarter.Basedir)/script.ps1") | Out-Null
@@ -54,7 +54,7 @@ Describe "New-PackageFromScript" {
     }
 
     Context "When http client throws an error" {
-        . "$env:ChocolateyInstall\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
+        . "$($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
         Mock Get-WebFile {throw "blah"}
         Mock New-BoxstarterPackage
 

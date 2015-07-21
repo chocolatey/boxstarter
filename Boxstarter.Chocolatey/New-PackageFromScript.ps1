@@ -53,8 +53,7 @@ about_boxstarter_chocolatey
     )
 
     if(!(test-path function:\Get-WebFile)){
-        Check-Chocolatey
-        . "$env:ChocolateyInstall\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
+        . "$($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
     }
     if($source -like "*://*"){
         try {$text = Get-WebFile -url $Source -passthru } catch{
@@ -71,7 +70,7 @@ about_boxstarter_chocolatey
     if(Test-Path "$($boxstarter.LocalRepo)\$PackageName"){
         Remove-Item "$($boxstarter.LocalRepo)\$PackageName" -recurse -force
     }
-    New-BoxstarterPackage $PackageName -quiet
+    New-BoxstarterPackage $PackageName -quiet | Out-Null
     Set-Content "$($boxstarter.LocalRepo)\$PackageName\tools\ChocolateyInstall.ps1" -value $text
     Invoke-BoxstarterBuild $PackageName -quiet
 

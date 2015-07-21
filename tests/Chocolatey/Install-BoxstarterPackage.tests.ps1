@@ -29,6 +29,23 @@ Describe "Install-BoxstarterPackage" {
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
 
+    Context "When installing a package that throws an error" {
+        Mock Enable-RemotingOnRemote { return $true }
+        Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
+        Mock Enable-BoxstarterCredSSP {@{Success=$true}}
+        Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
+
+        $result = Install-BoxstarterPackage -computerName localhost -PackageName exception-package -DisableReboots 2> $null
+
+        It "will include exceptions"{
+            $result.Errors.Count | should be 3
+        }
+        It "will report success in results" {
+            $result.Completed | should be $true
+        }
+    }
+
     Context "When using a BoxstarterconnectionConfig and remoting enabled on remote and local computer" {
         Mock Enable-RemotingOnRemote { return $true }
         Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
@@ -431,23 +448,6 @@ Describe "Install-BoxstarterPackage" {
         It "will report success in results" {
             $result[0].Completed | should be $true
             $result[1].Completed | should be $true
-        }
-    }
-
-    Context "When installing a package that throws an error" {
-        Mock Enable-RemotingOnRemote { return $true }
-        Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
-        Mock Enable-BoxstarterCredSSP {@{Success=$true}}
-        Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
-
-        $result = Install-BoxstarterPackage -computerName localhost -PackageName exception-package -DisableReboots 2> $null
-
-        It "will include exceptions"{
-            $result.Errors.Count | should be 2
-        }
-        It "will report success in results" {
-            $result.Completed | should be $true
         }
     }
 

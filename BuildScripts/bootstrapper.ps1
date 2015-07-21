@@ -2,10 +2,17 @@ function Get-Boxstarter {
     Param(
         [switch] $Force
     )
+    if(!(Test-Admin)) {
+        Write-Host "User is not running with administrative rights. Attempting to elevate..."
+        $command = "-ExecutionPolicy bypass -noexit -command . '$(${function:Get-Boxstarter}.File)';Get-Boxstarter $($args)"
+        Start-Process powershell -verb runas -argumentlist $command
+        return
+    }
+
     Write-Output "Welcome to the Boxstarter Module installer!"
     if(Check-Chocolatey -Force:$Force){
         Write-Output "Chocolatey installed, Installing Boxstarter Modules."
-        cinst Boxstarter -version 2.4.159
+        cinst Boxstarter -y -version 2.5.10
         $Message = "Boxstarter Module Installer completed"
     }
     else {
@@ -40,7 +47,6 @@ function Check-Chocolatey {
             $wp.UseDefaultCredentials=$true
             $wc.Proxy=$wp
             iex ($wc.DownloadString("http://chocolatey.org/install.ps1"))
-            Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
             $env:path="$env:path;$env:ChocolateyInstall\bin"
         }
         else{
@@ -105,4 +111,10 @@ function Confirm-Install {
         0 {return $true; break}
         1 {return $false; break}
     }
+}
+
+function Test-Admin {
+    $identity  = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = New-Object System.Security.Principal.WindowsPrincipal( $identity )
+    return $principal.IsInRole( [System.Security.Principal.WindowsBuiltInRole]::Administrator )
 }
