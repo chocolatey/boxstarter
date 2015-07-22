@@ -196,22 +196,13 @@ Intercepts Chocolatey call to check for reboots
 function Call-Chocolatey {
     param($command, $packageNames)
 
-    $psChoco = "$($Boxstarter.VendoredChocoPath)\chocolateyinstall\chocolatey.ps1"
-    $exeChoco = "$env:ChocolateyInstall\choco.exe"
-
-    if(Test-Path $psChoco) {
-        $chocoArgs = Format-Args $args
-        ."$psChoco" @PSBoundParameters @chocoArgs
+    $chocoArgs = @($command, $packageNames)
+    $chocoArgs += Format-ExeArgs $args
+    if(!$global:choco){
+        $global:choco = New-Object -TypeName boxstarter.choco.ChocolateyWrapper -ArgumentList @($Boxstarter.BaseDir, $host)
     }
-    elseif(Test-Path $exeChoco) {
-        $chocoArgs = @($command, $packageNames)
-        $chocoArgs += Format-ExeArgs $args
-        if(!$global:choco){
-            $global:choco = New-Object -TypeName boxstarter.choco.ChocolateyWrapper -ArgumentList @($Boxstarter.BaseDir, $host)
-        }
-        Enter-BoxstarterLogable {
-            $global:choco.Run($chocoArgs, $Boxstarter)
-        }
+    Enter-BoxstarterLogable {
+        $global:choco.Run($chocoArgs, $Boxstarter)
     }
 }
 
