@@ -199,13 +199,8 @@ function Call-Chocolatey {
     $chocoArgs = @($command, $packageNames)
     $chocoArgs += Format-ExeArgs @args
     Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
-    if(!$global:choco){
-        # $global:choco = New-Object -TypeName boxstarter.choco.ChocolateyWrapper -ArgumentList @($Boxstarter.BaseDir, $host)
-        $global:choco = [chocolatey.Lets]::GetChocolatey()
-    }
-    Enter-BoxstarterLogable {
-        $global:choco.RunConsole($chocoArgs)
-    }
+    $choco = New-Object -TypeName boxstarter.ChocolateyWrapper
+    Enter-BoxstarterLogable { $choco.Run($chocoArgs, "") }
 }
 
 function Format-Args {

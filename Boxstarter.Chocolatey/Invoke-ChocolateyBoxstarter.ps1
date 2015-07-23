@@ -186,8 +186,10 @@ function Download-Package([string[]]$bootstrapPackage) {
                 "$chocoRoot\lib\$bootstrapPackage.*",
                 "$chocoRoot\lib\$bootstrapPackage"
             ) | % {
-                del $_ -recurse -force -ErrorAction SilentlyContinue
-                Write-BoxstarterMessage "Deleted $_" -verbose
+                if(Test-Path $_){
+                    del $_ -recurse -force -ErrorAction SilentlyContinue
+                    Write-BoxstarterMessage "Deleted $_" -verbose
+                }
             }
         }
         $force=$true
