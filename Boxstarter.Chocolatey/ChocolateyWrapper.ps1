@@ -7,11 +7,16 @@ namespace Boxstarter
 
     public class ChocolateyWrapper
     {
-        public void Run(string[] args, string boxstarterSetup) {
-            var choco = Lets.GetChocolatey();
+        private GetChocolatey _choco;
+        
+        public ChocolateyWrapper(string boxstarterSetup) {
+            _choco = Lets.GetChocolatey();
             var psService = new PowershellService(new DotNetFileSystem(), boxstarterSetup);
-            choco.RegisterContainerComponent<IPowershellService>(() => psService);
-            choco.RunConsole(args);
+            _choco.RegisterContainerComponent<IPowershellService>(() => psService);
+        }
+
+        public void Run(string[] args) {
+            _choco.RunConsole(args);
         }
     }
 }

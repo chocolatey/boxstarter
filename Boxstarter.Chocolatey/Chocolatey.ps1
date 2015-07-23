@@ -199,8 +199,10 @@ function Call-Chocolatey {
     $chocoArgs = @($command, $packageNames)
     $chocoArgs += Format-ExeArgs @args
     Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
-    $choco = New-Object -TypeName boxstarter.ChocolateyWrapper
-    Enter-BoxstarterLogable { $choco.Run($chocoArgs, "") }
+    if(!$global:choco) {
+        $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList (Get-BoxstarterSetup)
+    }
+    Enter-BoxstarterLogable { $choco.Run($chocoArgs) }
 }
 
 function Format-Args {
@@ -359,4 +361,8 @@ function Wait-ForMSIEXEC{
             }
         }
     } Until ((Get-Process | ? {$_.Name -eq "MSIEXEC"} ) -eq $null)
+}
+
+function Get-BoxstarterSetup {
+"Import-Module '$($boxstarter.BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1'"
 }
