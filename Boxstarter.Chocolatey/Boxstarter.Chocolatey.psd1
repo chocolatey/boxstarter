@@ -21,6 +21,8 @@ PowerShellVersion = '2.0'
 # Minimum version of the .NET Framework required by this module
 DotNetFrameworkVersion = '2.0'
 
+RequiredAssemblies = @( "./chocolatey/chocolatey.dll" )
+
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @('..\Boxstarter.Common\Boxstarter.Common.psd1')
 

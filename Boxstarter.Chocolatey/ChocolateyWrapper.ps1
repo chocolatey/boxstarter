@@ -9,7 +9,8 @@ namespace Boxstarter
     {
         public void Run(string[] args, string boxstarterSetup) {
             var choco = Lets.GetChocolatey();
-            // choco.RegisterContainerComponent<IPowershellService>(() => _psService);
+            var psService = new PowershellService(new DotNetFileSystem(), boxstarterSetup);
+            choco.RegisterContainerComponent<IPowershellService>(() => psService);
             choco.RunConsole(args);
         }
     }
