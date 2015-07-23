@@ -3,8 +3,6 @@ Import-Module $unNormalized.FullName -global -DisableNameChecking -Force
 Resolve-Path $PSScriptRoot\*.ps1 | 
     % { . $_.ProviderPath }
 
-Check-Chocolatey -ShouldIntercept
-
 Export-ModuleMember Invoke-ChocolateyBoxstarter, New-BoxstarterPackage, Invoke-BoxstarterBuild, Get-PackageRoot, Set-BoxstarterShare, Get-BoxstarterConfig, Set-BoxstarterConfig, Install-BoxstarterPackage, New-PackageFromScript, Enable-BoxstarterClientRemoting, Enable-BoxstarterCredSSP, Resolve-VMPlugin
 
 Export-ModuleMember Install-ChocolateyInstallPackageOverride,

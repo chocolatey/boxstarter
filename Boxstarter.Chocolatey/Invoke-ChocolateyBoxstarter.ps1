@@ -181,10 +181,14 @@ function Download-Package([string[]]$bootstrapPackage) {
         if($chocoRoot -eq $null) {
             $chocoRoot = "$env:programdata\chocolatey"
         }
-        Write-BoxstarterMessage "Deleting $chocoRoot\lib\$bootstrapPackage.*" -verbose
         if(Test-Path "$chocoRoot\lib"){
-            del "$chocoRoot\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
-            Write-BoxstarterMessage "Deleted $chocoRoot\lib\$bootstrapPackage.*" -verbose
+            @(
+                "$chocoRoot\lib\$bootstrapPackage.*",
+                "$chocoRoot\lib\$bootstrapPackage"
+            ) | % {
+                del $_ -recurse -force -ErrorAction SilentlyContinue
+                Write-BoxstarterMessage "Deleted $_" -verbose
+            }
         }
         $force=$true
     }

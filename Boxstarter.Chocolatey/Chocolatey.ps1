@@ -197,12 +197,14 @@ function Call-Chocolatey {
     param($command, $packageNames)
 
     $chocoArgs = @($command, $packageNames)
-    $chocoArgs += Format-ExeArgs $args
+    $chocoArgs += Format-ExeArgs @args
+    Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
     if(!$global:choco){
-        $global:choco = New-Object -TypeName boxstarter.choco.ChocolateyWrapper -ArgumentList @($Boxstarter.BaseDir, $host)
+        # $global:choco = New-Object -TypeName boxstarter.choco.ChocolateyWrapper -ArgumentList @($Boxstarter.BaseDir, $host)
+        $global:choco = [chocolatey.Lets]::GetChocolatey()
     }
     Enter-BoxstarterLogable {
-        $global:choco.Run($chocoArgs, $Boxstarter)
+        $global:choco.RunConsole($chocoArgs)
     }
 }
 
@@ -223,7 +225,7 @@ function Format-Args {
 
 function Format-ExeArgs {
     $newArgs = @()
-    Format-Args $args | % {
+    Format-Args @args | % {
         if($onForce){
             $onForce = $false
             if($_ -eq $true) {$_ = ""}
@@ -238,6 +240,7 @@ function Format-ExeArgs {
     if($global:VerbosePreference -eq "Continue") {
         $newArgs += "-Verbose"
     }
+    $newArgs += '--allow-unofficial'
     $newArgs
 }
 

@@ -46,4 +46,4 @@
 # "@ -ReferencedAssemblies @($automation,$chocoDll)
 # }
 
-Add-Type -path "C:\dev\boxstarter\boxstarter.choco\bin\Debug\boxstarter.choco.dll"
+# Add-Type -path "C:\dev\boxstarter\boxstarter.choco\bin\Debug\boxstarter.choco.dll"
