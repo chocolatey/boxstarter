@@ -6,7 +6,7 @@ Import-Module $unNormalized.FullName -global -DisableNameChecking -Force
 Resolve-Path $PSScriptRoot\*.ps1 | 
     % { . $_.ProviderPath }
 
-Register-ChocolateyInterception -ExportCommands:$ExportCommands
+if($ExportCommands) { Export-ModuleMember cinst, cup, choco }
 
 Export-ModuleMember Invoke-ChocolateyBoxstarter, New-BoxstarterPackage, Invoke-BoxstarterBuild, Get-PackageRoot, Set-BoxstarterShare, Get-BoxstarterConfig, Set-BoxstarterConfig, Install-BoxstarterPackage, New-PackageFromScript, Enable-BoxstarterClientRemoting, Enable-BoxstarterCredSSP, Resolve-VMPlugin, Register-ChocolateyInterception
 

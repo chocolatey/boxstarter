@@ -53,7 +53,11 @@ function cinst {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param([int[]]$RebootCodes=@())
+    param(
+        [string[]]$packageNames=@(''),
+        [string]$source='',
+        [int[]]$RebootCodes=@()
+    )
     chocolatey Install @PSBoundParameters @args
 }
 
@@ -63,7 +67,12 @@ function choco {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param([int[]]$RebootCodes=@())
+    param(
+        [string]$command,
+        [string[]]$packageNames=@(''),
+        [string]$source='',
+        [int[]]$RebootCodes=@()
+    )
     chocolatey @PSBoundParameters @args
 }
 
@@ -73,18 +82,12 @@ function cup {
 Intercepts Chocolatey call to check for reboots
 
 #>    
-    param([int[]]$RebootCodes=@())
+    param(
+        [string[]]$packageNames=@(''),
+        [string]$source='',
+        [int[]]$RebootCodes=@()
+    )
     chocolatey Update @PSBoundParameters @args
-}
-
-function cinstm {
-<#
-.SYNOPSIS
-Intercepts Chocolatey call to check for reboots
-
-#>    
-    param([int[]]$RebootCodes=@())
-    chocolatey InstallMissing @PSBoundParameters @args
 }
 
 function chocolatey {
@@ -93,16 +96,17 @@ function chocolatey {
 Intercepts Chocolatey call to check for reboots
 
 #>  
-    param([int[]]$RebootCodes=@())
+    param(
+        [string]$command,
+        [string[]]$packageNames=@(''),
+        [string]$source='',
+        [int[]]$RebootCodes=@()
+    )
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
     $PSBoundParameters.Remove("RebootCodes") | Out-Null
     $packageNames=-split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
-    #backwards compatibility for Chocolatey versions prior to 0.9.8.21
-    if(!$packageNames){$packageNames=$packageName}
-    if($Script:NewChoco) {
-        $PSBoundParameters.yes = $true
-    }
+    $PSBoundParameters.yes = $true
     
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
@@ -131,7 +135,7 @@ Intercepts Chocolatey call to check for reboots
                 $Boxstarter.SuppressLogging = $currentLogging
             }
             else{
-                Call-Chocolatey @PSBoundParameters
+                Call-Chocolatey @PSBoundParameters @args
 
                 # chocolatey reassembles environment variables after an install
                 # but does not add the machine PSModule value to the user Online
@@ -194,6 +198,10 @@ Intercepts Chocolatey call to check for reboots
 }
 
 function Call-Chocolatey {
+    param(
+        [string]$command,
+        [string[]]$packageNames=@('')
+    )
     $chocoArgs = @($command, $packageNames)
     $chocoArgs += Format-ExeArgs @args
     Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
@@ -237,62 +245,6 @@ function Format-ExeArgs {
     }
     $newArgs += '--allow-unofficial'
     $newArgs
-}
-
-function Intercept-Command {
-    param(
-        $commandName, 
-        $targetCommand = "C:\Users\Matt\AppData\Roaming\Boxstarter\Chocolatey\chocolateyinstall\chocolatey.ps1",
-        [switch]$omitCommandParam,
-        [switch]$ExportCommand
-    )
-    $metadata=Get-MetaData $targetCommand
-    $srcMetadata=Get-MetaData $commandName
-    if($commandName.Split("\").Length -eq 2){
-        $commandName = $commandName.Substring($commandName.IndexOf("\")+1)
-    }
-    $metadata.Parameters.Remove("Verbose") | out-null
-    $metadata.Parameters.Remove("Debug") | out-null
-    $metadata.Parameters.Remove("ErrorAction") | out-null
-    $metadata.Parameters.Remove("WarningAction") | out-null
-    $metadata.Parameters.Remove("ErrorVariable") | out-null
-    $metadata.Parameters.Remove("WarningVariable") | out-null
-    $metadata.Parameters.Remove("OutVariable") | out-null
-    $metadata.Parameters.Remove("OutBuffer") | out-null
-    if($metadata.Parameters.ContainsKey("yes")){
-        $Script:NewChoco=$true
-    }
-    if($omitCommandParam) {
-        $metadata.Parameters.Remove("command") | out-null
-    }
-    $params = [Management.Automation.ProxyCommand]::GetParamBlock($metadata)    
-    if($srcMetadata.Parameters.count -gt 0) {
-        $srcParams = [Management.Automation.ProxyCommand]::GetParamBlock($srcMetadata)
-        $params += ",`r`n" + $srcParams
-    }
-    $cmdLetBinding = [Management.Automation.ProxyCommand]::GetCmdletBindingAttribute($metadata)
-    $strContent = (Get-Content function:\$commandName).ToString()
-    if($strContent -match "param\(.+\)") {
-        $strContent = $strContent.Replace($matches[0],"")
-    }
-    $newFunc = "$cmdLetBinding `r`n param ( $params )Process{ `r`n$strContent}"
-    Set-Item Function:\$commandName -value $newFunc -force
-    if($ExportCommand) { Export-ModuleMember $commandName }
-}
-
-function Get-MetaData ($command){
-    $cmdDef = Get-Command $command | ? {$_.CommandType -ne "Application"}
-    return New-Object System.Management.Automation.CommandMetaData ($cmdDef)
-}
-
-function Register-ChocolateyInterception {
-    param([switch]$ExportCommands)
-    Intercept-Command cinst -omitCommandParam -ExportCommand:$ExportCommands
-    Intercept-Command cup -omitCommandParam -ExportCommand:$ExportCommands
-    Intercept-Command cinstm -omitCommandParam -ExportCommand:$ExportCommands
-    Intercept-Command chocolatey -ExportCommand:$ExportCommands
-    Intercept-Command choco -ExportCommand:$ExportCommands
-    Intercept-Command call-chocolatey -ExportCommand:$ExportCommands
 }
 
 function Add-DefaultRebootCodes($codes) {
