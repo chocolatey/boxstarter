@@ -93,7 +93,7 @@ function chocolatey {
 Intercepts Chocolatey call to check for reboots
 
 #>  
-    param([string]$command,[string]$packageNames,[string]$packageName,[string]$source,[int[]]$RebootCodes=@())
+    param([int[]]$RebootCodes=@())
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
     $PSBoundParameters.Remove("RebootCodes") | Out-Null
     $packageNames=-split $packageNames
@@ -194,8 +194,6 @@ Intercepts Chocolatey call to check for reboots
 }
 
 function Call-Chocolatey {
-    param($command, $packageNames)
-
     $chocoArgs = @($command, $packageNames)
     $chocoArgs += Format-ExeArgs @args
     Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
@@ -244,8 +242,9 @@ function Format-ExeArgs {
 function Intercept-Command {
     param(
         $commandName, 
-        $targetCommand = "$($Boxstarter.VendoredChocoPath)\chocolateyinstall\chocolatey.ps1",
-        [switch]$omitCommandParam
+        $targetCommand = "C:\Users\Matt\AppData\Roaming\Boxstarter\Chocolatey\chocolateyinstall\chocolatey.ps1",
+        [switch]$omitCommandParam,
+        [switch]$ExportCommand
     )
     $metadata=Get-MetaData $targetCommand
     $srcMetadata=Get-MetaData $commandName
@@ -268,16 +267,17 @@ function Intercept-Command {
     }
     $params = [Management.Automation.ProxyCommand]::GetParamBlock($metadata)    
     if($srcMetadata.Parameters.count -gt 0) {
-        $srcParams = [Management.Automation.ProxyCommand]::GetParamBlock($srcMetadata)    
+        $srcParams = [Management.Automation.ProxyCommand]::GetParamBlock($srcMetadata)
+        $params += ",`r`n" + $srcParams
     }
-    else {
-        $srcParams = "`$a"
-    }
+    $cmdLetBinding = [Management.Automation.ProxyCommand]::GetCmdletBindingAttribute($metadata)
     $strContent = (Get-Content function:\$commandName).ToString()
     if($strContent -match "param\(.+\)") {
         $strContent = $strContent.Replace($matches[0],"")
     }
-    Set-Item Function:\$commandName -value "param ( $srcParams )Process{ `r`n$strContent}" -force
+    $newFunc = "$cmdLetBinding `r`n param ( $params )Process{ `r`n$strContent}"
+    Set-Item Function:\$commandName -value $newFunc -force
+    if($ExportCommand) { Export-ModuleMember $commandName }
 }
 
 function Get-MetaData ($command){
@@ -285,15 +285,14 @@ function Get-MetaData ($command){
     return New-Object System.Management.Automation.CommandMetaData ($cmdDef)
 }
 
-function Intercept-Chocolatey {
-    if($Script:BoxstarterIntrercepting){return}
-    Intercept-Command cinst -omitCommandParam
-    Intercept-Command cup -omitCommandParam
-    Intercept-Command cinstm -omitCommandParam
-    Intercept-Command chocolatey
-    Intercept-Command choco
-    Intercept-Command call-chocolatey
-    $Script:BoxstarterIntrercepting=$true
+function Register-ChocolateyInterception {
+    param([switch]$ExportCommands)
+    Intercept-Command cinst -omitCommandParam -ExportCommand:$ExportCommands
+    Intercept-Command cup -omitCommandParam -ExportCommand:$ExportCommands
+    Intercept-Command cinstm -omitCommandParam -ExportCommand:$ExportCommands
+    Intercept-Command chocolatey -ExportCommand:$ExportCommands
+    Intercept-Command choco -ExportCommand:$ExportCommands
+    Intercept-Command call-chocolatey -ExportCommand:$ExportCommands
 }
 
 function Add-DefaultRebootCodes($codes) {
@@ -364,5 +363,5 @@ function Wait-ForMSIEXEC{
 }
 
 function Get-BoxstarterSetup {
-"Import-Module '$($boxstarter.BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1'"
+"Import-Module '$($boxstarter.BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1' -DisableNameChecking -ArgumentList `$true"
 }
