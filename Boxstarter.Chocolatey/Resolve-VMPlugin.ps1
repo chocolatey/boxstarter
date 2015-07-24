@@ -17,8 +17,9 @@ function Resolve-VMPlugin {
 
         $metadata.Parameters.Keys | % {
             $param=$metadata.Parameters[$_]
+            $attr = $param.Attributes | ? { $_.TypeId -eq [System.Management.Automation.ParameterAttribute] }
             $dynParam = new-object `
-                    -Type System.Management.Automation.RuntimeDefinedParameter($param.Name, $param.ParameterType, $param.Attributes[1])
+                    -Type System.Management.Automation.RuntimeDefinedParameter($param.Name, $param.ParameterType, $attr)
             $paramDictionary.Add($param.Name, $dynParam)
         }
 
