@@ -106,7 +106,6 @@ Intercepts Chocolatey call to check for reboots
     $PSBoundParameters.Remove("RebootCodes") | Out-Null
     $packageNames=-split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
-    $PSBoundParameters.yes = $true
     
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
@@ -208,6 +207,7 @@ function Call-Chocolatey {
     if(!$global:choco) {
         $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList (Get-BoxstarterSetup)
     }
+    $env:wawawa="fffff"
     Enter-BoxstarterLogable { $choco.Run($chocoArgs) }
 }
 
@@ -215,7 +215,7 @@ function Format-Args {
     $newArgs = @()
     $args | % {
         if($_ -is [string] -and $_.StartsWith("-") -and $_.EndsWith(":")) { $_ = $_.Substring(0,$_.length-1)}
-        if($_ -eq "-source") {$hasSrc = $true}
+        if([string]$_ -eq "-source") { $hasSrc = $true }
         $newArgs += $_
     }
 
@@ -223,6 +223,7 @@ function Format-Args {
         $newArgs += "-Source"
         $newArgs += "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
     }
+
     $newArgs
 }
 
@@ -233,7 +234,7 @@ function Format-ExeArgs {
             $onForce = $false
             if($_ -eq $true) {$_ = ""}
         }
-        if($_ -eq "-force"){
+        if([string]$_ -eq "-force"){
             $_ = "-f"
             $onForce = $true
         }
@@ -243,6 +244,7 @@ function Format-ExeArgs {
     if($global:VerbosePreference -eq "Continue") {
         $newArgs += "-Verbose"
     }
+    $newArgs += '--y'
     $newArgs += '--allow-unofficial'
     $newArgs
 }
