@@ -143,9 +143,10 @@ Intercepts Chocolatey call to check for reboots
                     $env:PSModulePath += ";" + $machineModPath
                 }
 
-                Write-BoxstarterMessage "Exit Code: $LastExitCode" -Verbose
-                if($LastExitCode -ne $null -and $LastExitCode -ne 0) {
-                    Write-Error "Chocolatey reported an unsuccessful exit code of $LastExitCode"
+                Write-BoxstarterMessage "Exit Code: $([System.Environment]::ExitCode)" -Verbose
+                $ec = [System.Environment]::ExitCode
+                if($ec -ne 0) {
+                    Write-Error "Chocolatey reported an unsuccessful exit code of $ec"
                 }
             }
         }
@@ -176,6 +177,7 @@ Intercepts Chocolatey call to check for reboots
                 if($global:error[$idx] -match "code was '(-?\d+)'") {
                     $errorCode=$matches[1]
                     if($RebootCodes -contains $errorCode) {
+                       Write-BoxstarterMessage "Chocolatey Install returned a reboot-able exit code"
                        $rebootable = $true
                     }
                 }
@@ -183,13 +185,7 @@ Intercepts Chocolatey call to check for reboots
             }
         }
         Stop-Timedsection $session
-        if(!$Boxstarter.rebootOk) {continue}
-        if($Boxstarter.IsRebooting){
-            Remove-ChocolateyPackageInProgress $packageName
-            return
-        }
-        if($rebootable) {
-            Write-BoxstarterMessage "Chocolatey Install returned a reboot-able exit code"
+        if($Boxstarter.IsRebooting -or $rebootable){
             Remove-ChocolateyPackageInProgress $packageName
             Invoke-Reboot
         }
@@ -207,8 +203,15 @@ function Call-Chocolatey {
     if(!$global:choco) {
         $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList (Get-BoxstarterSetup)
     }
-    $env:wawawa="fffff"
+    Export-BoxstarterVars
     Enter-BoxstarterLogable { $choco.Run($chocoArgs) }
+
+    $restartFile = "$(Get-BoxstarterTempDir)\Boxstarter.$PID.restart"
+    if(Test-Path $restartFile) { 
+        Write-BoxstarterMessage "found $restartFile we are restarting"
+        $Boxstarter.IsRebooting = $true
+        remove-item $restartFile -Force
+    }
 }
 
 function Format-Args {
@@ -257,9 +260,9 @@ function Add-DefaultRebootCodes($codes) {
 }
 
 function Remove-ChocolateyPackageInProgress($packageName) {
-    $pkgDir = (dir $env:ChocolateyInstall\lib\$packageName.*)
-    if($pkgDir.length -gt 0) {$pkgDir = $pkgDir[-1]}
-    if($pkgDir -ne $null) {
+    $pkgDir = "$env:ChocolateyInstall\lib\$packageName"
+    if(Test-Path $pkgDir) {
+        Write-BoxstarterMessage "Removing $pkgDir in progress" -Verbose
         remove-item $pkgDir -Recurse -Force -ErrorAction SilentlyContinue  
     }
 }
@@ -318,4 +321,49 @@ function Wait-ForMSIEXEC{
 
 function Get-BoxstarterSetup {
 "Import-Module '$($boxstarter.BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1' -DisableNameChecking -ArgumentList `$true"
+}
+
+function Export-BoxstarterVars {
+    $boxstarter.keys | % {
+        Set-Item -Path "Env:\Boxstarter.$_" -Value $Boxstarter[$_].ToString() -Force
+    }
+    if($script:BoxstarterPassword) {
+        $env:BoxstarterPass = $script:BoxstarterPassword
+    }
+    if($global:VerbosePreference -eq "Continue") {
+        $env:BoxstarterVerbose = "True"
+    }
+    $env:BoxstarterSourcePID = $PID
+}
+
+function Import-BoxstarterVars {
+    Write-BoxstarterMessage "Importing vars set from pid: $($env:BoxstarterSourcePID)" -Verbose
+    Get-ChildItem -Path env: | ? { 
+        $_.Name.StartsWith('Boxstarter.') 
+    } | % {
+        $key = $_.Name.Substring('Boxstarter.'.Length)
+        $Boxstarter[$key] = $_.Value
+        if($_.Value -eq 'True'){
+            $Boxstarter[$key] = $true
+        }
+        if($_.Value -eq 'False'){
+            $Boxstarter[$key] = $false
+        }
+    }        
+
+    Get-ChildItem -Path env: | ? { 
+        $_.Name.StartsWith('Boxstarter.') 
+    } | remove-item
+
+    if($env:BoxstarterPass){
+        $script:BoxstarterPasswordsword = $env:BoxstarterPass
+        remove-item -Path env:\BoxstarterPass
+    }
+
+    $boxstarter.SourcePID = $env:BoxstarterSourcePID
+
+    if($env:BoxstarterVerbose){
+        $global:VerbosePreference = "Continue"
+        remove-item -Path env:\BoxstarterVerbose
+    }    
 }

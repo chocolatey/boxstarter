@@ -49,5 +49,6 @@ about_boxstarter_variable_in_bootstrapper
 }
 
 function Restart {
+    New-Item "$(Get-BoxstarterTempDir)\Boxstarter.$($Boxstarter.SourcePID).restart" -type file -value "" -force | Out-Null
     exit
 }
