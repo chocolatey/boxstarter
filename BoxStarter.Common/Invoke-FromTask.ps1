@@ -41,7 +41,7 @@ Remove-BoxstarterTask
 #>
     param(
         $command, 
-        $idleTimeout=60,
+        $idleTimeout=120,
         $totalTimeout=3600
     )
     Write-BoxstarterMessage "Invoking $command in scheduled task" -Verbose
@@ -50,10 +50,10 @@ Remove-BoxstarterTask
     $taskProc = start-Task
 
     if($taskProc -ne $null){
-        write-debug "Command launched in process $taskProc"
+        Write-BoxstarterMessage "Command launched in process $taskProc" -Verbose
         try { 
             $waitProc=get-process -id $taskProc -ErrorAction Stop 
-            Write-Debug "Waiting on $($waitProc.Id)"
+            Write-BoxstarterMessage "Waiting on $($waitProc.Id)" -Verbose
         } catch { $global:error.RemoveAt(0) }
     }
 
@@ -67,23 +67,17 @@ Remove-BoxstarterTask
 }
 
 function Get-ChildProcessMemoryUsage {
-    param($ID=$PID)
-    [int]$res=0
+    param(
+        $ID=$PID,
+        [int]$res=0
+    )
     Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
         if($_.ProcessID -ne $null) {
             try {
                 $proc = Get-Process -ID $_.ProcessID -ErrorAction Stop
+                Write-BoxstarterMessage "$($_.Name) $($proc.PrivateMemorySize + $proc.WorkingSet)" -Verbose
                 $res += $proc.PrivateMemorySize + $proc.WorkingSet
-                Write-Debug "$($_.Name) $($proc.PrivateMemorySize + $proc.WorkingSet)"
-            } catch { $global:error.RemoveAt(0) }
-        }
-    }
-    Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
-        if($_.ProcessID -ne $null) {
-            try {
-                $proc = Get-Process -ID $_.ProcessID -ErrorAction Top
-                $res += Get-ChildProcessMemoryUsage $_.ProcessID;
-                Write-Debug "$($_.Name) $($proc.PrivateMemorySize + $proc.WorkingSet)"
+                $res += (Get-ChildProcessMemoryUsage $_.ProcessID $res)
             } catch { $global:error.RemoveAt(0) }
         }
     }
@@ -104,15 +98,15 @@ Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
 function start-Task{
     $tasks=@()
     $tasks+=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
-    Write-Debug "Found $($tasks.Length) tasks already running"
+    Write-BoxstarterMessage "Found $($tasks.Length) tasks already running" -Verbose
     $taskResult = schtasks /RUN /I /TN 'Boxstarter Task'
     if($LastExitCode -gt 0){
         throw "Unable to run scheduled task. Message from task was $taskResult"
     }
-    write-debug "Launched task. Waiting for task to launch command..."
+    Write-BoxstarterMessage "Launched task. Waiting for task to launch command..." -Verbose
     do{
         if(!(Test-Path $env:temp\BoxstarterTask.ps1)){
-            Write-Debug "Task Completed before its process was captured."
+            Write-BoxstarterMessage "Task Completed before its process was captured." -Verbose
             break
         }
         $taskProc=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId } | ? { !($tasks -contains $_) }
@@ -130,8 +124,8 @@ function Test-TaskTimeout($waitProc, $idleTimeout) {
     }
     if($idleTimeout -gt 0){
         $lastMemUsageCount=Get-ChildProcessMemoryUsage $waitProc.ID
-        Write-Debug "Memory read: $lastMemUsageCount"
-        Write-Debug "Memory count: $($memUsageStack.Count)"
+        Write-BoxstarterMessage "Memory read: $lastMemUsageCount" -Verbose
+        Write-BoxstarterMessage "Memory count: $($memUsageStack.Count)" -Verbose
         $memUsageStack.Push($lastMemUsageCount)
         if($lastMemUsageCount -eq 0 -or (($memUsageStack.ToArray() | ? { $_ -ne $lastMemUsageCount }) -ne $null)){
             $memUsageStack.Clear()
@@ -172,7 +166,7 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
             }
         }
         Start-Sleep -Second 1
-        Write-Debug "Proc has exited: $($waitProc.HasExited) or Is Null: $($waitProc -eq $null)"
+        Write-BoxstarterMessage "Proc has exited: $($waitProc.HasExited) or Is Null: $($waitProc -eq $null)" -Verbose
         $byte=$reader.ReadByte()
         $text=$null
         while($byte -ne -1){
@@ -196,7 +190,7 @@ function KillTree($id){
     Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
         if($_.ProcessID -ne $null) {
             Invoke-SilentKill $_.ProcessID
-            Write-Debug "Killing $($_.Name)"
+            Write-BoxstarterMessage "Killing $($_.Name)" -Verbose
             KillTree $_.ProcessID
         }
     }
