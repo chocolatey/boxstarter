@@ -226,7 +226,10 @@ process {
             $OrigionalSettings.ForceAutoLogon = (Get-ItemProperty $WinlogonPath).ForceAutoLogon
             $OrigionalSettings.DefaultUserName = (Get-ItemProperty $WinlogonPath).DefaultUserName
             $OrigionalSettings.DefaultDomainName = (Get-ItemProperty $WinlogonPath).DefaultDomainName
-            $OrigionalSettings.DefaultPassword = (Get-ItemProperty $WinlogonPath).DefaultPassword
+            if((Get-ItemProperty $WinlogonPath).DefaultPassword) {
+                $OrigionalSettings.DefaultPassword = (Get-ItemProperty $WinlogonPath).DefaultPassword
+                Remove-ItemProperty -Path $WinlogonPath -Name DefaultPassword -Force
+            }
             $OrigionalSettings.AutoLogonCount = (Get-ItemProperty $WinlogonPath).AutoLogonCount
             
                 # The winlogon logon banner settings.
@@ -243,7 +246,7 @@ process {
             # Store the password securely.
         $lsaUtil = New-Object ComputerSystem.LSAutil -ArgumentList "DefaultPassword"
         $lsaUtil.SetSecret($decryptedPass)
-
+        
             # Store the autologon registry settings.
         Set-ItemProperty -Path $WinlogonPath -Name AutoAdminLogon -Value $Enable -Force
 
