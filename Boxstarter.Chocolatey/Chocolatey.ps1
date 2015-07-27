@@ -9,7 +9,7 @@ param(
     Wait-ForMSIEXEC
     if(Get-IsRemote){
         Invoke-FromTask @"
-Import-Module $($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\chocolateyInstaller.psm1 -Global -DisableNameChecking
+Import-Module $env:chocolateyinstall\helpers\chocolateyInstaller.psm1 -Global -DisableNameChecking
 Install-ChocolateyInstallPackage $(Expand-Splat $PSBoundParameters)
 "@
     }
@@ -204,7 +204,10 @@ function Call-Chocolatey {
         $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList (Get-BoxstarterSetup)
     }
     Export-BoxstarterVars
-    Enter-BoxstarterLogable { $choco.Run($chocoArgs) }
+    Enter-BoxstarterLogable { 
+        Write-BoxstarterMessage "calling choco now..." -verbose
+        $choco.Run($chocoArgs)
+    }
 
     $restartFile = "$(Get-BoxstarterTempDir)\Boxstarter.$PID.restart"
     if(Test-Path $restartFile) { 
@@ -306,7 +309,7 @@ function Resolve-SplatValue($val){
 }
 
 function Wait-ForMSIEXEC{
-    Write-BoxstarterMessage "Checking for other running MSIEXEC installers..."
+    Write-BoxstarterMessage "Checking for other running MSIEXEC installers..." -Verbose
     Do{
         Get-Process | ? {$_.Name -eq "MSIEXEC"} | % {
             if(!($_.HasExited)){
@@ -325,15 +328,21 @@ function Get-BoxstarterSetup {
 
 function Export-BoxstarterVars {
     $boxstarter.keys | % {
-        Set-Item -Path "Env:\Boxstarter.$_" -Value $Boxstarter[$_].ToString() -Force
+        if($Boxstarter[$_] -is [string] -or $Boxstarter[$_] -is [boolean]) {
+            Write-BoxstarterMessage "Exporting $_ as $($Boxstarter[$_])" -verbose
+            Set-Item -Path "Env:\Boxstarter.$_" -Value $Boxstarter[$_].ToString() -Force
+        }
     }
     if($script:BoxstarterPassword) {
+        Write-BoxstarterMessage "Exporting password as secure string" -verbose
         $env:BoxstarterPass = $script:BoxstarterPassword
     }
     if($global:VerbosePreference -eq "Continue") {
+        Write-BoxstarterMessage "Exporting verbose" -verbose
         $env:BoxstarterVerbose = "True"
     }
     $env:BoxstarterSourcePID = $PID
+    Write-BoxstarterMessage "Finished export" -verbose
 }
 
 function Import-BoxstarterVars {
