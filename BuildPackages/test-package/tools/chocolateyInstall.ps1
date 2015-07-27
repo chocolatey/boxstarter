@@ -1,5 +1,3 @@
-Write-Host "a test package just installed. yo2"
-gci env:
-get-command cinst
+Write-Host "a test package just installed. yo3"
 
-cinst ad-hoc-tests
+cinst windowsazurepowershell
