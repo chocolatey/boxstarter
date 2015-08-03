@@ -24,16 +24,16 @@ function Test-ChildOfWinrs($ID = $PID) {
    if(++$script:recursionLevel -gt 20) { return $false }
    $parent = (Get-WmiObject -Class Win32_Process -Filter "ProcessID=$ID").ParentProcessID 
     if($parent -eq $null) { 
-        write-BoxstarterMessage "No parent process found. Must be root." -Verbose
+        Log-BoxstarterMessage "No parent process found. Must be root."
         return $false 
     } 
     else {
     	try {$parentProc = Get-Process -ID $parent -ErrorAction Stop} catch {
-            write-BoxstarterMessage "Error getting parent process" -Verbose
+            Log-BoxstarterMessage "Error getting parent process"
             $global:error.RemoveAt(0)
             return $false
         }
-        write-BoxstarterMessage "parent process is $($parentProc.Name)" -Verbose
+        Log-BoxstarterMessage "parent process is $($parentProc.Name)"
     	if(@('wsmprovhost','winrshost').Contains($parentProc.Name)) {return $true}
         elseif($parentProc.Name -eq "services") {return $false} 
     	else {
