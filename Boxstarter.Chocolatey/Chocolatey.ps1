@@ -199,9 +199,16 @@ function Call-Chocolatey {
     )
     $chocoArgs = @($command, $packageNames)
     $chocoArgs += Format-ExeArgs @args
+    if(!$env:ChocolateyInstall) {
+        [System.Environment]::SetEnvironmentVariable('ChocolateyInstall', "$env:programdata\chocolatey", 'Machine')
+        $env:ChocolateyInstall = "$env:programdata\chocolatey"
+    }
     Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
     if(!$global:choco) {
-        $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList (Get-BoxstarterSetup)
+        $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList `
+          (Get-BoxstarterSetup),`
+          $host.UI,`
+          ($global:DebugPreference -eq "Continue")
     }
     Export-BoxstarterVars
     Enter-BoxstarterLogable { 
@@ -341,6 +348,10 @@ function Export-BoxstarterVars {
         Write-BoxstarterMessage "Exporting verbose" -verbose
         $env:BoxstarterVerbose = "True"
     }
+    if($global:DebugPreference -eq "Continue") {
+        Write-BoxstarterMessage "Exporting debug" -verbose
+        $env:BoxstarterDebug = "True"
+    }
     $env:BoxstarterSourcePID = $PID
     Write-BoxstarterMessage "Finished export" -verbose
 }
@@ -374,5 +385,9 @@ function Import-BoxstarterVars {
     if($env:BoxstarterVerbose){
         $global:VerbosePreference = "Continue"
         remove-item -Path env:\BoxstarterVerbose
-    }    
+    }
+    if($env:BoxstarterDebug){
+        $global:DebugPreference = "Continue"
+        remove-item -Path env:\BoxstarterDebug
+    }
 }
