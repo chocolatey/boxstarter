@@ -204,16 +204,10 @@ function Call-Chocolatey {
         $env:ChocolateyInstall = "$env:programdata\chocolatey"
     }
     Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
-    if(!$global:choco) {
-        $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList `
-          (Get-BoxstarterSetup),`
-          $host.UI,`
-          ($global:DebugPreference -eq "Continue")
-    }
     Export-BoxstarterVars
-    Enter-BoxstarterLogable { 
-        Write-BoxstarterMessage "calling choco now..." -verbose
-        $choco.Run($chocoArgs)
+
+    Enter-DotNet4 {
+        proxy-chocolatey
     }
 
     $restartFile = "$(Get-BoxstarterTempDir)\Boxstarter.$PID.restart"
