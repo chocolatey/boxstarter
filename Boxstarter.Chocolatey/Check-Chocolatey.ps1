@@ -12,13 +12,13 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
             if($global:error[0].CategoryInfo.Activity -eq 'Remove-Module'){ $global:error.RemoveAt(0) } #this is so terrible
             $Boxstarter.SuppressLogging = $currentLogging
         }
-
-        if(Test-Path $mod_install) {
-            Write-BoxstarterMessage "Importing Chocolatey module from $mod_install" -Verbose
-            Import-Module $mod_install -Global -Force -DisableNameChecking
-        }
     }
 
+    if(Test-Path $mod_install) {
+        Write-BoxstarterMessage "Importing Chocolatey module from $mod_install" -Verbose
+        Import-Module $mod_install -Global -Force -DisableNameChecking
+    }
+    
     # patching existing installs with tools\7zip
     $currentChocoInstall = $env:ChocolateyInstall
     if($currentChocoInstall -eq $null) {
