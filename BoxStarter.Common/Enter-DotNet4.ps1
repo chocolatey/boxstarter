@@ -1,13 +1,14 @@
 function Enter-Dotnet4 {
-    param([ScriptBlock]$net4Script)
+    param([ScriptBlock]$net4Script, [object[]]$ArgumentList)
     Enable-Net40
-    if($PSVersionTable.CLRVersion -lt "v4") {
+    if($PSVersionTable.CLRVersion.Major -lt 4) {
+        Write-BoxstarterMessage "Relaunching powershell under .net fx v4" -verbose
         $env:COMPLUS_version="v4.0.30319"
-        Start-Process powershell -verb runas -argumentlist "-ExecutionPolicy bypass -noexit -command $($net4Script.ToString())"
-        Powershell -ScriptBlock $net4Script
+        & powershell -OutputFormat Text -ExecutionPolicy bypass -command $net4Script -args $ArgumentList
     }
     else {
-        Invoke-Command -ScriptBlock $net4Script
+        Write-BoxstarterMessage "Using current powershell..." -verbose
+        Invoke-Command -ScriptBlock $net4Script -argumentlist $ArgumentList
     }
 }
 

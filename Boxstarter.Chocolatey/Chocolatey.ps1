@@ -27,7 +27,6 @@ param(
   [Parameter(Mandatory=$false)][Object] $Separator
 )
     if($Boxstarter.ScriptToCall -ne $null) { Log-BoxStarterMessage $object }
-
     if($Boxstarter.SuppressLogging){
         $caller = (Get-Variable MyInvocation -Scope 1).Value.MyCommand.Name
         if("Describe","Context","write-PesterResult" -contains $caller) {
@@ -207,8 +206,9 @@ function Call-Chocolatey {
     Export-BoxstarterVars
 
     Enter-DotNet4 {
-        proxy-chocolatey
-    }
+        Import-Module "$($args[1].BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1"
+        Invoke-Chocolatey $args[0]
+    } $chocoArgs, $Boxstarter
 
     $restartFile = "$(Get-BoxstarterTempDir)\Boxstarter.$PID.restart"
     if(Test-Path $restartFile) { 
@@ -221,7 +221,12 @@ function Call-Chocolatey {
 function Format-Args {
     $newArgs = @()
     $args | % {
+        Write-BoxstarterMessage "param sent to Call-Chocolatey: $_" -Verbose
         if($_ -is [string] -and $_.StartsWith("-") -and $_.EndsWith(":")) { $_ = $_.Substring(0,$_.length-1)}
+        if([string]$_ -eq "source") { 
+            $_ = '-Source'
+            $hasSrc = $true
+        }
         if([string]$_ -eq "-source") { $hasSrc = $true }
         $newArgs += $_
     }
@@ -321,10 +326,6 @@ function Wait-ForMSIEXEC{
             }
         }
     } Until ((Get-Process | ? {$_.Name -eq "MSIEXEC"} ) -eq $null)
-}
-
-function Get-BoxstarterSetup {
-"Import-Module '$($boxstarter.BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1' -DisableNameChecking -ArgumentList `$true"
 }
 
 function Export-BoxstarterVars {

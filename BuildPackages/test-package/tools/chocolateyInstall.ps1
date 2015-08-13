@@ -1,3 +1,3 @@
-Write-Host "a test package just installed. yo3"
+Write-boxstartermessage "a test package just installed. yo3"
 
-cinst windowsazurepowershell
+cinst git

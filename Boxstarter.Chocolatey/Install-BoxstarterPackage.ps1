@@ -537,7 +537,7 @@ function Invoke-Locally {
 
     $record = Start-Record 'localhost'
     try {
-        Invoke-ChocolateyBoxstarter @PSBoundParameters | Out-Null
+        Invoke-ChocolateyBoxstarter @PSBoundParameters
     }
     catch {
         $record.Completed=$false
@@ -594,6 +594,7 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
         Write-BoxstarterMessage "Copying $($_.Name) to $($Session.ComputerName)" -Verbose
         Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $session 
     }
+    Write-BoxstarterMessage "Expanding modules on $($Session.ComputerName)" -Verbose
     Invoke-Command -Session $Session {
         Set-ExecutionPolicy Bypass -Force
         $shellApplication = new-object -com shell.application 
@@ -611,8 +612,9 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
 function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $session) {
     Write-BoxstarterMessage "Running remote install..."
     $remoteResult = Invoke-Command -session $session {
-        param($SuppressLogging,$pkg,$Credential,$DisableReboots, $verbosity, $ProgressArgs)
+        param($SuppressLogging,$pkg,$Credential,$DisableReboots, $verbosity, $ProgressArgs, $debug)
         $global:VerbosePreference=$verbosity
+        $global:DebugPreference=$debug        
         Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
         if($Credential -eq $null){
             $currentUser = Get-CurrentUser
@@ -635,7 +637,7 @@ function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $sessio
         catch{
             throw $_
         }
-    } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Credential, $DisableReboots, $global:VerbosePreference, $global:Boxstarter.ProgressArgs
+    } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Credential, $DisableReboots, $global:VerbosePreference, $global:Boxstarter.ProgressArgs, $global:DebugPreference
     Write-BoxstarterMessage "Result from Remote Boxstarter: $($remoteResult.Result)" -Verbose
     return $remoteResult
 }

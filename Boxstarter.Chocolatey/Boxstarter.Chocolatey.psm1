@@ -11,7 +11,7 @@ if($ExportCommands) {
     Export-ModuleMember cinst, cup, choco 
 }
 
-Export-ModuleMember Invoke-ChocolateyBoxstarter, New-BoxstarterPackage, Invoke-BoxstarterBuild, Get-PackageRoot, Set-BoxstarterShare, Get-BoxstarterConfig, Set-BoxstarterConfig, Install-BoxstarterPackage, New-PackageFromScript, Enable-BoxstarterClientRemoting, Enable-BoxstarterCredSSP, Resolve-VMPlugin, Register-ChocolateyInterception
+Export-ModuleMember Invoke-ChocolateyBoxstarter, New-BoxstarterPackage, Invoke-BoxstarterBuild, Get-PackageRoot, Set-BoxstarterShare, Get-BoxstarterConfig, Set-BoxstarterConfig, Install-BoxstarterPackage, New-PackageFromScript, Enable-BoxstarterClientRemoting, Enable-BoxstarterCredSSP, Resolve-VMPlugin, Register-ChocolateyInterception, Invoke-Chocolatey
 
 Export-ModuleMember Install-ChocolateyInstallPackageOverride,
                     Write-HostOverride

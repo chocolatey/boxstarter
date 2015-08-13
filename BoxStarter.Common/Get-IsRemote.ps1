@@ -34,7 +34,8 @@ function Test-ChildOfWinrs($ID = $PID) {
             return $false
         }
         Log-BoxstarterMessage "parent process is $($parentProc.Name)"
-    	if(@('wsmprovhost','winrshost').Contains($parentProc.Name)) {return $true}
+    	
+        if(@('wsmprovhost','winrshost') -Contains $parentProc.Name) {return $true}
         elseif($parentProc.Name -eq "services") {return $false} 
     	else {
     		return Test-ChildOfWinrs $parent
