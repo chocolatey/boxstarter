@@ -9,8 +9,8 @@ function Invoke-Chocolatey($chocoArgs) {
         Add-Type -Path $_
     }
     $cpar = New-Object System.CodeDom.Compiler.CompilerParameters
-    $cpar.ReferencedAssemblies.Add([System.Reflection.Assembly]::Load('System.Management.Automation').location)
-    $refs | % { $cpar.ReferencedAssemblies.Add($_) }
+    $cpar.ReferencedAssemblies.Add([System.Reflection.Assembly]::Load('System.Management.Automation').location) | Out-Null
+    $refs | % { $cpar.ReferencedAssemblies.Add($_) | Out-Null }
     Write-BoxstarterMessage "Adding boxstarter choco wrapper types..." -Verbose
     Add-Type @"
 namespace Boxstarter

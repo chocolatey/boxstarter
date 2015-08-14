@@ -206,6 +206,10 @@ function Call-Chocolatey {
     Export-BoxstarterVars
 
     Enter-DotNet4 {
+        if($env:BoxstarterVerbose){
+            $global:VerbosePreference = "Continue"
+        }
+
         Import-Module "$($args[1].BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1"
         Invoke-Chocolatey $args[0]
     } $chocoArgs, $Boxstarter
