@@ -206,7 +206,7 @@ function Call-Chocolatey {
     Export-BoxstarterVars
 
     Enter-DotNet4 {
-        if($env:BoxstarterVerbose){
+        if($env:BoxstarterVerbose -eq 'true'){
             $global:VerbosePreference = "Continue"
         }
 
@@ -381,11 +381,11 @@ function Import-BoxstarterVars {
 
     $boxstarter.SourcePID = $env:BoxstarterSourcePID
 
-    if($env:BoxstarterVerbose){
+    if($env:BoxstarterVerbose -eq 'True'){
         $global:VerbosePreference = "Continue"
         remove-item -Path env:\BoxstarterVerbose
     }
-    if($env:BoxstarterDebug){
+    if($env:BoxstarterDebug -eq 'True'){
         $global:DebugPreference = "Continue"
         remove-item -Path env:\BoxstarterDebug
     }
