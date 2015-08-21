@@ -1,3 +1,3 @@
 Write-boxstartermessage "a test package just installed. yo3"
 
-cinst git
+cinst ad-hoc-tests

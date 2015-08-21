@@ -700,10 +700,15 @@ function Test-Reconnection($Session, $sessionPID) {
     $reconnected = $false
 
     #If there is a pending reboot then session is in the middle of a restart
-    $response=Invoke-Command -Session $session { 
-        Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 
-        return Test-PendingReboot
-    } -ErrorAction SilentlyContinue
+    try{
+        $response=Invoke-Command -Session $session { 
+            Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 
+            return Test-PendingReboot
+        } -ErrorAction Stop
+    } catch {
+        Write-BoxstarterMessage "Failed to test pending reboot : $($global:Error[0])" -Verbose
+        $global:Error.RemoveAt(0)
+    }
     Write-BoxstarterMessage "Reboot check returned $response" -Verbose
 
 
@@ -748,9 +753,11 @@ function Test-Reconnection($Session, $sessionPID) {
 function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
     Write-BoxstarterMessage "Invoking remote install" -verbose
     while($session.Availability -eq "Available") {
-        $sessionPID = Invoke-Command -Session $session { return $PID }
+        $sessionPID = try { Invoke-Command -Session $session { return $PID } } catch { $global:Error.RemoveAt(0) }
         Write-BoxstarterMessage "Session's process ID is $sessionPID" -verbose
-        $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential $DisableReboots $session
+        if($sessionPID -ne $null) {
+            $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential $DisableReboots $session
+        }
 
         if(Test-RebootingOrDisconnected $remoteResult) {
             Wait-ForSessionToClose $session
@@ -759,18 +766,26 @@ function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
             Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
             Do{
                 if($session -ne $null){
-                    Remove-PSSession $session
+                    Write-BoxstarterMessage "removing session..." -verbose
+                    try { Remove-PSSession $session } catch { $global:Error.RemoveAt(0) }
                     $session = $null
+                    Write-BoxstarterMessage "session removed..." -verbose
                 }
                 $response=$null
                 start-sleep -seconds 2
+                Write-BoxstarterMessage "attempting to recreate session..." -verbose
                 $session = New-PSSession @sessionArgs -Name Boxstarter -ErrorAction SilentlyContinue
                 if($session -eq $null) {
+                    Write-BoxstarterMessage "New session is null..." -verbose
                     $global:Error.RemoveAt(0)
                 }
                 elseif($session -ne $null -and $Session.Availability -eq "Available"){
+                    Write-BoxstarterMessage "testing new session..." -verbose
                     if($remoteResult.Result -eq "Rebooting"){$sessionPID=-1}
                     $reconnected = Test-Reconnection $session $sessionPID
+                }
+                else {
+                    Write-BoxstarterMessage "new session is not available..." -verbose
                 }
             }
             Until($reconnected -eq $true)
@@ -837,12 +852,13 @@ function Enable-RemoteCredSSP($sessionArgs) {
     $n=Invoke-RetriableScript {
         $splat=$args[0]
         Invoke-Command @splat { 
-            param($Credential)
+            param($Credential, $verbosity)
+            $VerbosePreference = $verbosity
             Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
             Create-BoxstarterTask $Credential
             Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null"
             Remove-BoxstarterTask
-        } -ArgumentList $args[0].Credential
+        } -ArgumentList @($args[0].Credential, $VerbosePreference)
     } $sessionArgs
     $sessionArgs.Authentication="CredSSP"
     Write-BoxstarterMessage "Creating New session with CredSSP Authentication..." -Verbose

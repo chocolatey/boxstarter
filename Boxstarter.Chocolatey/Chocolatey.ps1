@@ -203,16 +203,13 @@ function Call-Chocolatey {
         $env:ChocolateyInstall = "$env:programdata\chocolatey"
     }
     Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
-    Export-BoxstarterVars
 
-    Enter-DotNet4 {
-        if($env:BoxstarterVerbose -eq 'true'){
-            $global:VerbosePreference = "Continue"
-        }
-
-        Import-Module "$($args[1].BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1"
-        Invoke-Chocolatey $args[0]
-    } $chocoArgs, $Boxstarter
+    if($PSVersionTable.CLRVersion.Major -lt 4 -and (Get-IsRemote)) {
+        Invoke-ChocolateyFromTask $chocoArgs
+    }
+    else {
+        Invoke-LocalChocolatey $chocoArgs
+    }
 
     $restartFile = "$(Get-BoxstarterTempDir)\Boxstarter.$PID.restart"
     if(Test-Path $restartFile) { 
@@ -220,6 +217,50 @@ function Call-Chocolatey {
         $Boxstarter.IsRebooting = $true
         remove-item $restartFile -Force
     }
+}
+
+function Invoke-ChocolateyFromTask($chocoArgs) {
+    Invoke-FromTask @"
+        Import-Module $($boxstarter.BaseDir)\boxstarter.chocolatey\Boxstarter.chocolatey.psd1 -DisableNameChecking
+        $(Serialize-BoxstarterVars)
+        `$global:Boxstarter.Log = `$null
+        `$global:Boxstarter.DisableRestart = `$true
+        Export-BoxstarterVars
+        `$env:BoxstarterSourcePID = $PID
+        Invoke-Chocolatey $(Serialize-Array $chocoArgs)
+"@ -DotNetVersion "v4.0.30319"
+}
+
+function Invoke-LocalChocolatey($chocoArgs) {
+    Export-BoxstarterVars
+ 
+    Enter-DotNet4 {
+        if($env:BoxstarterVerbose -eq 'true'){
+            $global:VerbosePreference = "Continue"
+        }
+
+        Import-Module "$($args[1].BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1" -DisableNameChecking
+        Invoke-Chocolatey $args[0]
+    } $chocoArgs, $Boxstarter
+}
+
+function Serialize-Array($chocoArgs) {
+    $first = $false
+    $res = "@("
+    $chocoArgs | % {
+        if($first){$res+=","}
+        if($_ -is [Array]) {
+            $res += Serialize-Array $_
+        }
+        else {
+            $res += "`""
+            $res += $_
+            $res += "`""
+        }
+        $first = $true
+    }
+    $res += ")"
+    $res
 }
 
 function Format-Args {
@@ -338,6 +379,10 @@ function Export-BoxstarterVars {
             Write-BoxstarterMessage "Exporting $_ as $($Boxstarter[$_])" -verbose
             Set-Item -Path "Env:\Boxstarter.$_" -Value $Boxstarter[$_].ToString() -Force
         }
+        elseif($Boxstarter[$_] -eq $null) {
+            Write-BoxstarterMessage "Exporting $_ as `$null" -verbose
+            Set-Item -Path "Env:\Boxstarter.$_" -Value '$null' -Force
+        }
     }
     if($script:BoxstarterPassword) {
         Write-BoxstarterMessage "Exporting password as secure string" -verbose
@@ -355,20 +400,51 @@ function Export-BoxstarterVars {
     Write-BoxstarterMessage "Finished export" -verbose
 }
 
+function Serialize-BoxstarterVars {
+    $res = ""
+    $boxstarter.keys | % {
+        if($Boxstarter[$_] -is [string]) {
+            $res += "`$global:Boxstarter['$_']=@`"`r`n$($Boxstarter[$_])`r`n`"@`r`n"
+        }
+        if($Boxstarter[$_] -is [boolean]) {
+            $res += "`$global:Boxstarter['$_']=`$$($Boxstarter[$_].ToString())`r`n"
+        }
+    }
+    if($script:BoxstarterPassword) {
+        $res += "`$script:BoxstarterPassword=`"$($script:BoxstarterPassword)`"`r`n"
+    }
+    if($global:VerbosePreference -eq "Continue") {
+        $res += "`$global:VerbosePreference='Continue'`r`n"
+    }
+    if($global:DebugPreference -eq "Continue") {
+        $res += "`$global:DebugPreference='Continue'`r`n"
+    }
+    Write-BoxstarterMessage "Serialized boxstarter vars to:" -verbose
+    Write-BoxstarterMessage $res -verbose
+    $res
+}
+
 function Import-BoxstarterVars {
-    Write-BoxstarterMessage "Importing vars set from pid: $($env:BoxstarterSourcePID)" -Verbose
     Get-ChildItem -Path env: | ? { 
         $_.Name.StartsWith('Boxstarter.') 
     } | % {
         $key = $_.Name.Substring('Boxstarter.'.Length)
-        $Boxstarter[$key] = $_.Value
+        $global:Boxstarter[$key] = $_.Value
         if($_.Value -eq 'True'){
-            $Boxstarter[$key] = $true
+            $global:Boxstarter[$key] = $true
         }
         if($_.Value -eq 'False'){
-            $Boxstarter[$key] = $false
+            $global:Boxstarter[$key] = $false
+        }
+        if($_.Value -eq '$null'){
+            $global:Boxstarter[$key] = $null
         }
     }        
+
+    Write-BoxstarterMessage "Imported vars set from pid: $($env:BoxstarterSourcePID)" -Verbose
+    $boxstarter.keys | % {
+        Write-BoxstarterMessage "$_ set to $($Boxstarter.$_)" -verbose
+    }
 
     Get-ChildItem -Path env: | ? { 
         $_.Name.StartsWith('Boxstarter.') 

@@ -40,14 +40,15 @@ Create-BoxstarterTask
 Remove-BoxstarterTask
 #>
     param(
-        $command, 
+        $command,
+        $DotNetVersion = $null,
         $idleTimeout=120,
         $totalTimeout=3600
     )
     Write-BoxstarterMessage "Invoking $command in scheduled task" -Verbose
-    Add-TaskFiles $command
+    $runningCommand = Add-TaskFiles $command $DotNetVersion
 
-    $taskProc = start-Task
+    $taskProc = start-Task $runningCommand
 
     if($taskProc -ne $null){
         Write-BoxstarterMessage "Command launched in process $taskProc" -Verbose
@@ -57,12 +58,26 @@ Remove-BoxstarterTask
         } catch { $global:error.RemoveAt(0) }
     }
 
-    Wait-ForTask $waitProc $idleTimeout $totalTimeout
+    try {
+        Wait-ForTask $waitProc $idleTimeout $totalTimeout
+    }
+    catch {
+        Write-BoxstarterMessage "error thrown managing task" -verbose
+        Write-BoxstarterMessage "$($_ | fl * -force | out-string)" -verbose
+        throw $_
+    }
+    Write-BoxstarterMessage "Task has completed" -Verbose
 
+    # Microsoft.PowerShell.Utility\write-host (get-content $env:temp\BoxstarterError.stream)
     try{$errorStream=Import-CLIXML $env:temp\BoxstarterError.stream} catch {$global:error.RemoveAt(0)}
-    $str=($errorStream | Out-String)
-    if($str.Length -gt 0){
-        throw $errorStream
+    $verboseAndWarn = $errorStream | ? { $_ -is [String] }
+    $errorRecords = $errorStream | ? { !($_ -is [String]) }
+    if($verboseAndWarn.count -gt 0) {
+        Write-BoxstarterMessage "Warnings and Verbose output from task:"
+        $verboseAndWarn | % { Write-Host $_ }
+    }
+    if($errorRecords.count -gt 0) {
+        throw $errorRecords
     }
 }
 
@@ -84,20 +99,22 @@ function Get-ChildProcessMemoryUsage {
     $res
 }
 
-function Add-TaskFiles($command) {
+function Add-TaskFiles($command, $DotNetVersion) {
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("`$ProgressPreference='SilentlyContinue';$command"))
     $fileContent=@"
-Start-Process powershell -Wait -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -WorkingDirectory '$PWD' -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
+$(if($DotNetVersion -ne $null){"`$env:COMPLUS_version='$DotNetVersion'"})
+Start-Process powershell -NoNewWindow -Wait -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -WorkingDirectory '$PWD' -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
 Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
 "@
     Set-Content $env:temp\BoxstarterTask.ps1 -value $fileContent -force
     new-Item $env:temp\BoxstarterOutput.stream -Type File -Force | out-null
     new-Item $env:temp\BoxstarterError.stream -Type File -Force | out-null
+    $encoded
 }
 
-function start-Task{
+function start-Task($encoded){
     $tasks=@()
-    $tasks+=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
+    $tasks+=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%$encoded%'" | select ProcessId | % { $_.ProcessId }
     Write-BoxstarterMessage "Found $($tasks.Length) tasks already running" -Verbose
     $taskResult = schtasks /RUN /I /TN 'Boxstarter Task'
     if($LastExitCode -gt 0){
@@ -109,7 +126,7 @@ function start-Task{
             Write-BoxstarterMessage "Task Completed before its process was captured." -Verbose
             break
         }
-        $taskProc=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId } | ? { !($tasks -contains $_) }
+        $taskProc=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%$encoded%'" | select ProcessId | % { $_.ProcessId } | ? { !($tasks -contains $_) }
 
         Start-Sleep -Second 1
     }
@@ -158,8 +175,7 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
             $count=$reader.Read($byte,0,100)
             if($count -ne 0){
                 $text = [System.Text.Encoding]::Default.GetString($byte,0,$count)
-                $text | Out-File $boxstarter.Log -append
-                $text | write-host -NoNewline
+                $text | Write-Host -NoNewline
             }
             else {
                 Test-TaskTimeout $waitProc $idleTimeout
@@ -194,9 +210,19 @@ function KillTree($id){
             KillTree $_.ProcessID
         }
     }
-    Invoke-SilentKill $id
+    Invoke-SilentKill $id -wait
 }
 
-function Invoke-SilentKill($id) {
-    try {Kill $id -ErrorAction Stop -Force } catch { $global:error.RemoveAt(0) }
+function Invoke-SilentKill($id, [switch]$wait) {
+    try {
+        $p = Kill $id -ErrorAction Stop -Force
+        if($wait) {
+            while($p -ne $null -and !$p.HasExited){
+                Start-Sleep 1
+            }
+        }
+    } 
+    catch {
+        $global:error.RemoveAt(0)
+    }
 }
