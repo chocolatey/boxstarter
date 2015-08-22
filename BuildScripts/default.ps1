@@ -16,7 +16,7 @@ properties {
 }
 
 Task default -depends Build
-Task Build -depends Build-Clickonce, Build-Web, Test, Package
+Task Build -depends Build-Clickonce, Build-Web, Install-ChocoLib, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Chocolatey, Push-Github, Publish-Web
@@ -208,6 +208,15 @@ task Install-WebAppTargets {
 
 task Install-WebDeploy {
     if(!(Test-Path "$env:ProgramW6432\IIS\Microsoft Web Deploy V3")) { cinst webdeploy -y }
+}
+
+task Install-ChocoLib {
+    exec { .$nugetExe install chocolatey.lib -Version 0.9.9.8 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
+    MkDir $basedir\Boxstarter.Chocolatey\chocolatey -ErrorAction SilentlyContinue
+    Copy-Item $basedir\Boxstarter.Chocolatey\log4net.1.2.10\lib\2.0\* $basedir\Boxstarter.Chocolatey\chocolatey
+    Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.9.9.8\lib\* $basedir\Boxstarter.Chocolatey\chocolatey
+    Remove-Item $basedir\Boxstarter.Chocolatey\log4net.1.2.10 -Recurse -Force
+    Remove-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.9.9.8 -Recurse -Force
 }
 
 function PackDirectory($path, [switch]$AddReleaseNotes){

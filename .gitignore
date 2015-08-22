@@ -15,6 +15,7 @@ bin
 *.user
 *.suo
 Boxstarter.Chocolatey/Boxstarter.zip
+Boxstarter.Chocolatey/Chocolatey
 Packages
 Web/Content
 Web/fonts
