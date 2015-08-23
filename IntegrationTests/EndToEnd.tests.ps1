@@ -1,5 +1,14 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 import-module $here\..\boxstarter.Chocolatey\boxstarter.Chocolatey.psd1 -Force
+. $here\test-helper.ps1
+$secpasswd = ConvertTo-SecureString "Pass@word1" -AsPlainText -Force
+$credential = New-Object System.Management.Automation.PSCredential ("Administrator", $secpasswd)
+
+Describe "Win2k8r2LocalRun" {
+    it "runs" {
+        Invoke-LocalBoxstarterRun -BaseDir "$here\..\" -ComputerName 192.168.1.5 -Credential $credential -PackageName test-package
+    }
+}
 
 Describe "Invoke-ChocolateyBoxstarter via bootstrapper.bat (end to end)" {
     $testRoot = (Get-PSDrive TestDrive).Root
