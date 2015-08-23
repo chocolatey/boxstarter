@@ -1,3 +1,5 @@
-Write-boxstartermessage "a test package just installed. yo3"
+Write-boxstartermessage "installing test package"
 
-cinst ad-hoc-tests
+cinst force-reboot
+
+New-Item -Path "$($boxstarter.BaseDir)\test_marker" -ItemType File
