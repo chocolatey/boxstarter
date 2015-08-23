@@ -79,7 +79,7 @@ Task Test -depends Create-ModuleZipForRemoting {
     popd
 }
 
-Task Integration-Test -depends Pack-Nuget {
+Task Integration-Test -depends Pack-Nuget, Create-ModuleZipForRemoting {
     pushd "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester.2.1.0"
     if($testName){
@@ -212,10 +212,12 @@ task Install-WebDeploy {
 
 task Install-ChocoLib {
     exec { .$nugetExe install chocolatey.lib -Version 0.9.9.8 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
+    exec { .$nugetExe install log4net -Version 2.0.3 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
     MkDir $basedir\Boxstarter.Chocolatey\chocolatey -ErrorAction SilentlyContinue
-    Copy-Item $basedir\Boxstarter.Chocolatey\log4net.1.2.10\lib\2.0\* $basedir\Boxstarter.Chocolatey\chocolatey
+    Copy-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3\lib\net40-full\* $basedir\Boxstarter.Chocolatey\chocolatey
     Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.9.9.8\lib\* $basedir\Boxstarter.Chocolatey\chocolatey
     Remove-Item $basedir\Boxstarter.Chocolatey\log4net.1.2.10 -Recurse -Force
+    Remove-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3 -Recurse -Force
     Remove-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.9.9.8 -Recurse -Force
 }
 
