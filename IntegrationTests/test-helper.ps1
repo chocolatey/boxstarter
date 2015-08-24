@@ -5,12 +5,13 @@ function Invoke-LocalBoxstarterRun {
     [CmdletBinding()]
     param(
         [string]$BaseDir,
-        [string]$ComputerName,
+        [string]$VMName,
         [Management.Automation.PsCredential]$Credential,
         [string]$PackageName
     )
-    Write-Host "Creating session on $ComputerName"
-    $session = New-PsSession -ComputerName $ComputerName -Credential $Credential
+    $conn = Enable-BoxstarterVM -VMName $VMName -Credential $credential
+    Write-Host "Creating session on $ConnectionURI"
+    $session = New-PsSession -ConnectionURI $Conn.ConnectionURI -Credential $Credential
     Remove-PreviousMarker $session
 
     Setup-BoxstarterModuleAndLocalRepo $baseDir $session
@@ -25,7 +26,7 @@ function Invoke-LocalBoxstarterRun {
         }
         start-sleep 2
     }
-    until (wait-task ([ref]$session) $ComputerName $credential)
+    until (wait-task ([ref]$session) $conn.ConnectionURI $credential)
 }
 
 function start-task($session, $credential, $packageName) {
@@ -48,10 +49,10 @@ function Setup-BoxstarterModuleAndLocalRepo($BaseDir, $session){
     Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | out-Null }
     Send-File "$BaseDir\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
     Get-ChildItem "$BaseDir\BuildPackages\*.nupkg" | % { 
-        Write-host "Copying $($_.Name) to $($Session.ComputerName)"
+        Write-host "Copying $($_.Name) to $($Session.ConnectionURI)"
         Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $session 
     }
-    Write-Host "Expanding modules on $($Session.ComputerName)"
+    Write-Host "Expanding modules on $($Session.ConnectionURI)"
     Invoke-Command -Session $Session {
         Set-ExecutionPolicy Bypass -Force
         $shellApplication = new-object -com shell.application 
@@ -66,7 +67,7 @@ function Setup-BoxstarterModuleAndLocalRepo($BaseDir, $session){
     }
 }
 
-function wait-task([ref]$session, $ComputerName, $credential) {
+function wait-task([ref]$session, $ConnectionURI, $credential) {
     if(!(Test-Session $session.value)) {
         if($session.value -ne $null) {
             write-host "session failed $($session.value.Availability)"
@@ -78,10 +79,12 @@ function wait-task([ref]$session, $ComputerName, $credential) {
         }
         $session.value = $null
         try { 
-                $session.value = New-PsSession -ComputerName $ComputerName -Credential $Credential -ErrorAction SilentlyContinue
+                $session.value = New-PsSession -ConnectionURI $ConnectionURI -Credential $Credential -ErrorAction Stop
                 Write-Host "created new session. Availability: $($session.value.Availability)"
             }
-            catch {}
+            catch {
+                write-host "error reestablishing session $_"
+            }
     }
 
     if($session.value -eq $null) { return $false }
