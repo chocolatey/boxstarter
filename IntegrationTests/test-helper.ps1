@@ -1,7 +1,6 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 . $here\..\Boxstarter.Chocolatey\Send-File.ps1
 
-
 function Invoke-LocalBoxstarterRun {
     [CmdletBinding()]
     param(
@@ -12,9 +11,24 @@ function Invoke-LocalBoxstarterRun {
     )
     Write-Host "Creating session on $ComputerName"
     $session = New-PsSession -ComputerName $ComputerName -Credential $Credential
+    Remove-PreviousMarker $session
 
     Setup-BoxstarterModuleAndLocalRepo $baseDir $session
 
+    start-task $session $credential $packageName
+
+    $start = Get-Date
+    Write-Host "Waiting for Boxstarter run to complete..."
+    do {
+        if((Get-Date).Subtract($start).TotalSeconds -gt 300){
+            throw "Exceeded 5 minute timeout to run boxstarter"
+        }
+        start-sleep 2
+    }
+    until (wait-task ([ref]$session) $ComputerName $credential)
+}
+
+function start-task($session, $credential, $packageName) {
     Invoke-Command -Session $session { 
         param($Credential, $packageName)
         Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 -DisableNameChecking
@@ -28,7 +42,6 @@ function Invoke-LocalBoxstarterRun {
         Set-Content $env:temp\BoxstarterTask.ps1 -value $taskAction -force
         schtasks /RUN /I /TN 'Boxstarter Task'
     } -ArgumentList @($Credential, $packageName)
-
 }
 
 function Setup-BoxstarterModuleAndLocalRepo($BaseDir, $session){
@@ -51,4 +64,56 @@ function Setup-BoxstarterModuleAndLocalRepo($BaseDir, $session){
             $configXml.Save((Join-Path $env:temp\Boxstarter BoxStarter.config))
         }
     }
+}
+
+function wait-task([ref]$session, $ComputerName, $credential) {
+    if(!(Test-Session $session.value)) {
+        if($session.value -ne $null) {
+            write-host "session failed $($session.value.Availability)"
+            try { 
+                    Remove-PSSession $session.value -ErrorAction SilentlyContinue
+                    Write-Host "removed session after test failure"
+                } 
+                catch {}
+        }
+        $session.value = $null
+        try { 
+                $session.value = New-PsSession -ComputerName $ComputerName -Credential $Credential -ErrorAction SilentlyContinue
+                Write-Host "created new session. Availability: $($session.value.Availability)"
+            }
+            catch {}
+    }
+
+    if($session.value -eq $null) { return $false }
+
+    try {
+        Invoke-Command -session $session.value {
+            param($markerFile)
+            Test-Path $markerFile
+        } -ArgumentList (Get-MarkerPath $credential) -ErrorAction Stop
+    }
+    catch{
+        try {
+            Write-Host "removing session - reboot likely in progress"
+            Remove-PSSession $session.value -ErrorAction SilentlyContinue
+            Write-Host "session removed"
+        }
+        catch {}
+        $session.value = $null
+    }
+}
+
+function Get-MarkerPath($credential) {
+    "c:\users\$($credential.UserName)\appdata\local\temp\boxstarter\test_marker"
+}
+
+function Test-Session($session) {
+    $session -ne $null -and $session.Availability -eq "Available"
+}
+
+function Remove-PreviousMarker($session) {
+    Invoke-Command -session $session {
+        param($markerFile)
+        Remove-Item -Path $markerFile -ErrorAction SilentlyContinue
+    } -ArgumentList (Get-MarkerPath $credential)
 }
