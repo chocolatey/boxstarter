@@ -4,27 +4,57 @@ import-module $here\..\boxstarter.Hyperv\boxstarter.Hyperv.psd1 -Force
 $secpasswd = ConvertTo-SecureString "Pass@word1" -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential ("Administrator", $secpasswd)
 
-Describe "Win2k8r2LocalRun" {
-    $result = Invoke-LocalBoxstarterRun -BaseDir "$here\..\" -VMName win2k8r2 -Credential $credential -PackageName test-package
+Describe "Win2k8r2Run" {
+    $vmName = "win2k8r2"
+    $baseDir = "$here\..\"
 
-    it "installed test-package" {
-        $result.InvokeOnTarget($result.Session, {
-            Test-Path "c:\ProgramData\chocolatey\lib\test-package   "
-        }) | should be $true
+    context "local" {
+        $result = Invoke-LocalBoxstarterRun -BaseDir $baseDir -VMName $VMName -Credential $credential -PackageName test-package
+
+        it "installed test-package" {
+            $result.InvokeOnTarget($result.Session, {
+                Test-Path "c:\ProgramData\chocolatey\lib\test-package"
+            }) | should be $true
+        }
+
+        it "installed force-reboot" {
+            $result.InvokeOnTarget($result.Session, {
+                Test-Path "c:\ProgramData\chocolatey\lib\force-reboot"
+            }) | should be $true
+        }
+
+        it "had no errors" {
+            $result.Errors | should BeNullOrEmpty
+        }
+
+        it "rebooted" {
+            $result.Rebooted | Should be $true
+        }
     }
 
-    it "installed forced-reboot" {
-        $result.InvokeOnTarget($result.Session, {
-            Test-Path "c:\ProgramData\chocolatey\lib\force-reboot"
-        }) | should be $true
-    }
+    context "remote" {
+        $result = Invoke-RemoteBoxstarterRun -BaseDir $baseDir -VMName $VMName -Credential $credential -PackageName test-package
 
-    it "had no errors" {
-        $result.Errors | should BeNullOrEmpty
-    }
+        it "installed test-package" {
+            $result.InvokeOnTarget($result.Session, {
+                Test-Path "c:\ProgramData\chocolatey\lib\test-package"
+            }) | should be $true
+        }
 
-    it "rebooted" {
-        $result.Rebooted | Should be $true
+        it "installed force-reboot" {
+            $result.InvokeOnTarget($result.Session, {
+                Test-Path "c:\ProgramData\chocolatey\lib\force-reboot"
+            }) | should be $true
+        }
+
+        it "had no errors" {
+            $result.Errors | should BeNullOrEmpty
+            $result.Exceptions.Count | should Be 0
+        }
+
+        it "rebooted" {
+            $result.Rebooted | Should be $true
+        }
     }
 }
 

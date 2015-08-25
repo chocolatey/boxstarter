@@ -28,22 +28,51 @@ function Invoke-LocalBoxstarterRun {
         }
         start-sleep 2
     }
-    until (wait-task ([ref]$session) $conn.ConnectionURI $credential $result)
+    until (wait-task ([ref]$session) $conn.ConnectionURI $credential)
+    Write-host "Boxstarter un completed"
 
-    $result.Session = $session
-    $result.BoxstarterDir = Get-BoxDir
-    New-TestResult $result
+    New-TestResult $result $session $credential
 }
 
-function New-TestResult($result) {
+function Invoke-RemoteBoxstarterRun {
+    [CmdletBinding()]
+    param(
+        [string]$BaseDir,
+        [string]$VMName,
+        [Management.Automation.PsCredential]$Credential,
+        [string]$PackageName
+    )
+    $conn = Enable-BoxstarterVM -VMName $VMName -Credential $credential
+    Write-Host "Creating session on $ConnectionURI"
+    $session = New-PsSession -ConnectionURI $Conn.ConnectionURI -Credential $Credential
+    Remove-PreviousState $session
+
+    $result = @{}
+    $boxresult = Install-BoxstarterPackage -BoxstarterConnectionConfig $conn -PackageName $packageName
+    Write-host "Boxstarter un completed"
+
+    $result.Exceptions = $boxresult.Exceptions
+    $session = New-PsSession -ConnectionURI $Conn.ConnectionURI -Credential $Credential
+    New-TestResult $result $session $credential
+}
+
+function New-TestResult($result, $session, $credential) {
+    $result.Session = $session
+    $result.BoxstarterDir = Get-BoxDir $credential
+    $result.Error = Invoke-Command -Session $result.Session {
+        param($boxDir)
+        Get-Content -Path "$boxDir\test_error.txt" -ErrorAction SilentlyContinue
+    } -ArgumentList $result.BoxstarterDir
+    $log = Invoke-Command -Session $result.Session {
+        param($boxDir)
+        Get-Content -Path "$boxDir\..\..\boxstarter\boxstarter.log"
+    } -ArgumentList $result.BoxstarterDir
+    $result.Rebooted = ($log | Out-String).Contains("Restarting now.")
     $obj = New-Object PSObject -Prop $result
     $obj | Add-Member -MemberType ScriptMethod -Name InvokeOnTarget -Value {
         param($session, $script)
         Invoke-Command -Session $session -ScriptBlock $script
     }
-    $result.Error = $obj.InvokeOnTarget($result.Session, {
-        Get-Content -Path "$boxDir\test_error.txt" -ErrorAction SilentlyContinue
-    })
     $obj
 }
 
@@ -85,7 +114,7 @@ function Setup-BoxstarterModuleAndLocalRepo($BaseDir, $session){
     }
 }
 
-function wait-task([ref]$session, $ConnectionURI, $credential, $result) {
+function wait-task([ref]$session, $ConnectionURI, $credential) {
     if(!(Test-Session $session.value)) {
         if($session.value -ne $null) {
             write-host "session failed $($session.value.Availability)"
@@ -116,7 +145,6 @@ function wait-task([ref]$session, $ConnectionURI, $credential, $result) {
     catch{
         try {
             Write-Host "removing session - reboot likely in progress"
-            $result.Rebooted = $true
             Remove-PSSession $session.value -ErrorAction SilentlyContinue
             Write-Host "session removed"
         }
@@ -138,5 +166,7 @@ function Remove-PreviousState($session) {
         param($boxDir)
         Remove-Item -Path "$boxDir\test_marker" -ErrorAction SilentlyContinue | out-Null
         Remove-Item -Path "$boxDir\test_error.txt" -ErrorAction SilentlyContinue | Out-Null
+        Remove-Item -Path "$boxDir\reboot-test.txt" -ErrorAction SilentlyContinue | Out-Null
+        Remove-Item -Path "$boxDir\..\..\boxstarter\boxstarter.log" -ErrorAction SilentlyContinue | Out-Null
     } -ArgumentList (Get-BoxDir $credential)
 }
