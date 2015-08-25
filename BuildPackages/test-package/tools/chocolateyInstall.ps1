@@ -1,6 +1,12 @@
-Write-boxstartermessage "installing test package"
+try {
+    Remove-Item "c:\ProgramData\Chocolatey\lib\force-reboot" -Recurse -ErrorAction SilentlyContinue
 
-cinst force-reboot
+    Write-boxstartermessage "installing test package"
 
-Remove-Item "c:\ProgramData\Chocolatey\lib\force-reboot" -Recurse
-New-Item -Path "$($boxstarter.BaseDir)\test_marker" -ItemType File
+    cinst force-reboot
+
+    New-Item -Path "$($boxstarter.BaseDir)\test_marker" -ItemType File
+}
+catch {
+    $_ | Out-File "$($boxstarter.BaseDir)\test_error.txt" -Append
+}

@@ -9,12 +9,14 @@ function Invoke-LocalBoxstarterRun {
         [Management.Automation.PsCredential]$Credential,
         [string]$PackageName
     )
+    $result = @{}
+
     $conn = Enable-BoxstarterVM -VMName $VMName -Credential $credential
     Write-Host "Creating session on $ConnectionURI"
     $session = New-PsSession -ConnectionURI $Conn.ConnectionURI -Credential $Credential
-    Remove-PreviousMarker $session
+    Remove-PreviousState $session
 
-    Setup-BoxstarterModuleAndLocalRepo $baseDir $session
+    Setup-BoxstarterModuleAndLocalRepo $baseDir $session | Out-Null
 
     start-task $session $credential $packageName
 
@@ -26,7 +28,23 @@ function Invoke-LocalBoxstarterRun {
         }
         start-sleep 2
     }
-    until (wait-task ([ref]$session) $conn.ConnectionURI $credential)
+    until (wait-task ([ref]$session) $conn.ConnectionURI $credential $result)
+
+    $result.Session = $session
+    $result.BoxstarterDir = Get-BoxDir
+    New-TestResult $result
+}
+
+function New-TestResult($result) {
+    $obj = New-Object PSObject -Prop $result
+    $obj | Add-Member -MemberType ScriptMethod -Name InvokeOnTarget -Value {
+        param($session, $script)
+        Invoke-Command -Session $session -ScriptBlock $script
+    }
+    $result.Error = $obj.InvokeOnTarget($result.Session, {
+        Get-Content -Path "$boxDir\test_error.txt" -ErrorAction SilentlyContinue
+    })
+    $obj
 }
 
 function start-task($session, $credential, $packageName) {
@@ -41,7 +59,7 @@ function start-task($session, $credential, $packageName) {
             Install-BoxstarterPackage -PackageName $packageName -Credential `$Credential
 "@
         Set-Content $env:temp\BoxstarterTask.ps1 -value $taskAction -force
-        schtasks /RUN /I /TN 'Boxstarter Task'
+        schtasks /RUN /I /TN 'Boxstarter Task' | Out-Null
     } -ArgumentList @($Credential, $packageName)
 }
 
@@ -67,7 +85,7 @@ function Setup-BoxstarterModuleAndLocalRepo($BaseDir, $session){
     }
 }
 
-function wait-task([ref]$session, $ConnectionURI, $credential) {
+function wait-task([ref]$session, $ConnectionURI, $credential, $result) {
     if(!(Test-Session $session.value)) {
         if($session.value -ne $null) {
             write-host "session failed $($session.value.Availability)"
@@ -91,13 +109,14 @@ function wait-task([ref]$session, $ConnectionURI, $credential) {
 
     try {
         Invoke-Command -session $session.value {
-            param($markerFile)
-            Test-Path $markerFile
-        } -ArgumentList (Get-MarkerPath $credential) -ErrorAction Stop
+            param($boxDir)
+            Test-Path "$boxDir\test_marker"
+        } -ArgumentList (Get-BoxDir $credential) -ErrorAction Stop
     }
     catch{
         try {
             Write-Host "removing session - reboot likely in progress"
+            $result.Rebooted = $true
             Remove-PSSession $session.value -ErrorAction SilentlyContinue
             Write-Host "session removed"
         }
@@ -106,17 +125,18 @@ function wait-task([ref]$session, $ConnectionURI, $credential) {
     }
 }
 
-function Get-MarkerPath($credential) {
-    "c:\users\$($credential.UserName)\appdata\local\temp\boxstarter\test_marker"
+function Get-BoxDir($credential) {
+    "c:\users\$($credential.UserName)\appdata\local\temp\boxstarter"
 }
 
 function Test-Session($session) {
     $session -ne $null -and $session.Availability -eq "Available"
 }
 
-function Remove-PreviousMarker($session) {
+function Remove-PreviousState($session) {
     Invoke-Command -session $session {
-        param($markerFile)
-        Remove-Item -Path $markerFile -ErrorAction SilentlyContinue
-    } -ArgumentList (Get-MarkerPath $credential)
+        param($boxDir)
+        Remove-Item -Path "$boxDir\test_marker" -ErrorAction SilentlyContinue | out-Null
+        Remove-Item -Path "$boxDir\test_error.txt" -ErrorAction SilentlyContinue | Out-Null
+    } -ArgumentList (Get-BoxDir $credential)
 }
