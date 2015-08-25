@@ -29,7 +29,7 @@ function Invoke-LocalBoxstarterRun {
         start-sleep 2
     }
     until (wait-task ([ref]$session) $conn.ConnectionURI $credential)
-    Write-host "Boxstarter un completed"
+    Write-host "Boxstarter run completed"
 
     New-TestResult $result $session $credential
 }
@@ -49,7 +49,7 @@ function Invoke-RemoteBoxstarterRun {
 
     $result = @{}
     $boxresult = Install-BoxstarterPackage -BoxstarterConnectionConfig $conn -PackageName $packageName
-    Write-host "Boxstarter un completed"
+    Write-host "Boxstarter run completed"
 
     $result.Exceptions = $boxresult.Exceptions
     $session = New-PsSession -ConnectionURI $Conn.ConnectionURI -Credential $Credential
@@ -63,11 +63,11 @@ function New-TestResult($result, $session, $credential) {
         param($boxDir)
         Get-Content -Path "$boxDir\test_error.txt" -ErrorAction SilentlyContinue
     } -ArgumentList $result.BoxstarterDir
-    $log = Invoke-Command -Session $result.Session {
+    $result.Rebooted = Invoke-Command -Session $result.Session {
         param($boxDir)
-        Get-Content -Path "$boxDir\..\..\boxstarter\boxstarter.log"
+        $log = Get-Content -Path "$boxDir\..\..\boxstarter\boxstarter.log"
+        ($log | Out-String).Contains("Restarting now.")
     } -ArgumentList $result.BoxstarterDir
-    $result.Rebooted = ($log | Out-String).Contains("Restarting now.")
     $obj = New-Object PSObject -Prop $result
     $obj | Add-Member -MemberType ScriptMethod -Name InvokeOnTarget -Value {
         param($session, $script)
