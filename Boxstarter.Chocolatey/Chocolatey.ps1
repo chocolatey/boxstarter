@@ -232,6 +232,9 @@ function Invoke-ChocolateyFromTask($chocoArgs) {
 }
 
 function Invoke-LocalChocolatey($chocoArgs) {
+    if(Get-IsRemote) {
+        $global:Boxstarter.DisableRestart = $true
+    }
     Export-BoxstarterVars
  
     Enter-DotNet4 {
