@@ -490,13 +490,13 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
             }
         }
         
-        Invoke-Remotely $session $PackageName $DisableReboots $sessionArgs
+        Invoke-Remotely ([ref]$session) $PackageName $DisableReboots $sessionArgs
         return $true
     }
     finally {
         Write-BoxstarterMessage "checking if session should be removed..." -Verbose
         if($session -ne $null -and $session.Name -eq "Boxstarter") {
-            Write-BoxstarterMessage "Removing session..." -Verbose
+            Write-BoxstarterMessage "Removing session $($session.id)..." -Verbose
             Remove-PSSession $Session
             Write-BoxstarterMessage "Session removed..." -Verbose
             $Session = $null
@@ -750,39 +750,39 @@ function Test-Reconnection($Session, $sessionPID) {
     return $reconnected
 }
 
-function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
+function Invoke-Remotely([ref]$session,$Package,$DisableReboots,$sessionArgs){
     Write-BoxstarterMessage "Invoking remote install" -verbose
-    while($session.Availability -eq "Available") {
-        $sessionPID = try { Invoke-Command -Session $session { return $PID } } catch { $global:Error.RemoveAt(0) }
+    while($session.value.Availability -eq "Available") {
+        $sessionPID = try { Invoke-Command -Session $session.value { return $PID } } catch { $global:Error.RemoveAt(0) }
         Write-BoxstarterMessage "Session's process ID is $sessionPID" -verbose
         if($sessionPID -ne $null) {
-            $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential $DisableReboots $session
+            $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential $DisableReboots $session.value
         }
 
         if(Test-RebootingOrDisconnected $remoteResult) {
-            Wait-ForSessionToClose $session
+            Wait-ForSessionToClose $session.value
 
             $reconnected=$false
-            Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
+            Write-BoxstarterMessage "Waiting for $($session.value.ComputerName) to respond to remoting..."
             Do{
-                if($session -ne $null){
+                if($session.value -ne $null){
                     Write-BoxstarterMessage "removing session..." -verbose
-                    try { Remove-PSSession $session } catch { $global:Error.RemoveAt(0) }
-                    $session = $null
+                    try { Remove-PSSession $session.value } catch { $global:Error.RemoveAt(0) }
+                    $session.value = $null
                     Write-BoxstarterMessage "session removed..." -verbose
                 }
                 $response=$null
                 start-sleep -seconds 2
                 Write-BoxstarterMessage "attempting to recreate session..." -verbose
-                $session = New-PSSession @sessionArgs -Name Boxstarter -ErrorAction SilentlyContinue
-                if($session -eq $null) {
+                $session.value = New-PSSession @sessionArgs -Name Boxstarter -ErrorAction SilentlyContinue
+                if($session.value -eq $null) {
                     Write-BoxstarterMessage "New session is null..." -verbose
                     $global:Error.RemoveAt(0)
                 }
-                elseif($session -ne $null -and $Session.Availability -eq "Available"){
+                elseif($session.value -ne $null -and $Session.value.Availability -eq "Available"){
                     Write-BoxstarterMessage "testing new session..." -verbose
                     if($remoteResult.Result -eq "Rebooting"){$sessionPID=-1}
-                    $reconnected = Test-Reconnection $session $sessionPID
+                    $reconnected = Test-Reconnection $session.value $sessionPID
                 }
                 else {
                     Write-BoxstarterMessage "new session is not available..." -verbose
