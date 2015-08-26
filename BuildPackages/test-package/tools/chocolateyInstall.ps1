@@ -5,7 +5,7 @@ try {
 
     cinst force-reboot
 
-    New-Item -Path "$($boxstarter.BaseDir)\test_marker" -ItemType File
+    New-Item -Path "$($boxstarter.BaseDir)\test_marker" -ItemType File -force
 }
 catch {
     $_ | Out-File "$($boxstarter.BaseDir)\test_error.txt" -Append

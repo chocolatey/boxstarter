@@ -12,7 +12,7 @@ function Invoke-LocalBoxstarterRun {
     $result = @{}
 
     $conn = Enable-BoxstarterVM -VMName $VMName -Credential $credential
-    Write-Host "Creating session on $ConnectionURI"
+    Write-Host "Creating session on $($conn.ConnectionURI)"
     $session = New-PsSession -ConnectionURI $Conn.ConnectionURI -Credential $Credential
     Remove-PreviousState $session
 
@@ -31,6 +31,11 @@ function Invoke-LocalBoxstarterRun {
     until (wait-task ([ref]$session) $conn.ConnectionURI $credential)
     Write-host "Boxstarter run completed"
 
+    Invoke-Command -Session $session {
+        start-sleep 2
+        Get-Process -Name Powershell | ? { $_.id -ne $PID } | Stop-Process
+    }
+    
     New-TestResult $result $session $credential
 }
 
@@ -43,9 +48,10 @@ function Invoke-RemoteBoxstarterRun {
         [string]$PackageName
     )
     $conn = Enable-BoxstarterVM -VMName $VMName -Credential $credential
-    Write-Host "Creating session on $ConnectionURI"
+    Write-Host "Creating session on $($Conn.ConnectionURI)"
     $session = New-PsSession -ConnectionURI $Conn.ConnectionURI -Credential $Credential
     Remove-PreviousState $session
+    Remove-PsSession $Session
 
     $result = @{}
     $boxresult = Install-BoxstarterPackage -BoxstarterConnectionConfig $conn -PackageName $packageName
@@ -79,7 +85,8 @@ function New-TestResult($result, $session, $credential) {
 function start-task($session, $credential, $packageName) {
     Invoke-Command -Session $session { 
         param($Credential, $packageName)
-        Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 -DisableNameChecking
+        Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
+        # write-host "$(get-command -module boxstarter.chocolatey | fl | out-string)"
         Create-BoxstarterTask $Credential
         $taskAction = @"
             `$secpasswd = ConvertTo-SecureString "$($Credential.GetNetworkCredential().Password)" -AsPlainText -Force
@@ -96,10 +103,10 @@ function Setup-BoxstarterModuleAndLocalRepo($BaseDir, $session){
     Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | out-Null }
     Send-File "$BaseDir\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
     Get-ChildItem "$BaseDir\BuildPackages\*.nupkg" | % { 
-        Write-host "Copying $($_.Name) to $($Session.ConnectionURI)"
+        Write-host "Copying $($_.Name) to $($Session.ComputerName)"
         Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $session 
     }
-    Write-Host "Expanding modules on $($Session.ConnectionURI)"
+    Write-Host "Expanding modules on $($Session.ComputerName)"
     Invoke-Command -Session $Session {
         Set-ExecutionPolicy Bypass -Force
         $shellApplication = new-object -com shell.application 
@@ -129,9 +136,7 @@ function wait-task([ref]$session, $ConnectionURI, $credential) {
                 $session.value = New-PsSession -ConnectionURI $ConnectionURI -Credential $Credential -ErrorAction Stop
                 Write-Host "created new session. Availability: $($session.value.Availability)"
             }
-            catch {
-                write-host "error reestablishing session $_"
-            }
+            catch {}
     }
 
     if($session.value -eq $null) { return $false }

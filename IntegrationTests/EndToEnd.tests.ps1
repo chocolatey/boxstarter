@@ -4,56 +4,60 @@ import-module $here\..\boxstarter.Hyperv\boxstarter.Hyperv.psd1 -Force
 $secpasswd = ConvertTo-SecureString "Pass@word1" -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential ("Administrator", $secpasswd)
 
-Describe "Win2k8r2Run" {
-    $vmName = "win2k8r2"
-    $baseDir = "$here\..\"
+@("win2k8r2", "win2012r2") | % {
+    Describe $_ {
+        $vmName = $_
+        $baseDir = "$here\..\"
 
-    context "local" {
-        $result = Invoke-LocalBoxstarterRun -BaseDir $baseDir -VMName $VMName -Credential $credential -PackageName test-package
+        context "local" {
+            $result = Invoke-LocalBoxstarterRun -BaseDir $baseDir -VMName $VMName -Credential $credential -PackageName test-package
 
-        it "installed test-package" {
-            $result.InvokeOnTarget($result.Session, {
-                Test-Path "c:\ProgramData\chocolatey\lib\test-package"
-            }) | should be $true
+            it "installed test-package" {
+                $result.InvokeOnTarget($result.Session, {
+                    Test-Path "c:\ProgramData\chocolatey\lib\test-package"
+                }) | should be $true
+            }
+
+            it "installed force-reboot" {
+                $result.InvokeOnTarget($result.Session, {
+                    Test-Path "c:\ProgramData\chocolatey\lib\force-reboot"
+                }) | should be $true
+            }
+
+            it "had no errors" {
+                $result.Errors | should BeNullOrEmpty
+            }
+
+            it "rebooted" {
+                $result.Rebooted | Should be $true
+                Remove-PsSession $result.Session
+            }
         }
 
-        it "installed force-reboot" {
-            $result.InvokeOnTarget($result.Session, {
-                Test-Path "c:\ProgramData\chocolatey\lib\force-reboot"
-            }) | should be $true
-        }
+        context "remote" {
+            $result = Invoke-RemoteBoxstarterRun -BaseDir $baseDir -VMName $VMName -Credential $credential -PackageName test-package
 
-        it "had no errors" {
-            $result.Errors | should BeNullOrEmpty
-        }
+            it "installed test-package" {
+                $result.InvokeOnTarget($result.Session, {
+                    Test-Path "c:\ProgramData\chocolatey\lib\test-package"
+                }) | should be $true
+            }
 
-        it "rebooted" {
-            $result.Rebooted | Should be $true
-        }
-    }
+            it "installed force-reboot" {
+                $result.InvokeOnTarget($result.Session, {
+                    Test-Path "c:\ProgramData\chocolatey\lib\force-reboot"
+                }) | should be $true
+            }
 
-    context "remote" {
-        $result = Invoke-RemoteBoxstarterRun -BaseDir $baseDir -VMName $VMName -Credential $credential -PackageName test-package
+            it "had no errors" {
+                $result.Errors | should BeNullOrEmpty
+                $result.Exceptions.Count | should Be 0
+            }
 
-        it "installed test-package" {
-            $result.InvokeOnTarget($result.Session, {
-                Test-Path "c:\ProgramData\chocolatey\lib\test-package"
-            }) | should be $true
-        }
-
-        it "installed force-reboot" {
-            $result.InvokeOnTarget($result.Session, {
-                Test-Path "c:\ProgramData\chocolatey\lib\force-reboot"
-            }) | should be $true
-        }
-
-        it "had no errors" {
-            $result.Errors | should BeNullOrEmpty
-            $result.Exceptions.Count | should Be 0
-        }
-
-        it "rebooted" {
-            $result.Rebooted | Should be $true
+            it "rebooted" {
+                $result.Rebooted | Should be $true
+                Remove-PsSession $result.Session
+            }
         }
     }
 }
@@ -61,40 +65,15 @@ Describe "Win2k8r2Run" {
 Describe "Invoke-ChocolateyBoxstarter via bootstrapper.bat (end to end)" {
     $testRoot = (Get-PSDrive TestDrive).Root
     mkdir "$testRoot\Repo" -ErrorAction SilentlyContinue | Out-Null
-    Copy-Item $here\..\BuildPackages\test-package.*.nupkg "$testRoot\Repo"
+    Copy-Item $here\..\BuildPackages\test-package2.*.nupkg "$testRoot\Repo"
 
     Context "When installing a local package" {
-        remove-Item "$env:ChocolateyInstall\lib\test-package.*" -force -recurse
+        remove-Item "$env:ChocolateyInstall\lib\test-package2*" -force -recurse
 
-        ."$here\..\boxstarter.bat" test-package -LocalRepo "$testRoot\Repo" -DisableReboots
-
-        it "should save boxstarter package to chocolatey lib folder" {
-            Test-Path "$env:ChocolateyInstall\lib\test-package.*" | Should Be $true
-        }
-    }
-}
-
-Describe "Install-BoxstarterPackage" {
-    $testRoot = (Get-PSDrive TestDrive).Root
-    $oldChoco = $env:ChocolateyInstall
-    $env:ChocolateyInstall = "$testRoot\choco"
-    $repo = "$testRoot\Repo"
-    mkdir $repo -ErrorAction SilentlyContinue | Out-Null
-    mkdir $env:ChocolateyInstall -ErrorAction SilentlyContinue | Out-Null
-    
-    Copy-Item $here\..\BuildPackages\test-package.*.nupkg $repo
-    Copy-Item $oldChoco\choco.exe $env:ChocolateyInstall
-
-    Context "When installing a local package" {
-        remove-Item "$env:ChocolateyInstall\lib\test-package.*" -force -recurse -ErrorAction SilentlyContinue
-
-        $result = Install-BoxstarterPackage -PackageName test-package -LocalRepo "$testRoot\Repo" -DisableReboots
+        ."$here\..\boxstarter.bat" test-package2 -LocalRepo "$testRoot\Repo" -DisableReboots
 
         it "should save boxstarter package to chocolatey lib folder" {
-            Test-Path "$env:ChocolateyInstall\lib\test-package" | Should Be $true
-        }
-        it "should not have errors" {
-            $result.errors.count | Should Be 0
+            Test-Path "$env:ChocolateyInstall\lib\test-package2*" | Should Be $true
         }
     }
 }
@@ -107,7 +86,6 @@ Describe "Chocolatey Package throws an Exception" {
         $errorMsg="I am an error"
         Set-Content "$testRoot\test.txt" -Value "throw '$errorMsg'" -Force
 
-        get-content "$testRoot\test.txt"
         $result = Invoke-ChocolateyBoxstarter "$testRoot\test.txt" -LocalRepo "$testRoot\Repo" -DisableReboots 2>&1
 
         it "should log error" {
@@ -132,7 +110,7 @@ Describe "Chocolatey Package throws an Exception" {
             $result.Count | should be 2
         }                  
         it "should write correct error to error stream" {
-            $result[0].Exception.Message.Contains($errorMsg) | should be $true
+            $result[0].Exception.Message | should Match $errorMsg
         }          
     }
 }
