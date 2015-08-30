@@ -89,28 +89,7 @@ Describe "Chocolatey Package throws an Exception" {
         $result = Invoke-ChocolateyBoxstarter "$testRoot\test.txt" -LocalRepo "$testRoot\Repo" -DisableReboots 2>&1
 
         it "should log error" {
-            Get-Content "$testRoot\test.txt" | Should Match $errorMsg
+            $boxstarter.Log | Should Contain $errorMsg
         }
-        it "should write error to error stream" {
-            $result.Exception.Message | should be $errorMsg
-        }          
-    }
-
-    Context "When exception is thrown from chocolatey" {
-        remove-Item $boxstarter.Log -Force
-        $errorMsg="I am another error"
-        Set-Content "$testRoot\test.txt" -Value "try {throw '$errorMsg'}catch{Write-ChocolateyFailure 'testing' `$(`$_.Exception.Message);throw}" -Force
-
-        $result = Invoke-ChocolateyBoxstarter "$testRoot\test.txt" -LocalRepo "$testRoot\Repo" -DisableReboots 2>&1
-
-        it "should log error" {
-            Get-Content "$testRoot\test.txt" | Should Match $errorMsg
-        }
-        it "should write error once" {
-            $result.Count | should be 2
-        }                  
-        it "should write correct error to error stream" {
-            $result[0].Exception.Message | should Match $errorMsg
-        }          
     }
 }

@@ -10,7 +10,7 @@ function Invoke-LocalBoxstarterRun {
         [string]$PackageName
     )
     $result = @{}
-
+    Write-Host "Getting connection for $VMName"
     $conn = Enable-BoxstarterVM -VMName $VMName -Credential $credential
     Write-Host "Creating session on $($conn.ConnectionURI)"
     $session = New-PsSession -ConnectionURI $Conn.ConnectionURI -Credential $Credential
@@ -35,7 +35,7 @@ function Invoke-LocalBoxstarterRun {
         start-sleep 2
         Get-Process -Name Powershell | ? { $_.id -ne $PID } | Stop-Process
     }
-    
+
     New-TestResult $result $session $credential
 }
 
