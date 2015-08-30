@@ -27,11 +27,11 @@ namespace Boxstarter
     {
         private GetChocolatey _choco;
         
-        public ChocolateyWrapper(string boxstarterSetup, PSHostUserInterface ui, bool logDebug) {
+        public ChocolateyWrapper(string boxstarterSetup, PSHostUserInterface ui, bool logDebug, string logPath) {
             _choco = Lets.GetChocolatey();
             var psService = new PowershellService(new DotNetFileSystem(), boxstarterSetup);
             _choco.RegisterContainerComponent<IPowershellService>(() => psService);
-            _choco.SetCustomLogging(new PsLogger(ui, logDebug));
+            _choco.SetCustomLogging(new PsLogger(ui, logDebug, logPath));
         }
 
         public void Run(string[] args) {
@@ -42,12 +42,14 @@ namespace Boxstarter
     public class PsLogger : ILog
     {
         private PSHostUserInterface _ui;
+        private string _path;
         private Boolean _logDebug;
 
-        public PsLogger(PSHostUserInterface ui, bool logDebug)
+        public PsLogger(PSHostUserInterface ui, bool logDebug, string path)
         {
             _ui = ui;
             _logDebug = logDebug;
+            _path = path;
         }
 
         public void InitializeFor(string loggerName)
@@ -57,7 +59,9 @@ namespace Boxstarter
         public void Debug(string message, params object[] formatting)
         {
             try {
-                if(_logDebug) _ui.WriteDebugLine(String.Format(message, formatting));
+                var msg = String.Format(message, formatting);
+                if(_logDebug) _ui.WriteDebugLine(msg);
+                WriteRaw(msg);
             }
             catch(Exception e) {
                 WriteRaw(e.ToString());
@@ -67,7 +71,9 @@ namespace Boxstarter
         public void Debug(Func<string> message)
         {
             try {
-                if(_logDebug) _ui.WriteDebugLine(message.Invoke());
+                var msg = message.Invoke();
+                if(_logDebug) _ui.WriteDebugLine(msg);
+                WriteRaw(msg);
             }
             catch(Exception e) {
                 WriteRaw(e.ToString());
@@ -78,7 +84,9 @@ namespace Boxstarter
         public void Info(string message, params object[] formatting)
         {
             try {
-                _ui.WriteLine(String.Format(message, formatting));
+                var msg = String.Format(message, formatting);
+                _ui.WriteLine(msg);
+                WriteRaw(msg);
             }
             catch(Exception e) {
                 WriteRaw(e.ToString());
@@ -88,7 +96,9 @@ namespace Boxstarter
         public void Info(Func<string> message)
         {
             try {
-                _ui.WriteLine(message.Invoke());
+                var msg = message.Invoke();
+                _ui.WriteLine(msg);
+                WriteRaw(msg);
             }
             catch(Exception e) {
                 WriteRaw(e.ToString());
@@ -98,7 +108,9 @@ namespace Boxstarter
         public void Warn(string message, params object[] formatting)
         {
             try {
-                _ui.WriteWarningLine(String.Format(message, formatting));
+                var msg = String.Format(message, formatting);
+                _ui.WriteWarningLine(msg);
+                WriteRaw(msg);
             }
             catch(Exception e) {
                 WriteRaw(e.ToString());
@@ -109,7 +121,9 @@ namespace Boxstarter
         public void Warn(Func<string> message)
         {
             try {
-                _ui.WriteWarningLine(message.Invoke());
+                var msg = message.Invoke();
+                _ui.WriteWarningLine(msg);
+                WriteRaw(msg);
             }
             catch(Exception e) {
                 WriteRaw(e.ToString());
@@ -120,7 +134,9 @@ namespace Boxstarter
         public void Error(string message, params object[] formatting)
         {
             try {
-                _ui.WriteErrorLine(String.Format(message, formatting));
+                var msg = String.Format(message, formatting);
+                _ui.WriteErrorLine(msg);
+                WriteRaw(msg);
             }
             catch(Exception e) {
                 WriteRaw(e.ToString());
@@ -132,7 +148,9 @@ namespace Boxstarter
         public void Error(Func<string> message)
         {
             try {
-                _ui.WriteErrorLine(message.Invoke());
+                var msg = message.Invoke();
+                _ui.WriteErrorLine(msg);
+                WriteRaw(msg);
             }
             catch(Exception e) {
                 WriteRaw(e.ToString());
@@ -144,7 +162,9 @@ namespace Boxstarter
         public void Fatal(string message, params object[] formatting)
         {
             try {
-                _ui.WriteErrorLine(String.Format(message, formatting));
+                var msg = String.Format(message, formatting);
+                _ui.WriteErrorLine(msg);
+                WriteRaw(msg);
             }
             catch(Exception e) {
                 WriteRaw(e.ToString());
@@ -156,7 +176,9 @@ namespace Boxstarter
         public void Fatal(Func<string> message)
         {
             try {
-                _ui.WriteErrorLine(message.Invoke());
+                var msg = message.Invoke();
+                _ui.WriteErrorLine(msg);
+                WriteRaw(msg);
             }
             catch(Exception e) {
                 WriteRaw(e.ToString());
@@ -167,19 +189,14 @@ namespace Boxstarter
 
         private void WriteRaw(string message)
         {
-            string path = @"c:\MyTest.txt";
-            if (!File.Exists(path)) 
+            if(String.IsNullOrEmpty(_path))
+                return;
+            using (FileStream fs = new FileStream(_path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
             {
-                using (StreamWriter sw = File.CreateText(path)) 
+                using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8)) 
                 {
                     sw.WriteLine(message);
-                }   
-            }
-            else {
-                using (StreamWriter sw = File.AppendText(path)) 
-                {
-                    sw.WriteLine(message);
-                }   
+                }
             }
         }
     }
@@ -191,7 +208,8 @@ namespace Boxstarter
         $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList `
           (Get-BoxstarterSetup),`
           $host.UI,`
-          ($global:DebugPreference -eq "Continue")
+          ($global:DebugPreference -eq "Continue"),`
+          $boxstarter.log
     }
 
     Enter-BoxstarterLogable { 
