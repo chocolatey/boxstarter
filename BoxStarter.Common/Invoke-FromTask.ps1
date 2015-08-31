@@ -190,7 +190,6 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
             $byte=$reader.ReadByte()
         }
         if($text -ne $null){
-            $text | out-file $boxstarter.Log -append
             $text | write-host -NoNewline
         }
     }
