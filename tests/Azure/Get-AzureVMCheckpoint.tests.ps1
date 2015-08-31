@@ -14,7 +14,7 @@ $modulePath="$programFiles86\Microsoft SDKs\Windows Azure\PowerShell\Azure\Azure
 if(Test-Path $modulePath) {
     Import-Module $modulePath -global
 }
-Add-Type -Path "$env:ProgramW6432\Microsoft SDKs\Windows Azure\.NET SDK\v2.2\bin\plugins\caching\Microsoft.WindowsAzure.StorageClient.dll"
+Add-Type -Path "$env:ProgramFiles\Microsoft SDKs\Azure\.NET SDK\v2.5\bin\plugins\Caching\Microsoft.WindowsAzure.StorageClient.dll"
 
 Describe "Get-AzureVMCheckpoint" {
     $Boxstarter.SuppressLogging=$true
