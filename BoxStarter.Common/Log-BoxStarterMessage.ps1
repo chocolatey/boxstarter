@@ -19,6 +19,21 @@ about_boxstarter_logging
 #>
     param([object[]]$message)
     if($Boxstarter.Log) {
-        "[$(Get-Date -format o):::PID $pid] $message" | out-file $Boxstarter.Log -Encoding utf8 -append
+        $fileStream = New-Object -TypeName System.IO.FileStream -ArgumentList @(
+            $Boxstarter.Log,
+            [system.io.filemode]::Append,
+            [System.io.FileAccess]::Write,
+            [System.IO.FileShare]::ReadWrite
+        )
+        $writer = New-Object -TypeName System.IO.StreamWriter -ArgumentList @(
+            $fileStream,
+            [System.Text.Encoding]::UTF8
+        )
+        try {
+            $writer.WriteLine("[$(Get-Date -format o):::PID $pid] $message")
+        }
+        finally{
+            $writer.Dispose()
+        }
     }
 }

@@ -191,12 +191,18 @@ namespace Boxstarter
         {
             if(String.IsNullOrEmpty(_path))
                 return;
-            using (FileStream fs = new FileStream(_path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
-            {
-                using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8)) 
+            try {
+                using (FileStream fs = new FileStream(_path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
                 {
-                    sw.WriteLine(message);
+                    using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8)) 
+                    {
+                        sw.WriteLine(message);
+                    }
                 }
+            }
+            catch(Exception e)
+            {
+                _ui.WriteErrorLine(e.ToString());
             }
         }
     }
