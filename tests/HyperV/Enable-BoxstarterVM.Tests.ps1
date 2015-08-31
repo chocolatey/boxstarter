@@ -4,9 +4,9 @@ Describe "Enable-BoxstarterVM" {
     Remove-Module boxstarter.*
     Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
     % { . $_.ProviderPath }
-    Resolve-Path $here\..\..\boxstarter.HyperV\*.ps1 | 
-    % { . $_.ProviderPath }
     Resolve-Path $here\..\..\boxstarter.Chocolatey\*.ps1 | 
+    % { . $_.ProviderPath }
+    Resolve-Path $here\..\..\boxstarter.HyperV\*.ps1 | 
     % { . $_.ProviderPath }
     Remove-Item alias:\Enable-BoxstarterVM
 
@@ -103,7 +103,7 @@ Describe "Enable-BoxstarterVM" {
         Enable-BoxstarterVM Me -Credential $mycreds | Out-Null
 
         It "Should Edit VHD"{
-            Assert-MockCalled Enable-BoxstarterVHD -parameterFilter { $IgnoreWMI -eq $false -and $IgnoreLocalAccountTokenFilterPolicy -eq $false}
+            Assert-MockCalled Enable-BoxstarterVHD -parameterFilter { $IgnoreWMI -eq $null -and $IgnoreLocalAccountTokenFilterPolicy -eq $null}
         }
     }
 
