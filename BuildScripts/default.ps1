@@ -69,7 +69,7 @@ task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
 
 Task Test -depends Create-ModuleZipForRemoting {
     pushd "$baseDir"
-    $pesterDir = "$env:ChocolateyInstall\lib\Pester.2.1.0"
+    $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     if($testName){
         exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -testName $testName}
     }
@@ -81,7 +81,7 @@ Task Test -depends Create-ModuleZipForRemoting {
 
 Task Integration-Test -depends Pack-Nuget, Create-ModuleZipForRemoting {
     pushd "$baseDir"
-    $pesterDir = "$env:ChocolateyInstall\lib\Pester.2.1.0"
+    $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     if($testName){
         exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/IntegrationTests -testName $testName}
     }
