@@ -9,7 +9,7 @@ http://boxstarter.org
 #>
     $path = "HKCU:\SOFTWARE\Microsoft\GameBar"
     if(!(Test-Path $path)) {
-        md $path
+        New-Item $path
     }
 
     New-ItemProperty -LiteralPath $path -Name "ShowStartupPanel" -Value 0 -PropertyType "DWord" -ErrorAction SilentlyContinue
