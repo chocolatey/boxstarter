@@ -31,6 +31,7 @@
     <Compile Include="Boxstarter.WinConfig.psm1" />
     <Compile Include="Disable-InternetExplorerESC.ps1" />
     <Compile Include="Disable-UAC.ps1" />
+    <Compile Include="Disable-AutoRebootWithLoggedOnUsers.ps1" />
     <Compile Include="Enable-RemoteDesktop.ps1" />
     <Compile Include="Enable-UAC.ps1" />
     <Compile Include="Get-LibraryNames.ps1" />

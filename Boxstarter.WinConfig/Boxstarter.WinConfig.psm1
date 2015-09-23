@@ -6,6 +6,7 @@ Export-ModuleMember `
     Enable-UAC, `
     Get-UAC, `
     Disable-InternetExplorerESC, `
+    Disable-AutoRebootWithLoggedOnUsers, `
     Get-ExplorerOptions, `
     Set-TaskbarSmall, `
     Install-WindowsUpdate, `
