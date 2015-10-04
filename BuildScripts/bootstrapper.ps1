@@ -41,12 +41,12 @@ function Check-Chocolatey {
             }
             $env:ChocolateyInstall = "$env:programdata\chocolatey"
             New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
-            $url="http://chocolatey.org/api/v2/package/chocolatey/"
+            $url="https://chocolatey.org/api/v2/package/chocolatey/"
             $wc=new-object net.webclient
             $wp=[system.net.WebProxy]::GetDefaultProxy()
             $wp.UseDefaultCredentials=$true
             $wc.Proxy=$wp
-            iex ($wc.DownloadString("http://chocolatey.org/install.ps1"))
+            iex ($wc.DownloadString("https://chocolatey.org/install.ps1"))
             $env:path="$env:path;$env:ChocolateyInstall\bin"
         }
         else{
