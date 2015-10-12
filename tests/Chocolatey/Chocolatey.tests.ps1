@@ -211,7 +211,7 @@ Describe "Getting-Chocolatey" {
     Context "When chocolatey returns an erroneous exit code" {
         Mock Test-PendingReboot {return $false}
         Mock Invoke-Reboot
-        Mock Call-Chocolatey {$global:LASTEXITCODE=1}
+        Mock Call-Chocolatey {[System.Environment]::ExitCode=1}
         $Boxstarter.IsRebooting=$false
         
         $error = Chocolatey Install pkg 2>&1
