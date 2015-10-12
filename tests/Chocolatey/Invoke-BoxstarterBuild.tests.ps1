@@ -15,7 +15,6 @@ Describe "Invoke-BoxstarterBuild" {
 
     Context "When Building a single package" {
         Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}
-        Mock Intercept-Chocolatey
         New-BoxstarterPackage $packageName | Out-Null
 
         Invoke-BoxstarterBuild $packageName | Out-Null
@@ -23,10 +22,6 @@ Describe "Invoke-BoxstarterBuild" {
         It "Will Create the nupkg" {
             Join-Path $Boxstarter.LocalRepo "$packageName.1.0.0.nupkg" | Should Exist
         }
-        It "Should not intercept chocolatey" {
-            Assert-MockCalled Intercept-Chocolatey -Times 0
-        }
-
     }
 
     Context "When Building all packages" {
