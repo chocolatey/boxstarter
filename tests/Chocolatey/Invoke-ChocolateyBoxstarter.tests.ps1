@@ -18,7 +18,6 @@ Describe "Invoke-ChocolateyBoxstarter" {
         $Boxstarter.ScriptToCall=$null
         Mock Invoke-Boxstarter
         Mock Chocolatey
-        Mock Check-Chocolatey
 
         Invoke-ChocolateyBoxstarter package
 
@@ -33,7 +32,6 @@ Describe "Invoke-ChocolateyBoxstarter" {
     Context "When calling normally" {
         Mock New-PackageFromScript {return "somePackage"} -ParameterFilter {$source -eq "TestDrive:\package.txt"}
         Mock Chocolatey
-        Mock Check-Chocolatey
         New-Item TestDrive:\package.txt -type file | Out-Null
 
         Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | out-null
@@ -47,7 +45,6 @@ Describe "Invoke-ChocolateyBoxstarter" {
         $Boxstarter.ScriptToCall=$null
         Mock Invoke-Boxstarter
         Mock Chocolatey
-        Mock Check-Chocolatey
         $securePassword = (ConvertTo-SecureString "mypassword" -asplaintext -force)
 
         Invoke-ChocolateyBoxstarter package -password $securePassword
@@ -61,7 +58,6 @@ Describe "Invoke-ChocolateyBoxstarter" {
         $Boxstarter.ScriptToCall=$null
         Mock Invoke-Boxstarter
         Mock Chocolatey
-        Mock Check-Chocolatey
 
         Invoke-ChocolateyBoxstarter package -NoPassword
 
@@ -74,7 +70,6 @@ Describe "Invoke-ChocolateyBoxstarter" {
         $Boxstarter.ScriptToCall="return"
         Mock Invoke-Boxstarter
         Mock Chocolatey
-        Mock Check-Chocolatey
 
         Invoke-ChocolateyBoxstarter package
 
@@ -91,7 +86,6 @@ Describe "Invoke-ChocolateyBoxstarter" {
         $Boxstarter.LocalRepo="myrepo"
         Mock Invoke-Boxstarter
         Mock Chocolatey
-        Mock Check-Chocolatey
 
         Invoke-ChocolateyBoxstarter package
 
@@ -105,7 +99,6 @@ Describe "Invoke-ChocolateyBoxstarter" {
         $Boxstarter.LocalRepo="myrepo"
         Mock Invoke-Boxstarter
         Mock Chocolatey
-        Mock Check-Chocolatey
 
         Invoke-ChocolateyBoxstarter package -Localrepo "c:\anotherRepo"
 
@@ -117,7 +110,6 @@ Describe "Invoke-ChocolateyBoxstarter" {
     Context "When specifying a file instead of a package" {
         Mock New-PackageFromScript {return "somePackage"} -ParameterFilter {$source -eq "TestDrive:\package.txt"}
         Mock Chocolatey
-        Mock Check-Chocolatey
         New-Item TestDrive:\package.txt -type file | Out-Null
 
         Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | out-null
@@ -130,7 +122,6 @@ Describe "Invoke-ChocolateyBoxstarter" {
     Context "When specifying a http Uri instead of a package" {
         Mock New-PackageFromScript {return "somePackage"} -ParameterFilter {$source -eq "http://someurl"}
         Mock Chocolatey
-        Mock Check-Chocolatey
 
         Invoke-ChocolateyBoxstarter http://someurl -NoPassword | out-null
 
@@ -142,7 +133,6 @@ Describe "Invoke-ChocolateyBoxstarter" {
     Context "When specifying a package that is also a directory name" {
         Mock New-PackageFromScript
         Mock Chocolatey
-        Mock Check-Chocolatey
         New-Item TestDrive:\package -type directory | Out-Null
 
         Invoke-ChocolateyBoxstarter "TestDrive:\package" -NoPassword | out-null
@@ -157,7 +147,6 @@ Describe "Invoke-ChocolateyBoxstarter" {
 
     Context "When specifying multiple packages" {
         Mock Chocolatey
-        Mock Check-Chocolatey
         $packages=@("package1","package2")
 
         Invoke-ChocolateyBoxstarter $packages -NoPassword | out-null

@@ -31,7 +31,6 @@ Describe "Invoke-BoxstarterBuild" {
 
     Context "When Building all packages" {
         Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}
-        Mock Check-Chocolatey
         New-BoxstarterPackage "pkg1" | Out-Null
         New-BoxstarterPackage "pkg2" | Out-Null
 
@@ -46,7 +45,6 @@ Describe "Invoke-BoxstarterBuild" {
 
     Context "When LocalRepo is null" {
         Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}        
-        Mock Check-Chocolatey
         New-BoxstarterPackage $packageName | Out-Null
         $boxstarter.LocalRepo = $null
 
@@ -60,7 +58,6 @@ Describe "Invoke-BoxstarterBuild" {
 
     Context "When No nuspec is in the named repo" {
         Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}
-        Mock Check-Chocolatey
         Mkdir $Boxstarter.LocalRepo | Out-Null
 
         try {Invoke-BoxstarterBuild $packageName} catch { $ex=$_ }

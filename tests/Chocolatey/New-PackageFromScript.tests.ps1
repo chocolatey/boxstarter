@@ -12,7 +12,6 @@ Describe "New-PackageFromScript" {
     $Boxstarter.LocalRepo=Join-Path $boxstarter.BaseDir "repo"
     $Boxstarter.SuppressLogging=$true
     Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}
-    Mock Check-Chocolatey
 
     Context "When Building a script from a file" {
         New-Item TestDrive:\script.ps1 -type file -Value "return" | Out-Null
