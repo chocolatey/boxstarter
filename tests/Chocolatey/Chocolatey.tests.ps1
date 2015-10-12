@@ -14,6 +14,8 @@ function DISM { return; }
 
 Describe "Getting-Chocolatey" {
     Mock Call-Chocolatey {$global:LASTEXITCODE=0}
+    $pkgDir = "$env:ChocolateyInstall\lib\pkg"
+    Mock Test-Path  { $true } -ParameterFilter {$path -eq $pkgDir}
 
     Context "When a reboot is pending and reboots are OK" {
         Mock Test-PendingReboot {$true}
@@ -109,7 +111,6 @@ Describe "Getting-Chocolatey" {
         Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true
         Mock Remove-Item
-        Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
         Mock Invoke-Reboot
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'."}
 
@@ -119,7 +120,7 @@ Describe "Getting-Chocolatey" {
             Assert-MockCalled Invoke-Reboot -times 1
         }
         it "will delete package folder" {
-            Assert-MockCalled Remove-Item -parameterFilter {$path -eq "dir2"}
+            Assert-MockCalled Remove-Item -parameterFilter {$path -eq $pkgDir}
         }
     }
 
@@ -127,7 +128,6 @@ Describe "Getting-Chocolatey" {
         Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true
         Mock Remove-Item
-        Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
         Mock Invoke-Reboot
         Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '-654'."}
         
@@ -137,7 +137,7 @@ Describe "Getting-Chocolatey" {
             Assert-MockCalled Invoke-Reboot -times 1
         }
         it "will delete package folder" {
-            Assert-MockCalled Remove-Item -parameterFilter {$path -eq "dir2"}
+            Assert-MockCalled Remove-Item -parameterFilter {$path -eq $pkgDir}
         }
     }
 
@@ -145,7 +145,6 @@ Describe "Getting-Chocolatey" {
         Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true
         Mock Remove-Item
-        Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
         Mock Invoke-Reboot
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'." }
         
@@ -155,7 +154,7 @@ Describe "Getting-Chocolatey" {
             Assert-MockCalled Invoke-Reboot -times 1
         }
         it "will delete package folder when a default code is called too" {
-            Assert-MockCalled Remove-Item -parameterFilter {$path -eq "dir2"}
+            Assert-MockCalled Remove-Item -parameterFilter {$path -eq $pkgDir}
         }
     }
 
@@ -201,12 +200,11 @@ Describe "Getting-Chocolatey" {
         $boxstarter.RebootOk=$true
         Mock Invoke-Reboot
         Mock Remove-Item
-        Mock Get-ChildItem {@("dir1","dir2")} -parameterFilter {$path -match "\\lib\\pkg.*"}
 
         Chocolatey Install pkg | out-null
 
         it "will delete package folder" {
-            Assert-MockCalled Remove-Item -parameterFilter {$path -eq "dir2"}
+            Assert-MockCalled Remove-Item -parameterFilter {$path -eq $pkgDir}
         }
     }
 
