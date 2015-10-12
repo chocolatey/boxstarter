@@ -68,17 +68,32 @@ Remove-BoxstarterTask
     }
     Write-BoxstarterMessage "Task has completed" -Verbose
 
-    # Microsoft.PowerShell.Utility\write-host (get-content $env:temp\BoxstarterError.stream)
-    try{$errorStream=Import-CLIXML $env:temp\BoxstarterError.stream} catch {$global:error.RemoveAt(0)}
-    $verboseAndWarn = $errorStream | ? { $_ -is [String] }
-    $errorRecords = $errorStream | ? { !($_ -is [String]) }
-    if($verboseAndWarn.count -gt 0) {
+    $verboseStream = Get-CliXmlStream (Get-ErrorFileName) 'verbose'
+    if($verboseStream -ne $null) {
         Write-BoxstarterMessage "Warnings and Verbose output from task:"
-        $verboseAndWarn | % { Write-Host $_ }
+        $verboseStream | % { Write-Host $_ }
     }
-    if($errorRecords.count -gt 0) {
-        throw $errorRecords
+
+    $errorStream = Get-CliXmlStream (Get-ErrorFileName) 'error'
+    if($errorStream -ne $null) {
+        throw $errorStream
     }
+}
+
+function Get-ErrorFileName { "$env:temp\BoxstarterError.stream" }
+
+function Get-CliXmlStream($cliXmlFile, $stream) {
+    $content = get-content $cliXmlFile
+    if($content.count -lt 2) { return $null }
+
+    # Strip the first line containing '#< CLIXML'
+    [xml]$xml = $content[1..($content.count-1)]
+
+    # return stream stripping carriage retuens and linefeeds
+    $xml.DocumentElement.ChildNodes |
+      ? { $_.S -eq $stream } |
+      % { $_.'#text'.Replace('_x000D_','').Replace('_x000A_','') } |
+      out-string
 }
 
 function Get-ChildProcessMemoryUsage {
@@ -103,12 +118,12 @@ function Add-TaskFiles($command, $DotNetVersion) {
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("`$ProgressPreference='SilentlyContinue';$command"))
     $fileContent=@"
 $(if($DotNetVersion -ne $null){"`$env:COMPLUS_version='$DotNetVersion'"})
-Start-Process powershell -NoNewWindow -Wait -RedirectStandardError $env:temp\BoxstarterError.stream -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -WorkingDirectory '$PWD' -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
+Start-Process powershell -NoNewWindow -Wait -RedirectStandardError $(Get-ErrorFileName) -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -WorkingDirectory '$PWD' -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
 Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
 "@
     Set-Content $env:temp\BoxstarterTask.ps1 -value $fileContent -force
     new-Item $env:temp\BoxstarterOutput.stream -Type File -Force | out-null
-    new-Item $env:temp\BoxstarterError.stream -Type File -Force | out-null
+    new-Item (Get-ErrorFileName) -Type File -Force | out-null
     $encoded
 }
 
