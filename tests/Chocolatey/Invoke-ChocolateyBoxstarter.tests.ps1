@@ -151,7 +151,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         Invoke-ChocolateyBoxstarter $packages -NoPassword | out-null
 
         it "should pass both packages to chocolatey" {
-            Assert-MockCalled chocolatey -ParameterFilter {$packageNames -eq $packages }
+            Assert-MockCalled chocolatey -ParameterFilter { (Compare-Object $packageNames $packages) -eq $null }
         }
     }
 
