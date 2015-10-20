@@ -518,7 +518,8 @@ function Invoke-Locally {
         [switch]$Force,
         [switch]$DisableReboots,
         [switch]$KeepWindowOpen,
-        [switch]$DisableRestart
+        [switch]$DisableRestart,
+        [string]$LocalRepo
     )
     if($PSBoundParameters.ContainsKey("Credential")){
         if($Credential -ne $null) {
