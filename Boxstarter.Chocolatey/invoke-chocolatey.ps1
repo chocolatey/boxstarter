@@ -6,7 +6,7 @@ function Invoke-Chocolatey($chocoArgs) {
     )
     $refs | % {
         Write-BoxstarterMessage "Adding types from $_" -Verbose
-        Add-Type -Path $_
+        [System.Reflection.Assembly]::Load([io.file]::ReadAllBytes($_))
     }
     $cpar = New-Object System.CodeDom.Compiler.CompilerParameters
     $cpar.ReferencedAssemblies.Add([System.Reflection.Assembly]::Load('System.Management.Automation').location) | Out-Null
