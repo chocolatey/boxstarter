@@ -145,7 +145,7 @@ Intercepts Chocolatey call to check for reboots
                 Write-BoxstarterMessage "Exit Code: $([System.Environment]::ExitCode)" -Verbose
                 $ec = [System.Environment]::ExitCode
                 if($ec -ne 0) {
-                    Write-Error "Chocolatey reported an unsuccessful exit code of $ec"
+                    Write-Error "Chocolatey reported an unsuccessful exit code of $ec. See $($Boxstarter.Log) for details."
                 }
             }
         }
