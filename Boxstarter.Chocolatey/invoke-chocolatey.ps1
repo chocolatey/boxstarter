@@ -27,11 +27,11 @@ namespace Boxstarter
     {
         private GetChocolatey _choco;
         
-        public ChocolateyWrapper(string boxstarterSetup, PSHostUserInterface ui, bool logDebug, string logPath) {
+        public ChocolateyWrapper(string boxstarterSetup, PSHostUserInterface ui, bool logDebug, string logPath, bool quiet) {
             _choco = Lets.GetChocolatey();
             var psService = new PowershellService(new DotNetFileSystem(), boxstarterSetup);
             _choco.RegisterContainerComponent<IPowershellService>(() => psService);
-            _choco.SetCustomLogging(new PsLogger(ui, logDebug, logPath));
+            _choco.SetCustomLogging(new PsLogger(ui, logDebug, logPath, quiet));
         }
 
         public void Run(string[] args) {
@@ -43,13 +43,15 @@ namespace Boxstarter
     {
         private PSHostUserInterface _ui;
         private string _path;
-        private Boolean _logDebug;
+        private bool _logDebug;
+        private bool _quiet;
 
-        public PsLogger(PSHostUserInterface ui, bool logDebug, string path)
+        public PsLogger(PSHostUserInterface ui, bool logDebug, string path, bool quiet)
         {
             _ui = ui;
             _logDebug = logDebug;
             _path = path;
+            _quiet = quiet;
         }
 
         public void InitializeFor(string loggerName)
@@ -58,6 +60,7 @@ namespace Boxstarter
 
         public void Debug(string message, params object[] formatting)
         {
+            if(_quiet) return;
             try {
                 var msg = String.Format(message, formatting);
                 if(_logDebug) _ui.WriteDebugLine(msg);
@@ -70,6 +73,7 @@ namespace Boxstarter
 
         public void Debug(Func<string> message)
         {
+            if(_quiet) return;
             try {
                 var msg = message.Invoke();
                 if(_logDebug) _ui.WriteDebugLine(msg);
@@ -83,6 +87,7 @@ namespace Boxstarter
 
         public void Info(string message, params object[] formatting)
         {
+            if(_quiet) return;
             try {
                 var msg = String.Format(message, formatting);
                 _ui.WriteLine(msg);
@@ -95,6 +100,7 @@ namespace Boxstarter
 
         public void Info(Func<string> message)
         {
+            if(_quiet) return;
             try {
                 var msg = message.Invoke();
                 _ui.WriteLine(msg);
@@ -107,6 +113,7 @@ namespace Boxstarter
 
         public void Warn(string message, params object[] formatting)
         {
+            if(_quiet) return;
             try {
                 var msg = String.Format(message, formatting);
                 _ui.WriteWarningLine(msg);
@@ -120,6 +127,7 @@ namespace Boxstarter
 
         public void Warn(Func<string> message)
         {
+            if(_quiet) return;
             try {
                 var msg = message.Invoke();
                 _ui.WriteWarningLine(msg);
@@ -133,6 +141,7 @@ namespace Boxstarter
 
         public void Error(string message, params object[] formatting)
         {
+            if(_quiet) return;
             try {
                 var msg = String.Format(message, formatting);
                 _ui.WriteErrorLine(msg);
@@ -147,6 +156,7 @@ namespace Boxstarter
 
         public void Error(Func<string> message)
         {
+            if(_quiet) return;
             try {
                 var msg = message.Invoke();
                 _ui.WriteErrorLine(msg);
@@ -161,6 +171,7 @@ namespace Boxstarter
 
         public void Fatal(string message, params object[] formatting)
         {
+            if(_quiet) return;
             try {
                 var msg = String.Format(message, formatting);
                 _ui.WriteErrorLine(msg);
@@ -175,6 +186,7 @@ namespace Boxstarter
 
         public void Fatal(Func<string> message)
         {
+            if(_quiet) return;
             try {
                 var msg = message.Invoke();
                 _ui.WriteErrorLine(msg);
@@ -215,7 +227,8 @@ namespace Boxstarter
           (Get-BoxstarterSetup),`
           $host.UI,`
           ($global:DebugPreference -eq "Continue"),`
-          $boxstarter.log
+          $boxstarter.log,`
+          $boxstarter.SuppressLogging
     }
 
     Enter-BoxstarterLogable { 
