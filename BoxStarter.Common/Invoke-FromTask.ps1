@@ -75,7 +75,7 @@ Remove-BoxstarterTask
     }
 
     $errorStream = Get-CliXmlStream (Get-ErrorFileName) 'error'
-    if($errorStream -ne $null) {
+    if($errorStream -ne $null -and $errorStream.length -gt 0) {
         throw $errorStream
     }
 }
