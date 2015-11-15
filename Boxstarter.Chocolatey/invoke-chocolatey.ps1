@@ -6,7 +6,12 @@ function Invoke-Chocolatey($chocoArgs) {
     )
     $refs | % {
         Write-BoxstarterMessage "Adding types from $_" -Verbose
-        [System.Reflection.Assembly]::Load([io.file]::ReadAllBytes($_))
+        if($PSVersionTable.PSVersion.Major -lt 4) {
+            Add-Type -Path $_
+        }
+        else {
+            [System.Reflection.Assembly]::Load([io.file]::ReadAllBytes($_))
+        }
     }
     $cpar = New-Object System.CodeDom.Compiler.CompilerParameters
     $cpar.ReferencedAssemblies.Add([System.Reflection.Assembly]::Load('System.Management.Automation').location) | Out-Null
@@ -221,6 +226,12 @@ namespace Boxstarter
 }
 "@ -CompilerParameters $cpar
     Write-BoxstarterMessage "Types added..." -Verbose
+
+    if(!$env:ChocolateyInstall) {
+        [System.Environment]::SetEnvironmentVariable('ChocolateyInstall', "$env:programdata\chocolatey", 'Machine')
+        $env:ChocolateyInstall = "$env:programdata\chocolatey"
+    }
+
     if(!$global:choco) {
         Write-BoxstarterMessage "instantiating choco wrapper..." -Verbose
         $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList `
