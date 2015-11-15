@@ -49,6 +49,7 @@ about_boxstarter_variable_in_bootstrapper
 }
 
 function Restart {
+    Write-BoxstarterMessage "Writing restart marker with pid $($Boxstarter.SourcePID) from $PID" -verbose
     New-Item "$(Get-BoxstarterTempDir)\Boxstarter.$($Boxstarter.SourcePID).restart" -type file -value "" -force | Out-Null
     exit
 }

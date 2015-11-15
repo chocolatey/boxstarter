@@ -428,6 +428,7 @@ function Serialize-BoxstarterVars {
 }
 
 function Import-BoxstarterVars {
+    Write-BoxstarterMessage "Importing Boxstarter vars into pid $PID" -verbose
     Get-ChildItem -Path env: | ? { 
         $_.Name.StartsWith('Boxstarter.') 
     } | % {
