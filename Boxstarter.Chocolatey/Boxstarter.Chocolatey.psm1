@@ -29,7 +29,7 @@ Export-ModuleMember Get-BoxstarterConfig,`
                     Set-BoxstarterShare,`
                     Write-HostOverride
 
-Export-ModuleMember -alias,`
+Export-ModuleMember -alias `
                     Enable-BoxstarterVM,`
                     Install-ChocolateyInstallPackage,`
                     Write-Host
