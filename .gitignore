@@ -25,6 +25,3 @@ Web/downloads
 PublishProfiles
 *.pfx
 .vagrant
-Chocolatey/*
-*.dll
-chocolatey.xml
