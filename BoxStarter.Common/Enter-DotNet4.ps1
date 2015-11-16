@@ -1,14 +1,41 @@
 function Enter-Dotnet4 {
-    param([ScriptBlock]$net4Script, [object[]]$ArgumentList)
+<#
+.SYNOPSIS
+Runs a script from a process hosting the .net 4 runtile
+
+.DESCRIPTION
+This function will ensure that the .net 4 runtime is installed on the
+machine. If it is not, it will be downloaded and installed. If running
+remotely, the .net 4 installation will run from a scheduled task.
+
+If the CLRVersion of the hosting powershell process is less than 4,
+such as is the case in powershell 2, the given script will be run
+from a new a new powershell process tht will be configured to host the
+CLRVersion 4.0.30319.
+
+.Parameter ScriptBlock
+The script to be executed in the .net 4 CLR
+
+.Parameter ArgumentList
+Arguments to be passed to the ScriptBlock
+
+.LINK
+http://boxstarter.org
+
+#>
+    param(
+        [ScriptBlock]$ScriptBlock,
+        [object[]]$ArgumentList
+    )
     Enable-Net40
     if($PSVersionTable.CLRVersion.Major -lt 4) {
         Write-BoxstarterMessage "Relaunching powershell under .net fx v4" -verbose
         $env:COMPLUS_version="v4.0.30319"
-        & powershell -OutputFormat Text -ExecutionPolicy bypass -command $net4Script -args $ArgumentList
+        & powershell -OutputFormat Text -ExecutionPolicy bypass -command $ScriptBlock -args $ArgumentList
     }
     else {
         Write-BoxstarterMessage "Using current powershell..." -verbose
-        Invoke-Command -ScriptBlock $net4Script -argumentlist $ArgumentList
+        Invoke-Command -ScriptBlock $ScriptBlock -argumentlist $ArgumentList
     }
 }
 
