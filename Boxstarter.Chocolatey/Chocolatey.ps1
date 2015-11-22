@@ -164,7 +164,7 @@ Intercepts Chocolatey call to check for reboots
             Write-BoxstarterMessage "There was an error calling chocolatey" -Verbose
             $idx = 0
             while($idx -lt $chocoErrors){
-                Log-BoxstarterMessage "Error from chocolatey: $($global:error[$idx].Exception | fl * -Force | Out-String)"
+                Write-BoxstarterMessage "Error from chocolatey: $($global:error[$idx].Exception | fl * -Force | Out-String)"
                 if($global:error[$idx] -match "code was '(-?\d+)'") {
                     $errorCode=$matches[1]
                     if($RebootCodes -contains $errorCode) {
@@ -190,13 +190,17 @@ function Get-PassedArg($argName, $origArgs) {
         $candidateKeys += "--$_"
     }
     $nextIsValue = $false
+    $val = $null
 
     $origArgs | % {
-        if($nextIsValue) { return $_ }
+        if($nextIsValue) {
+            $nextIsValue = $false
+            $val =  $_
+        }
         if($candidateKeys -contains $_) { $nextIsValue = $true }
     }
 
-    return $null
+    return $val
 }
 
 function Call-Chocolatey {
