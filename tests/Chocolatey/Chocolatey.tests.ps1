@@ -14,13 +14,14 @@ function DISM { return; }
 
 Describe "Getting-Chocolatey" {
     Mock Call-Chocolatey {$global:LASTEXITCODE=0}
+    Mock Invoke-Reboot
+    Mock Test-PendingReboot {return $false}
     $pkgDir = "$env:ChocolateyInstall\lib\pkg"
     Mock Test-Path  { $true } -ParameterFilter {$path -eq $pkgDir}
 
     Context "When a reboot is pending and reboots are OK" {
         Mock Test-PendingReboot {$true}
         $boxstarter.RebootOk=$true
-        Mock Invoke-Reboot
         
         Chocolatey Install pkg
 
@@ -35,7 +36,6 @@ Describe "Getting-Chocolatey" {
     Context "When Boxstarter is restarting from a nested package" {
         $Boxstarter.IsRebooting=$true
         $boxstarter.RebootOk=$true
-        Mock Invoke-Reboot
         
         Chocolatey Install pkg
 
@@ -51,7 +51,6 @@ Describe "Getting-Chocolatey" {
     Context "When a reboot is pending but reboots are not OK" {
         Mock Test-PendingReboot {$true}
         $boxstarter.RebootOk=$false
-        Mock Invoke-Reboot
         
         Chocolatey Install pkg
 
@@ -64,8 +63,6 @@ Describe "Getting-Chocolatey" {
     }
 
     Context "When chocolatry strips the machine module path" {
-        Mock Test-PendingReboot {return $false}
-        Mock Invoke-Reboot
         Mock Call-Chocolatey {
             $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath","User")
             $global:LASTEXITCODE=0
@@ -78,23 +75,7 @@ Describe "Getting-Chocolatey" {
         }        
     }
 
-    Context "When a reboot is not pending" {
-        Mock Test-PendingReboot {return $false}
-        Mock Invoke-Reboot
-        
-        Chocolatey Install pkg
-
-        it "will not Invoke-Reboot" {
-            Assert-MockCalled Invoke-Reboot -times 0
-        }
-        it "will get Chocolatey" {
-            Assert-MockCalled Call-Chocolatey -times 1
-        }        
-    }
-
     Context "When Installing multiple packages" {
-        Mock Test-PendingReboot {return $false}
-        Mock Invoke-Reboot
         $packages=@("package1","package2")
         
         Chocolatey Install $packages
@@ -108,10 +89,8 @@ Describe "Getting-Chocolatey" {
     }
 
     Context "When chocolatey throws a reboot error and reboots are OK" {
-        Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true
         Mock Remove-Item
-        Mock Invoke-Reboot
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'."}
 
         Chocolatey Install pkg -RebootCodes @(56,3010,654) 2>&1 | out-null
@@ -125,10 +104,8 @@ Describe "Getting-Chocolatey" {
     }
 
     Context "When chocolatey writes a reboot error and reboots are OK" {
-        Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true
         Mock Remove-Item
-        Mock Invoke-Reboot
         Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '-654'."}
         
         Chocolatey Install pkg -RebootCodes @(56,3010,-654) 2>&1 | out-null
@@ -142,10 +119,8 @@ Describe "Getting-Chocolatey" {
     }
 
     Context "When user specifies a reboot code" {
-        Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true
         Mock Remove-Item
-        Mock Invoke-Reboot
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'." }
         
         Chocolatey Install pkg -RebootCodes @(56,-654) 2>&1 | out-null
@@ -159,9 +134,7 @@ Describe "Getting-Chocolatey" {
     }
 
     Context "When chocolatey writes a error that is not a reboot error" {
-        Mock Test-PendingReboot {return $false}
         $boxstarter.RebootOk=$true
-        Mock Invoke-Reboot
         Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '3020'." 2>&1 | out-null}
 
         Chocolatey Install pkg -RebootCodes @(56,3010,654) | out-null
@@ -172,8 +145,6 @@ Describe "Getting-Chocolatey" {
     }
 
     Context "When WindowsFeature is already installed" {
-        Mock Test-PendingReboot {return $false}
-        Mock Invoke-Reboot
         Mock DISM {"State : Enabled"}
         
         Chocolatey Install "somefeature" -source "WindowsFeatures" | out-null
@@ -183,10 +154,7 @@ Describe "Getting-Chocolatey" {
         }
     }   
 
-    Context "When WindowsFeature is not already installed" {
-        Mock Test-PendingReboot {return $false}
-        Mock Invoke-Reboot
-        
+    Context "When WindowsFeature is not already installed" {       
         Chocolatey Install "somefeature" -source "WindowsFeatures" | out-null
 
         it "will Call Chocolatey" {
@@ -196,9 +164,7 @@ Describe "Getting-Chocolatey" {
 
     Context "When a reboot was triggered" {
         Mock Call-Chocolatey { $Boxstarter.IsRebooting=$true }
-        Mock Test-PendingReboot {$false}
         $boxstarter.RebootOk=$true
-        Mock Invoke-Reboot
         Mock Remove-Item
 
         Chocolatey Install pkg | out-null
@@ -209,8 +175,6 @@ Describe "Getting-Chocolatey" {
     }
 
     Context "When chocolatey returns an erroneous exit code" {
-        Mock Test-PendingReboot {return $false}
-        Mock Invoke-Reboot
         Mock Call-Chocolatey {[System.Environment]::ExitCode=1}
         $Boxstarter.IsRebooting=$false
         
@@ -218,6 +182,60 @@ Describe "Getting-Chocolatey" {
 
         it "will write an error" {
             $error| should match "Chocolatey reported an unsuccessful exit code of 1"
+        }
+        [System.Environment]::ExitCode=0
+    }
+
+    Context "When a reboot is not pending" {       
+        Chocolatey Install pkg
+
+        it "will not Invoke-Reboot" {
+            Assert-MockCalled Invoke-Reboot -times 0
+        }
+        it "will get Chocolatey" {
+            Assert-MockCalled Call-Chocolatey -times 1
+        }        
+    }
+}
+
+Describe "Call-Chocolatey" {
+    context "when dot net version is less than 4 and remote" {
+        $currentCLR = $PSVersionTable.CLRVersion
+        Mock Get-IsRemote { return $true }
+        Mock Invoke-FromTask -ParameterFilter { $DotNetVersion -eq "v4.0.30319" -and $command -like "*Invoke-Chocolatey*" }
+        $PSVersionTable.CLRVersion = New-Object Version '2.0.0'
+
+        Call-Chocolatey Install pkg
+
+        it "invoke from task .net 4 task" {
+            Assert-MockCalled Invoke-FromTask -times 1
+        }
+        $PSVersionTable.CLRVersion = $currentCLR
+    }
+
+    context "when dot net version is 4" {
+        $currentCLR = $PSVersionTable.CLRVersion
+        Mock Invoke-FromTask
+        Mock Invoke-LocalChocolatey
+        $PSVersionTable.CLRVersion = New-Object Version '4.0.0'
+
+        Call-Chocolatey Install pkg
+
+        it "do not invoke from task" {
+            Assert-MockCalled Invoke-FromTask -times 0
+        }
+        $PSVersionTable.CLRVersion = $currentCLR
+    }
+
+    context "when remote" {
+        Mock Invoke-FromTask
+        Mock Invoke-LocalChocolatey
+        Mock Get-IsRemote { return $true }
+
+        Call-Chocolatey Install pkg
+
+        it "do not invoke from task" {
+            Assert-MockCalled Invoke-FromTask -times 0
         }
     }
 }
