@@ -142,8 +142,8 @@ Intercepts Chocolatey call to check for reboots
                     $env:PSModulePath += ";" + $machineModPath
                 }
 
-                Write-BoxstarterMessage "Exit Code: $([System.Environment]::ExitCode)" -Verbose
                 $ec = [System.Environment]::ExitCode
+                Write-BoxstarterMessage "Exit Code: $ec" -Verbose
                 if($ec -ne 0) {
                     Write-Error "Chocolatey reported an unsuccessful exit code of $ec. See $($Boxstarter.Log) for details."
                 }
@@ -176,7 +176,7 @@ Intercepts Chocolatey call to check for reboots
                 if($global:error[$idx] -match "code was '(-?\d+)'") {
                     $errorCode=$matches[1]
                     if($RebootCodes -contains $errorCode) {
-                       Write-BoxstarterMessage "Chocolatey Install returned a reboot-able exit code"
+                       Write-BoxstarterMessage "Chocolatey Install returned a reboot-able exit code" -verbose
                        $rebootable = $true
                     }
                 }
@@ -198,10 +198,6 @@ function Call-Chocolatey {
     )
     $chocoArgs = @($command, $packageNames)
     $chocoArgs += Format-ExeArgs @args
-    if(!$env:ChocolateyInstall) {
-        [System.Environment]::SetEnvironmentVariable('ChocolateyInstall', "$env:programdata\chocolatey", 'Machine')
-        $env:ChocolateyInstall = "$env:programdata\chocolatey"
-    }
     Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
 
     if($PSVersionTable.CLRVersion.Major -lt 4 -and (Get-IsRemote)) {
