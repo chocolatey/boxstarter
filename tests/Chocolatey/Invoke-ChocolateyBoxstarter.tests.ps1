@@ -30,13 +30,14 @@ Describe "Invoke-ChocolateyBoxstarter" {
 
     Context "When calling normally" {
         Mock New-PackageFromScript {return "somePackage"} -ParameterFilter {$source -eq "TestDrive:\package.txt"}
-        Mock Chocolatey
+        $script:passedSource = ""
+        Mock Chocolatey { $script:passedSource = $args[5] }
         New-Item TestDrive:\package.txt -type file | Out-Null
 
         Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | out-null
 
         it "should concatenate local repo and nuget sources for source param to chocolatey" {
-            Assert-MockCalled chocolatey -ParameterFilter {$source -eq "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"}
+            $script:passedSource | Should Be "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
         }
     }
 
