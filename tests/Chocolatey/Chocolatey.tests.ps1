@@ -274,15 +274,20 @@ Describe "Call-Chocolatey" {
         $script:passedArgs = ""
         Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
 
-        choco Install pkg --source blah
+        choco Install pkg --source blah --bing boom
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 6
+            $passedArgs.count | Should Be 8
         }
         it "passes source" {
             $passedArgs[2] | Should Be "--source"
             $passedArgs[3] | Should Be "blah"
         }
+        it "passes other args" {
+            $passedArgs[4] | Should Be "--bing"
+            $passedArgs[5] | Should Be "boom"
+        }
+
     }
 
     context "when passing source as -source" {
