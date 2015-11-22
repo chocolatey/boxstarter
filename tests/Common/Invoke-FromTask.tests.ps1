@@ -42,11 +42,13 @@ Describe "Invoke-FromTask" {
 
     Context "When Invoking a task with verbose output"{
         Remove-Item $env:temp\test.txt -ErrorAction SilentlyContinue
+        $script:out = ""
         Mock write-host {
             $script:out += $object
         }
 
         Invoke-FromTask "Write-Verbose 'here is some verbose output' -Verbose" -IdleTimeout 0
+
         It "Should invoke the command"{
             $script:out | should be "here is some verbose output`r`n"
         }
