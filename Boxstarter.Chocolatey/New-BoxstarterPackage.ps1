@@ -65,24 +65,30 @@ Get-PackageRoot
     }
     $pkgFile = Join-Path $pkgDir "$name.nuspec"
     if(!(test-path $pkgFile)){
-        $nugetResult = .$nugetExe spec $Name -NonInteractive 2>&1
-        if($LASTEXITCODE -ne 0){
-            Throw "Nuspec creation failed with exit code $LASTEXITCODE and message: $nugetResult"
-        }
-
-        Write-BoxstarterMessage "Nuget.exe result: $nugetResult" -Verbose
+        $nuspec = @"
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id></id>
+    <version>1.0.0</version>
+    <authors></authors>
+    <owners></owners>
+    <description>Package description</description>
+    <tags>Tag1 Tag2</tags>
+  </metadata>
+</package>
+"@
 
         Invoke-RetriableScript {
-            [xml]$xml = Get-Content $args[0]
+            [xml]$xml = $args[1]
             $metadata = $xml.package.metadata
-            $nodesToDelete = @()
-            $nodesNamesToDelete = @("licenseUrl","projectUrl","iconUrl","requireLicenseAcceptance","releaseNotes", "copyright","dependencies")
-            $metadata.ChildNodes | ? { $nodesNamesToDelete -contains $_.Name } | % { $nodesToDelete += $_ }
-            $nodesToDelete | %{ $metadata.RemoveChild($_) } | out-null
-            if($args[1]){$metadata.Description=$args[1]}
+            $metadata.id = $args[2]
+            if($args[3]){$metadata.Description=$args[3]}
+            $metadata.authors = $env:USERNAME
+            $metadata.owners = $env:USERNAME
             $metadata.tags="Boxstarter"
             $xml.Save($args[0])
-        } $pkgFile $description
+        } $pkgFile $nuspec $Name $description
     }
     if(!(test-path "tools")){
         Mkdir "tools" | out-null
