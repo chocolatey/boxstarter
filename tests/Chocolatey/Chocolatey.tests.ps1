@@ -199,6 +199,9 @@ Describe "Getting-Chocolatey" {
 }
 
 Describe "Call-Chocolatey" {
+    Mock Invoke-Reboot
+    Mock Test-PendingReboot {return $false}
+
     context "when dot net version is less than 4 and remote" {
         $currentCLR = $PSVersionTable.CLRVersion
         Mock Get-IsRemote { return $true }
@@ -236,6 +239,136 @@ Describe "Call-Chocolatey" {
 
         it "do not invoke from task" {
             Assert-MockCalled Invoke-FromTask -times 0
+        }
+    }
+
+    context "when passing normal args" {
+        $script:passedArgs = ""
+        Mock Get-BoxstarterConfig { @{NugetSources="blah"} }
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Install pkg
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 6
+        }
+        it "passes thru command" {
+            $passedArgs[0] | Should Be "Install"
+        }
+        it "passes thru package" {
+            $passedArgs[1] | Should Be "pkg"
+        }
+        it "passes configed source" {
+            $passedArgs[2] | Should Be "-source"
+            $passedArgs[3] | Should Be "$($Boxstarter.LocalRepo);blah"
+        }
+        it "passes confirm" {
+            $passedArgs[4] | Should Be "-y"
+        }
+        it "passes allow-unofficial" {
+            $passedArgs[5] | Should Be "--allow-unofficial"
+        }
+    }
+
+    context "when passing source as --source" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Install pkg --source blah
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 6
+        }
+        it "passes source" {
+            $passedArgs[2] | Should Be "--source"
+            $passedArgs[3] | Should Be "blah"
+        }
+    }
+
+    context "when passing source as -source" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Install pkg -source blah
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 6
+        }
+        it "passes source" {
+            $passedArgs[2] | Should Be "-source"
+            $passedArgs[3] | Should Be "blah"
+        }
+    }
+
+    context "when passing source as -s" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Install pkg -s blah
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 6
+        }
+        it "passes source" {
+            $passedArgs[2] | Should Be "-s"
+            $passedArgs[3] | Should Be "blah"
+        }
+    }
+
+    context "when passing force as -force:`$true" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Install pkg -force:$true
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 7
+        }
+        it "passes source" {
+            $passedArgs[2] | Should Be "-f"
+        }
+    }
+
+    context "when passing force as -force:`$false" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Install pkg -force:$false
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 6
+        }
+        it "passes source" {
+            $passedArgs -contains "-f" | Should Be $false
+        }
+    }
+
+    context "when passing force as -f" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Install pkg -f
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 7
+        }
+        it "passes source" {
+            $passedArgs[2] | Should Be "-f"
+        }
+    }
+
+    context "when verbose" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+        $global:VerbosePreference="Continue"
+        choco Install pkg
+        $global:VerbosePreference="SilentlyContinue"
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 7
+        }
+        it "passes source" {
+            $passedArgs[4] | Should Be "-Verbose"
         }
     }
 }

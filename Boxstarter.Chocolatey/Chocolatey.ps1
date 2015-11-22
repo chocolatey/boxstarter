@@ -53,9 +53,7 @@ Intercepts Chocolatey call to check for reboots
 
 #>    
     param(
-        [string[]]$packageNames=@(''),
-        [string]$source='',
-        [int[]]$RebootCodes=@()
+        [string[]]$packageNames=@('')
     )
     chocolatey Install @PSBoundParameters @args
 }
@@ -68,9 +66,7 @@ Intercepts Chocolatey call to check for reboots
 #>    
     param(
         [string]$command,
-        [string[]]$packageNames=@(''),
-        [string]$source='',
-        [int[]]$RebootCodes=@()
+        [string[]]$packageNames=@('')
     )
     chocolatey @PSBoundParameters @args
 }
@@ -82,9 +78,7 @@ Intercepts Chocolatey call to check for reboots
 
 #>    
     param(
-        [string[]]$packageNames=@(''),
-        [string]$source='',
-        [int[]]$RebootCodes=@()
+        [string[]]$packageNames=@('')
     )
     chocolatey Update @PSBoundParameters @args
 }
@@ -97,18 +91,16 @@ Intercepts Chocolatey call to check for reboots
 #>  
     param(
         [string]$command,
-        [string[]]$packageNames=@(''),
-        [string]$source='',
-        [int[]]$RebootCodes=@()
+        [string[]]$packageNames=@('')
     )
+    $RebootCodes = Get-PassedArg RebootCodes $args
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
-    $PSBoundParameters.Remove("RebootCodes") | Out-Null
     $packageNames=-split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
     
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
-        if($source -eq "WindowsFeatures"){
+        if((Get-PassedArg @("source", "s") $args) -eq "WindowsFeatures"){
             $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
             if($dismInfo -contains "State : Enabled" -or $dismInfo -contains "State : Enable Pending") {
                 Write-BoxstarterMessage "$packageName is already installed"
@@ -191,6 +183,22 @@ Intercepts Chocolatey call to check for reboots
     }
 }
 
+function Get-PassedArg($argName, $origArgs) {
+    $candidateKeys = @()
+    $argName | % {
+        $candidateKeys += "-$_"
+        $candidateKeys += "--$_"
+    }
+    $nextIsValue = $false
+
+    $origArgs | % {
+        if($nextIsValue) { return $_ }
+        if($candidateKeys -contains $_) { $nextIsValue = $true }
+    }
+
+    return $null
+}
+
 function Call-Chocolatey {
     param(
         [string]$command,
@@ -262,45 +270,38 @@ function Serialize-Array($chocoArgs) {
     $res
 }
 
-function Format-Args {
-    $newArgs = @()
-    $args | % {
-        Write-BoxstarterMessage "param sent to Call-Chocolatey: $_" -Verbose
-        if($_ -is [string] -and $_.StartsWith("-") -and $_.EndsWith(":")) { $_ = $_.Substring(0,$_.length-1)}
-        if([string]$_ -eq "source") { 
-            $_ = '-Source'
-            $hasSrc = $true
-        }
-        if([string]$_ -eq "-source") { $hasSrc = $true }
-        $newArgs += $_
-    }
-
-    if(!$hasSrc){
-        $newArgs += "-Source"
-        $newArgs += "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
-    }
-
-    $newArgs
-}
-
 function Format-ExeArgs {
     $newArgs = @()
-    Format-Args @args | % {
+    $args | % {
         if($onForce){
             $onForce = $false
-            if($_ -eq $true) {$_ = ""}
+            if($_ -eq $true) {return}
+            else {
+                $lastIdx = $newArgs.count-2
+                if($lastIdx -ge 0){
+                    $newArgs = $newArgs[0..$lastIdx]
+                }
+                else { $newArgs = @() }
+                return
+            }
         }
-        if([string]$_ -eq "-force"){
+        if([string]$_ -eq "-force:"){
             $_ = "-f"
             $onForce = $true
         }
         $newArgs += $_
     }
 
+    if((Get-PassedArg @("source","s") $args) -eq $null){
+        $newArgs += "-Source"
+        $newArgs += "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
+    }
+
     if($global:VerbosePreference -eq "Continue") {
         $newArgs += "-Verbose"
     }
-    $newArgs += '--y'
+
+    $newArgs += '-y'
     $newArgs += '--allow-unofficial'
     $newArgs
 }
