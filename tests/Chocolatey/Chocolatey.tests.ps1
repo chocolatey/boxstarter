@@ -404,7 +404,7 @@ Describe "Export-BoxstarterVars" {
     Mock write-host {
         $script:out += $object
     }
-    #$global:VerbosePreference="continue"
+
     Invoke-FromTask @"
         Import-Module $($boxstarter.BaseDir)\boxstarter.chocolatey\Boxstarter.chocolatey.psd1 -DisableNameChecking
         $(Serialize-BoxstarterVars)
