@@ -386,7 +386,49 @@ Describe "Install-ChocolateyInstallPackageOverride" {
 
     Install-ChocolateyInstallPackageOverride -packageName pkg -silentArgs "/s" -file "myfile.exe" -validExitCodes @(1,2,3)
 
-    it "invoke from task .net 4 task" {
+    it "passes command params to task" {
         $script:passedCommand -like "*Install-ChocolateyInstallPackage -packageName `"pkg`" -silentArgs `"/s`" -file `"myfile.exe`" -validExitCodes @(1,2,3)*" | Should Be $true
     }
+}
+
+Describe "Export-BoxstarterVars" {
+    $identity  = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
+            /RU "$($identity.Name)" /IT `
+    /TR "powershell -noprofile -ExecutionPolicy Bypass -File $env:temp\BoxstarterTask.ps1" /F |
+            Out-Null
+    $global:Boxstarter.Var1 = "val1"
+    $global:Boxstarter.Var2 = $true
+    $global:Boxstarter.Val3 = $null
+    $script:out = ""
+    Mock write-host {
+        $script:out += $object
+    }
+    #$global:VerbosePreference="continue"
+    Invoke-FromTask @"
+        Import-Module $($boxstarter.BaseDir)\boxstarter.chocolatey\Boxstarter.chocolatey.psd1 -DisableNameChecking
+        $(Serialize-BoxstarterVars)
+        `$global:Boxstarter.TaskPid = "`$PID"
+        Export-BoxstarterVars
+        PowerShell -Command {
+            Import-Module '$($boxstarter.BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1' -DisableNameChecking -ArgumentList `$true
+            `$Boxstarter | ConvertTo-Json | Write-Output
+        } 
+"@
+    $boxstarterJson = ConvertFrom-Json $script:out
+
+    it "exports string variable" {
+        $boxstarterJson.Var1 | Should Be "val1"
+    }
+    it "exports boolean variable" {
+        $boxstarterJson.Var2 | Should Be $true
+    }
+    it "does not export null variable" {
+        $boxstarterJson.psobject.properties.match("Var3") | Should Be $null
+    }
+    it "exports source pid" {
+        $boxstarterJson.SourcePid | Should Be $boxstarterJson.TaskPid
+    }
+
+    schtasks /DELETE /TN 'Boxstarter Task' /F 2>&1 | Out-null
 }

@@ -443,7 +443,7 @@ function Import-BoxstarterVars {
     } | remove-item
 
     if($env:BoxstarterPass){
-        $script:BoxstarterPasswordsword = $env:BoxstarterPass
+        $script:BoxstarterPassword = $env:BoxstarterPass
         remove-item -Path env:\BoxstarterPass
     }
 
