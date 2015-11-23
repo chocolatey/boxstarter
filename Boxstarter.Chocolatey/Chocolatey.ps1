@@ -264,9 +264,12 @@ function Serialize-Array($chocoArgs) {
             $res += Serialize-Array $_
         }
         else {
-            $res += "`""
-            $res += $_
-            $res += "`""
+            if($_ -is [int]){
+                $res += "$_"
+            }
+            else{
+                $res += "`"$_`""
+            }
         }
         $first = $true
     }
@@ -342,23 +345,7 @@ function Resolve-SplatValue($val){
             return ":`$False"
         }
     }
-    if($val -is [Array]){
-        $ret=" @("
-        $firstVal=$False
-        foreach($arrayVal in $val){
-            if($firstVal){$ret+=","}
-            if($arrayVal -is [int]){
-                $ret += "$arrayVal"
-            }
-            else{
-                $ret += "`"$arrayVal`""
-            }
-
-            $firstVal=$true
-        }
-        $ret += ")"
-        return $ret
-    }
+    if($val -is [Array]){ return " $(Serialize-Array $val)" }
     $ret = " `"$($val.Replace('"','`' + '"'))`""
     return $ret
 }
