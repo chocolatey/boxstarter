@@ -111,7 +111,7 @@ Intercepts Chocolatey call to check for reboots
             }
         }
         if(((Test-PendingReboot) -or $Boxstarter.IsRebooting) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
-        $session=Start-TimedSection "Calling Boxstarter's vendored Chocolatey to install $packageName. This may take several minutes to complete..."
+        $session=Start-TimedSection "Calling Chocolatey to install $packageName. This may take several minutes to complete..."
         $currentErrorCount = $global:error.Count
         $rebootable = $false
         try {

@@ -8,4 +8,3 @@ if($BoxStarter.LocalRepo.StartsWith("$env:windir")) {
 }
 $Boxstarter.NugetSources=$config.NugetSources
 $Boxstarter.RebootOk=$true
-$Boxstarter.VendoredChocoPath = Join-Path $Boxstarter.BaseDir "Chocolatey"
