@@ -205,13 +205,14 @@ Describe "Call-Chocolatey" {
     context "when dot net version is less than 4 and remote" {
         $currentCLR = $PSVersionTable.CLRVersion
         Mock Get-IsRemote { return $true }
-        Mock Invoke-FromTask -ParameterFilter { $DotNetVersion -eq "v4.0.30319" -and $command -like "*Invoke-Chocolatey*" }
+        $script:passedCommand = ""
+        Mock Invoke-FromTask { $script:passedCommand=$command } -ParameterFilter { $DotNetVersion -eq "v4.0.30319" }
         $PSVersionTable.CLRVersion = New-Object Version '2.0.0'
 
-        Call-Chocolatey Install pkg
+        Call-Chocolatey Install @("pkg1","pkg2") -source blah
 
         it "invoke from task .net 4 task" {
-            Assert-MockCalled Invoke-FromTask -times 1
+            $script:passedCommand -like "*Invoke-Chocolatey @(`"Install`",@(`"pkg1`",`"pkg2`"),`"-source`",`"blah`",`"-y`",`"--allow-unofficial`")" | Should Be $true
         }
         $PSVersionTable.CLRVersion = $currentCLR
     }
@@ -375,5 +376,17 @@ Describe "Call-Chocolatey" {
         it "passes source" {
             $passedArgs[4] | Should Be "-Verbose"
         }
+    }
+}
+
+Describe "Install-ChocolateyInstallPackageOverride" {
+    Mock Get-IsRemote { return $true }
+    $script:passedCommand = ""
+    Mock Invoke-FromTask { $script:passedCommand=$command }
+
+    Install-ChocolateyInstallPackageOverride -packageName pkg -silentArgs "/s" -file "myfile.exe" -validExitCodes @(1,2,3)
+
+    it "invoke from task .net 4 task" {
+        $script:passedCommand -like "*Install-ChocolateyInstallPackage -packageName `"pkg`" -silentArgs `"/s`" -file `"myfile.exe`" -validExitCodes @(1,2,3)*" | Should Be $true
     }
 }
