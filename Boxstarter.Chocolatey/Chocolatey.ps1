@@ -255,28 +255,6 @@ function Invoke-LocalChocolatey($chocoArgs) {
     } $chocoArgs, $Boxstarter
 }
 
-function Serialize-Array($chocoArgs) {
-    $first = $false
-    $res = "@("
-    $chocoArgs | % {
-        if($first){$res+=","}
-        if($_ -is [Array]) {
-            $res += Serialize-Array $_
-        }
-        else {
-            if($_ -is [int]){
-                $res += "$_"
-            }
-            else{
-                $res += "`"$_`""
-            }
-        }
-        $first = $true
-    }
-    $res += ")"
-    $res
-}
-
 function Format-ExeArgs {
     $newArgs = @()
     $args | % {
@@ -345,9 +323,7 @@ function Resolve-SplatValue($val){
             return ":`$False"
         }
     }
-    if($val -is [Array]){ return " $(Serialize-Array $val)" }
-    $ret = " `"$($val.Replace('"','`' + '"'))`""
-    return $ret
+    return " $(ConvertTo-PSString $val)"
 }
 
 function Wait-ForMSIEXEC{
@@ -377,50 +353,35 @@ function Export-BoxstarterVars {
     }
     if($script:BoxstarterPassword) {
         Write-BoxstarterMessage "Exporting password as secure string" -verbose
-        $env:BoxstarterPass = $script:BoxstarterPassword
+        $env:BoxstarterPassword = $script:BoxstarterPassword
     }
-    if($global:VerbosePreference -eq "Continue") {
-        Write-BoxstarterMessage "Exporting verbose" -verbose
-        $env:BoxstarterVerbose = "True"
-    }
-    if($global:DebugPreference -eq "Continue") {
-        Write-BoxstarterMessage "Exporting debug" -verbose
-        $env:BoxstarterDebug = "True"
-    }
+    $env:BoxstarterVerbose = $global:VerbosePreference
+    $env:BoxstarterDebug = $global:DebugPreference
     $env:BoxstarterSourcePID = $PID
-    Write-BoxstarterMessage "Finished export" -verbose
 }
 
 function Serialize-BoxstarterVars {
     $res = ""
     $boxstarter.keys | % {
-        if($Boxstarter[$_] -is [string]) {
-            $res += "`$global:Boxstarter['$_']=@`"`r`n$($Boxstarter[$_])`r`n`"@`r`n"
-        }
-        if($Boxstarter[$_] -is [boolean]) {
-            $res += "`$global:Boxstarter['$_']=`$$($Boxstarter[$_].ToString())`r`n"
-        }
+        $res += "`$global:Boxstarter['$_']=$(ConvertTo-PSString $Boxstarter[$_])`r`n"
     }
     if($script:BoxstarterPassword) {
-        $res += "`$script:BoxstarterPassword=`"$($script:BoxstarterPassword)`"`r`n"
+        $res += "`$script:BoxstarterPassword='$($script:BoxstarterPassword)'`r`n"
     }
-    if($global:VerbosePreference -eq "Continue") {
-        $res += "`$global:VerbosePreference='Continue'`r`n"
-    }
-    if($global:DebugPreference -eq "Continue") {
-        $res += "`$global:DebugPreference='Continue'`r`n"
-    }
+    $res += "`$global:VerbosePreference='$global:VerbosePreference'`r`n"
+    $res += "`$global:DebugPreference='$global:DebugPreference'`r`n"
     Write-BoxstarterMessage "Serialized boxstarter vars to:" -verbose
     Write-BoxstarterMessage $res -verbose
     $res
 }
 
 function Import-BoxstarterVars {
-    Write-BoxstarterMessage "Importing Boxstarter vars into pid $PID" -verbose
+    Write-BoxstarterMessage "Importing Boxstarter vars into pid $PID from pid: $($env:BoxstarterSourcePID)" -verbose
     Get-ChildItem -Path env: | ? { 
         $_.Name.StartsWith('Boxstarter.') 
     } | % {
         $key = $_.Name.Substring('Boxstarter.'.Length)
+        Write-BoxstarterMessage "setting $key to $($_.value)" -verbose
         $global:Boxstarter[$key] = $_.Value
         if($_.Value -eq 'True'){
             $global:Boxstarter[$key] = $true
@@ -433,28 +394,53 @@ function Import-BoxstarterVars {
         }
     }        
 
-    Write-BoxstarterMessage "Imported vars set from pid: $($env:BoxstarterSourcePID)" -Verbose
-    $boxstarter.keys | % {
-        Write-BoxstarterMessage "$_ set to $($Boxstarter.$_)" -verbose
-    }
-
     Get-ChildItem -Path env: | ? { 
         $_.Name.StartsWith('Boxstarter.') 
     } | remove-item
 
-    if($env:BoxstarterPass){
-        $script:BoxstarterPassword = $env:BoxstarterPass
-        remove-item -Path env:\BoxstarterPass
+    if($env:BoxstarterPassword){
+        $script:BoxstarterPassword = $env:BoxstarterPassword
+        remove-item -Path env:\BoxstarterPassword
     }
 
     $boxstarter.SourcePID = $env:BoxstarterSourcePID
 
-    if($env:BoxstarterVerbose -eq 'True'){
-        $global:VerbosePreference = "Continue"
+    if($env:BoxstarterVerbose){
+        $global:VerbosePreference = $env:BoxstarterVerbose
         remove-item -Path env:\BoxstarterVerbose
     }
-    if($env:BoxstarterDebug -eq 'True'){
-        $global:DebugPreference = "Continue"
+    if($env:BoxstarterDebug){
+        $global:DebugPreference = $env:BoxstarterDebug
         remove-item -Path env:\BoxstarterDebug
     }
+}
+
+function ConvertTo-PSString($originalValue) {
+    if($originalValue -is [int]){
+        "$originalValue"
+    }
+    elseif($originalValue -is [Array]){
+        Serialize-Array $originalValue
+    }
+    elseif($originalValue -is [boolean]) {
+        "`$$($originalValue.ToString())"
+    }
+    elseif($originalValue -ne $null){
+        "`"$($originalValue.Replace('"','`' + '"'))`""
+    }
+    else {
+        "`$null"
+    }
+}
+
+function Serialize-Array($chocoArgs) {
+    $first = $false
+    $res = "@("
+    $chocoArgs | % {
+        if($first){$res+=","}
+        $res += ConvertTo-PSString $_
+        $first = $true
+    }
+    $res += ")"
+    $res
 }
