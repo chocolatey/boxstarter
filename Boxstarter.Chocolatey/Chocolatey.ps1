@@ -311,6 +311,7 @@ function Expand-Splat($splat){
     ForEach($item in $splat.KEYS.GetEnumerator()) {
         $ret += "-$item$(Resolve-SplatValue $splat[$item]) " 
     }
+    Write-BoxstarterMessage "Expanded splat to $ret"
     return $ret
 }
 
@@ -342,22 +343,25 @@ function Wait-ForMSIEXEC{
 
 function Export-BoxstarterVars {
     $boxstarter.keys | % {
-        if($Boxstarter[$_] -is [string] -or $Boxstarter[$_] -is [boolean]) {
-            Write-BoxstarterMessage "Exporting $_ as $($Boxstarter[$_])" -verbose
-            Set-Item -Path "Env:\Boxstarter.$_" -Value $Boxstarter[$_].ToString() -Force
-        }
-        elseif($Boxstarter[$_] -eq $null) {
-            Write-BoxstarterMessage "Exporting $_ as `$null" -verbose
-            Set-Item -Path "Env:\Boxstarter.$_" -Value '$null' -Force
-        }
+        Export-ToEnvironment "Boxstarter.$_"
     }
     if($script:BoxstarterPassword) {
-        Write-BoxstarterMessage "Exporting password as secure string" -verbose
-        $env:BoxstarterPassword = $script:BoxstarterPassword
+        Export-ToEnvironment "BoxstarterPassword" script
     }
-    $env:BoxstarterVerbose = $global:VerbosePreference
-    $env:BoxstarterDebug = $global:DebugPreference
+    Export-ToEnvironment "VerbosePreference" global
+    Export-ToEnvironment "DebugPreference" global
     $env:BoxstarterSourcePID = $PID
+}
+
+function Export-ToEnvironment($varToExport, $scope) {
+    $val = Invoke-Expression "`$$($scope):$varToExport"
+    if($val -is [string] -or $val -is [boolean]) {
+        Set-Item -Path "Env:\BEX.$varToExport" -Value $val.ToString() -Force
+    }
+    elseif($val -eq $null) {
+        Set-Item -Path "Env:\BEX.$varToExport" -Value '$null' -Force
+    }
+    Write-BoxstarterMessage "Exported $varToExport from $PID to `$env:BEX.$varToExport with value $val" -verbose
 }
 
 function Serialize-BoxstarterVars {
@@ -375,44 +379,32 @@ function Serialize-BoxstarterVars {
     $res
 }
 
+function Import-FromEnvironment ($varToImport, $scope) {
+    if(!(Test-Path "Env:\$varToImport")) { return }
+    [object]$ival = (Get-Item "Env:\$varToImport").Value.ToString()
+
+    if($ival.ToString() -eq 'True'){ $ival = $true }
+    if($ival.ToString() -eq 'False'){ $ival = $false }
+    if($ival.ToString() -eq '$null'){ $ival = $null }
+
+    Write-BoxstarterMessage "Importing $varToImport from $env:BoxstarterSourcePID to $PID with value $ival" -Verbose
+
+    $newVar = $varToImport.Substring('BEX.'.Length)
+    Invoke-Expression "`$$($scope):$newVar=$(ConvertTo-PSString $ival)"
+
+    remove-item "Env:\$varToImport"
+}
+
 function Import-BoxstarterVars {
     Write-BoxstarterMessage "Importing Boxstarter vars into pid $PID from pid: $($env:BoxstarterSourcePID)" -verbose
-    Get-ChildItem -Path env: | ? { 
-        $_.Name.StartsWith('Boxstarter.') 
-    } | % {
-        $key = $_.Name.Substring('Boxstarter.'.Length)
-        Write-BoxstarterMessage "setting $key to $($_.value)" -verbose
-        $global:Boxstarter[$key] = $_.Value
-        if($_.Value -eq 'True'){
-            $global:Boxstarter[$key] = $true
-        }
-        if($_.Value -eq 'False'){
-            $global:Boxstarter[$key] = $false
-        }
-        if($_.Value -eq '$null'){
-            $global:Boxstarter[$key] = $null
-        }
-    }        
+    Import-FromEnvironment "BEX.BoxstarterPassword" script
 
-    Get-ChildItem -Path env: | ? { 
-        $_.Name.StartsWith('Boxstarter.') 
-    } | remove-item
-
-    if($env:BoxstarterPassword){
-        $script:BoxstarterPassword = $env:BoxstarterPassword
-        remove-item -Path env:\BoxstarterPassword
-    }
+    $varsToImport = @()
+    Get-ChildItem -Path env: | ? { $_.Name.StartsWith('BEX.') } | % { $varsToImport += $_.Name }
+    
+    $varsToImport | % { Import-FromEnvironment $_ global }
 
     $boxstarter.SourcePID = $env:BoxstarterSourcePID
-
-    if($env:BoxstarterVerbose){
-        $global:VerbosePreference = $env:BoxstarterVerbose
-        remove-item -Path env:\BoxstarterVerbose
-    }
-    if($env:BoxstarterDebug){
-        $global:DebugPreference = $env:BoxstarterDebug
-        remove-item -Path env:\BoxstarterDebug
-    }
 }
 
 function ConvertTo-PSString($originalValue) {
