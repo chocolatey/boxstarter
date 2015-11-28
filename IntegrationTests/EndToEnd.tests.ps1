@@ -43,6 +43,15 @@ $credential = New-Object System.Management.Automation.PSCredential ("Administrat
                 }) | should be $true
             }
 
+if($vmName -eq "win2012r2") {
+            it "installed windirstat in task" {
+                $result.InvokeOnTarget($result.Session, {
+                    $log = Get-Content "$env:localappdata\boxstarter\boxstarter.log" | Out-String
+                    $log.Contains("windirstatInstall.exe`"  in scheduled task")
+                }) | should be $true
+            }
+}
+
             it "installed force-reboot" {
                 $result.InvokeOnTarget($result.Session, {
                     Test-Path "c:\ProgramData\chocolatey\lib\force-reboot"
