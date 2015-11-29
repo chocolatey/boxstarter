@@ -271,6 +271,30 @@ Describe "Call-Chocolatey" {
         }
     }
 
+    context "when not calling install or update" {
+        $script:passedArgs = ""
+        Mock Get-BoxstarterConfig { @{NugetSources="blah"} }
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Uninstall pkg
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 4
+        }
+        it "passes thru command" {
+            $passedArgs[0] | Should Be "Uninstall"
+        }
+        it "passes thru package" {
+            $passedArgs[1] | Should Be "pkg"
+        }
+        it "passes confirm" {
+            $passedArgs[2] | Should Be "-y"
+        }
+        it "passes allow-unofficial" {
+            $passedArgs[3] | Should Be "--allow-unofficial"
+        }
+    }
+
     context "when passing source as --source" {
         $script:passedArgs = ""
         Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }

@@ -8,8 +8,7 @@ Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "Invoke-BoxstarterBuild" {
-    $Boxstarter.BaseDir=(Get-PSDrive TestDrive).Root
-    $Boxstarter.LocalRepo=Join-Path $boxstarter.BaseDir "repo"
+    $Boxstarter.LocalRepo=Join-Path ((Get-PSDrive TestDrive).Root) "repo"
     $Boxstarter.SuppressLogging=$true
     $packageName="pkg"
 

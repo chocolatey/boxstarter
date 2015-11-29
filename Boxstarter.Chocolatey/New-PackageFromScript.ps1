@@ -52,6 +52,10 @@ about_boxstarter_chocolatey
         [string] $PackageName="temp_BoxstarterPackage"
     )
 
+    if(!(Test-Path Env:\ChocolateyInstall)) {
+        # Simply Installs choco repo and helpers
+        Call-Chocolatey
+    }
     if(!(test-path function:\Get-WebFile)){
         . "$env:chocolateyinstall\helpers\functions\Get-WebFile.ps1"
     }

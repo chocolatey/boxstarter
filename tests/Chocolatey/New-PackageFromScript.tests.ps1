@@ -8,12 +8,13 @@ Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "New-PackageFromScript" {
-    $Boxstarter.BaseDir=(Get-PSDrive TestDrive).Root
-    $Boxstarter.LocalRepo=Join-Path $boxstarter.BaseDir "repo"
+    $Boxstarter.LocalRepo=Join-Path ((Get-PSDrive TestDrive).Root) "repo"
     $Boxstarter.SuppressLogging=$true
+    $unzipPath = Join-Path $Boxstarter.LocalRepo "unzipped"
     Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}
 
     Context "When Building a script from a file" {
+        MkDir $unzipPath
         New-Item TestDrive:\script.ps1 -type file -Value "return" | Out-Null
 
         ($result = New-PackageFromScript TestDrive:\script.ps1) | Out-Null
@@ -26,13 +27,14 @@ Describe "New-PackageFromScript" {
             $shell_app=new-object -com shell.application
             $filename = "$result.1.0.0.zip"
             $zip_file = $shell_app.namespace("$($boxstarter.LocalRepo)\$filename")
-            $destination = $shell_app.namespace($boxstarter.BaseDir)
+            $destination = $shell_app.namespace($unzipPath)
             $destination.Copyhere($zip_file.items())
-            Get-content "$($boxstarter.BaseDir)\tools\ChocolateyInstall.ps1" | Should be "return"
+            Get-content "$unzipPath\tools\ChocolateyInstall.ps1" | Should be "return"
         }
     }
 
     Context "When Building a script from a URL" {
+        MkDir $unzipPath
         . "$env:chocolateyinstall\helpers\functions\Get-WebFile.ps1"
         Mock Get-WebFile {return "return"}
 
@@ -46,9 +48,9 @@ Describe "New-PackageFromScript" {
             $shell_app=new-object -com shell.application
             $filename = "$result.1.0.0.zip"
             $zip_file = $shell_app.namespace("$($boxstarter.LocalRepo)\$filename")
-            $destination = $shell_app.namespace($boxstarter.BaseDir)
+            $destination = $shell_app.namespace($unzipPath)
             $destination.Copyhere($zip_file.items())
-            Get-content "$($boxstarter.BaseDir)\tools\ChocolateyInstall.ps1" | Should be "return"
+            Get-content "$unzipPath\tools\ChocolateyInstall.ps1" | Should be "return"
         }
     }
 
@@ -75,6 +77,7 @@ Describe "New-PackageFromScript" {
     }
 
     Context "When ReBuilding an existing package" {
+        MkDir $unzipPath
         New-Item TestDrive:\script.ps1 -type file -Value "return" | Out-Null
         New-PackageFromScript TestDrive:\script.ps1 | Out-Null
         New-Item TestDrive:\script.ps1 -type file -Value "return 'again'" -force | Out-Null
@@ -86,9 +89,9 @@ Describe "New-PackageFromScript" {
             $shell_app=new-object -com shell.application
             $filename = "$result.1.0.0.zip"
             $zip_file = $shell_app.namespace("$($boxstarter.LocalRepo)\$filename")
-            $destination = $shell_app.namespace($boxstarter.BaseDir)
+            $destination = $shell_app.namespace($unzipPath)
             $destination.Copyhere($zip_file.items())
-            Get-content "$($boxstarter.BaseDir)\tools\ChocolateyInstall.ps1" | Should be "return 'again'"
+            Get-content "$unzipPath\tools\ChocolateyInstall.ps1" | Should be "return 'again'"
         }
     }
 

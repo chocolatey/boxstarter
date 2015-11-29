@@ -209,7 +209,7 @@ function Call-Chocolatey {
         [string[]]$packageNames=@('')
     )
     $chocoArgs = @($command, $packageNames)
-    $chocoArgs += Format-ExeArgs @args
+    $chocoArgs += Format-ExeArgs $command @args
     Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
 
     if($PSVersionTable.CLRVersion.Major -lt 4 -and (Get-IsRemote)) {
@@ -255,7 +255,7 @@ function Invoke-LocalChocolatey($chocoArgs) {
     } $chocoArgs, $Boxstarter
 }
 
-function Format-ExeArgs {
+function Format-ExeArgs($command) {
     $newArgs = @()
     $args | % {
         if($onForce){
@@ -278,8 +278,10 @@ function Format-ExeArgs {
     }
 
     if((Get-PassedArg @("source","s") $args) -eq $null){
-        $newArgs += "-Source"
-        $newArgs += "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
+        if(@("Install","Update") -contains $command) {
+            $newArgs += "-Source"
+            $newArgs += "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
+        }
     }
 
     if($global:VerbosePreference -eq "Continue") {

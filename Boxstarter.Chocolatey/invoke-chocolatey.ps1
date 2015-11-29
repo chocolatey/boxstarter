@@ -244,7 +244,16 @@ namespace Boxstarter
 
     Enter-BoxstarterLogable { 
         Write-BoxstarterMessage "calling choco now with $chocoArgs" -verbose
-        $choco.Run($chocoArgs)
+        $cd = [System.IO.Directory]::GetCurrentDirectory()
+        try {
+            # Chocolatey.dll uses GetCurrentDirectory which is not quite right
+            # when calling via powershell. so we set it here
+            [System.IO.Directory]::SetCurrentDirectory((Get-Location).Path)
+            $choco.Run($chocoArgs)
+        }
+        finally {
+            [System.IO.Directory]::SetCurrentDirectory($cd)
+        }
     }
 }
 
