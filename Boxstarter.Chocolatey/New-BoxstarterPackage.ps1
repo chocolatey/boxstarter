@@ -81,7 +81,9 @@ Get-PackageRoot
         Invoke-RetriableScript {
             [xml]$xml = $args[1]
             $metadata = $xml.package.metadata
-            $metadata.id = $args[2]
+            # Why ToString()? I have no idea but psv2 breaks without it
+            # What I do know is I can't wait for psv2 to die
+            $metadata.id = $args[2].ToString()
             if($args[3]){$metadata.Description=$args[3]}
             $metadata.authors = $env:USERNAME
             $metadata.owners = $env:USERNAME
