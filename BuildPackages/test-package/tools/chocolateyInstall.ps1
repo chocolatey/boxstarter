@@ -5,9 +5,6 @@ try {
     cinst force-reboot
 
     if($PSVersionTable.PSVersion -gt '2.0.0' -and ([bool]::Parse($env:IsRemote))) {
-        if(Test-Path "c:\ProgramData\Chocolatey\lib\windirstat") {
-            cuninst windirstat -y
-        }
         cinst windirstat
     }
     New-Item -Path "$($boxstarter.BaseDir)\test_marker" -ItemType File -force
