@@ -56,8 +56,7 @@ function Invoke-RemoteBoxstarterRun {
     $result = @{}
     $boxresult = Install-BoxstarterPackage -BoxstarterConnectionConfig $conn -PackageName $packageName
     Write-host "Boxstarter run completed"
-
-    $result.Exceptions = $boxresult.Exceptions
+    $result.Exceptions = $boxresult.Errors
     $session = New-PsSession -ConnectionURI $Conn.ConnectionURI -Credential $Credential
     New-TestResult $result $session $credential
 }
