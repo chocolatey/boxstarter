@@ -1,4 +1,6 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
+import-module $here\..\boxstarter.Hyperv\boxstarter.Hyperv.psd1 -Force
+import-module $here\..\boxstarter.Chocolatey\boxstarter.Chocolatey.psd1 -Force
 . $here\..\Boxstarter.Chocolatey\Send-File.ps1
 
 function Invoke-LocalBoxstarterRun {

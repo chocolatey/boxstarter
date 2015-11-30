@@ -1,5 +1,4 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-import-module $here\..\boxstarter.Hyperv\boxstarter.Hyperv.psd1 -Force
 . $here\test-helper.ps1
 $secpasswd = ConvertTo-SecureString "Pass@word1" -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential ("Administrator", $secpasswd)
