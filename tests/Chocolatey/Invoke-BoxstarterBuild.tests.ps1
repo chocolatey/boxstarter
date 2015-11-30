@@ -52,7 +52,7 @@ Describe "Invoke-BoxstarterBuild" {
 
     Context "When No nuspec is in the named repo" {
         Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}
-        Mkdir $Boxstarter.LocalRepo | Out-Null
+        Mkdir $Boxstarter.LocalRepo -ErrorAction SilentlyContinue | Out-Null
 
         try {Invoke-BoxstarterBuild $packageName} catch { $ex=$_ }
 
