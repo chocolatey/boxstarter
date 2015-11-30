@@ -289,7 +289,6 @@ function Format-ExeArgs($command) {
     }
 
     $newArgs += '-y'
-    $newArgs += '--allow-unofficial'
     $newArgs
 }
 

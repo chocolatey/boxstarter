@@ -212,7 +212,7 @@ Describe "Call-Chocolatey" {
         Call-Chocolatey Install @("pkg1","pkg2") -source blah
 
         it "invoke from task .net 4 task" {
-            $script:passedCommand -like "*Invoke-Chocolatey @(`"Install`",@(`"pkg1`",`"pkg2`"),`"-source`",`"blah`",`"-y`",`"--allow-unofficial`")" | Should Be $true
+            $script:passedCommand -like "*Invoke-Chocolatey @(`"Install`",@(`"pkg1`",`"pkg2`"),`"-source`",`"blah`",`"-y`")" | Should Be $true
         }
         $PSVersionTable.CLRVersion = $currentCLR
     }
@@ -251,7 +251,7 @@ Describe "Call-Chocolatey" {
         choco Install pkg
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 6
+            $passedArgs.count | Should Be 5
         }
         it "passes thru command" {
             $passedArgs[0] | Should Be "Install"
@@ -266,9 +266,6 @@ Describe "Call-Chocolatey" {
         it "passes confirm" {
             $passedArgs[4] | Should Be "-y"
         }
-        it "passes allow-unofficial" {
-            $passedArgs[5] | Should Be "--allow-unofficial"
-        }
     }
 
     context "when not calling install or update" {
@@ -279,7 +276,7 @@ Describe "Call-Chocolatey" {
         choco Uninstall pkg
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 4
+            $passedArgs.count | Should Be 3
         }
         it "passes thru command" {
             $passedArgs[0] | Should Be "Uninstall"
@@ -290,9 +287,6 @@ Describe "Call-Chocolatey" {
         it "passes confirm" {
             $passedArgs[2] | Should Be "-y"
         }
-        it "passes allow-unofficial" {
-            $passedArgs[3] | Should Be "--allow-unofficial"
-        }
     }
 
     context "when passing source as --source" {
@@ -302,7 +296,7 @@ Describe "Call-Chocolatey" {
         choco Install pkg --source blah --bing boom
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 8
+            $passedArgs.count | Should Be 7
         }
         it "passes source" {
             $passedArgs[2] | Should Be "--source"
@@ -322,7 +316,7 @@ Describe "Call-Chocolatey" {
         choco Install pkg -source blah
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 6
+            $passedArgs.count | Should Be 5
         }
         it "passes source" {
             $passedArgs[2] | Should Be "-source"
@@ -337,7 +331,7 @@ Describe "Call-Chocolatey" {
         choco Install pkg -s blah
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 6
+            $passedArgs.count | Should Be 5
         }
         it "passes source" {
             $passedArgs[2] | Should Be "-s"
@@ -352,7 +346,7 @@ Describe "Call-Chocolatey" {
         choco Install pkg -force:$true
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 7
+            $passedArgs.count | Should Be 6
         }
         it "passes source" {
             $passedArgs[2] | Should Be "-f"
@@ -366,7 +360,7 @@ Describe "Call-Chocolatey" {
         choco Install pkg -force:$false
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 6
+            $passedArgs.count | Should Be 5
         }
         it "passes source" {
             $passedArgs -contains "-f" | Should Be $false
@@ -380,7 +374,7 @@ Describe "Call-Chocolatey" {
         choco Install pkg -f
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 7
+            $passedArgs.count | Should Be 6
         }
         it "passes source" {
             $passedArgs[2] | Should Be "-f"
@@ -395,7 +389,7 @@ Describe "Call-Chocolatey" {
         $global:VerbosePreference="SilentlyContinue"
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 7
+            $passedArgs.count | Should Be 6
         }
         it "passes source" {
             $passedArgs[4] | Should Be "-Verbose"
