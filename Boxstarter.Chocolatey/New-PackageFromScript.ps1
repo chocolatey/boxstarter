@@ -59,6 +59,7 @@ about_boxstarter_chocolatey
         $chocoInstall = [System.Environment]::GetEnvironmentVariable('ChocolateyInstall', 'MACHINE')
     }
     if(!(test-path function:\Get-WebFile)){
+        . "$chocoInstall\helpers\functions\Format-FileSize.ps1"
         . "$chocoInstall\helpers\functions\Get-WebFile.ps1"
     }
     if($source -like "*://*"){
