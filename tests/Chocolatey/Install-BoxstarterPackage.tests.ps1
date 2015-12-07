@@ -347,6 +347,7 @@ Describe "Install-BoxstarterPackage" {
     Context "When using a session and remoting enabled on remote and local computer" {
         $session = New-PSSession localhost
         $session2 = New-PSSession .
+        $session, $session2 | % { Invoke-Command -session $_ { $Env:TestingBoxstarter = $true } }
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
 

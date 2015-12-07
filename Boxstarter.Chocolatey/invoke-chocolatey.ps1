@@ -6,11 +6,13 @@ function Invoke-Chocolatey($chocoArgs) {
     )
     $refs | % {
         Write-BoxstarterMessage "Adding types from $_" -Verbose
-        if($PSVersionTable.PSVersion.Major -lt 4) {
-            Add-Type -Path $_
+        if($env:TestingBoxstarter) {
+            Write-BoxstarterMessage "loading choco bytes" -Verbose
+            [System.Reflection.Assembly]::Load([io.file]::ReadAllBytes($_))
         }
         else {
-            [System.Reflection.Assembly]::Load([io.file]::ReadAllBytes($_))
+            Write-BoxstarterMessage "loading choco from path" -Verbose
+            Add-Type -Path $_
         }
     }
     $cpar = New-Object System.CodeDom.Compiler.CompilerParameters
