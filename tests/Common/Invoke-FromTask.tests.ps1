@@ -31,7 +31,6 @@ Describe "Invoke-FromTask" {
         Remove-Item $env:temp\test.txt -ErrorAction SilentlyContinue
         Mock write-host {
             $script:out += $object
-            Microsoft.PowerShell.Utility\Write-Host @PSBoundParameters
         }
 
         Invoke-FromTask "Write-Output 'here is some output'" -IdleTimeout 0
