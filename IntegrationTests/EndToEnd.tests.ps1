@@ -6,7 +6,7 @@ $credential = New-Object System.Management.Automation.PSCredential ("Administrat
 Describe "GistPackage" {
     $result = Invoke-RemoteBoxstarterRun -BaseDir $baseDir -VMName win2012r2 -Credential $credential -PackageName "https://gist.githubusercontent.com/mwrock/32030c56149138ad0c44/raw/32b6a80741404a3ab1a10ae3f5622b447e33c34a/gistfile1.txt"
 
-    it "installed test-package" {
+    it "installed temp-package" {
         $result.InvokeOnTarget($result.Session, {
             Test-Path "c:\ProgramData\chocolatey\lib\temp_boxstarterPackage"
         }) | should be $true
@@ -28,6 +28,12 @@ Describe "GistPackage" {
             it "installed test-package" {
                 $result.InvokeOnTarget($result.Session, {
                     Test-Path "c:\ProgramData\chocolatey\lib\test-package"
+                }) | should be $true
+            }
+
+            it "enabled telnet" {
+                $result.InvokeOnTarget($result.Session, {
+                    (get-command telnet -ErrorAction SilentlyContinue) -ne $null
                 }) | should be $true
             }
 
@@ -64,6 +70,12 @@ if($vmName -eq "win2012r2") {
                 }) | should be $true
             }
 }
+
+            it "enabled telnet" {
+                $result.InvokeOnTarget($result.Session, {
+                    (get-command telnet -ErrorAction SilentlyContinue) -ne $null
+                }) | should be $true
+            }
 
             it "installed force-reboot" {
                 $result.InvokeOnTarget($result.Session, {

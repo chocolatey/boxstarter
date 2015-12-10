@@ -1,7 +1,10 @@
 try {
-    Remove-Item "c:\ProgramData\Chocolatey\lib\force-reboot" -Recurse -ErrorAction SilentlyContinue
+    if(Test-Path "c:\ProgramData\Chocolatey\lib\force-reboot"){
+        Remove-Item "c:\ProgramData\Chocolatey\lib\force-reboot" -Recurse
+    }
 
     Write-boxstartermessage "installing test package"
+    cinst TelnetClient -source WindowsFeatures
     cinst force-reboot
 
     if($PSVersionTable.PSVersion -gt '2.0.0' -and ([bool]::Parse($env:IsRemote))) {

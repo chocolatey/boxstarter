@@ -100,14 +100,12 @@ Intercepts Chocolatey call to check for reboots
     
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
+        $currentLogging=$Boxstarter.Suppresslogging
         if((Get-PassedArg @("source", "s") $args) -eq "WindowsFeatures"){
             $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
             if($dismInfo -contains "State : Enabled" -or $dismInfo -contains "State : Enable Pending") {
                 Write-BoxstarterMessage "$packageName is already installed"
                 return
-            }
-            else{
-                $winFeature=$true
             }
         }
         if(((Test-PendingReboot) -or $Boxstarter.IsRebooting) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
@@ -115,30 +113,19 @@ Intercepts Chocolatey call to check for reboots
         $currentErrorCount = $global:error.Count
         $rebootable = $false
         try {
-            if($winFeature -eq $true -and (Get-IsRemote)){
-                #DISM Output is more confusing than helpful.
-                $currentLogging=$Boxstarter.Suppresslogging
-                if($VerbosePreference -eq "SilentlyContinue"){$Boxstarter.Suppresslogging=$true}
-                Invoke-FromTask @"
-."$($Boxstarter.VendoredChocoPath)\chocolateyinstall\chocolatey.ps1" $(Expand-Splat $PSBoundParameters)
-"@
-                $Boxstarter.SuppressLogging = $currentLogging
+            Call-Chocolatey @PSBoundParameters @args
+
+            # chocolatey reassembles environment variables after an install
+            # but does not add the machine PSModule value to the user Online
+            $machineModPath = [System.Environment]::GetEnvironmentVariable("PSModulePath","Machine")
+            if(!$env:PSModulePath.EndsWith($machineModPath)) {
+                $env:PSModulePath += ";" + $machineModPath
             }
-            else{
-                Call-Chocolatey @PSBoundParameters @args
 
-                # chocolatey reassembles environment variables after an install
-                # but does not add the machine PSModule value to the user Online
-                $machineModPath = [System.Environment]::GetEnvironmentVariable("PSModulePath","Machine")
-                if(!$env:PSModulePath.EndsWith($machineModPath)) {
-                    $env:PSModulePath += ";" + $machineModPath
-                }
-
-                $ec = [System.Environment]::ExitCode
-                Write-BoxstarterMessage "Exit Code: $ec" -Verbose
-                if($ec -ne 0) {
-                    Write-Error "Chocolatey reported an unsuccessful exit code of $ec. See $($Boxstarter.Log) for details."
-                }
+            $ec = [System.Environment]::ExitCode
+            Write-BoxstarterMessage "Exit Code: $ec" -Verbose
+            if($ec -ne 0) {
+                Write-Error "Chocolatey reported an unsuccessful exit code of $ec. See $($Boxstarter.Log) for details."
             }
         }
         catch { 
@@ -214,6 +201,17 @@ function Call-Chocolatey {
 
     if($PSVersionTable.CLRVersion.Major -lt 4 -and (Get-IsRemote)) {
         Invoke-ChocolateyFromTask $chocoArgs
+    }
+    elseif((Get-PassedArg @("source", "s") $args) -eq "WindowsFeatures" -and (Get-IsRemote)) {
+        $currentErrorCount = $global:error.Count
+        #DISM Output is more confusing than helpful.
+        $currentLogging=$Boxstarter.Suppresslogging
+        try {
+            Invoke-ChocolateyFromTask $chocoArgs
+        }
+        finally {
+            $Boxstarter.SuppressLogging = $currentLogging
+        }
     }
     else {
         Invoke-LocalChocolatey $chocoArgs

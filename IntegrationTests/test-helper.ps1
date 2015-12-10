@@ -170,6 +170,7 @@ function Test-Session($session) {
 function Remove-PreviousState($session) {
     Invoke-Command -session $session {
         param($boxDir)
+        DISM /online /Disable-Feature /FeatureName:TelnetClient 2>&1 | Out-Null
         Remove-Item -Path "$boxDir\test_marker" -ErrorAction SilentlyContinue | out-Null
         Remove-Item -Path "$boxDir\test_error.txt" -ErrorAction SilentlyContinue | Out-Null
         Remove-Item -Path "$boxDir\reboot-test.txt" -ErrorAction SilentlyContinue | Out-Null
