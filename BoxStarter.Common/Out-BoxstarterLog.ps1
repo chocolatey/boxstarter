@@ -68,8 +68,8 @@ about_boxstarter_logging
 
     process {
         if(!$Quiet -and !$Boxstarter.SuppressLogging){write-host $object}
-        if($Boxstarter -and $BoxStarter.Log -and $object){
-            $object >> $Boxstarter.Log            
+        if($object){
+            Log-BoxstarterMessage $object
         }
     }
 }
