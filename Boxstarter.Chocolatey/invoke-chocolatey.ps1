@@ -95,19 +95,72 @@ namespace Boxstarter
         public void Info(string message, params object[] formatting)
         {
             if(_quiet) return;
+            var origColor = _ui.RawUI.ForegroundColor;
             try {
                 var msg = String.Format(message, formatting);
+                if(msg.StartsWith("Boxstarter: ") || msg.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
+                    _ui.RawUI.ForegroundColor = ConsoleColor.Green;
+                }
+                else {
+                    _ui.RawUI.ForegroundColor = ConsoleColor.White;
+                }
                 _ui.WriteLine(msg);
                 WriteRaw(msg);
             }
             catch(Exception e) {
                 WriteRaw(e.ToString());
+            }
+            finally{
+                _ui.RawUI.ForegroundColor = origColor;
             }
         }
 
         public void Info(Func<string> message)
         {
             if(_quiet) return;
+            var origColor = _ui.RawUI.ForegroundColor;
+            try {
+                var msg = message.Invoke();
+                if(msg.StartsWith("Boxstarter: ") || msg.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
+                    _ui.RawUI.ForegroundColor = ConsoleColor.Green;
+                }
+                else {
+                    _ui.RawUI.ForegroundColor = ConsoleColor.White;
+                }
+                _ui.WriteLine(msg);
+                WriteRaw(msg);
+            }
+            catch(Exception e) {
+                WriteRaw(e.ToString());
+            }
+            finally{
+                _ui.RawUI.ForegroundColor = origColor;
+            }
+        }
+
+        public void Warn(string message, params object[] formatting)
+        {
+            if(_quiet) return;
+            var origColor = _ui.RawUI.ForegroundColor;
+            _ui.RawUI.ForegroundColor = ConsoleColor.Yellow;
+            try {
+                var msg = String.Format(message, formatting);
+                _ui.WriteLine(msg);
+                WriteRaw(msg);
+            }
+            catch(Exception e) {
+                WriteRaw(e.ToString());
+            }
+            finally{
+                _ui.RawUI.ForegroundColor = origColor;
+            }
+        }
+
+        public void Warn(Func<string> message)
+        {
+            if(_quiet) return;
+            var origColor = _ui.RawUI.ForegroundColor;
+            _ui.RawUI.ForegroundColor = ConsoleColor.Yellow;
             try {
                 var msg = message.Invoke();
                 _ui.WriteLine(msg);
@@ -116,34 +169,9 @@ namespace Boxstarter
             catch(Exception e) {
                 WriteRaw(e.ToString());
             }
-        }
-
-        public void Warn(string message, params object[] formatting)
-        {
-            if(_quiet) return;
-            try {
-                var msg = String.Format(message, formatting);
-                _ui.WriteWarningLine(msg);
-                WriteRaw(msg);
+            finally{
+                _ui.RawUI.ForegroundColor = origColor;
             }
-            catch(Exception e) {
-                WriteRaw(e.ToString());
-            }
-
-        }
-
-        public void Warn(Func<string> message)
-        {
-            if(_quiet) return;
-            try {
-                var msg = message.Invoke();
-                _ui.WriteWarningLine(msg);
-                WriteRaw(msg);
-            }
-            catch(Exception e) {
-                WriteRaw(e.ToString());
-            }
-
         }
 
         public void Error(string message, params object[] formatting)
