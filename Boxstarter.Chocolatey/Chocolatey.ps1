@@ -125,7 +125,8 @@ Intercepts Chocolatey call to check for reboots
 
             Write-BoxstarterMessage "Exit Code: $ec" -Verbose
             if($ec -ne 0) {
-                Write-Warning "Chocolatey reported an unsuccessful exit code of $ec. See $($Boxstarter.Log) for details."
+                Write-Error "Chocolatey reported an unsuccessful exit code of $ec. See $($Boxstarter.Log) for details."
+                $currentErrorCount += 1
             }
         }
         catch { 

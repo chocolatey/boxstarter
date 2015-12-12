@@ -178,7 +178,7 @@ Describe "Getting-Chocolatey" {
         Mock Call-Chocolatey {[System.Environment]::ExitCode=1}
         $Boxstarter.IsRebooting=$false
         
-        $error = Chocolatey Install pkg 3>&1
+        $error = Chocolatey Install pkg 2>&1
 
         it "will write a warning" {
             $error| should match "Chocolatey reported an unsuccessful exit code of 1"
