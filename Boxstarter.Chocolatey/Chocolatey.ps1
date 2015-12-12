@@ -100,7 +100,6 @@ Intercepts Chocolatey call to check for reboots
     
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
-        $currentLogging=$Boxstarter.Suppresslogging
         if((Get-PassedArg @("source", "s") $args) -eq "WindowsFeatures"){
             $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
             if($dismInfo -contains "State : Enabled" -or $dismInfo -contains "State : Enable Pending") {
@@ -114,7 +113,9 @@ Intercepts Chocolatey call to check for reboots
         $rebootable = $false
         try {
             Call-Chocolatey @PSBoundParameters @args
-
+            $ec = [System.Environment]::ExitCode
+            # suppress errors from enabled features that need a reboot
+            if((Test-WindowsFeatureInstall $args) -and $ec -eq 3010) { $ec=0 }
             # chocolatey reassembles environment variables after an install
             # but does not add the machine PSModule value to the user Online
             $machineModPath = [System.Environment]::GetEnvironmentVariable("PSModulePath","Machine")
@@ -122,10 +123,9 @@ Intercepts Chocolatey call to check for reboots
                 $env:PSModulePath += ";" + $machineModPath
             }
 
-            $ec = [System.Environment]::ExitCode
             Write-BoxstarterMessage "Exit Code: $ec" -Verbose
             if($ec -ne 0) {
-                Write-Error "Chocolatey reported an unsuccessful exit code of $ec. See $($Boxstarter.Log) for details."
+                Write-Warning "Chocolatey reported an unsuccessful exit code of $ec. See $($Boxstarter.Log) for details."
             }
         }
         catch { 
@@ -155,7 +155,7 @@ Intercepts Chocolatey call to check for reboots
                 if($global:error[$idx] -match "code was '(-?\d+)'") {
                     $errorCode=$matches[1]
                     if($RebootCodes -contains $errorCode) {
-                       Write-BoxstarterMessage "Chocolatey Install returned a reboot-able exit code" -verbose
+                       Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code" -verbose
                        $rebootable = $true
                     }
                 }
@@ -190,6 +190,10 @@ function Get-PassedArg($argName, $origArgs) {
     return $val
 }
 
+function Test-WindowsFeatureInstall($passedArgs) {
+(Get-PassedArg @("source", "s") $passedArgs) -eq "WindowsFeatures"
+}
+
 function Call-Chocolatey {
     param(
         [string]$command,
@@ -199,22 +203,18 @@ function Call-Chocolatey {
     $chocoArgs += Format-ExeArgs $command @args
     Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
 
-    if($PSVersionTable.CLRVersion.Major -lt 4 -and (Get-IsRemote)) {
-        Invoke-ChocolateyFromTask $chocoArgs
-    }
-    elseif((Get-PassedArg @("source", "s") $args) -eq "WindowsFeatures" -and (Get-IsRemote)) {
-        $currentErrorCount = $global:error.Count
-        #DISM Output is more confusing than helpful.
-        $currentLogging=$Boxstarter.Suppresslogging
-        try {
+    $currentLogging=$Boxstarter.Suppresslogging
+    try {
+        if(Test-WindowsFeatureInstall $args) { $Boxstarter.SuppressLogging=$true }
+        if(($PSVersionTable.CLRVersion.Major -lt 4 -or (Test-WindowsFeatureInstall $args)) -and (Get-IsRemote)) {
             Invoke-ChocolateyFromTask $chocoArgs
         }
-        finally {
-            $Boxstarter.SuppressLogging = $currentLogging
+        else {
+            Invoke-LocalChocolatey $chocoArgs
         }
     }
-    else {
-        Invoke-LocalChocolatey $chocoArgs
+    finally {
+        $Boxstarter.SuppressLogging = $currentLogging
     }
 
     $restartFile = "$(Get-BoxstarterTempDir)\Boxstarter.$PID.restart"
