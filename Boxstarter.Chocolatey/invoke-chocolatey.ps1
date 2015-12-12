@@ -98,7 +98,7 @@ namespace Boxstarter
             var origColor = _ui.RawUI.ForegroundColor;
             try {
                 var msg = String.Format(message, formatting);
-                if(msg.StartsWith("Boxstarter: ") || msg.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
+                if(msg.Trim().StartsWith("Boxstarter: ") || msg.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
                     _ui.RawUI.ForegroundColor = ConsoleColor.Green;
                 }
                 else {
@@ -121,7 +121,7 @@ namespace Boxstarter
             var origColor = _ui.RawUI.ForegroundColor;
             try {
                 var msg = message.Invoke();
-                if(msg.StartsWith("Boxstarter: ") || msg.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
+                if(msg.Trim().StartsWith("Boxstarter: ") || msg.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
                     _ui.RawUI.ForegroundColor = ConsoleColor.Green;
                 }
                 else {
