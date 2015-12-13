@@ -67,103 +67,128 @@ namespace Boxstarter
 
         public void Debug(string message, params object[] formatting)
         {
-            if(_quiet) return;
-            try {
-                var msg = String.Format(message, formatting);
-                if(_logDebug) _ui.WriteDebugLine(msg);
-                WriteRaw(msg);
-            }
-            catch(Exception e) {
-                WriteRaw(e.ToString());
-            }
+            WriteLog(
+                message,
+                x => { if(_logDebug) _ui.WriteDebugLine(x); },
+                formatting
+            );
         }
 
         public void Debug(Func<string> message)
         {
-            if(_quiet) return;
-            try {
-                var msg = message.Invoke();
-                if(_logDebug) _ui.WriteDebugLine(msg);
-                WriteRaw(msg);
-            }
-            catch(Exception e) {
-                WriteRaw(e.ToString());
-            }
-
+            WriteLog(
+                message,
+                x => { if(_logDebug) _ui.WriteDebugLine(x); }
+            );
         }
 
         public void Info(string message, params object[] formatting)
         {
-            if(_quiet) return;
-            var origColor = _ui.RawUI.ForegroundColor;
-            try {
-                var msg = String.Format(message, formatting);
-                if(msg.Trim().StartsWith("Boxstarter: ") || msg.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
-                    _ui.RawUI.ForegroundColor = ConsoleColor.Green;
-                }
-                else {
-                    _ui.RawUI.ForegroundColor = ConsoleColor.White;
-                }
-                _ui.WriteLine(msg);
-                WriteRaw(msg);
-            }
-            catch(Exception e) {
-                WriteRaw(e.ToString());
-            }
-            finally{
-                _ui.RawUI.ForegroundColor = origColor;
-            }
+            WriteLog(
+                message,
+                x => {
+                        if(x.Trim().StartsWith("Boxstarter: ") || x.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
+                            _ui.RawUI.ForegroundColor = ConsoleColor.Green;
+                        }
+                        else {
+                            _ui.RawUI.ForegroundColor = ConsoleColor.White;
+                        }
+                        _ui.WriteLine(x);
+                    },
+                formatting
+            );
         }
 
         public void Info(Func<string> message)
         {
-            if(_quiet) return;
-            var origColor = _ui.RawUI.ForegroundColor;
-            try {
-                var msg = message.Invoke();
-                if(msg.Trim().StartsWith("Boxstarter: ") || msg.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
-                    _ui.RawUI.ForegroundColor = ConsoleColor.Green;
-                }
-                else {
-                    _ui.RawUI.ForegroundColor = ConsoleColor.White;
-                }
-                _ui.WriteLine(msg);
-                WriteRaw(msg);
-            }
-            catch(Exception e) {
-                WriteRaw(e.ToString());
-            }
-            finally{
-                _ui.RawUI.ForegroundColor = origColor;
-            }
+            WriteLog(
+                message,
+                x => {
+                        if(x.Trim().StartsWith("Boxstarter: ") || x.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
+                            _ui.RawUI.ForegroundColor = ConsoleColor.Green;
+                        }
+                        else {
+                            _ui.RawUI.ForegroundColor = ConsoleColor.White;
+                        }
+                        _ui.WriteLine(x);
+                    }
+            );
         }
 
         public void Warn(string message, params object[] formatting)
         {
-            if(_quiet) return;
-            var origColor = _ui.RawUI.ForegroundColor;
-            _ui.RawUI.ForegroundColor = ConsoleColor.Yellow;
-            try {
-                var msg = String.Format(message, formatting);
-                _ui.WriteLine(msg);
-                WriteRaw(msg);
-            }
-            catch(Exception e) {
-                WriteRaw(e.ToString());
-            }
-            finally{
-                _ui.RawUI.ForegroundColor = origColor;
-            }
+            WriteLog(
+                message,
+                x => {
+                        _ui.RawUI.ForegroundColor = ConsoleColor.Yellow;
+                        _ui.WriteLine(x);
+                    },
+                formatting
+            );
         }
 
         public void Warn(Func<string> message)
         {
+            WriteLog(
+                message,
+                x => {
+                        _ui.RawUI.ForegroundColor = ConsoleColor.Yellow;
+                        _ui.WriteLine(x);
+                    }
+            );
+        }
+
+        public void Error(string message, params object[] formatting)
+        {
+            WriteLog(
+                message,
+                x => _ui.WriteErrorLine(x),
+                formatting
+            );
+        }
+
+        public void Error(Func<string> message)
+        {
+            WriteLog(
+                message,
+                x => _ui.WriteErrorLine(x)
+            );
+        }
+
+        public void Fatal(string message, params object[] formatting)
+        {
+            WriteLog(
+                message,
+                x => _ui.WriteErrorLine(x),
+                formatting
+            );
+        }
+
+        public void Fatal(Func<string> message)
+        {
+            WriteLog(
+                message,
+                x => _ui.WriteErrorLine(x)
+            );
+        }
+
+        private void WriteLog(string message, Action<String> logAction, params object[] formatting)
+        {
+            WriteFormattedLog(() => String.Format(message, formatting), logAction);
+        }
+
+        private void WriteLog(Func<string> message, Action<String> logAction)
+        {
+            WriteFormattedLog(() => message.Invoke(), logAction);
+        }
+
+        private void WriteFormattedLog(Func<string> formatMessage, Action<String> logAction)
+        {
             if(_quiet) return;
             var origColor = _ui.RawUI.ForegroundColor;
-            _ui.RawUI.ForegroundColor = ConsoleColor.Yellow;
             try {
-                var msg = message.Invoke();
-                _ui.WriteLine(msg);
+                var msg = formatMessage.Invoke();
+                logAction.Invoke(msg);
                 WriteRaw(msg);
             }
             catch(Exception e) {
@@ -171,67 +196,7 @@ namespace Boxstarter
             }
             finally{
                 _ui.RawUI.ForegroundColor = origColor;
-            }
-        }
-
-        public void Error(string message, params object[] formatting)
-        {
-            if(_quiet) return;
-            try {
-                var msg = String.Format(message, formatting);
-                _ui.WriteErrorLine(msg);
-                WriteRaw(msg);
-            }
-            catch(Exception e) {
-                WriteRaw(e.ToString());
-                WriteRaw(message);
-            }
-
-        }
-
-        public void Error(Func<string> message)
-        {
-            if(_quiet) return;
-            try {
-                var msg = message.Invoke();
-                _ui.WriteErrorLine(msg);
-                WriteRaw(msg);
-            }
-            catch(Exception e) {
-                WriteRaw(e.ToString());
-                WriteRaw(message.Invoke());
-            }
-
-        }
-
-        public void Fatal(string message, params object[] formatting)
-        {
-            if(_quiet) return;
-            try {
-                var msg = String.Format(message, formatting);
-                _ui.WriteErrorLine(msg);
-                WriteRaw(msg);
-            }
-            catch(Exception e) {
-                WriteRaw(e.ToString());
-                WriteRaw(message);
-            }
-
-        }
-
-        public void Fatal(Func<string> message)
-        {
-            if(_quiet) return;
-            try {
-                var msg = message.Invoke();
-                _ui.WriteErrorLine(msg);
-                WriteRaw(msg);
-            }
-            catch(Exception e) {
-                WriteRaw(e.ToString());
-                WriteRaw(message.Invoke());
-            }
-
+            }            
         }
 
         private void WriteRaw(string message)
