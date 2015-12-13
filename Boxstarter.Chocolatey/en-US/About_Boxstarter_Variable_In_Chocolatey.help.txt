@@ -18,10 +18,6 @@ BOXSTARTER VARIABLE SETTINGS
 		x86 machines and the 'Program Files (x86)' folder in the 
 		system drive on 64 bit machines.
 
-	ChocolateyBin
-		This points to the path of the chocolatey bin directory which 
-		by default is c:\chocolatey\bin.
-
 	Package
 		The name of the bootstrapper package running in Boxstarter.
 

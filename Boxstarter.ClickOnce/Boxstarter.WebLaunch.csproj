@@ -100,6 +100,9 @@
     <Content Include="..\Boxstarter.Chocolatey\*.*">
       <Link>Boxstarter.Chocolatey\%(Filename)%(Extension)</Link>
     </Content>
+    <Content Include="..\Boxstarter.Chocolatey\Chocolatey\*.*">
+      <Link>Boxstarter.Chocolatey\Chocolatey\%(Filename)%(Extension)</Link>
+    </Content>
     <Content Include="..\BoxStarter.Common\*.*">
       <Link>Boxstarter.Common\%(Filename)%(Extension)</Link>
     </Content>

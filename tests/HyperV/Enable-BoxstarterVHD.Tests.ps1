@@ -29,6 +29,8 @@ Describe "Enable-BoxstarterVHD" {
         Remove-Module boxstarter.*
         Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
         % { . $_.ProviderPath }
+        Resolve-Path $here\..\..\boxstarter.Chocolatey\*.ps1 | 
+        % { . $_.ProviderPath }
         Resolve-Path $here\..\..\boxstarter.HyperV\*.ps1 | 
         % { . $_.ProviderPath }
         $Boxstarter.SuppressLogging=$true
@@ -223,7 +225,7 @@ Describe "Enable-BoxstarterVHD" {
             Dismount-VHD $testRoot\test.vhdx -ErrorAction SilentlyContinue
             Remove-Item $testRoot\test.vhdx
         }
-        del $env:temp\Boxstarter.tests -recurse -force
+        del $env:temp\Boxstarter.tests -recurse -force -ErrorAction SilentlyContinue
         Get-Process Explorer | Stop-Process
     }
 }

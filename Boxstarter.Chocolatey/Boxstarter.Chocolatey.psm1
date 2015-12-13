@@ -1,12 +1,35 @@
+param(
+    [parameter(Position=0,Mandatory=$false)][boolean]$ExportCommands=$false
+)
 $unNormalized=(Get-Item "$PSScriptRoot\..\Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1")
-Import-Module $unNormalized.FullName -global -DisableNameChecking -Force
+Import-Module $unNormalized.FullName -global -DisableNameChecking
 Resolve-Path $PSScriptRoot\*.ps1 | 
     % { . $_.ProviderPath }
 
-Check-Chocolatey -ShouldIntercept
+if($ExportCommands) { 
+    Import-BoxstarterVars
+    Export-ModuleMember cinst, cup, choco 
+}
 
-Export-ModuleMember Invoke-ChocolateyBoxstarter, New-BoxstarterPackage, Invoke-BoxstarterBuild, Get-PackageRoot, Set-BoxstarterShare, Get-BoxstarterConfig, Set-BoxstarterConfig, Install-BoxstarterPackage, New-PackageFromScript, Enable-BoxstarterClientRemoting, Enable-BoxstarterCredSSP, Resolve-VMPlugin
-
-Export-ModuleMember Install-ChocolateyInstallPackageOverride,
+Export-ModuleMember Get-BoxstarterConfig,`
+                    Get-PackageRoot,`
+                    Enable-BoxstarterClientRemoting,`
+                    Enable-BoxstarterCredSSP,`
+                    Export-BoxstarterVars,`
+                    Install-ChocolateyInstallPackageOverride,`
+                    Invoke-BoxstarterBuild,`
+                    Invoke-Chocolatey,`
+                    Invoke-ChocolateyBoxstarter,`
+                    Install-BoxstarterPackage,`
+                    New-BoxstarterPackage,`
+                    New-PackageFromScript,`
+                    Register-ChocolateyInterception,`
+                    Resolve-VMPlugin,`
+                    Set-BoxstarterConfig,`
+                    Set-BoxstarterShare,`
                     Write-HostOverride
-Export-ModuleMember -alias Install-ChocolateyInstallPackage, Write-Host, Enable-BoxstarterVM
+
+Export-ModuleMember -alias `
+                    Enable-BoxstarterVM,`
+                    Install-ChocolateyInstallPackage,`
+                    Write-Host

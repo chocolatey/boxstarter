@@ -1,7 +1,23 @@
 Resolve-Path $PSScriptRoot\*.ps1 | 
     % { . $_.ProviderPath }
 
-Export-ModuleMember     Write-BoxstarterMessage, Start-TimedSection, Stop-TimedSection, Enter-BoxstarterLogable, Out-BoxstarterLog, Log-BoxstarterMessage, Test-Admin, Invoke-FromTask, Get-IsRemote, Confirm-Choice, Create-BoxstarterTask, Remove-BoxstarterTask, Write-BoxstarterLogo, Get-CurrentUser, Get-IsMicrosoftUpdateEnabled, Invoke-RetriableScript, Remove-BoxstarterError
-                        
-Export-ModuleMember -Variable Boxstarter
+Export-ModuleMember Confirm-Choice,`
+                    Create-BoxstarterTask,`
+                    Enter-BoxstarterLogable,`
+                    Enter-DotNet4,`
+                    Get-CurrentUser,`
+                    Get-IsMicrosoftUpdateEnabled,`
+                    Get-IsRemote,`
+                    Invoke-FromTask,`
+                    Invoke-RetriableScript,`
+                    Out-BoxstarterLog,`
+                    Log-BoxstarterMessage,`
+                    Remove-BoxstarterError,`
+                    Remove-BoxstarterTask,`
+                    Start-TimedSection,`
+                    Stop-TimedSection,`
+                    Test-Admin,`
+                    Write-BoxstarterLogo,`
+                    Write-BoxstarterMessage
 
+Export-ModuleMember -Variable Boxstarter

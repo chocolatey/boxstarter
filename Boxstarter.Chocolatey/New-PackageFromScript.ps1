@@ -52,8 +52,15 @@ about_boxstarter_chocolatey
         [string] $PackageName="temp_BoxstarterPackage"
     )
 
+    $chocoInstall = [System.Environment]::GetEnvironmentVariable('ChocolateyInstall', 'MACHINE')
+    if($chocoInstall -eq $null) {
+        # Simply Installs choco repo and helpers
+        Call-Chocolatey
+        $chocoInstall = [System.Environment]::GetEnvironmentVariable('ChocolateyInstall', 'MACHINE')
+    }
     if(!(test-path function:\Get-WebFile)){
-        . "$($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
+        . "$chocoInstall\helpers\functions\Format-FileSize.ps1"
+        . "$chocoInstall\helpers\functions\Get-WebFile.ps1"
     }
     if($source -like "*://*"){
         try {$text = Get-WebFile -url $Source -passthru } catch{

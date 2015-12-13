@@ -31,12 +31,25 @@ Describe "Invoke-FromTask" {
         Remove-Item $env:temp\test.txt -ErrorAction SilentlyContinue
         Mock write-host {
             $script:out += $object
-            Microsoft.PowerShell.Utility\Write-Host @PSBoundParameters
         }
 
-        Invoke-FromTask "Write-Output 'here is some output'" -IdleTimeout 0 -verbose
+        Invoke-FromTask "Write-Output 'here is some output'" -IdleTimeout 0
         It "Should invoke the command"{
             $script:out | should be "here is some output`r`n"
+        }
+    }
+
+    Context "When Invoking a task with verbose output"{
+        Remove-Item $env:temp\test.txt -ErrorAction SilentlyContinue
+        $script:out = ""
+        Mock write-host {
+            $script:out += $object
+        }
+
+        Invoke-FromTask "Write-Verbose 'here is some verbose output' -Verbose" -IdleTimeout 0
+
+        It "Should invoke the command"{
+            $script:out | should be "here is some verbose output`r`n"
         }
     }
 

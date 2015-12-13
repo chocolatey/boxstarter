@@ -143,7 +143,8 @@ Set-BoxstarterConfig
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
 Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage '$($bootstrapPackage -join ''',''')'"}) $(if($LocalRepo){"-LocalRepo $localRepo"})  $(if($DisableReboots){"-DisableReboots"})
 "@
-            return Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password -KeepWindowOpen:$KeepWindowOpen -NoPassword:$NoPassword -DisableRestart:$DisableRestart
+            Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password -KeepWindowOpen:$KeepWindowOpen -NoPassword:$NoPassword -DisableRestart:$DisableRestart
+            return
         }
         if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
         $Boxstarter.ProgramFiles86="$programFiles86"
@@ -181,9 +182,17 @@ function Download-Package([string[]]$bootstrapPackage) {
         if($chocoRoot -eq $null) {
             $chocoRoot = "$env:programdata\chocolatey"
         }
-        Write-BoxstarterMessage "Deleting $chocoRoot\lib\$bootstrapPackage.*" -verbose
-        del "$chocoRoot\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
-        Write-BoxstarterMessage "Deleted $chocoRoot\lib\$bootstrapPackage.*" -verbose
+        if(Test-Path "$chocoRoot\lib"){
+            @(
+                "$chocoRoot\lib\$bootstrapPackage.*",
+                "$chocoRoot\lib\$bootstrapPackage"
+            ) | % {
+                if(Test-Path $_){
+                    del $_ -recurse -force -ErrorAction SilentlyContinue
+                    Write-BoxstarterMessage "Deleted $_" -verbose
+                }
+            }
+        }
         $force=$true
     }
     $source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"

@@ -16,7 +16,7 @@ properties {
 }
 
 Task default -depends Build
-Task Build -depends Build-Clickonce, Build-Web, Test, Package
+Task Build -depends Build-Clickonce, Build-Web, Install-ChocoLib, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Chocolatey, Push-Github, Publish-Web
@@ -69,7 +69,7 @@ task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
 
 Task Test -depends Create-ModuleZipForRemoting {
     pushd "$baseDir"
-    $pesterDir = "$env:ChocolateyInstall\lib\Pester.2.1.0"
+    $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     if($testName){
         exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -testName $testName}
     }
@@ -79,9 +79,9 @@ Task Test -depends Create-ModuleZipForRemoting {
     popd
 }
 
-Task Integration-Test -depends Pack-Nuget {
+Task Integration-Test -depends Pack-Nuget, Create-ModuleZipForRemoting {
     pushd "$baseDir"
-    $pesterDir = "$env:ChocolateyInstall\lib\Pester.2.1.0"
+    $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     if($testName){
         exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/IntegrationTests -testName $testName}
     }
@@ -208,6 +208,16 @@ task Install-WebAppTargets {
 
 task Install-WebDeploy {
     if(!(Test-Path "$env:ProgramW6432\IIS\Microsoft Web Deploy V3")) { cinst webdeploy -y }
+}
+
+task Install-ChocoLib {
+    exec { .$nugetExe install chocolatey.lib -Version 0.9.10-beta-20151210 -Pre -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
+    exec { .$nugetExe install log4net -Version 2.0.3 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
+    MkDir $basedir\Boxstarter.Chocolatey\chocolatey -ErrorAction SilentlyContinue
+    Copy-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3\lib\net40-full\* $basedir\Boxstarter.Chocolatey\chocolatey
+    Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.9.10-beta-20151210\lib\* $basedir\Boxstarter.Chocolatey\chocolatey
+    Remove-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3 -Recurse -Force
+    Remove-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.9.10-beta-20151210 -Recurse -Force
 }
 
 function PackDirectory($path, [switch]$AddReleaseNotes){

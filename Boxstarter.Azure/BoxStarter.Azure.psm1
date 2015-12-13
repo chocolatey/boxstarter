@@ -8,4 +8,9 @@ try {Get-Module Storage -ListAvailable | Import-Module -global} catch { Log-Boxs
 
 Import-AzureModule
 
-Export-ModuleMember Enable-BoxstarterVM, Get-AzureVMCheckpoint, Set-AzureVMCheckpoint, Restore-AzureVMCheckpoint, Remove-AzureVMCheckpoint, Test-VMStarted
+Export-ModuleMember Enable-BoxstarterVM,`
+                    Get-AzureVMCheckpoint,`
+                    Remove-AzureVMCheckpoint,`
+                    Restore-AzureVMCheckpoint,`
+                    Set-AzureVMCheckpoint,`
+                    Test-VMStarted

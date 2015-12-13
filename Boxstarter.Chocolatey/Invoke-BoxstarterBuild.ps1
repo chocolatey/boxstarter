@@ -29,7 +29,6 @@ New-BoxstarterPackage
         [switch]$all,
         [switch]$quiet
     )
-    $choco="$($Boxstarter.VendoredChocoPath)\chocolateyinstall\chocolatey.ps1"
     if(!$boxstarter -or !$boxstarter.LocalRepo){
         throw "No Local Repository has been set in `$Boxstarter.LocalRepo."
     }
@@ -41,7 +40,7 @@ New-BoxstarterPackage
             if(!(Test-Path $searchPath)){
                 throw "Cannot find $($Boxstarter.LocalRepo)\$searchPath"
             }
-            .$choco Pack (join-path $name "$name.nuspec") | out-null
+            Call-Chocolatey Pack (join-path $name "$name.nuspec") | out-null
             if(!$quiet){
                 Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $name or Install-BoxstarterPackage $name will run this package." -nologo
             }
@@ -52,7 +51,7 @@ New-BoxstarterPackage
                     $directoriesExist=$true
                     Write-BoxstarterMessage "Found directory $($_.name). Looking for $($_.name).nuspec"
                     if(Test-Path (join-path $_.name "$($_.name).nuspec")){
-                        .$choco Pack (join-path . "$($_.Name)\$($_.Name).nuspec") | out-null
+                        Call-Chocolatey Pack (join-path . "$($_.Name)\$($_.Name).nuspec") | out-null
                         if(!$quiet){
                             Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Install-BoxstarterPackage $($_.Name) will run this package." -nologo                        
                         }
@@ -65,6 +64,6 @@ New-BoxstarterPackage
         }
     }
     finally {
-        popd    
+        popd
     }
 }

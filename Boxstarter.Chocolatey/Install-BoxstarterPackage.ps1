@@ -490,13 +490,13 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
             }
         }
         
-        Invoke-Remotely $session $PackageName $DisableReboots $sessionArgs
+        Invoke-Remotely ([ref]$session) $PackageName $DisableReboots $sessionArgs
         return $true
     }
     finally {
         Write-BoxstarterMessage "checking if session should be removed..." -Verbose
         if($session -ne $null -and $session.Name -eq "Boxstarter") {
-            Write-BoxstarterMessage "Removing session..." -Verbose
+            Write-BoxstarterMessage "Removing session $($session.id)..." -Verbose
             Remove-PSSession $Session
             Write-BoxstarterMessage "Session removed..." -Verbose
             $Session = $null
@@ -518,7 +518,8 @@ function Invoke-Locally {
         [switch]$Force,
         [switch]$DisableReboots,
         [switch]$KeepWindowOpen,
-        [switch]$DisableRestart
+        [switch]$DisableRestart,
+        [string]$LocalRepo
     )
     if($PSBoundParameters.ContainsKey("Credential")){
         if($Credential -ne $null) {
@@ -537,7 +538,7 @@ function Invoke-Locally {
 
     $record = Start-Record 'localhost'
     try {
-        Invoke-ChocolateyBoxstarter @PSBoundParameters | Out-Null
+        Invoke-ChocolateyBoxstarter @PSBoundParameters
     }
     catch {
         $record.Completed=$false
@@ -594,6 +595,7 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
         Write-BoxstarterMessage "Copying $($_.Name) to $($Session.ComputerName)" -Verbose
         Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $session 
     }
+    Write-BoxstarterMessage "Expanding modules on $($Session.ComputerName)" -Verbose
     Invoke-Command -Session $Session {
         Set-ExecutionPolicy Bypass -Force
         $shellApplication = new-object -com shell.application 
@@ -611,8 +613,9 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
 function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $session) {
     Write-BoxstarterMessage "Running remote install..."
     $remoteResult = Invoke-Command -session $session {
-        param($SuppressLogging,$pkg,$Credential,$DisableReboots, $verbosity, $ProgressArgs)
+        param($SuppressLogging,$pkg,$Credential,$DisableReboots, $verbosity, $ProgressArgs, $debug)
         $global:VerbosePreference=$verbosity
+        $global:DebugPreference=$debug        
         Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
         if($Credential -eq $null){
             $currentUser = Get-CurrentUser
@@ -635,7 +638,7 @@ function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $sessio
         catch{
             throw $_
         }
-    } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Credential, $DisableReboots, $global:VerbosePreference, $global:Boxstarter.ProgressArgs
+    } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Credential, $DisableReboots, $global:VerbosePreference, $global:Boxstarter.ProgressArgs, $global:DebugPreference
     Write-BoxstarterMessage "Result from Remote Boxstarter: $($remoteResult.Result)" -Verbose
     return $remoteResult
 }
@@ -698,10 +701,15 @@ function Test-Reconnection($Session, $sessionPID) {
     $reconnected = $false
 
     #If there is a pending reboot then session is in the middle of a restart
-    $response=Invoke-Command -Session $session { 
-        Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 
-        return Test-PendingReboot
-    } -ErrorAction SilentlyContinue
+    try{
+        $response=Invoke-Command -Session $session { 
+            Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 
+            return Test-PendingReboot
+        } -ErrorAction Stop
+    } catch {
+        Write-BoxstarterMessage "Failed to test pending reboot : $($global:Error[0])" -Verbose
+        $global:Error.RemoveAt(0)
+    }
     Write-BoxstarterMessage "Reboot check returned $response" -Verbose
 
 
@@ -743,32 +751,42 @@ function Test-Reconnection($Session, $sessionPID) {
     return $reconnected
 }
 
-function Invoke-Remotely($session,$Package,$DisableReboots,$sessionArgs){
+function Invoke-Remotely([ref]$session,$Package,$DisableReboots,$sessionArgs){
     Write-BoxstarterMessage "Invoking remote install" -verbose
-    while($session.Availability -eq "Available") {
-        $sessionPID = Invoke-Command -Session $session { return $PID }
+    while($session.value.Availability -eq "Available") {
+        $sessionPID = try { Invoke-Command -Session $session.value { return $PID } } catch { $global:Error.RemoveAt(0) }
         Write-BoxstarterMessage "Session's process ID is $sessionPID" -verbose
-        $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential $DisableReboots $session
+        if($sessionPID -ne $null) {
+            $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential $DisableReboots $session.value
+        }
 
         if(Test-RebootingOrDisconnected $remoteResult) {
-            Wait-ForSessionToClose $session
+            Wait-ForSessionToClose $session.value
 
             $reconnected=$false
-            Write-BoxstarterMessage "Waiting for $($session.ComputerName) to respond to remoting..."
+            Write-BoxstarterMessage "Waiting for $($session.value.ComputerName) to respond to remoting..."
             Do{
-                if($session -ne $null){
-                    Remove-PSSession $session
-                    $session = $null
+                if($session.value -ne $null){
+                    Write-BoxstarterMessage "removing session..." -verbose
+                    try { Remove-PSSession $session.value } catch { $global:Error.RemoveAt(0) }
+                    $session.value = $null
+                    Write-BoxstarterMessage "session removed..." -verbose
                 }
                 $response=$null
                 start-sleep -seconds 2
-                $session = New-PSSession @sessionArgs -Name Boxstarter -ErrorAction SilentlyContinue
-                if($session -eq $null) {
+                Write-BoxstarterMessage "attempting to recreate session..." -verbose
+                $session.value = New-PSSession @sessionArgs -Name Boxstarter -ErrorAction SilentlyContinue
+                if($session.value -eq $null) {
+                    Write-BoxstarterMessage "New session is null..." -verbose
                     $global:Error.RemoveAt(0)
                 }
-                elseif($session -ne $null -and $Session.Availability -eq "Available"){
+                elseif($session.value -ne $null -and $Session.value.Availability -eq "Available"){
+                    Write-BoxstarterMessage "testing new session..." -verbose
                     if($remoteResult.Result -eq "Rebooting"){$sessionPID=-1}
-                    $reconnected = Test-Reconnection $session $sessionPID
+                    $reconnected = Test-Reconnection $session.value $sessionPID
+                }
+                else {
+                    Write-BoxstarterMessage "new session is not available..." -verbose
                 }
             }
             Until($reconnected -eq $true)
@@ -835,12 +853,13 @@ function Enable-RemoteCredSSP($sessionArgs) {
     $n=Invoke-RetriableScript {
         $splat=$args[0]
         Invoke-Command @splat { 
-            param($Credential)
+            param($Credential, $verbosity)
+            $VerbosePreference = $verbosity
             Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
             Create-BoxstarterTask $Credential
             Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null"
             Remove-BoxstarterTask
-        } -ArgumentList $args[0].Credential
+        } -ArgumentList @($args[0].Credential, $VerbosePreference)
     } $sessionArgs
     $sessionArgs.Authentication="CredSSP"
     Write-BoxstarterMessage "Creating New session with CredSSP Authentication..." -Verbose

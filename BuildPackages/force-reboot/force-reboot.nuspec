@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>force-reboot</id>
+    <version>1.0.0</version>
+    <authors>mwrock</authors>
+    <owners>mwrock</owners>
+    <description>force reboot</description>
+    <tags>test</tags>
+  </metadata>
+  <files>
+    <file src="tools\**\*.*" target="tools"/>
+  </files>
+</package>
