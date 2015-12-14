@@ -11,7 +11,7 @@ Describe "Enter-DotNet4" {
     Mock Test-Path { $true } -ParameterFilter { $path.EndsWith('v4.0.30319') }
     Mock Test-PendingReboot { $false }
     Mock Get-IsRemote { $false }
-    Mock Get-HttpToFile
+    Mock Get-HttpResource
     Mock Start-Process { @{HasExited=$true} } -ParameterFilter { $FilePath.EndsWith("net45.exe") }
     $PSVersionTable.CLRVersion = New-Object Version '4.0.0'
 
@@ -21,7 +21,7 @@ Describe "Enter-DotNet4" {
         $result | should be "PID:$PID"
     }
     it 'should not download .net' {
-        Assert-MockCalled Get-HttpToFile -Times 0
+        Assert-MockCalled Get-HttpResource -Times 0
     }
     it 'should not install .net' {
         Assert-MockCalled Start-Process -Times 0
@@ -34,7 +34,7 @@ Describe "Enter-DotNet4" {
         Enter-Dotnet4 { Write-Output "$($args[0]):$PID" } 'PID' | Out-Null
 
         it 'downloads .net 4' {
-            Assert-MockCalled Get-HttpToFile
+            Assert-MockCalled Get-HttpResource
         }
         it 'installs .net 4' {
             Assert-MockCalled Start-Process
@@ -49,7 +49,7 @@ Describe "Enter-DotNet4" {
         Enter-Dotnet4 { Write-Output "$($args[0]):$PID" } 'PID' | Out-Null
 
         it 'downloads .net 4' {
-            Assert-MockCalled Get-HttpToFile
+            Assert-MockCalled Get-HttpResource
         }
         it 'does not installs .net 4 in process' {
             Assert-MockCalled Start-Process -Times 0

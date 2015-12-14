@@ -58,12 +58,8 @@ about_boxstarter_chocolatey
         Call-Chocolatey
         $chocoInstall = [System.Environment]::GetEnvironmentVariable('ChocolateyInstall', 'MACHINE')
     }
-    if(!(test-path function:\Get-WebFile)){
-        . "$chocoInstall\helpers\functions\Format-FileSize.ps1"
-        . "$chocoInstall\helpers\functions\Get-WebFile.ps1"
-    }
     if($source -like "*://*"){
-        try {$text = Get-WebFile -url $Source -passthru } catch{
+        try {$text = Get-HttpResource -url $Source -passthru } catch{
             throw "Unable to retrieve script from $source `r`nInner Exception is:`r`n$_"
         }
     }

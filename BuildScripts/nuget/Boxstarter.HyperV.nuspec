@@ -16,6 +16,7 @@
       <dependency id="Boxstarter.Chocolatey" version="$version$" />
     </dependencies>
     <releaseNotes>
+- Use internal function to download http gist scripts.
 - No longer vendors a legacy version of Chocolatey. Leverages the current beta Chocolatey library API for all Chocolatey interaction.
 </releaseNotes>
   </metadata>

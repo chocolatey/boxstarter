@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
     <releaseNotes xmlns="">
+- Use internal function to download http gist scripts.
 - No longer vendors a legacy version of Chocolatey. Leverages the current beta Chocolatey library API for all Chocolatey interaction.
 </releaseNotes>
   </metadata>

@@ -6,6 +6,7 @@ Export-ModuleMember Confirm-Choice,`
                     Enter-BoxstarterLogable,`
                     Enter-DotNet4,`
                     Get-CurrentUser,`
+                    Get-HttpResource,`
                     Get-IsMicrosoftUpdateEnabled,`
                     Get-IsRemote,`
                     Invoke-FromTask,`
