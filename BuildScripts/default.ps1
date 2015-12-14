@@ -163,9 +163,23 @@ Task Push-Github {
         body=$releaseNotes.DocumentElement.'#text'
     } -Compress
 
-    $response = Invoke-RestMethod -Uri "https://api.github.com/repos/mwrock/boxstarter/releases" -Method POST -Body $postParams -Headers $headers
-    $uploadUrl = $response.upload_url.replace("{?name}","?name=boxstarter.$version.zip")
-    Invoke-RestMethod -Uri $uploadUrl -Method POST -ContentType "application/zip" -InFile "$basedir\BuildArtifacts\Boxstarter.$version.zip" -Headers $headers
+    $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/mwrock/boxstarter/releases/latest" -Method GET -Headers $headers
+    if($latest.tag_name -ne "v$version"){
+        write-host "Creating release"
+        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/mwrock/boxstarter/releases" -Method POST -Body $postParams -Headers $headers
+        $uploadUrl = $response.upload_url.replace("{?name,label}","?name=boxstarter.$version.zip")
+    }
+    else {
+        $uploadUrl = $latest.upload_url.replace("{?name,label}","?name=boxstarter.$version.zip")
+    }
+
+    write-host "Uploading $basedir\BuildArtifacts\Boxstarter.$version.zip to $uploadUrl"
+    try {
+        Invoke-RestMethod -Uri $uploadUrl -Method POST -ContentType "application/zip" -InFile "$basedir\BuildArtifacts\Boxstarter.$version.zip" -Headers $headers
+    }
+    catch{
+        write-host $_ | fl * -force
+    }
 }
 
 task Update-Homepage {
