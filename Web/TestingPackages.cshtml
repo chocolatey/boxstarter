@@ -8,7 +8,7 @@
 }
 
 <p>
-    The Boxstarter TestRunner module can test <a href="http://chocolatwey.org">Chocolatey</a> package installs
+    The Boxstarter TestRunner module can test <a href="https://chocolatey.org">Chocolatey</a> package installs
     on one or more deployment targets and evaluate whether the installation
     was successful. The TestRunner module can also be used to automate
     the publishing of Chocolatey packages to a <a href="http://nuget.org">Nuget</a> feed. That may be
@@ -23,7 +23,7 @@
     is located. The Boxstarter repository is a single directory on disk
     that contains one subdirectory per package. By default, Boxstarter
     maintains this directory in a directory called <code>BuildPackages</code> inside
-    the same root directory where the Boxstarter modules reside. See <a href="CreatingPackages.cshtml">Creating Packages</a> 
+    the same root directory where the Boxstarter modules reside. See <a href="CreatingPackages.cshtml">Creating Packages</a>
     for detailed information on using Boxstarter commands to simplify package creation. All
     Boxstarter commands that create and build packages act within this
     directory. The repository location can be found using the <code>$boxstarter</code>
@@ -72,9 +72,9 @@ Set-BoxstarterDeployOptions -DeploymentTargetCredentials $cred `
     Key 5cbc38d9-1a94-430d-8361-685a9080a6b8.
 </p>
 <p>
-    Currently the available Boxstarter VM providers are Azure and HyperV. Any VM regardless of hypervisor 
-    implementation can be used by passing in the names of the computers as the deployment targets. However, 
-    use of Boxstarter VM providers are necessary in order to take advantage of checkpoints. 
+    Currently the available Boxstarter VM providers are Azure and HyperV. Any VM regardless of hypervisor
+    implementation can be used by passing in the names of the computers as the deployment targets. However,
+    use of Boxstarter VM providers are necessary in order to take advantage of checkpoints.
 </p>
 <p>
     The default deployment options deploy locally using the credentials of the current user and publish to the public chocolatey feed.
