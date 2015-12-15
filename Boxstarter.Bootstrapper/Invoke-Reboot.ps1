@@ -32,6 +32,10 @@ about_boxstarter_variable_in_bootstrapper
         return 
     }
     if(!(Get-IsRemote -PowershellRemoting) -and !($Boxstarter.DisableRestart)){
+        if(!$Boxstarter.ScriptToCall) {
+            Write-BoxstarterMessage "Invoke-Reboot must be called from a Boxstarter package."
+            return
+        }
         Write-BoxstarterMessage "writing restart file"
         New-Item "$(Get-BoxstarterTempDir)\Boxstarter.script" -type file -value $boxstarter.ScriptToCall -force | Out-Null
         $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"

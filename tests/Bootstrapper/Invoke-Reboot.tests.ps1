@@ -9,6 +9,7 @@ Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 |
 $Boxstarter.BoxstarterUser="user"
 $Boxstarter.SuppressLogging=$true
 $Boxstarter.NoPassword=$false
+$Boxstarter.ScriptToCall="some script"
 
 Describe "Invoke-Reboot" {
     Mock New-Item -ParameterFilter { $Path -like "*boxstarter*" }
