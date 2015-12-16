@@ -244,7 +244,7 @@ namespace Boxstarter
             # Chocolatey.dll uses GetCurrentDirectory which is not quite right
             # when calling via powershell. so we set it here
             Write-BoxstarterMessage "setting current directory location to $((Get-Location).Path)" -Verbose
-            [System.IO.Directory]::SetCurrentDirectory((Get-Location).Path)
+            [System.IO.Directory]::SetCurrentDirectory("$(Convert-Path (Get-Location).Path)")
             $choco.Run($chocoArgs)
         }
         finally {
