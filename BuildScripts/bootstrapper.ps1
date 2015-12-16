@@ -21,7 +21,7 @@ function Get-Boxstarter {
             # if there is no -v then its an older version with no -y
             $command = "cinst Boxstarter"
         }
-        $command += " -version 2.6.16
+        $command += " -version 2.6.16"
         Invoke-Expression $command
         $Message = "Boxstarter Module Installer completed"
     }
