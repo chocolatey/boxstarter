@@ -4,7 +4,7 @@ Description = 'Provides common functionality used by multiple Boxstarter Modules
 ModuleToProcess = './boxstarter.common.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.6.16'
+ModuleVersion = '2.6.20'
 
 # ID used to uniquely identify this module
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e51'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = '79b9778b57c9020e45c1d1709cacd3a9f79e6bba'
+PrivateData = 'ea8b1117490657a085bac36e32b1554e39ec8a44'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
