@@ -197,5 +197,5 @@ function Download-Package([string[]]$bootstrapPackage) {
     }
     $source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
     write-BoxstarterMessage "Installing $($bootstrapPackage.Count) packages from $source" -Verbose
-    Chocolatey install $bootstrapPackage -source $source -force:$force
+    Chocolatey install $bootstrapPackage -source $source -force:$force -execution-timeout 86400
 }
