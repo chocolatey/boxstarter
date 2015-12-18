@@ -41,13 +41,13 @@ http://boxstarter.org
         $wp.UseDefaultCredentials=$true
         $downloader.Proxy=$wp
         try {
-            $httpString = $downloader.DownloadString($args[0])
             if($args[1]) {
-                Write-BoxstarterMessage "Saving $httpString to $($args[1])" -Verbose
-                if(Test-Path $args[1]){Remove-Item $args[1] -Force}
-                $httpString | Out-File -FilePath $args[1] -Encoding utf8
+                Write-BoxstarterMessage "Saving $($args[0]) to $($args[1])" -Verbose
+                $downloader.DownloadFile($args[0], $args[1])
             }
-            $httpString
+            else {
+                $downloader.DownloadString($args[0])
+            }
         }
         catch{
             if($VerbosePreference -eq "Continue"){
@@ -57,5 +57,12 @@ http://boxstarter.org
         }
     } $Url $OutputPath
 
-    if($PassThru) { Write-Output $str }
+    if($PassThru) { 
+        if($str) {
+            Write-Output $str
+        }
+        elseif($OutputPath) {
+            Get-Content -Path $OutputPath
+        }
+    }
 }
