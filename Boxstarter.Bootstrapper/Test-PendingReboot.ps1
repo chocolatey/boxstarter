@@ -24,9 +24,13 @@ about_boxstarter_bootstrapper
 #>
     Write-BoxstarterMessage "Checking for Pending reboot" -Verbose
     $rebootPending = Get-PendingReboot -ErrorLog $BoxStarter.Log
-    if($rebootPending.RebootPending) {
+    if ($rebootPending.RebootPending) {
         Write-BoxstarterMessage "Detected Pending reboot" -Verbose
         Log-BoxstarterMessage "$rebootPending"
         return $true
     }
+    else {
+        return $false
+    }
+    
 }
