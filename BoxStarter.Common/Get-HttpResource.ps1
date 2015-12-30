@@ -40,6 +40,7 @@ http://boxstarter.org
         $wp=[system.net.WebProxy]::GetDefaultProxy()
         $wp.UseDefaultCredentials=$true
         $downloader.Proxy=$wp
+        $downloader.UseDefaultCredentials=$true
         try {
             if($args[1]) {
                 Write-BoxstarterMessage "Saving $($args[0]) to $($args[1])" -Verbose
