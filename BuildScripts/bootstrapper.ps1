@@ -14,7 +14,7 @@ function Get-Boxstarter {
         Write-Output "Chocolatey installed, Installing Boxstarter Modules."
         $version = choco -v
         try {
-            [Version]::Parse($version.split('-')[0]) | Out-Null
+            New-Object -TypeName Version -ArgumentList $version.split('-')[0] | Out-Null
             $command = "cinst Boxstarter -y"
         }
         catch{
