@@ -306,7 +306,21 @@ Describe "Call-Chocolatey" {
             $passedArgs[4] | Should Be "--bing"
             $passedArgs[5] | Should Be "boom"
         }
+    }
 
+    context "when passing source as --source with =" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Install pkg --source=blah
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 5
+        }
+        it "passes source" {
+            $passedArgs[2] | Should Be "--source"
+            $passedArgs[3] | Should Be "blah"
+        }
     }
 
     context "when passing source as -source" {

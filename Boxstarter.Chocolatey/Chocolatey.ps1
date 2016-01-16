@@ -185,7 +185,14 @@ function Get-PassedArg($argName, $origArgs) {
             $nextIsValue = $false
             $val =  $_
         }
-        if($candidateKeys -contains $_) { $nextIsValue = $true }
+        if($candidateKeys -contains $_) {
+            $nextIsValue = $true
+        }
+        elseif($_.ToString().Contains("=")) {
+            $parts = $_.split("=", 2)
+            $nextIsValue = $false
+            $val = $parts[1]
+        }        
     }
 
     return $val
@@ -273,6 +280,10 @@ function Format-ExeArgs($command) {
             $_ = "-f"
             $onForce = $true
         }
+        elseif($_.Tostring().StartsWith("-") -and $_.ToString().Contains("=")){
+            $_ = $_.split("=",2)
+        }
+
         $newArgs += $_
     }
 
