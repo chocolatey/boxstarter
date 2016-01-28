@@ -12,9 +12,10 @@ http://boxstarter.org
 #>
 
     param(
-        [ValidateSet("On","Off")]
+        [Parameter(Position=0)]
+        [ValidateSet("On", "Off", ignorecase=$True)]
         [String]
-		$NLA
+	$NLA="On"
 	)
     
     Write-BoxstarterMessage "Enabling Remote Desktop..."
