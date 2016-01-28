@@ -12,7 +12,17 @@ function Get-Boxstarter {
     Write-Output "Welcome to the Boxstarter Module installer!"
     if(Check-Chocolatey -Force:$Force){
         Write-Output "Chocolatey installed, Installing Boxstarter Modules."
-        cinst Boxstarter -y -version 2.5.10
+        $version = choco -v
+        try {
+            New-Object -TypeName Version -ArgumentList $version.split('-')[0] | Out-Null
+            $command = "cinst Boxstarter -y"
+        }
+        catch{
+            # if there is no -v then its an older version with no -y
+            $command = "cinst Boxstarter"
+        }
+        $command += " -version 2.6.25"
+        Invoke-Expression $command
         $Message = "Boxstarter Module Installer completed"
     }
     else {
@@ -41,12 +51,12 @@ function Check-Chocolatey {
             }
             $env:ChocolateyInstall = "$env:programdata\chocolatey"
             New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
-            $url="http://chocolatey.org/api/v2/package/chocolatey/"
+            $url="https://chocolatey.org/api/v2/package/chocolatey/"
             $wc=new-object net.webclient
             $wp=[system.net.WebProxy]::GetDefaultProxy()
             $wp.UseDefaultCredentials=$true
             $wc.Proxy=$wp
-            iex ($wc.DownloadString("http://chocolatey.org/install.ps1"))
+            iex ($wc.DownloadString("https://chocolatey.org/install.ps1"))
             $env:path="$env:path;$env:ChocolateyInstall\bin"
         }
         else{

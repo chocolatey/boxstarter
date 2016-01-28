@@ -52,11 +52,14 @@ about_boxstarter_chocolatey
         [string] $PackageName="temp_BoxstarterPackage"
     )
 
-    if(!(test-path function:\Get-WebFile)){
-        . "$($Boxstarter.VendoredChocoPath)\chocolateyinstall\helpers\functions\Get-WebFile.ps1"
+    $chocoInstall = [System.Environment]::GetEnvironmentVariable('ChocolateyInstall', 'MACHINE')
+    if($chocoInstall -eq $null) {
+        # Simply Installs choco repo and helpers
+        Call-Chocolatey
+        $chocoInstall = [System.Environment]::GetEnvironmentVariable('ChocolateyInstall', 'MACHINE')
     }
     if($source -like "*://*"){
-        try {$text = Get-WebFile -url $Source -passthru } catch{
+        try {$text = Get-HttpResource -url $Source -passthru } catch{
             throw "Unable to retrieve script from $source `r`nInner Exception is:`r`n$_"
         }
     }

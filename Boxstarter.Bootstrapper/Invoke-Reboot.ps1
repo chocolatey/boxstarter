@@ -32,6 +32,10 @@ about_boxstarter_variable_in_bootstrapper
         return 
     }
     if(!(Get-IsRemote -PowershellRemoting) -and !($Boxstarter.DisableRestart)){
+        if(!$Boxstarter.ScriptToCall) {
+            Write-BoxstarterMessage "Invoke-Reboot must be called from a Boxstarter package."
+            return
+        }
         Write-BoxstarterMessage "writing restart file"
         New-Item "$(Get-BoxstarterTempDir)\Boxstarter.script" -type file -value $boxstarter.ScriptToCall -force | Out-Null
         $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
@@ -45,6 +49,11 @@ about_boxstarter_variable_in_bootstrapper
     }
     catch {} # There are several reports of the bitlocker module throwing errors
     $Boxstarter.IsRebooting=$true
+
+    if($Boxstarter.SourcePID -ne $Null) {
+        Write-BoxstarterMessage "Writing restart marker with pid $($Boxstarter.SourcePID) from $PID" -verbose
+        New-Item "$(Get-BoxstarterTempDir)\Boxstarter.$($Boxstarter.SourcePID).restart" -type file -value "" -force | Out-Null
+    }
     Restart
 }
 

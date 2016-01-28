@@ -57,7 +57,6 @@
   <ItemGroup>
     <Compile Include="Boxstarter.Chocolatey.psd1" />
     <Compile Include="Boxstarter.Chocolatey.psm1" />
-    <Compile Include="Check-Chocolatey.ps1" />
     <Compile Include="Chocolatey.ps1" />
     <Compile Include="Enable-BoxstarterClientRemoting.ps1" />
     <Compile Include="Enable-RemotePsRemoting.ps1" />

@@ -33,13 +33,13 @@ cinst IIS-WebServerRole -source windowsfeatures
 <h4><span class="text-primary">Its Simply Chocolatey</span></h4>
 <p>Other than the <a href="WinConfig">Boxstarter commands</a> that are imported into all Boxstarter Installation sessions, you will likely recognize this syntax if you are already familiar with Chocolatey. This script is going to configure Windows Explorer in a way that won't drive you crazy, allow you to use Remote Desktop to connect to the machine, install a handful of applications that you commonly use and install Hyper-V's virtualization host and the IIS Web Server.</p>
 
-<p>Boxstarter can run any <a href="https://github.com/chocolatey/chocolatey/wiki/CreatePackagesQuickStart">Chocolatey package</a>. The only difference as far as the script is concerned is that your script also has access to Boxstarter's commands for configuring Windows, running updates as well as logging and reboot control.</p>
+<p>Boxstarter can run any <a href="https://github.com/chocolatey/choco/wiki/CreatePackagesQuickStart">Chocolatey package</a>. The only difference as far as the script is concerned is that your script also has access to Boxstarter's commands for configuring Windows, running updates as well as logging and reboot control.</p>
 
 <h3>Step 2</h3>
 <h4><span class="text-primary">Save your script</span></h4>
 <p>You have lots of options here. Boxstarter supports:</p>
 <ul>
-<li>Saving to as a package on any Nuget feed.</li>
+<li>Saving as a package to any Nuget feed.</li>
 <li>Saving a package to a Network share or any local media such as a thumb drive.</li>
 <li>Saving to a single text file or any text based HTTP resource (like a <a href="https://gist.github.com/">Github Gist</a>)</li>
 </ul>
@@ -65,6 +65,11 @@ START http://boxstarter.org/package/nr/url?https://gist.github.com/mwrock/738288
 
 <p>We add our raw Gist URL to the Boxstarter URL separated by a '?'.</p>
 
+<p>Additionally, if the script is saved locally to a single text file, the path can be added to the Boxstarter URL, again separated by a '?'.</p>
+<pre>
+START http://boxstarter.org/package/nr/url?c:\temp\myscript.txt
+</pre>
+
 <p>This invokes a Boxstarter installer that will install everything according to your script. </p>
 <img src="images\install.png"/>
 
@@ -72,6 +77,6 @@ START http://boxstarter.org/package/nr/url?https://gist.github.com/mwrock/738288
 
 <h4>Other facts about the Boxstarter web installer:</h4>
 <ul>
-<li>You can also install any package on the public <a href="http://chocolatey.org/packages">Chocolatey.org</a> feed as well as the <a href="https://www.myget.org/gallery/boxstarter">Boxstarter community feed</a> on <a href="http://myget.org">MyGet.org</a>. To install these packages, use the package name instead of URL. So if you wanted to install FireFox, you would use http://boxstarter.org/package/nr/firefox.</li>
-<li>As briefly noted above, by default the web launch URLs will not work outside of Internet Explorer or from the START command if Internet Explorer is not your default browser. You need to install a "Click-Once" extension for non-IE browsers. <a href="https://addons.mozilla.org/en-us/firefox/addon/microsoft-net-framework-assist/">Here</a> is one for firefox.</li>        
+<li>You can also install any package on the public <a href="https://chocolatey.org/packages">Chocolatey.org</a> feed as well as the <a href="https://www.myget.org/gallery/boxstarter">Boxstarter community feed</a> on <a href="http://myget.org">MyGet.org</a>. To install these packages, use the package name instead of URL. So if you wanted to install FireFox, you would use http://boxstarter.org/package/nr/firefox.</li>
+<li>As briefly noted above, by default the web launch URLs will not work outside of Internet Explorer or from the START command if Internet Explorer is not your default browser. You need to install a "Click-Once" extension for non-IE browsers. <a href="https://addons.mozilla.org/en-us/firefox/addon/microsoft-net-framework-assist/">Here</a> is one for firefox and <a href="https://chrome.google.com/webstore/detail/windows-remix-clickonce-h/dgpgholdldjjbcmpeckiephjigdpikan">here</a> is one for chrome.</li>        
 </ul>

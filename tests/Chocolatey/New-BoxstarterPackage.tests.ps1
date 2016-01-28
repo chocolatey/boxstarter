@@ -14,8 +14,6 @@ Describe "New-BoxstarterPackage" {
     $packageName="pkg"
     $Description="My Description"
     Context "When No Path is provided" {
-        Mock Intercept-Chocolatey
-
         New-BoxstarterPackage $packageName $Description | out-null
 
         It "Will Create the nuspec" {
@@ -40,13 +38,9 @@ Describe "New-BoxstarterPackage" {
         It "Will Create ChocolateyInstall file" {
             join-path (Join-Path $Boxstarter.LocalRepo "$packageName\tools") "ChocolateyInstall.ps1" | Should Exist
         }
-        It "Should not intercept chocolatey" {
-            Assert-MockCalled Intercept-Chocolatey -Times 0
-        }
     }
 
     Context "When a Path is provided that has no nuspec or chocolateyInstall" {
-        Mock Check-Chocolatey
         mkdir (Join-Path $boxstarter.BaseDir "mypkg\dir1") |out-null
         New-Item (Join-Path $boxstarter.BaseDir "mypkg\test.txt") -type file | out-null
         New-Item (Join-Path $boxstarter.BaseDir "mypkg\dir1\test1.txt") -type file | out-null
@@ -82,7 +76,6 @@ Describe "New-BoxstarterPackage" {
     }    
 
     Context "When a Path is provided that has a nuspec" {
-        Mock Check-Chocolatey
         mkdir (Join-Path $boxstarter.BaseDir "mypkg\dir1") |out-null
         New-Item (Join-Path $boxstarter.BaseDir "mypkg\pkg.nuspec") -type file -value "my nuspec" | out-null
 
@@ -94,7 +87,6 @@ Describe "New-BoxstarterPackage" {
     }
 
     Context "When a Path is provided that has a chocolateyInstall and nuspec" {
-        Mock Check-Chocolatey
         mkdir (Join-Path $boxstarter.BaseDir "mypkg\tools") |out-null
         New-Item (Join-Path $boxstarter.BaseDir "mypkg\tools\chocolateyInstall.ps1") -type file -value "my install" | out-null
         New-Item (Join-Path $boxstarter.BaseDir "mypkg\pkg.nuspec") -type file -value "my nuspec" | out-null
@@ -107,7 +99,6 @@ Describe "New-BoxstarterPackage" {
     }    
 
     Context "When a LocalRepo is null" {
-        Mock Check-Chocolatey
         $boxstarter.LocalRepo = $null
 
         try {New-BoxstarterPackage $packageName $Description} catch { $ex=$_ }
@@ -119,7 +110,6 @@ Describe "New-BoxstarterPackage" {
     }
 
     Context "When a package name is not valid" {
-        Mock Check-Chocolatey
         try {New-BoxstarterPackage "my: invalid name" $Description} catch { $ex=$_ }
 
         It "Will throw Invalid Package ID" {
@@ -128,7 +118,6 @@ Describe "New-BoxstarterPackage" {
     } 
 
     Context "When a package directory already exists" {
-        Mock Check-Chocolatey
         mkdir (Join-Path $boxstarter.LocalRepo $packageName) |out-null
 
         try {New-BoxstarterPackage $packageName $Description} catch { $ex=$_ }
@@ -139,8 +128,6 @@ Describe "New-BoxstarterPackage" {
     }    
 
     Context "When a path is provided that does not exist" {
-        Mock Check-Chocolatey
-
         try {New-BoxstarterPackage $packageName $Description (Join-Path $boxstarter.BaseDir "mypkg") } catch { $ex=$_ }
 
         It "Will throw path does not exist" {

@@ -169,11 +169,11 @@ Your password will be securely stored and encrypted.
 }
 
 function Resolve-Script([ScriptBlock]$script, [string]$scriptFile){
-    if($script) {return $script}
+    if($script) {return $script.ToString()}
     if(Test-Path $scriptFile) {
         $scriptFile=(Get-Content $scriptFile)
         if($scriptFile.length -gt 0) {
-            return [ScriptBlock]::Create($scriptFile)
+            return $scriptFile
         }
     }
     throw "No Script was specified to call."

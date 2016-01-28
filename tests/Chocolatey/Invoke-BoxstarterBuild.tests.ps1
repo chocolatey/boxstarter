@@ -8,14 +8,12 @@ Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "Invoke-BoxstarterBuild" {
-    $Boxstarter.BaseDir=(Get-PSDrive TestDrive).Root
-    $Boxstarter.LocalRepo=Join-Path $boxstarter.BaseDir "repo"
+    $Boxstarter.LocalRepo=Join-Path ((Get-PSDrive TestDrive).Root) "repo"
     $Boxstarter.SuppressLogging=$true
     $packageName="pkg"
 
     Context "When Building a single package" {
         Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}
-        Mock Intercept-Chocolatey
         New-BoxstarterPackage $packageName | Out-Null
 
         Invoke-BoxstarterBuild $packageName | Out-Null
@@ -23,15 +21,10 @@ Describe "Invoke-BoxstarterBuild" {
         It "Will Create the nupkg" {
             Join-Path $Boxstarter.LocalRepo "$packageName.1.0.0.nupkg" | Should Exist
         }
-        It "Should not intercept chocolatey" {
-            Assert-MockCalled Intercept-Chocolatey -Times 0
-        }
-
     }
 
     Context "When Building all packages" {
         Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}
-        Mock Check-Chocolatey
         New-BoxstarterPackage "pkg1" | Out-Null
         New-BoxstarterPackage "pkg2" | Out-Null
 
@@ -46,7 +39,6 @@ Describe "Invoke-BoxstarterBuild" {
 
     Context "When LocalRepo is null" {
         Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}        
-        Mock Check-Chocolatey
         New-BoxstarterPackage $packageName | Out-Null
         $boxstarter.LocalRepo = $null
 
@@ -60,8 +52,7 @@ Describe "Invoke-BoxstarterBuild" {
 
     Context "When No nuspec is in the named repo" {
         Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}
-        Mock Check-Chocolatey
-        Mkdir $Boxstarter.LocalRepo | Out-Null
+        Mkdir $Boxstarter.LocalRepo -ErrorAction SilentlyContinue | Out-Null
 
         try {Invoke-BoxstarterBuild $packageName} catch { $ex=$_ }
 

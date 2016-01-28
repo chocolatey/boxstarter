@@ -19,7 +19,7 @@
 <h4><span class="text-primary">Create your installer script</span></h4>
 <p>Open your favorite text editor and compose your installer. Although this can contain any valid Powershell, you really do not need to know any Powershell to create your script. This could just be a collection of Boxstarter commands. Here is an example:</p>
 <pre>
-Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
+Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowProtectedOSFiles -EnableShowFileExtensions
 Enable-RemoteDesktop
 Set-StartScreenOptions -EnableBootToDesktop
 cinst fiddler4
