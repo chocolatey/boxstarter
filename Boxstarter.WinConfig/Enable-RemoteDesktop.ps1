@@ -3,8 +3,9 @@
 .SYNOPSIS
 Allows Remote Desktop access to machine and enables Remote Desktop firewall rule
 
-.PARAMETER NLA
-Changes the if Remote Desktop requires Network Level Authentication.  Valid inputs are On and Off.
+.PARAMETER DoNotRequireUserLevelAuthentication
+Allows connections from computers running remote desktop
+without Network Level Authentication (not recommended)
 
 .LINK
 http://boxstarter.org
@@ -12,11 +13,8 @@ http://boxstarter.org
 #>
 
     param(
-        [Parameter(Position=0)]
-        [ValidateSet("On", "Off", ignorecase=$True)]
-        [String]
-	$NLA="On"
-	)
+        [switch]$DoNotRequireUserLevelAuthentication
+    )
     
     Write-BoxstarterMessage "Enabling Remote Desktop..."
     $obj = Get-WmiObject -Class "Win32_TerminalServiceSetting" -Namespace root\cimv2\terminalservices
@@ -38,14 +36,14 @@ http://boxstarter.org
         return
     }
     try {
-        switch ($NLA) {
-			"On" { $obj2.SetUserAuthenticationRequired(1) | out-null
-            Write-BoxstarterMessage "Enabling Remote Desktop NLA ..."    
-            }
-			"Off" { $obj2.SetUserAuthenticationRequired(0) | out-null
+        if($DoNotRequireUserLevelAuthentication) {
+            $obj2.SetUserAuthenticationRequired(0) | out-null
             Write-BoxstarterMessage "Disabling Remote Desktop NLA ..."
-            }
-		}
+        }
+        else {
+			$obj2.SetUserAuthenticationRequired(1) | out-null
+            Write-BoxstarterMessage "Enabling Remote Desktop NLA ..."    
+        }
     }
     catch {
         throw "There was a problem enabling Remote Desktop NLA. Make sure your operating system supports Remote Desktop NLA and there is no group policy preventing you from enabling it."
