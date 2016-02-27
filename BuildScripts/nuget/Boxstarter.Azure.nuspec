@@ -13,7 +13,7 @@
     <tags>Boxstarter bootstrapper environment setup VM virtualization Azure</tags>
     <dependencies>
       <dependency id="Boxstarter" version="$version$" />
-      <dependency id="WindowsAzurePowershell" version="0.8.8" />
+      <dependency id="WindowsAzurePowershell" />
     </dependencies>
     <releaseNotes>
 - Use internal function to download http gist scripts.
