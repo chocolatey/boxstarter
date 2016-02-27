@@ -14,7 +14,6 @@
     <dependencies>
       <dependency id="Boxstarter" version="$version$" />
       <dependency id="WindowsAzurePowershell" version="0.8.8" />
-      <dependency id="WindowsAzureLibsForNet" version="[2.5]" />
     </dependencies>
     <releaseNotes>
 - Use internal function to download http gist scripts.
@@ -25,6 +24,7 @@
     <file src="..\..\LICENSE.txt" target="tools" />
     <file src="..\chocolateyinstall.ps1" target="tools" />
     <file src="..\Setup.ps1" target="tools" />
+    <file src="Boxstarter.Azure.PreInstall.ps1" target="tools" />
     <file src="..\..\Boxstarter.Azure\**\*.*" target="tools\Boxstarter.Azure" />
   </files>
 </package>
