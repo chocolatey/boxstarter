@@ -208,14 +208,18 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When CredSSP is enabled but not for given computer" {
-        Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah","")}
+        Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah,wsman/bleeblee","")}
         Mock Confirm-Choice {return $False}
         Mock Invoke-Command { New-Object System.Object }
+        $script:delegateComputer = $null
+        Mock Enable-WSManCredSSP { $script:delegateComputer = $DelegateComputer }
 
         Install-BoxstarterPackage -computerName blah,blah2 -PackageName test -Credential $mycreds | Out-Null
 
         It "will enable CredSSP when done for current computer"{
-            Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$Role -eq "client" -and $DelegateComputer -eq "blahblah"}
+            $script:delegateComputer.count | Should be 2
+            $script:delegateComputer[0] | should Be "blahblah"
+            $script:delegateComputer[1] | should Be "bleeblee"
         }
         It "will disable/reset when done"{
             Assert-MockCalled Disable-WSManCredSSP -ParameterFilter {$Role -eq "client"}

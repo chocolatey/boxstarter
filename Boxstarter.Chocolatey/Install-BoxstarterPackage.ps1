@@ -907,7 +907,7 @@ function Rollback-ClientRemoting($ClientRemotingStatus, $CredSSPStatus) {
         if($CredSSPStatus.PreviousCSSPTrustedHosts -ne $null){
             try{
                 Write-BoxstarterMessage "Reseting CredSSP Trusted Hosts to $($CredSSPStatus.PreviousCSSPTrustedHosts.Replace('wsman/',''))" -Verbose
-                Enable-WSManCredSSP -DelegateComputer $CredSSPStatus.PreviousCSSPTrustedHosts.Replace("wsman/","") -Role Client -Force | Out-Null
+                Enable-WSManCredSSP -DelegateComputer ($CredSSPStatus.PreviousCSSPTrustedHosts.Replace("wsman/","").split(",") | Get-Unique) -Role Client -force | Out-Null
             }
             catch{}
         }
