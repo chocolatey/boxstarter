@@ -15,6 +15,9 @@ Changes the size of the Taskbar Icons.  Valid inputs are Small and Large.
 .PARAMETER Dock
 Changes the location in which the Taskbar is docked.  Valid inputs are Top, Left, Bottom and Right.
 
+.PARAMETER Combine
+Changes the Taskbar Icon combination style. Valid inputs are Always, Full, and Never.
+
 #>
 	[CmdletBinding(DefaultParameterSetName='unlock')]
 	param(
@@ -25,28 +28,36 @@ Changes the location in which the Taskbar is docked.  Valid inputs are Top, Left
 		[ValidateSet('Small','Large')]
 		$Size,
 		[ValidateSet('Top','Left','Bottom','Right')]
-		$Dock
+		$Dock,
+		[ValidateSet('Always','Full','Never')]
+		$Combine
 	)
 
 	$key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
 	$dockingKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects2'
 
 	if(Test-Path -Path $key) {
-		if($Lock) 
-		{ 
+		if($Lock)
+		{
 			Set-ItemProperty $key TaskbarSizeMove 0
         }
         if($UnLock){
-			Set-ItemProperty $key TaskbarSizeMove 1 
-		} 
+			Set-ItemProperty $key TaskbarSizeMove 1
+		}
 
 		switch ($Size) {
 			"Small" { Set-ItemProperty $key TaskbarSmallIcons 1 }
 			"Large" { Set-ItemProperty $key TaskbarSmallIcons 0 }
 		}
 
+		switch($Combine) {
+			"Always" { Set-ItemProperty $key TaskbarGlomLevel 0 }
+			"Full" { Set-ItemProperty $key TaskbarGlomLevel 1 }
+			"Never" { Set-ItemProperty $key TaskbarGlomLevel 2 }
+		}
+
 		Restart-Explorer
-	}	
+	}
 
 	if(Test-Path -Path $dockingKey) {
 		switch ($Dock) {
