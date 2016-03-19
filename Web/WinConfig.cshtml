@@ -71,11 +71,11 @@ Set-WindowsExplorerOptions -DisableShowHiddenFilesFoldersDrives -DisableShowProt
 <h3>Set-TaskbarOptions</h3>
 <p>Sets options on the Windows Taskbar</p>
 <pre>
-Set-TaskbarOptions -Size Small -Lock -Dock Top
+Set-TaskbarOptions -Size Small -Lock -Dock Top -Combine Always
 </pre>
 <p>It is also possible to do the converse actions, if required.</p>
 <pre>
-    Set-TaskbarOptions -Size Large -UnLock -Dock Bottom
+    Set-TaskbarOptions -Size Large -UnLock -Dock Bottom -Combine Never
 </pre>
 
 <h3>Update-ExecutionPolicy</h3>
