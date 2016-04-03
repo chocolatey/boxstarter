@@ -17,13 +17,8 @@
       <dependency id="Boxstarter.Bootstrapper" version="$version$" />
     </dependencies>
     <releaseNotes>
-- Fix CredSSP rollback from setting bogus delegate computers
-- Fis Boxstarter.Azure dependency pins
-- Add ability to set the User Level Authentication Required setting when enabling RDP
-- Fix parsing of choco args delimiting key/values with an = sign
-- Use default credentials on web client downloading http scripts
-- Use internal function to download http gist scripts.
-- No longer vendors a legacy version of Chocolatey. Leverages the current beta Chocolatey library API for all Chocolatey interaction.
+- Enabling powershell remoting via WMI on remote machine was not working when piping from Enable-BoxstarterVM
+- Added a -Combine parameter to Set-TaskBarOptions
 </releaseNotes>
   </metadata>
   <files>
