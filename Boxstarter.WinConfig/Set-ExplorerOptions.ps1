@@ -3,7 +3,7 @@ function Set-ExplorerOptions {
 .SYNOPSIS
 Sets options on the windows Explorer shell
 
-.PARAMETER showHidenFilesFoldersDrives
+.PARAMETER showHiddenFilesFoldersDrives
 If this switch is set, hidden files will be shown in windows explorer
 
 .PARAMETER showProtectedOSFiles
@@ -15,17 +15,17 @@ Setting this switch will cause windows explorer to include the file extension in
 .LINK
 http://boxstarter.org
 
-#>    
+#>
     param(
-        [switch]$showHidenFilesFoldersDrives, 
-        [switch]$showProtectedOSFiles, 
+        [switch]$showHiddenFilesFoldersDrives,
+        [switch]$showProtectedOSFiles,
         [switch]$showFileExtensions
     )
 
 	Write-Warning "This command is deprecated, use Set-WindowsExplorerOptions instead."
 	Write-Warning "Your call to this function will now be routed to the Set-WindowsExplorerOptions function."
 
-	if($showHidenFilesFoldersDrives) { Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives }
+	if($showHiddenFilesFoldersDrives) { Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives }
     if($showFileExtensions) { Set-WindowsExplorerOptions -EnableShowProtectedOSFiles }
     if($showProtectedOSFiles) { Set-WindowsExplorerOptions -EnableShowFileExtensions }
 }

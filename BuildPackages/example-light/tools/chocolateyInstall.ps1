@@ -1,5 +1,5 @@
 Update-ExecutionPolicy Unrestricted
-Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
+Set-ExplorerOptions -showHiddenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
 Enable-RemoteDesktop
 
 cinst console-devel
