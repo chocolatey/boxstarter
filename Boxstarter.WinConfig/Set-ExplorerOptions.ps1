@@ -17,6 +17,7 @@ http://boxstarter.org
 
 #>
     param(
+        [alias("showHidenFilesFoldersDrives")]
         [switch]$showHiddenFilesFoldersDrives,
         [switch]$showProtectedOSFiles,
         [switch]$showFileExtensions
