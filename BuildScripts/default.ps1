@@ -67,7 +67,7 @@ task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:boxstarter_publish_password }
 }
 
-Task Test -depends Create-ModuleZipForRemoting {
+Task Test -depends Install-ChocoLib, Pack-Nuget, Create-ModuleZipForRemoting {
     pushd "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     if($testName){
