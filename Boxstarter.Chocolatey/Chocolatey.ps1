@@ -419,7 +419,7 @@ function Import-BoxstarterVars {
 }
 
 function ConvertTo-PSString($originalValue) {
-    if($originalValue -is [int]){
+    if($originalValue -is [int] -or $originalValue -is [int64]){
         "$originalValue"
     }
     elseif($originalValue -is [Array]){
