@@ -14,7 +14,7 @@ Install-BoxstarterPackage -PackageName https://gist.github.com/mwrock/8066325/ra
 </pre>
 
 <h3>New-PackageFromScript</h3>
-<p>The simplest way to create a Nuget package is using the <code>New-PackageFromScript</code> command.</p> 
+<p>The simplest way to create a Nuget package is using the <code>New-PackageFromScript</code> command.</p>
 <pre>
 New-PackageFromScript MyScript.ps1 MyPackage
 </pre>
@@ -79,7 +79,7 @@ Notepad (Join-Path -Path $Boxstarter.LocalRepo -ChildPath "MyPackage\tools\Choco
 <pre>
 Update-ExecutionPolicy Unrestricted
 Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
-Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
+Set-ExplorerOptions -showHiddenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
 Set-TaskbarSmall
 Enable-RemoteDesktop
 
