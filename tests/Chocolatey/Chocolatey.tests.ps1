@@ -64,7 +64,7 @@ Describe "Getting-Chocolatey" {
 
     Context "When chocolatry strips the machine module path" {
         Mock Call-Chocolatey {
-            $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath","User")
+            $env:PSModulePath = "C:\Program Files\WindowsPowerShell\Modules"
             $global:LASTEXITCODE=0
         }
 
