@@ -414,7 +414,7 @@ Describe "Call-Chocolatey" {
 Describe "Install-ChocolateyInstallPackageOverride" {
     Mock Get-IsRemote { return $true }
     $script:passedCommand = ""
-    $i64 = [Int32]::MaxValue + 1
+    [Int64]$i64 = [Int32]::MaxValue + 1
     Mock Invoke-FromTask { $script:passedCommand=$command }
 
     Install-ChocolateyInstallPackageOverride -packageName pkg -silentArgs "/s" -file "myfile.exe" -validExitCodes @(1,2,$i64)
