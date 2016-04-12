@@ -30,6 +30,7 @@
     <Compile Include="boxstarter.WinConfig.psd1" />
     <Compile Include="Boxstarter.WinConfig.psm1" />
     <Compile Include="Disable-InternetExplorerESC.ps1" />
+    <Compile Include="Disable-GameBarTips.ps1" />
     <Compile Include="Disable-UAC.ps1" />
     <Compile Include="Enable-RemoteDesktop.ps1" />
     <Compile Include="Enable-UAC.ps1" />
