@@ -27,6 +27,12 @@ Setting this switch will cause Windows Explorer to show the full folder path in 
 .PARAMETER DisableShowFullPathInTitleBar
 Disables the showing of the full path in Windows Explorer Title Bar, see EnableShowFullPathInTitleBar
 
+.PARAMETER EnableExpandToOpenFolder
+Setting this switch will cause Windows Explorer to expand the navigation pane to the current open folder
+
+.PARAMETER DisableExpandToOpenFolder
+Disables the expanding of the navigation page to the current open folder in Windows Explorer, see EnableExpandToOpenFolder
+
 .LINK
 http://boxstarter.org
 
@@ -41,7 +47,9 @@ http://boxstarter.org
 		[switch]$EnableShowFileExtensions,
 		[switch]$DisableShowFileExtensions,
 		[switch]$EnableShowFullPathInTitleBar,
-		[switch]$DisableShowFullPathInTitleBar
+		[switch]$DisableShowFullPathInTitleBar,
+		[switch]$EnableExpandToOpenFolder,
+		[switch]$DisableExpandToOpenFolder
 	)
 
 	$PSBoundParameters.Keys | % {
@@ -67,7 +75,10 @@ http://boxstarter.org
 		
 		if($EnableShowProtectedOSFiles) {Set-ItemProperty $advancedKey ShowSuperHidden 1}
 		if($DisableShowProtectedOSFiles) {Set-ItemProperty $advancedKey ShowSuperHidden 0}
-		
+
+		if($EnableExpandToOpenFolder) {Set-ItemProperty $advancedKey NavPaneExpandToCurrentFolder 1}
+		if($DisableExpandToOpenFolder) {Set-ItemProperty $advancedKey NavPaneExpandToCurrentFolder 0}
+
 		Restart-Explorer
 	}
 
