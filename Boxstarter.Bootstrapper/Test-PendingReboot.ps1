@@ -5,7 +5,7 @@ Checks to see if Windows is pending a reboot
 
 .DESCRIPTION
 Uses a script from Brian Wilhite 
-http://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542 
+https://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542 
 that queries the registry, Windows Update and System 
 Configuration Manager to determine if a pending reboot is 
 required.
@@ -17,30 +17,20 @@ call Invoke-Reboot to restart the local machine.
 
 .LINK
 http://boxstarter.org
-http://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542 
+https://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542 
 Invoke-Reboot
 about_boxstarter_bootstrapper
 
 #>
     Write-BoxstarterMessage "Checking for Pending reboot" -Verbose
     $rebootPending = Get-PendingReboot -ErrorLog $BoxStarter.Log
-    if($rebootPending.RebootPending) {
+    if ($rebootPending.RebootPending) {
         Write-BoxstarterMessage "Detected Pending reboot" -Verbose
         Log-BoxstarterMessage "$rebootPending"
         return $true
     }
-    return IsCCMRebootPending
-}
-
-function IsCCMRebootPending {
-    try { $clientutils = [wmiclass]"\\.\root\ccm\clientsdk:CCM_ClientUtilities" } catch{$global:error.RemoveAt(0)}
-    if($clientutils) {
-        try {
-            $determination=$clientutils.DetermineIfRebootPending()
-            $isPending=$determination.RebootPending
-            if($isPending){Write-BoxstarterMessage "Configuration manager is pending reboot" -Verbose}
-            return $isPending
-            } catch {}
+    else {
+        return $false
     }
-    return $false
+    
 }
