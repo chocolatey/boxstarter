@@ -96,8 +96,6 @@ http://boxstarter.org
 
         if($EnableShowFrequentFoldersInQuickAccess) {Set-ItemProperty $key ShowFrequent 1}
         if($DisableShowFrequentFoldersInQuickAccess) {Set-ItemProperty $key ShowFrequent 0}
-
-        Restart-Explorer
     }
 
     if(Test-Path -Path $advancedKey) {
@@ -115,14 +113,12 @@ http://boxstarter.org
 
         if($EnableOpenFileExplorerToQuickAccess) {Set-ItemProperty $advancedKey LaunchTo 2}
         if($DisableOpenFileExplorerToQuickAccess) {Set-ItemProperty $advancedKey LaunchTo 1}
-
-        Restart-Explorer
     }
 
     if(Test-Path -Path $cabinetStateKey) {
         if($EnableShowFullPathInTitleBar) {Set-ItemProperty $cabinetStateKey FullPath  1}
         if($DisableShowFullPathInTitleBar) {Set-ItemProperty $cabinetStateKey FullPath  0}
-
-        Restart-Explorer		
     }
+
+    Restart-Explorer        
 }
