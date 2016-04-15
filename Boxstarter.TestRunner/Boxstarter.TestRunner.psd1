@@ -13,7 +13,7 @@ GUID = '087b5fe9-4a6e-40b5-a0fb-e670b86563b3'
 Author = 'Matt Wrock'
 
 # Copyright statement for this module
-Copyright = '(c) 2015 Matt Wrock'
+Copyright = '(c) 2016 Matt Wrock'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '2.0'
