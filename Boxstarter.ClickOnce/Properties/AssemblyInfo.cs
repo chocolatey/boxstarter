@@ -7,5 +7,5 @@ using System.Reflection;
 [assembly: AssemblyProduct("Boxstarter.WebLaunch")]
 [assembly: AssemblyCopyright("(c) 2014 Matt Wrock")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyVersion("2.7.0")]
-[assembly: AssemblyFileVersion("2.7.0")]
+[assembly: AssemblyVersion("2.8.0")]
+[assembly: AssemblyFileVersion("2.8.0")]
