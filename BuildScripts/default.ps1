@@ -5,7 +5,10 @@ properties {
         $versionTag = git tag | ? { $_ -match '^[0-9\.]*$' } | Select-Object -Last 1
         $version = $versionTag + "."
         $version += (git log $($version + '..') --pretty=oneline | measure-object).Count
-        $changeset=(git log -1 $($versionTag + '..') --pretty=format:%H)
+        $changeset = (git log -1 $($versionTag + '..') --pretty=format:%H)
+        if($changeset -eq $null) {
+            $changeset = (git log -1 --pretty=format:%H)
+        }
     }
     else {
         $version="1.0.0"
