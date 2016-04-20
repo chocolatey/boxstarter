@@ -1,4 +1,5 @@
 <releaseNotes>
+- Suppress bogus Invalid Namespace errors
 - Added ability to configure "Expand to open folder" in Set-WindowsExplorerOptions
 - Added ability to configure QuickAccess options in Set-WindowsExplorerOption
 - Added Disable-GameBarTips to WinConfig module
