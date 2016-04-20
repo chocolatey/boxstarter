@@ -112,6 +112,7 @@ Intercepts Chocolatey call to check for reboots
         $currentErrorCount = $global:error.Count
         $rebootable = $false
         try {
+            [System.Environment]::ExitCode = 0
             Call-Chocolatey @PSBoundParameters @args
             $ec = [System.Environment]::ExitCode
             # suppress errors from enabled features that need a reboot
