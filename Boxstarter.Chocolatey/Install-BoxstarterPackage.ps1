@@ -642,7 +642,9 @@ function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $sessio
             throw $_
         }
     } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Credential, $DisableReboots, $global:VerbosePreference, $global:Boxstarter.ProgressArgs, $global:DebugPreference
-    $global:Error.AddRange($remoteResult.Errors)
+    if($remoteResult.Errors -ne $null) {
+        $global:Error.AddRange($remoteResult.Errors)
+    }
     Write-BoxstarterMessage "Result from Remote Boxstarter: $($remoteResult.Result)" -Verbose
     return $remoteResult
 }
