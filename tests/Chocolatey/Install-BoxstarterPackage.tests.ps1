@@ -40,7 +40,7 @@ Describe "Install-BoxstarterPackage" {
         $result = Install-BoxstarterPackage -computerName localhost -PackageName exception-package -DisableReboots 2> $null
 
         It "will include exceptions"{
-            $result.Errors.Count | should be 1
+            $result.Errors.Count | should be 2
         }
         It "will report success in results" {
             $result.Completed | should be $true
