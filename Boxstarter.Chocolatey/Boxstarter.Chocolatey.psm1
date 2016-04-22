@@ -21,6 +21,7 @@ Export-ModuleMember Get-BoxstarterConfig,`
                     Invoke-Chocolatey,`
                     Invoke-ChocolateyBoxstarter,`
                     Install-BoxstarterPackage,`
+                    Install-BoxstarterPinnedTaskBarItem,`
                     New-BoxstarterPackage,`
                     New-PackageFromScript,`
                     Register-ChocolateyInterception,`
