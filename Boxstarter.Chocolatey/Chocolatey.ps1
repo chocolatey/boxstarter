@@ -53,7 +53,8 @@ Intercepts Chocolatey call to check for reboots
 
 #>    
     param(
-        [string[]]$packageNames=@('')
+        [string[]]$packageNames=@(''),
+        [switch]$RunAsTask
     )
     chocolatey Install @PSBoundParameters @args
 }
@@ -66,7 +67,8 @@ Intercepts Chocolatey call to check for reboots
 #>    
     param(
         [string]$command,
-        [string[]]$packageNames=@('')
+        [string[]]$packageNames=@(''),
+        [switch]$RunAsTask
     )
     chocolatey @PSBoundParameters @args
 }
@@ -78,7 +80,8 @@ Intercepts Chocolatey call to check for reboots
 
 #>    
     param(
-        [string[]]$packageNames=@('')
+        [string[]]$packageNames=@(''),
+        [switch]$RunAsTask
     )
     chocolatey Update @PSBoundParameters @args
 }
@@ -91,7 +94,8 @@ Intercepts Chocolatey call to check for reboots
 #>  
     param(
         [string]$command,
-        [string[]]$packageNames=@('')
+        [string[]]$packageNames=@(''),
+        [switch]$RunAsTask
     )
     $RebootCodes = Get-PassedArg RebootCodes $args
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
@@ -205,7 +209,8 @@ function Test-WindowsFeatureInstall($passedArgs) {
 function Call-Chocolatey {
     param(
         [string]$command,
-        [string[]]$packageNames=@('')
+        [string[]]$packageNames=@(''),
+        [switch]$RunAsTask
     )
     $chocoArgs = @($command, $packageNames)
     $chocoArgs += Format-ExeArgs $command @args
@@ -214,7 +219,12 @@ function Call-Chocolatey {
     $currentLogging=$Boxstarter.Suppresslogging
     try {
         if(Test-WindowsFeatureInstall $args) { $Boxstarter.SuppressLogging=$true }
-        if(($PSVersionTable.CLRVersion.Major -lt 4 -or (Test-WindowsFeatureInstall $args)) -and (Get-IsRemote)) {
+        if(         ( `
+                           ($PSVersionTable.CLRVersion.Major -lt 4 -or (Test-WindowsFeatureInstall $args)) `
+                    -and   (Get-IsRemote) `
+                    ) `
+            -or     $RunAsTask `
+        ) {
             Invoke-ChocolateyFromTask $chocoArgs
         }
         else {
