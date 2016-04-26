@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Azure\" />
+    <Folder Include="Bootstrapper\" />
     <Folder Include="Chocolatey\" />
     <Folder Include="Common\" />
     <Folder Include="HyperV\" />
@@ -47,6 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Azure\Enable-BoxstarterVM.Tests.ps1" />
+    <Compile Include="Bootstrapper\Test-PendingReboot.tests.ps1" />
+    <Compile Include="Bootstrapper\Invoke-BoxStarter.tests.ps1" />
+    <Compile Include="Bootstrapper\Invoke-Reboot.tests.ps1" />
     <Compile Include="Chocolatey\Chocolatey.tests.ps1" />
     <Compile Include="Chocolatey\Enable-BoxstarterClientRemoting.Tests.ps1" />
     <Compile Include="Chocolatey\Get-BoxstarterConfig.tests.ps1" />
