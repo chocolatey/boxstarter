@@ -16,6 +16,7 @@
       <dependency id="WindowsAzurePowershell" />
     </dependencies>
     <releaseNotes>
+- Fix pending reboot check from always returning false
 - Persist RebootOk setting in nested installs
 - Suppress bogus Invalid Namespace errors
 - Added ability to configure "Expand to open folder" in Set-WindowsExplorerOptions
