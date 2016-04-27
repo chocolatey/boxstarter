@@ -53,8 +53,7 @@ Intercepts Chocolatey call to check for reboots
 
 #>    
     param(
-        [string[]]$packageNames=@(''),
-        [switch]$RunAsTask
+        [string[]]$packageNames=@('')
     )
     chocolatey Install @PSBoundParameters @args
 }
@@ -67,8 +66,7 @@ Intercepts Chocolatey call to check for reboots
 #>    
     param(
         [string]$command,
-        [string[]]$packageNames=@(''),
-        [switch]$RunAsTask
+        [string[]]$packageNames=@('')
     )
     chocolatey @PSBoundParameters @args
 }
@@ -80,8 +78,7 @@ Intercepts Chocolatey call to check for reboots
 
 #>    
     param(
-        [string[]]$packageNames=@(''),
-        [switch]$RunAsTask
+        [string[]]$packageNames=@('')
     )
     chocolatey Update @PSBoundParameters @args
 }
@@ -94,8 +91,7 @@ Intercepts Chocolatey call to check for reboots
 #>  
     param(
         [string]$command,
-        [string[]]$packageNames=@(''),
-        [switch]$RunAsTask
+        [string[]]$packageNames=@('')
     )
     $RebootCodes = Get-PassedArg RebootCodes $args
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
@@ -209,8 +205,7 @@ function Test-WindowsFeatureInstall($passedArgs) {
 function Call-Chocolatey {
     param(
         [string]$command,
-        [string[]]$packageNames=@(''),
-        [switch]$RunAsTask
+        [string[]]$packageNames=@('')
     )
     $chocoArgs = @($command, $packageNames)
     $chocoArgs += Format-ExeArgs $command @args
@@ -219,12 +214,7 @@ function Call-Chocolatey {
     $currentLogging=$Boxstarter.Suppresslogging
     try {
         if(Test-WindowsFeatureInstall $args) { $Boxstarter.SuppressLogging=$true }
-        if(         ( `
-                           ($PSVersionTable.CLRVersion.Major -lt 4 -or (Test-WindowsFeatureInstall $args)) `
-                    -and   (Get-IsRemote) `
-                    ) `
-            -or     $RunAsTask `
-        ) {
+        if(($PSVersionTable.CLRVersion.Major -lt 4 -or (Test-WindowsFeatureInstall $args)) -and (Get-IsRemote)) {
             Invoke-ChocolateyFromTask $chocoArgs
         }
         else {
@@ -252,6 +242,18 @@ function Invoke-ChocolateyFromTask($chocoArgs) {
         Export-BoxstarterVars
         `$env:BoxstarterSourcePID = $PID
         Invoke-Chocolatey $(Serialize-Array $chocoArgs)
+"@ -DotNetVersion "v4.0.30319"
+}
+
+function Invoke-BoxstarterFromTask($cmd) {
+    Invoke-FromTask @"
+        Import-Module $($boxstarter.BaseDir)\boxstarter.chocolatey\Boxstarter.chocolatey.psd1 -DisableNameChecking
+        $(Serialize-BoxstarterVars)
+        `$global:Boxstarter.Log = `$null
+        `$global:Boxstarter.DisableRestart = `$true
+        Export-BoxstarterVars
+        `$env:BoxstarterSourcePID = $PID
+        . $cmd
 "@ -DotNetVersion "v4.0.30319"
 }
 
