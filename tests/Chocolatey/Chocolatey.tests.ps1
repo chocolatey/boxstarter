@@ -64,7 +64,7 @@ Describe "Getting-Chocolatey" {
 
     Context "When chocolatry strips the machine module path" {
         Mock Call-Chocolatey {
-            $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath","User")
+            $env:PSModulePath = "C:\Program Files\WindowsPowerShell\Modules"
             $global:LASTEXITCODE=0
         }
 
@@ -414,12 +414,13 @@ Describe "Call-Chocolatey" {
 Describe "Install-ChocolateyInstallPackageOverride" {
     Mock Get-IsRemote { return $true }
     $script:passedCommand = ""
+    [Int64]$i64 = [Int32]::MaxValue + 1
     Mock Invoke-FromTask { $script:passedCommand=$command }
 
-    Install-ChocolateyInstallPackageOverride -packageName pkg -silentArgs "/s" -file "myfile.exe" -validExitCodes @(1,2,3)
+    Install-ChocolateyInstallPackageOverride -packageName pkg -silentArgs "/s" -file "myfile.exe" -validExitCodes @(1,2,$i64)
 
     it "passes command params to task" {
-        $script:passedCommand -like "*Install-ChocolateyInstallPackage -packageName `"pkg`" -silentArgs `"/s`" -file `"myfile.exe`" -validExitCodes @(1,2,3)*" | Should Be $true
+        $script:passedCommand -like "*Install-ChocolateyInstallPackage -packageName `"pkg`" -silentArgs `"/s`" -file `"myfile.exe`" -validExitCodes @(1,2,$i64)*" | Should Be $true
     }
 }
 

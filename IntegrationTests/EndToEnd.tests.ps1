@@ -5,6 +5,8 @@ $credential = New-Object System.Management.Automation.PSCredential ("Administrat
 
 Describe "GistPackage" {
     $result = Invoke-RemoteBoxstarterRun -BaseDir $baseDir -VMName win2012r2 -Credential $credential -PackageName "https://gist.githubusercontent.com/mwrock/32030c56149138ad0c44/raw/32b6a80741404a3ab1a10ae3f5622b447e33c34a/gistfile1.txt"
+    Write-Host ($result.Errors | Out-String)
+    Write-Host ($result.Exceptions | Out-String)
 
     it "installed temp-package" {
         $result.InvokeOnTarget($result.Session, {
@@ -24,6 +26,7 @@ Describe "GistPackage" {
 
         context "local" {
             $result = Invoke-LocalBoxstarterRun -BaseDir $baseDir -VMName $VMName -Credential $credential -PackageName test-package
+            Write-Host ($result.Errors | Out-String)
 
             it "installed test-package" {
                 $result.InvokeOnTarget($result.Session, {
@@ -55,6 +58,8 @@ Describe "GistPackage" {
 
         context "remote" {
             $result = Invoke-RemoteBoxstarterRun -BaseDir $baseDir -VMName $VMName -Credential $credential -PackageName test-package
+            Write-Host ($result.Errors | Out-String)
+            Write-Host ($result.Exceptions | Out-String)
 
             it "installed test-package" {
                 $result.InvokeOnTarget($result.Session, {

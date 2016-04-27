@@ -627,18 +627,24 @@ function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $sessio
         $global:Boxstarter.ProgressArgs=$ProgressArgs 
         $result=$null
         try {
+            $resultToReturn = @{}
             $result = Invoke-ChocolateyBoxstarter $pkg -Password $Credential.password -DisableReboots:$DisableReboots
             if($Boxstarter.IsRebooting){
-                return @{Result="Rebooting"}
+                $resultToReturn.Result="Rebooting"
             }
-            if($result=$true){
-                return @{Result="Completed"}
+            elseif($result=$true){
+                $resultToReturn.Result="Completed"
             }
+            $resultToReturn.Errors = $Global:Error
+            return $resultToReturn
         }
         catch{
             throw $_
         }
     } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Credential, $DisableReboots, $global:VerbosePreference, $global:Boxstarter.ProgressArgs, $global:DebugPreference
+    if($remoteResult.Errors -ne $null) {
+        $global:Error.AddRange($remoteResult.Errors)
+    }
     Write-BoxstarterMessage "Result from Remote Boxstarter: $($remoteResult.Result)" -Verbose
     return $remoteResult
 }

@@ -3,7 +3,7 @@ try {
     try{
         Move-LibraryDirectory "Personal" "$env:UserProfile\skydrive\documents"
     } catch{}
-    Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
+    Set-ExplorerOptions -showHiddenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
     Set-TaskbarSmall
     Enable-RemoteDesktop
 
@@ -16,7 +16,7 @@ try {
             Install-ChocolateyPackage 'vs update 2 ctp2' 'exe' '/passive /norestart' 'http://download.microsoft.com/download/8/9/3/89372D24-6707-4587-A7F0-10A29EECA317/vsupdate_KB2707250.exe'
         }
     }catch{}
-    
+
     cinst fiddler4
     cinst mssqlserver2012express
     cinst git-credential-winstore

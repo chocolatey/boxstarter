@@ -108,7 +108,7 @@ Invoke-Reboot
         return $true
     }
     catch {
-       Log-BoxStarterMessage $_
+       Log-BoxStarterMessage ($_ | Out-String)
        throw $_
     }
     finally{

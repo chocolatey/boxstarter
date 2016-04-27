@@ -4,7 +4,7 @@ Description = 'The Boxstarter Test Runner module makes it easy to automate the t
 ModuleToProcess = './Boxstarter.TestRunner.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.7.0'
+ModuleVersion = '2.8.18'
 
 # ID used to uniquely identify this module
 GUID = '087b5fe9-4a6e-40b5-a0fb-e670b86563b3'
@@ -13,7 +13,7 @@ GUID = '087b5fe9-4a6e-40b5-a0fb-e670b86563b3'
 Author = 'Matt Wrock'
 
 # Copyright statement for this module
-Copyright = '(c) 2015 Matt Wrock'
+Copyright = '(c) 2016 Matt Wrock'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '2.0'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = ''
+PrivateData = '3c1aed0f6cb5b6b539d8bc7ed0cf0199eae5d000'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

@@ -176,6 +176,7 @@ function Download-Package([string[]]$bootstrapPackage) {
         }
     }
     $Boxstarter.Package=$bootstrapPackage
+    $force=$false
     if($bootstrapPackage.Count -eq 1){
         Write-BoxstarterMessage "Deleting previous $bootstrapPackage package" -Verbose
         $chocoRoot = $env:ChocolateyInstall

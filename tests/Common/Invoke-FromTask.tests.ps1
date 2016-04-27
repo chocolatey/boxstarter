@@ -80,7 +80,7 @@ Describe "Invoke-FromTask" {
     Context "When Invoking Task that is idle longer than idle timeout"{
         try { Invoke-FromTask "Start-Process journal.exe -Wait" -Credential $mycreds -IdleTimeout 2} catch {$err=$_}
         $origId=Get-WmiObject -Class Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
-        $id=Get-WmiObject -Class Win32_Process -Filter "Name='journal.exe'" | select ProcessId | % { $_.ProcessId }
+        if($origId -ne $null) { $proc = Get-Process $origId -ErrorAction SilentlyContinue }
         start-sleep -seconds 2
 
         It "Should timeout"{
@@ -91,13 +91,14 @@ Describe "Invoke-FromTask" {
             $LastExitCode | should be 1
         }
         It "Should kill the original powershell task"{
-            $origId | should be $null
+            ($proc -eq $null -or $proc.HasExited) | should be $true
         }
     }
 
     Context "When Invoking Task that is not idle but lasts longer than total timeout"{
         try { Invoke-FromTask "start-sleep -seconds 30" -Credential $mycreds -TotalTimeout 2} catch {$err=$_}
         $origId=Get-WmiObject -Class Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
+    if($origId -ne $null) { $proc = Get-Process $origId -ErrorAction SilentlyContinue }
 
         It "Should timeout"{
             $err.Exception | should match "likely in a hung state"
@@ -107,7 +108,7 @@ Describe "Invoke-FromTask" {
             $LastExitCode | should be 1
         }
         It "Should kill the original powershell task"{
-            $origId | should be $null
+            ($proc -eq $null -or $proc.HasExited) | should be $true
         }
     }
 }

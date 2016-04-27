@@ -12,8 +12,20 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
     <releaseNotes xmlns="">
-- Enabling powershell remoting via WMI on remote machine was not working when piping from Enable-BoxstarterVM
-- Added a -Combine parameter to Set-TaskBarOptions
+- Fix pending reboot check from always returning false
+- Persist RebootOk setting in nested installs
+- Suppress bogus Invalid Namespace errors
+- Added ability to configure "Expand to open folder" in Set-WindowsExplorerOptions
+- Added ability to configure QuickAccess options in Set-WindowsExplorerOption
+- Added Disable-GameBarTips to WinConfig module
+- Added Disable-BingSearch to WinConfig module
+- Updated to latest Get-PendingReboot
+- Eliminate multiple explorer restarts in Set-WindowsExplorerOption
+- Fix scenarios where providing multiple packages to Install-BoxstarterPackage fails
+- Added improved error logging where stacktrace was being dropped
+- Fix errors caused by using Int64 RebootCodes
+- Fix parameter typo in Set-ExplorerOptions
+- Update to latest Pester and ensure tests pass on clean VM
 </releaseNotes>
   </metadata>
   <files>

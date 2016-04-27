@@ -4,7 +4,7 @@ Description = 'Provides Cmdlets that will install a Boxstarter package on a Hype
 ModuleToProcess = './boxstarter.HyperV.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.7.0'
+ModuleVersion = '2.8.18'
 
 # ID used to uniquely identify this module
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e58'
@@ -13,7 +13,7 @@ GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e58'
 Author = 'Matt Wrock'
 
 # Copyright statement for this module
-Copyright = '(c) 2015 Matt Wrock'
+Copyright = '(c) 2016 Matt Wrock'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '3.0'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = ''
+PrivateData = '3c1aed0f6cb5b6b539d8bc7ed0cf0199eae5d000'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
