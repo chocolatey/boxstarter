@@ -430,7 +430,7 @@ function ConvertTo-PSString($originalValue) {
         "`$$($originalValue.ToString())"
     }
     elseif($originalValue -ne $null){
-        "`"$($originalValue.Replace('"','`' + '"'))`""
+        "`"$($originalValue.ToString().Replace('"','`' + '"'))`""
     }
     else {
         "`$null"
