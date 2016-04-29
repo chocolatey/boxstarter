@@ -4,7 +4,7 @@ Description = 'Provides an unattended installation environment supporting automa
 ModuleToProcess = './boxstarter.bootstrapper.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.8.18'
+ModuleVersion = '2.8.21'
 
 # ID used to uniquely identify this module
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e50'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = '3c1aed0f6cb5b6b539d8bc7ed0cf0199eae5d000'
+PrivateData = '3ea9d67300d998649215591c283a1f50b565f2f9'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

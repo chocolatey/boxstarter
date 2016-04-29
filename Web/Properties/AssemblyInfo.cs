@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Web")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
-[assembly: AssemblyTrademark("3c1aed0f6cb5b6b539d8bc7ed0cf0199eae5d000")]
+[assembly: AssemblyTrademark("3ea9d67300d998649215591c283a1f50b565f2f9")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("2.8.18")]
-[assembly: AssemblyFileVersion("2.8.18")]
+[assembly: AssemblyVersion("2.8.21")]
+[assembly: AssemblyFileVersion("2.8.21")]

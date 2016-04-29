@@ -7,4 +7,3 @@ if($BoxStarter.LocalRepo.StartsWith("$env:windir")) {
    if(!(Test-Path $BoxStarter.LocalRepo)) { mkdir $BoxStarter.LocalRepo | Out-Null }
 }
 $Boxstarter.NugetSources=$config.NugetSources
-if(!$Boxstarter.ContainsKey('RebootOk')) { $Boxstarter.RebootOk=$true }

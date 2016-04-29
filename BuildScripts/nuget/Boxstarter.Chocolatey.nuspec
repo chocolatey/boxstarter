@@ -17,6 +17,7 @@
       <dependency id="Boxstarter.Bootstrapper" version="$version$" />
     </dependencies>
     <releaseNotes>
+- Fix RebootOk setting always being set to false
 - Fix pending reboot check from always returning false
 - Persist RebootOk setting in nested installs
 - Suppress bogus Invalid Namespace errors
