@@ -246,7 +246,19 @@ function Invoke-ChocolateyFromTask($chocoArgs) {
 "@ -DotNetVersion "v4.0.30319"
 }
 
-function Invoke-BoxstarterFromTask($cmd) {
+function Invoke-BoxstarterFromTask($Command) {
+<#
+.SYNOPSIS
+Runs the normal chocolatey command as a scheduled task.
+
+.PARAMETER Command
+A chocolatey command to execute within a scheduled task. For example "cinst fiddler".
+
+.EXAMPLE
+A chocolatey command
+
+Invoke-BoxstarterFromTask "cinst rsat"
+#>
     Invoke-FromTask @"
         Import-Module $($boxstarter.BaseDir)\boxstarter.chocolatey\Boxstarter.chocolatey.psd1 -DisableNameChecking
         $(Serialize-BoxstarterVars)
@@ -254,7 +266,7 @@ function Invoke-BoxstarterFromTask($cmd) {
         `$global:Boxstarter.DisableRestart = `$true
         Export-BoxstarterVars
         `$env:BoxstarterSourcePID = $PID
-        . $cmd
+        . $Command
 "@ -DotNetVersion "v4.0.30319"
 }
 
