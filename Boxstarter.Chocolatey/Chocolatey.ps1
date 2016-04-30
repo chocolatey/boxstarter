@@ -235,15 +235,7 @@ function Call-Chocolatey {
 }
 
 function Invoke-ChocolateyFromTask($chocoArgs) {
-    Invoke-FromTask @"
-        Import-Module $($boxstarter.BaseDir)\boxstarter.chocolatey\Boxstarter.chocolatey.psd1 -DisableNameChecking
-        $(Serialize-BoxstarterVars)
-        `$global:Boxstarter.Log = `$null
-        `$global:Boxstarter.DisableRestart = `$true
-        Export-BoxstarterVars
-        `$env:BoxstarterSourcePID = $PID
-        Invoke-Chocolatey $(Serialize-Array $chocoArgs)
-"@ -DotNetVersion "v4.0.30319"
+    Invoke-BoxstarterFromTask "Invoke-Chocolatey $(Serialize-Array $chocoArgs)"
 }
 
 function Invoke-LocalChocolatey($chocoArgs) {

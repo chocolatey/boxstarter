@@ -21,6 +21,7 @@ Export-ModuleMember Get-BoxstarterConfig,`
                     Export-BoxstarterVars,`
                     Install-ChocolateyInstallPackageOverride,`
                     Invoke-BoxstarterBuild,`
+                    Invoke-BoxstarterFromTask,`
                     Invoke-Chocolatey,`
                     Invoke-ChocolateyBoxstarter,`
                     Install-BoxstarterPackage,`
