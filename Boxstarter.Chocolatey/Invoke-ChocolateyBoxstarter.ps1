@@ -124,6 +124,7 @@ Set-BoxstarterConfig
       [switch]$DisableRestart
     )
     try{
+		$Boxstarter.RebootOk=$true
         if($DisableReboots){
             Write-BoxstarterMessage "Disabling reboots" -Verbose
             $Boxstarter.RebootOk=$false
