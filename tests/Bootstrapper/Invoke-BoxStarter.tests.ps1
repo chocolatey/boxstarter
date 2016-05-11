@@ -483,4 +483,14 @@ Describe "Invoke-Boxstarter" {
             Assert-MockCalled New-Item -ParameterFilter {$path -like "*ReEnableUac*"} -times 0
         }
     }
+
+	Context "When Shutdown is enabled" {
+		Mock Stop-Computer
+		Invoke-Boxstarter {return} -Shutdown | Out-Null
+
+		It "will invoke a shutdown when finished" {
+			Assert-MockCalled Stop-Computer
+		}
+
+	}
 }

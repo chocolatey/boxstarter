@@ -173,4 +173,13 @@ Describe "Invoke-ChocolateyBoxstarter" {
 			Assert-MockCalled Invoke-Boxstarter -ParameterFilter {$RebootOk -eq $false}
 		}
     }
+
+	Context "When Shutdown switch enabled" {
+		Mock Invoke-Boxstarter
+		Invoke-ChocolateyBoxstarter test-package3 -Shutdown | Out-Null
+
+		It "should pass shutdown on to Invoke-Boxstarter" {
+			Assert-MockCalled Invoke-Boxstarter -ParameterFilter {Shutdown -eq $true}
+		}
+	}
 }

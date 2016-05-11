@@ -567,4 +567,13 @@ Describe "Install-BoxstarterPackage" {
             $result.Completed | should be $false
         }
     }
+
+	Context "When shutdown is enabled" {
+		Mock Invoke-ChocolateyBoxstarter
+		Install-BoxstarterPackage -PackageName test-package3 -Shutdown
+
+		It "should be passed on" {
+			Assert-MockCalled Invoke-ChocolateyBoxstarter -ParameterFilter { $Shutdown -eq $true }
+		}
+	}
 }
