@@ -8,7 +8,7 @@
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <id>Boxstarter.WinConfig</id>
     <title>Boxstarter WinConfig Module</title>
-    <iconUrl>https://raw.githubusercontent.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
+    <iconUrl>https://cdn.rawgit.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Functions that Boxstarter uses to customize the windows environment.</description>
     <tags>devops bootstraper setup windows customizations</tags>
@@ -16,6 +16,7 @@
       <dependency id="Boxstarter.Common" version="$version$" />
     </dependencies>
     <releaseNotes xmlns="">
+- Silence errors from Move-LibraryDirectory about file conflicts from old location
 - Fix RebootOk setting always being set to false
 - Fix pending reboot check from always returning false
 - Persist RebootOk setting in nested installs

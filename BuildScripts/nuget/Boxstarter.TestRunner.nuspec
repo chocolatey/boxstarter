@@ -6,7 +6,7 @@
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
     <title>Boxstarter Test Runner Module</title>
-    <iconUrl>https://raw.githubusercontent.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
+    <iconUrl>https://cdn.rawgit.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <projectUrl>http://Boxstarter.org</projectUrl>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <description>Boxstarter's Test Runner module makes it easy to automate the testing and publishing of Chocolatey packages.</description>
@@ -16,6 +16,7 @@
       <dependency id="Boxstarter.Azure" version="$version$" />
     </dependencies>
     <releaseNotes>
+- Silence errors from Move-LibraryDirectory about file conflicts from old location
 - Fix RebootOk setting always being set to false
 - Fix pending reboot check from always returning false
 - Persist RebootOk setting in nested installs
