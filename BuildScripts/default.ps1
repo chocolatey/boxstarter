@@ -15,7 +15,7 @@ properties {
     }
     $nugetExe = "$env:ChocolateyInstall\bin\nuget.exe"
     $ftpHost="waws-prod-bay-001.ftp.azurewebsites.windows.net"
-    $msbuildExe="${env:ProgramFiles(x86)}\MSBuild\12.0\Bin\msbuild.exe"
+    $msbuildExe="${env:ProgramFiles(x86)}\MSBuild\14.0\Bin\msbuild.exe"
 }
 
 Task default -depends Build
@@ -210,7 +210,7 @@ bye
 }
 
 task Install-MSBuild {
-    if(!(Test-Path "$env:ProgramFiles\MSBuild\12.0\Bin\msbuild.exe")) { cinst microsoft-build-tools -y }
+    if(!(Test-Path "$env:ProgramFiles\MSBuild\14.0\Bin\msbuild.exe")) { cinst microsoft-build-tools --version 14.0.23107.10 -y }
 }
 
 task Install-Win8SDK {
@@ -218,7 +218,7 @@ task Install-Win8SDK {
 }
 
 task Install-WebAppTargets {
-    if(!(Test-Path "$env:ChocolateyInstall\lib\MSBuild.Microsoft.VisualStudio.Web.targets.12.0.4\tools\VSToolsPath\WebApplications\Microsoft.WebApplication.targets")) { 
+    if(!(Test-Path "$env:ChocolateyInstall\lib\MSBuild.Microsoft.VisualStudio.Web.targets\tools\VSToolsPath\WebApplications\Microsoft.WebApplication.targets")) { 
         cinst MSBuild.Microsoft.VisualStudio.Web.targets -source http://packages.nuget.org/v1/FeedService.svc/ -version '12.0.4' -y
     }
 }
