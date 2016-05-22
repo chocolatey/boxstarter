@@ -46,5 +46,5 @@ Get-LibraryNames
     Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' $libraryName $newPath
     Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders' $libraryName $newPath
     Restart-Explorer
-    if(!$DoNotMoveOldContent) { Move-Item -Force $oldPath/* $newPath }
+    if(!$DoNotMoveOldContent) { Move-Item -Force $oldPath/* $newPath -ErrorAction SilentlyContinue}
 }
