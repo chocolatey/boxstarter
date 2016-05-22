@@ -1,4 +1,5 @@
 <releaseNotes>
+- Silence errors from Move-LibraryDirectory about file conflicts from old location
 - Fix RebootOk setting always being set to false
 - Fix pending reboot check from always returning false
 - Persist RebootOk setting in nested installs
