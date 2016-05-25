@@ -1,6 +1,10 @@
 $here = Split-Path -parent $MyInvocation.MyCommand.Definition
+
+# Import the chocolatey module first so that $Boxstarter properties 
+# are initialized correctly and then import everything else.
+Import-Module $here\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 -DisableNameChecking -ErrorAction SilentlyContinue
 Resolve-Path $here\Boxstarter.*\*.psd1 | 
-    % { Import-Module $_.ProviderPath -DisableNameChecking -Force -ErrorAction SilentlyContinue }
+    % { Import-Module $_.ProviderPath -DisableNameChecking -ErrorAction SilentlyContinue }
 Import-Module $here\Boxstarter.Common\Boxstarter.Common.psd1 -Function Test-Admin
 
 if(!(Test-Admin)) {
