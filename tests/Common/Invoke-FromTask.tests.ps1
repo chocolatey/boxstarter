@@ -78,7 +78,7 @@ Describe "Invoke-FromTask" {
     }
 
     Context "When Invoking Task that is idle longer than idle timeout"{
-        try { Invoke-FromTask "Start-Process journal.exe -Wait" -Credential $mycreds -IdleTimeout 2} catch {$err=$_}
+        try { Invoke-FromTask "Start-Process notepad.exe -Wait" -Credential $mycreds -IdleTimeout 2} catch {$err=$_}
         $origId=Get-WmiObject -Class Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
         if($origId -ne $null) { $proc = Get-Process $origId -ErrorAction SilentlyContinue }
         start-sleep -seconds 2
