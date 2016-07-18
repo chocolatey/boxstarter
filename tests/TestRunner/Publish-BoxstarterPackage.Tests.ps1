@@ -129,8 +129,7 @@ Describe "Publish-BoxstarterPackage" {
             $global:Error[0].Exception.Message | should be ($nugetError -Join ", ")
         }
         it "Should include error in Publish errors" {
-            $result.PublishErrors[0] | should be $nugetError[0]
-            $result.PublishErrors[1].ToString() | should be $nugetError[1].ToString()
+            $result.PublishErrors[0].ToString() | should be $nugetError[0].ToString()
         }
     }
 
