@@ -31,7 +31,7 @@ http://boxstarter.org
     if($PSVersionTable.CLRVersion.Major -lt 4) {
         Write-BoxstarterMessage "Relaunching powershell under .net fx v4" -verbose
         $env:COMPLUS_version="v4.0.30319"
-        & powershell -OutputFormat Text -ExecutionPolicy bypass -command $ScriptBlock -args $ArgumentList
+        & powershell -OutputFormat Text -NoProfile -ExecutionPolicy bypass -command $ScriptBlock -args $ArgumentList
     }
     else {
         Write-BoxstarterMessage "Using current powershell..." -verbose
