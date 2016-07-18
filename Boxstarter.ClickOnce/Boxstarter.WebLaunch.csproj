@@ -65,7 +65,7 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>6e7a730d2d8672b9491ff5cf0761a6f5645aef60</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>199e3c519de4bc2465bfa1be6ed60fb64532a05a</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>
