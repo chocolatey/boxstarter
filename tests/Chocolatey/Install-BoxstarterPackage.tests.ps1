@@ -35,7 +35,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
         Mock Enable-BoxstarterCredSSP {@{Success=$true}}
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
+        Remove-Item "$env:temp\chocolatey\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
         $result = Install-BoxstarterPackage -computerName localhost -PackageName exception-package -DisableReboots 2> $null
 
@@ -52,7 +52,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
         Mock Enable-BoxstarterCredSSP {@{Success=$true}}
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
+        Remove-Item "$env:temp\chocolatey\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
         $result = (new-Object -TypeName BoxstarterconnectionConfig -ArgumentList "http://localhost:5985/wsman",$null,$null) | Install-BoxstarterPackage -PackageName test-package3 -DisableReboots
 
@@ -68,7 +68,7 @@ Describe "Install-BoxstarterPackage" {
             }
         }
         It "will execute package"{
-            ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package"
+            ((Get-Content "$env:temp\chocolatey\testpackage.txt") -join ",") | should be "test-package"
         }
         It "will output correct computers in results"{
             $result[0].ComputerName | should be "localhost"
@@ -353,7 +353,7 @@ Describe "Install-BoxstarterPackage" {
         $session2 = New-PSSession .
         $session, $session2 | % { Invoke-Command -session $_ { $Env:TestingBoxstarter = $true } }
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
+        Remove-Item "$env:temp\chocolatey\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
         $result = ($session,$session2) | Install-BoxstarterPackage -PackageName test-package3 -DisableReboots
 
@@ -369,7 +369,7 @@ Describe "Install-BoxstarterPackage" {
             }
         }
         It "will execute package"{
-            ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package,test-package"
+            ((Get-Content "$env:temp\chocolatey\testpackage.txt") -join ",") | should be "test-package,test-package"
         }
         It "will output correct computers in results"{
             $result[0].ComputerName | should be "localhost"
@@ -426,7 +426,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Enable-BoxstarterCredSSP {@{Success=$true}}
 
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
+        Remove-Item "$env:temp\chocolatey\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
         $result = ("localhost",$env:COMPUTERNAME) | Install-BoxstarterPackage -PackageName test-package3 -DisableReboots
 
@@ -442,7 +442,7 @@ Describe "Install-BoxstarterPackage" {
             }
         }
         It "will execute package"{
-            ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package,test-package"
+            ((Get-Content "$env:temp\chocolatey\testpackage.txt") -join ",") | should be "test-package,test-package"
         }
         It "will output 2 results"{
             $result.Count | Should be 2
@@ -462,7 +462,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Enable-BoxstarterClientRemoting {@{Success=$true}}
         Mock Enable-BoxstarterCredSSP {@{Success=$true}}
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item "$env:temp\testpackage.txt" -Force -ErrorAction SilentlyContinue
+        Remove-Item "$env:temp\chocolatey\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
         $result = ([URI]"http://localhost:5985/wsman",[URI]"http://$($env:computername):5985/wsman") | Install-BoxstarterPackage -PackageName test-package3 -DisableReboots
 
@@ -478,7 +478,7 @@ Describe "Install-BoxstarterPackage" {
             }
         }
         It "will execute package"{
-            ((Get-Content "$env:temp\testpackage.txt") -join ",") | should be "test-package,test-package"
+            ((Get-Content "$env:temp\chocolatey\testpackage.txt") -join ",") | should be "test-package,test-package"
         }
         It "will output correct computers in results"{
             $result[0].ComputerName | should be "localhost"
