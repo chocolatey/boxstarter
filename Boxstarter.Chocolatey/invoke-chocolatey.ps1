@@ -227,6 +227,10 @@ namespace Boxstarter
         $env:ChocolateyInstall = "$env:programdata\chocolatey"
     }
 
+    if(!(Test-Path "$env:ChocolateyInstall\lib")) {
+        mkdir "$env:ChocolateyInstall\lib" | Out-Null
+    }
+    
     if(!$global:choco) {
         Write-BoxstarterMessage "instantiating choco wrapper..." -Verbose
         $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList `
