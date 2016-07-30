@@ -24,7 +24,7 @@ Disables the displaying of the Start screen on active screen, see enableShowStar
 .PARAMETER EnableShowAppsViewOnStartScreen
 Show the Apps view automatically when I go to Start
 
-PARAMETER DisableShowAppsViewOnStartScreen
+.PARAMETER DisableShowAppsViewOnStartScreen
 Disables the showing of Apps View when Start is activated, see enableShowAppsViewOnStartScreen
 
 .PARAMETER EnableSearchEverywhereInAppsView
