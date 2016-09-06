@@ -117,7 +117,7 @@ Enable-PSRemoting -Force
 <p>Now on your machine where Boxstarter is installed:</p>
 <pre>
 $cred=Get-Credential=MyTargetMachine\myusername
-Install-BoxstarterPackage -ComputerName MyTargetMachine -PackagName MyPackage -Credential $cred
+Install-BoxstarterPackage -ComputerName MyTargetMachine -PackageName MyPackage -Credential $cred
 </pre>
 <p>Boxstarter will use the credential to connect to MyTargetMachine and will copy the Boxstarter modules and your Local Repository packages to its local storage. It will then run the package on that machine. Boxstarter will configure your local machine to be able to connect to the remote machine and it may prompt you for permission to change settings. You can always provide the -Force parameter to silence the prompts and allow boxstarter to freely enable remoting if it is not already enabled.</p>
 <p>Here is a screen shot of Boxstarter installing a Minecraft Server (bukkit) on a AWS EC2 instance:</p>
@@ -125,7 +125,7 @@ Install-BoxstarterPackage -ComputerName MyTargetMachine -PackagName MyPackage -C
 <p>You can pipe several computer names, URIs or Windows PowerShell sessions to <code>Install-BoxstarterPackage</code>. Boxstarter will attempt to install the package on each machine and return a PSObject result for each machine.</p>
 <pre>
 $cred=Get-Credential=MyTargetMachine\myusername
-$result = "thing1","thing2" | Install-BoxstarterPackage -PackagName MyPackage -Credential $cred
+$result = "thing1","thing2" | Install-BoxstarterPackage -PackageName MyPackage -Credential $cred
 $result
 
 Errors       : {}
