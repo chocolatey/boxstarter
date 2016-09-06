@@ -148,7 +148,7 @@ $cred1=Get-Credential=MyTargetMachine\myusername
 $cred2=Get-Credential=Domain\myDomainUser
 $result = (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList machine1,$cred1),`
     (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList machine2,$cred2) | 
-    Install-BoxstarterPackage -PackagName MyPackage
+    Install-BoxstarterPackage -PackageName MyPackage
 </pre>
 <h3>Troubleshooting Remote Installations</h3>
 <h4>Establishing remote connections with servers not on the local subnet</h4>
