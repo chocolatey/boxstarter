@@ -69,3 +69,63 @@ Describe "Invoke-Chocolatey" {
 		}
 	}
 }
+
+Describe "PsLogger" {
+	# Just invoke to make sure the types are created and loaded.
+	Invoke-Chocolatey -chocoArgs "--version"
+
+	Add-Type @"
+namespace Boxstarter.Tests
+{
+	using System;
+	using System.IO;
+
+	public class RedirectConsole
+	{
+		public string Execute(Action a)
+		{
+			using (var writer = new StringWriter())
+            {
+                Console.SetOut(writer);
+				a();
+
+                return writer.ToString();
+            }
+		}
+	}
+}
+"@
+	$redirect = New-Object Boxstarter.Tests.RedirectConsole
+	$logfile = Join-Path $env:TEMP "test.log"
+
+	Context "logDebug is false" {
+		$log = New-Object -TypeName boxstarter.PsLogger -ArgumentList `
+			$false,`
+			$logfile,`
+			$false
+
+		It "should hide VERBOSE info" {
+			$redirect.Execute({ $log.Info("VERBOSE: {0}", "info") }) | Should Be ""
+		}
+
+		It "should print normal info" {
+			$redirect.Execute({ $log.Info("Hello: {0}", "info") }) | Should BeLike "Hello: info*"
+		}
+	}
+
+	
+	Context "logDebug is true" {
+		$log = New-Object -TypeName boxstarter.PsLogger -ArgumentList `
+			$true,`
+			$logfile,`
+			$false
+
+		It "should print VERBOSE info" {
+			$redirect.Execute({ $log.Info("VERBOSE: {0}", "info") }) | Should BeLike "VERBOSE: info*"
+		}
+
+		It "should print normal info" {
+			$redirect.Execute({ $log.Info("Hello: {0}", "info") }) | Should BeLike "Hello: info*"
+		}
+	}
+}

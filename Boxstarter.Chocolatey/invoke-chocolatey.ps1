@@ -89,6 +89,12 @@ namespace Boxstarter
 
         public void Info(string message, params object[] formatting)
         {
+			if (message.StartsWith("VERBOSE: "))
+			{
+				Debug(message, formatting);
+				return;
+			}
+
             WriteLog(
                 message,
                 x => {
@@ -236,7 +242,7 @@ namespace Boxstarter
         Write-BoxstarterMessage "instantiating choco wrapper..." -Verbose
         $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList `
           (Get-BoxstarterSetup),`
-          ($global:DebugPreference -eq "Continue"),`
+          $false,`
           $boxstarter.log,`
           $boxstarter.SuppressLogging
     }
