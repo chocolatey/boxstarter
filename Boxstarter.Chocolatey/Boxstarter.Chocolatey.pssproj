@@ -64,6 +64,7 @@
     <Compile Include="Get-PackageRoot.ps1" />
     <Compile Include="Install-BoxstarterPackage.ps1" />
     <Compile Include="Invoke-BoxstarterBuild.ps1" />
+    <Compile Include="invoke-chocolatey.ps1" />
     <Compile Include="Invoke-ChocolateyBoxstarter.ps1" />
     <Compile Include="New-BoxstarterPackage.ps1" />
     <Compile Include="New-PackageFromScript.ps1" />

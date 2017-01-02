@@ -2,7 +2,8 @@ function Invoke-Chocolatey($chocoArgs) {
     Write-BoxstarterMessage "Current runtime is $($PSVersionTable.CLRVersion)" -Verbose
     $refs = @( 
         "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/log4net.dll",
-        "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/chocolatey.dll"
+        "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/chocolatey.dll",
+		"$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/AlphaFS.dll"
     )
     $refs | % {
         Write-BoxstarterMessage "Adding types from $_" -Verbose
@@ -16,7 +17,6 @@ function Invoke-Chocolatey($chocoArgs) {
         }
     }
     $cpar = New-Object System.CodeDom.Compiler.CompilerParameters
-    $cpar.ReferencedAssemblies.Add([System.Reflection.Assembly]::Load('System.Management.Automation').location) | Out-Null
     $refs | % { $cpar.ReferencedAssemblies.Add($_) | Out-Null }
     Write-BoxstarterMessage "Adding boxstarter choco wrapper types..." -Verbose
     Add-Type @"
@@ -28,17 +28,24 @@ namespace Boxstarter
     using chocolatey.infrastructure.logging;
     using System;
     using System.IO;
-    using System.Management.Automation.Host;
 
     public class ChocolateyWrapper
     {
-        private GetChocolatey _choco;
+        private static GetChocolatey _choco;
         
-        public ChocolateyWrapper(string boxstarterSetup, PSHostUserInterface ui, bool logDebug, string logPath, bool quiet) {
-            _choco = Lets.GetChocolatey();
-            var psService = new PowershellService(new DotNetFileSystem(), boxstarterSetup);
-            _choco.RegisterContainerComponent<IPowershellService>(() => psService);
-            _choco.SetCustomLogging(new PsLogger(ui, logDebug, logPath, quiet));
+        public ChocolateyWrapper(string boxstarterSetup, bool logDebug, string logPath, bool quiet) {
+			if (_choco == null) 
+			{
+				_choco = Lets.GetChocolatey();
+
+				// Because chocolatey uses a static container which gets locked
+				// after first resolve we may only register our custom PowershellService once.
+				var psService = new PowershellService(new DotNetFileSystem(), boxstarterSetup);
+				_choco.RegisterContainerComponent<IPowershellService>(() => psService);
+			}
+
+			_choco.SetCustomLogging(new PsLogger(logDebug, logPath, quiet));
+
         }
 
         public void Run(string[] args) {
@@ -48,14 +55,12 @@ namespace Boxstarter
 
     public class PsLogger : ILog
     {
-        private PSHostUserInterface _ui;
         private string _path;
         private bool _logDebug;
         private bool _quiet;
 
-        public PsLogger(PSHostUserInterface ui, bool logDebug, string path, bool quiet)
+        public PsLogger(bool logDebug, string path, bool quiet)
         {
-            _ui = ui;
             _logDebug = logDebug;
             _path = path;
             _quiet = quiet;
@@ -69,7 +74,7 @@ namespace Boxstarter
         {
             WriteLog(
                 message,
-                x => { if(_logDebug) _ui.WriteDebugLine(x); },
+                x => { if(_logDebug) Console.WriteLine(x); },
                 formatting
             );
         }
@@ -78,22 +83,28 @@ namespace Boxstarter
         {
             WriteLog(
                 message,
-                x => { if(_logDebug) _ui.WriteDebugLine(x); }
+                x => { if(_logDebug) Console.WriteLine(x); }
             );
         }
 
         public void Info(string message, params object[] formatting)
         {
+			if (message.StartsWith("VERBOSE: "))
+			{
+				Debug(message, formatting);
+				return;
+			}
+
             WriteLog(
                 message,
                 x => {
                         if(x.Trim().StartsWith("Boxstarter: ") || x.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
-                            _ui.RawUI.ForegroundColor = ConsoleColor.Green;
+                            Console.ForegroundColor = ConsoleColor.Green;
                         }
                         else {
-                            _ui.RawUI.ForegroundColor = ConsoleColor.White;
+                            Console.ForegroundColor = ConsoleColor.White;
                         }
-                        _ui.WriteLine(x);
+                        Console.WriteLine(x);
                     },
                 formatting
             );
@@ -105,12 +116,12 @@ namespace Boxstarter
                 message,
                 x => {
                         if(x.Trim().StartsWith("Boxstarter: ") || x.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
-                            _ui.RawUI.ForegroundColor = ConsoleColor.Green;
+                            Console.ForegroundColor = ConsoleColor.Green;
                         }
                         else {
-                            _ui.RawUI.ForegroundColor = ConsoleColor.White;
+                            Console.ForegroundColor = ConsoleColor.White;
                         }
-                        _ui.WriteLine(x);
+                        Console.WriteLine(x);
                     }
             );
         }
@@ -120,8 +131,8 @@ namespace Boxstarter
             WriteLog(
                 message,
                 x => {
-                        _ui.RawUI.ForegroundColor = ConsoleColor.Yellow;
-                        _ui.WriteLine(x);
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine(x);
                     },
                 formatting
             );
@@ -132,8 +143,8 @@ namespace Boxstarter
             WriteLog(
                 message,
                 x => {
-                        _ui.RawUI.ForegroundColor = ConsoleColor.Yellow;
-                        _ui.WriteLine(x);
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine(x);
                     }
             );
         }
@@ -142,7 +153,7 @@ namespace Boxstarter
         {
             WriteLog(
                 message,
-                x => _ui.WriteErrorLine(x),
+                x => Console.Error.WriteLine(x),
                 formatting
             );
         }
@@ -151,7 +162,7 @@ namespace Boxstarter
         {
             WriteLog(
                 message,
-                x => _ui.WriteErrorLine(x)
+                x => Console.Error.WriteLine(x)
             );
         }
 
@@ -159,7 +170,7 @@ namespace Boxstarter
         {
             WriteLog(
                 message,
-                x => _ui.WriteErrorLine(x),
+                x => Console.Error.WriteLine(x),
                 formatting
             );
         }
@@ -168,7 +179,7 @@ namespace Boxstarter
         {
             WriteLog(
                 message,
-                x => _ui.WriteErrorLine(x)
+                x => Console.Error.WriteLine(x)
             );
         }
 
@@ -185,7 +196,7 @@ namespace Boxstarter
         private void WriteFormattedLog(Func<string> formatMessage, Action<String> logAction)
         {
             if(_quiet) return;
-            var origColor = _ui.RawUI.ForegroundColor;
+            var origColor = Console.ForegroundColor;
             try {
                 var msg = formatMessage.Invoke();
                 logAction.Invoke(msg);
@@ -195,7 +206,7 @@ namespace Boxstarter
                 WriteRaw(e.ToString());
             }
             finally{
-                _ui.RawUI.ForegroundColor = origColor;
+                Console.ForegroundColor = origColor;
             }            
         }
 
@@ -214,7 +225,7 @@ namespace Boxstarter
             }
             catch(Exception e)
             {
-                _ui.WriteErrorLine(e.ToString());
+                Console.Error.WriteLine(e.ToString());
             }
         }
     }
@@ -231,8 +242,7 @@ namespace Boxstarter
         Write-BoxstarterMessage "instantiating choco wrapper..." -Verbose
         $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList `
           (Get-BoxstarterSetup),`
-          $host.UI,`
-          ($global:DebugPreference -eq "Continue"),`
+          $false,`
           $boxstarter.log,`
           $boxstarter.SuppressLogging
     }

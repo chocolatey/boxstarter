@@ -228,13 +228,21 @@ task Install-WebDeploy {
 }
 
 task Install-ChocoLib {
-    exec { .$nugetExe install chocolatey.lib -Version 0.9.10-beta-20151210 -Pre -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
-    exec { .$nugetExe install log4net -Version 2.0.3 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
-    MkDir $basedir\Boxstarter.Chocolatey\chocolatey -ErrorAction SilentlyContinue
-    Copy-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3\lib\net40-full\* $basedir\Boxstarter.Chocolatey\chocolatey
-    Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.9.10-beta-20151210\lib\* $basedir\Boxstarter.Chocolatey\chocolatey
-    Remove-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3 -Recurse -Force
-    Remove-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.9.10-beta-20151210 -Recurse -Force
+	$project = Join-Path $basedir "Boxstarter.Chocolatey"
+	$temp = Join-Path $project "temp"
+
+    exec { .$nugetExe install chocolatey.lib -Version 0.10.3 -OutputDirectory $temp }
+    exec { .$nugetExe install alphafs -Version 2.0.0 -OutputDirectory $temp }
+
+	$output = Join-Path $project "chocolatey"
+	Remove-Item $output -Force -Recurse
+    New-Item $output -ItemType Directory
+
+    Copy-Item $temp\log4net.*\lib\net40-full\* $output
+    Copy-Item $temp\chocolatey.lib.*\lib\* $output
+	Copy-Item $temp\alphafs.*\lib\net451\* $output
+    
+	Remove-Item $temp -Recurse -Force
 }
 
 function PackDirectory($path, [switch]$AddReleaseNotes){
