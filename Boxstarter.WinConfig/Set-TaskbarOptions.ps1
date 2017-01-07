@@ -36,6 +36,10 @@ Changes the Taskbar Icon combination style. Valid inputs are Always, Full, and N
 	$key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
 	$dockingKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects2'
 
+	if(-not (Test-Path -Path $dockingKey)) {
+		$dockingKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects3'
+	}
+
 	if(Test-Path -Path $key) {
 		if($Lock)
 		{
