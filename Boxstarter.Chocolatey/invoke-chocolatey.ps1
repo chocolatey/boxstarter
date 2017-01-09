@@ -2,7 +2,8 @@ function Invoke-Chocolatey($chocoArgs) {
     Write-BoxstarterMessage "Current runtime is $($PSVersionTable.CLRVersion)" -Verbose
     $refs = @( 
         "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/log4net.dll",
-        "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/chocolatey.dll"
+        "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/chocolatey.dll",
+        "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/AlphaFS.dll"
     )
     $refs | % {
         Write-BoxstarterMessage "Adding types from $_" -Verbose
@@ -32,12 +33,14 @@ namespace Boxstarter
 
     public class ChocolateyWrapper
     {
-        private GetChocolatey _choco;
+        private static GetChocolatey _choco;
         
         public ChocolateyWrapper(string boxstarterSetup, PSHostUserInterface ui, bool logDebug, string logPath, bool quiet) {
-            _choco = Lets.GetChocolatey();
-            var psService = new PowershellService(new DotNetFileSystem(), boxstarterSetup);
-            _choco.RegisterContainerComponent<IPowershellService>(() => psService);
+            if (_choco == null) {
+                _choco = Lets.GetChocolatey();
+                var psService = new PowershellService(new DotNetFileSystem(), boxstarterSetup);
+                _choco.RegisterContainerComponent<IPowershellService>(() => psService);
+            }
             _choco.SetCustomLogging(new PsLogger(ui, logDebug, logPath, quiet));
         }
 
@@ -242,7 +245,7 @@ namespace Boxstarter
     }
 
     Enter-BoxstarterLogable { 
-        Write-BoxstarterMessage "calling choco now with $chocoArgs" -verbose
+        Write-BoxstarterMessage "calling choco now with $chocoArgs" -Verbose
         $cd = [System.IO.Directory]::GetCurrentDirectory()
         try {
             # Chocolatey.dll uses GetCurrentDirectory which is not quite right
