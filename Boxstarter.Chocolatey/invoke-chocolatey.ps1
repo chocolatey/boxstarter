@@ -35,13 +35,13 @@ namespace Boxstarter
     {
         private static GetChocolatey _choco;
         
-        public ChocolateyWrapper(string boxstarterSetup, PSHostUserInterface ui, bool logDebug, string logPath, bool quiet) {
+        public ChocolateyWrapper(string boxstarterSetup, PSHostUserInterface ui, bool logDebug, bool logVerbose, string logPath, bool quiet) {
             if (_choco == null) {
                 _choco = Lets.GetChocolatey();
                 var psService = new PowershellService(new DotNetFileSystem(), boxstarterSetup);
                 _choco.RegisterContainerComponent<IPowershellService>(() => psService);
             }
-            _choco.SetCustomLogging(new PsLogger(ui, logDebug, logPath, quiet));
+            _choco.SetCustomLogging(new PsLogger(ui, logDebug, logVerbose, logPath, quiet));
         }
 
         public void Run(string[] args) {
@@ -54,12 +54,14 @@ namespace Boxstarter
         private PSHostUserInterface _ui;
         private string _path;
         private bool _logDebug;
+        private bool _logVerbose;
         private bool _quiet;
 
-        public PsLogger(PSHostUserInterface ui, bool logDebug, string path, bool quiet)
+        public PsLogger(PSHostUserInterface ui, bool logDebug, bool logVerbose, string path, bool quiet)
         {
             _ui = ui;
             _logDebug = logDebug;
+            _logVerbose = logVerbose;
             _path = path;
             _quiet = quiet;
         }
@@ -96,7 +98,12 @@ namespace Boxstarter
                         else {
                             _ui.RawUI.ForegroundColor = ConsoleColor.White;
                         }
-                        _ui.WriteLine(x);
+                        if(x.Trim().StartsWith("VERBOSE: ")) {
+                            if(_logVerbose) _ui.WriteVerboseLine(x);
+                        }
+                        else {
+                            _ui.WriteLine(x);
+                        }
                     },
                 formatting
             );
@@ -113,7 +120,12 @@ namespace Boxstarter
                         else {
                             _ui.RawUI.ForegroundColor = ConsoleColor.White;
                         }
-                        _ui.WriteLine(x);
+                        if(x.Trim().StartsWith("VERBOSE: ")) {
+                            if(_logVerbose) _ui.WriteVerboseLine(x);
+                        }
+                        else {
+                            _ui.WriteLine(x);
+                        }
                     }
             );
         }
@@ -240,6 +252,7 @@ namespace Boxstarter
           (Get-BoxstarterSetup),`
           $host.UI,`
           ($global:DebugPreference -eq "Continue"),`
+          ($global:VerbosePreference -eq "Continue"),`
           $boxstarter.log,`
           $boxstarter.SuppressLogging
     }
