@@ -1,5 +1,44 @@
 function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
-    $boxstarterPath=Join-Path $env:AppData Boxstarter
+    ##Checking Arguments
+    $arguments = @{}
+    # Default the values
+    $MachineInstall = $false
+
+    # Now parse the packageParameters using good old regular expression
+    if ($installArgs) {
+        $match_pattern = "\/(?<option>([a-zA-Z]+)):(?<value>([`"'])?([a-zA-Z0-9- _\\:\.]+)([`"'])?)|\/(?<option>([a-zA-Z]+))"
+        $option_name = 'option'
+        $value_name = 'value'
+
+        if ($installArgs -match $match_pattern ){
+            $results = $installArgs | Select-String $match_pattern -AllMatches
+            $results.matches | % {
+                $arguments.Add(
+                    $_.Groups[$option_name].Value.Trim(),
+                    $_.Groups[$value_name].Value.Trim())
+            }
+        }
+        else
+        {
+            Throw "Package Parameters were found but were invalid (REGEX Failure)"
+        }
+
+        if ($arguments.ContainsKey("MachineInstall")) {
+            if( ($arguments.MachineInstall -eq $null) -or ($arguments.MachineInstall -eq $true) ){
+                $MachineInstall = $true
+            }
+            Write-Host "MachineInstall Argument Found"
+        }
+    } else {
+        Write-Debug "No Package Parameters Passed in"
+    }
+
+    ##Install Boxstarter
+    if( $MachineInstall ){
+        $boxstarterPath=Join-Path $env:ProgramFiles Boxstarter
+    }else{
+        $boxstarterPath=Join-Path $env:AppData Boxstarter
+    }
     if(!(test-Path $boxstarterPath)){
         mkdir $boxstarterPath
     }
@@ -15,8 +54,8 @@ function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
     }
     Copy-Item "$here\*" $boxstarterPath -Recurse -Force -Exclude ChocolateyInstall.ps1, Setup.*
 
-    PersistBoxStarterPathToEnvironmentVariable "PSModulePath"
-    PersistBoxStarterPathToEnvironmentVariable "Path"
+    PersistBoxStarterPathToEnvironmentVariable "PSModulePath" $MachineInstall
+    PersistBoxStarterPathToEnvironmentVariable "Path" $MachineInstall
     $binPath =  "$here\..\..\..\bin"
     $boxModule=Get-Module Boxstarter.Chocolatey
     if($boxModule) {
@@ -89,8 +128,12 @@ function Create-Shortcut($location, $target, $targetArgs, $boxstarterPath) {
 				
 	Move-Item -Path $tempFile $location -Force
 }
-function PersistBoxStarterPathToEnvironmentVariable($variableName){
-    $value = [Environment]::GetEnvironmentVariable($variableName, 'User')
+function PersistBoxStarterPathToEnvironmentVariable($variableName, $MachineInstall){
+    if($MachineInstall){
+        $value = [Environment]::GetEnvironmentVariable($variableName, 'Machine')
+    }else{
+        $value = [Environment]::GetEnvironmentVariable($variableName, 'User')
+    }
     if($value){
         $values=($value -split ';' | ?{ !($_.ToLower() -match "\\boxstarter$")}) -join ';'
         $values+=";$boxstarterPath"
@@ -103,8 +146,11 @@ function PersistBoxStarterPathToEnvironmentVariable($variableName){
         $values ="$boxstarterPath"
     }
     if(!$value -or !($values -contains $boxstarterPath)){
-        $values = $values.Replace(';;',';')
-        [Environment]::SetEnvironmentVariable($variableName, $values, 'User')
+        if($MachineInstall){
+            [Environment]::SetEnvironmentVariable($variableName, $values, 'Machine')
+        }else{
+            [Environment]::SetEnvironmentVariable($variableName, $values, 'User')
+        }
         $varValue = Get-Content env:\$variableName
         $varValue += ";$boxstarterPath"
         $varValue = $varValue.Replace(';;',';')
