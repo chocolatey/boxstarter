@@ -1,5 +1,15 @@
 function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
-    $boxstarterPath=Join-Path $env:AppData Boxstarter
+    $machineInstall = $false
+    if( $installArgs -match "MachineInstall" ){
+        $machineInstall = $true
+    }
+
+    if( $machineInstall ){
+        $boxstarterPath = Join-Path $env:ProgramFiles Boxstarter
+    } else {
+        $boxstarterPath = Join-Path $env:AppData Boxstarter
+    }
+
     if(!(test-Path $boxstarterPath)){
         mkdir $boxstarterPath
     }
@@ -15,8 +25,8 @@ function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
     }
     Copy-Item "$here\*" $boxstarterPath -Recurse -Force -Exclude ChocolateyInstall.ps1, Setup.*
 
-    PersistBoxStarterPathToEnvironmentVariable "PSModulePath"
-    PersistBoxStarterPathToEnvironmentVariable "Path"
+    PersistBoxStarterPathToEnvironmentVariable "PSModulePath" $machineInstall
+    PersistBoxStarterPathToEnvironmentVariable "Path" $machineInstall
     $binPath =  "$here\..\..\..\bin"
     $boxModule=Get-Module Boxstarter.Chocolatey
     if($boxModule) {
@@ -41,7 +51,7 @@ PS:>Get-Help Boxstarter
 "@
     Write-Host $successMsg
 
-    if($ModuleName -eq "Boxstarter.Chocolatey" -and !$env:appdata.StartsWith($env:windir)) {
+    if(!$machineInstall -and ($ModuleName -eq "Boxstarter.Chocolatey" -and !$env:appdata.StartsWith($env:windir))) {
         $desktop = $([System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::DesktopDirectory))
         $startMenu=$("$env:appdata\Microsoft\Windows\Start Menu\Programs\Boxstarter")
         if(!(Test-Path $startMenu)){
@@ -89,8 +99,13 @@ function Create-Shortcut($location, $target, $targetArgs, $boxstarterPath) {
 				
 	Move-Item -Path $tempFile $location -Force
 }
-function PersistBoxStarterPathToEnvironmentVariable($variableName){
-    $value = [Environment]::GetEnvironmentVariable($variableName, 'User')
+function PersistBoxStarterPathToEnvironmentVariable($variableName, $machineInstall){
+    $value = $null
+    if( $machineInstall ){
+        $value = [Environment]::GetEnvironmentVariable($variableName, 'Machine')
+    } else {
+        $value = [Environment]::GetEnvironmentVariable($variableName, 'User')
+    }
     if($value){
         $values=($value -split ';' | ?{ !($_.ToLower() -match "\\boxstarter$")}) -join ';'
         $values+=";$boxstarterPath"
@@ -104,7 +119,11 @@ function PersistBoxStarterPathToEnvironmentVariable($variableName){
     }
     if(!$value -or !($values -contains $boxstarterPath)){
         $values = $values.Replace(';;',';')
-        [Environment]::SetEnvironmentVariable($variableName, $values, 'User')
+        if( $machineInstall ){
+            [Environment]::SetEnvironmentVariable($variableName, $values, 'Machine')
+        } else {
+            [Environment]::SetEnvironmentVariable($variableName, $values, 'User')
+        }
         $varValue = Get-Content env:\$variableName
         $varValue += ";$boxstarterPath"
         $varValue = $varValue.Replace(';;',';')
