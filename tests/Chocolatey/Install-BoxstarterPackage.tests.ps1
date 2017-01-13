@@ -1,5 +1,7 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.chocolatey){Remove-Module boxstarter.chocolatey}
+$myIp = (Test-Connection -ComputerName $env:COMPUTERNAME -Count 1  | Select IPV4Address).IPV4Address.IPAddressToString
+$myIpv6 = (Test-Connection -ComputerName $env:COMPUTERNAME -Count 1  | Select IPV6Address).IPV6Address.IPAddressToString
 
 Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
     % { . $_.ProviderPath }
@@ -25,7 +27,7 @@ Describe "Install-BoxstarterPackage" {
     Mock Invoke-WmiMethod { New-Object System.Object }
     Mock Setup-BoxstarterModuleAndLocalRepo -ParameterFilter{$session.ComputerName -eq $null }
     Mock Invoke-Remotely -ParameterFilter{$session.Value.ComputerName -eq $null}
-    Mock New-PSSession {@{Availability="Available"}} -ParameterFilter{$ComputerName -ne "localhost" -and $computerName -ne $null -and $ComputerName -ne "." -and $ComputerName -ne "$env:COMPUTERNAME"}
+    Mock New-PSSession {@{Availability="Available"}} -ParameterFilter{$ComputerName -ne $myIp -and $computerName -ne $null -and $ComputerName -ne "." -and $ComputerName -ne "$env:COMPUTERNAME" -and $ComputerName -ne "localhost" -and $ComputerName -ne $myIpv6}
     Mock Invoke-Command -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*restart-computer*"}
     $secpasswd = ConvertTo-SecureString "PlainTextPassword" -AsPlainText -Force
     $mycreds = New-Object System.Management.Automation.PSCredential ("username", $secpasswd)
@@ -37,8 +39,8 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\chocolatey\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        $result = Install-BoxstarterPackage -computerName localhost -PackageName exception-package -DisableReboots 2> $null
-
+        $result = Install-BoxstarterPackage -computerName $myIp -PackageName exception-package -DisableReboots 2> $null
+        
         It "will include exceptions"{
             $result.Errors.Count | should be 2
         }
@@ -54,7 +56,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\chocolatey\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        $result = (new-Object -TypeName BoxstarterconnectionConfig -ArgumentList "http://localhost:5985/wsman",$null,$null) | Install-BoxstarterPackage -PackageName test-package3 -DisableReboots
+        $result = (new-Object -TypeName BoxstarterconnectionConfig -ArgumentList "http://${myIp}:5985/wsman",$null,$null) | Install-BoxstarterPackage -PackageName test-package3 -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -71,7 +73,7 @@ Describe "Install-BoxstarterPackage" {
             ((Get-Content "$env:temp\chocolatey\testpackage.txt") -join ",") | should be "test-package"
         }
         It "will output correct computers in results"{
-            $result[0].ComputerName | should be "localhost"
+            $result[0].ComputerName | should be $myIp
         }
         It "will report success in results" {
             $result[0].Completed | should be $true
@@ -111,7 +113,7 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When remoting and wmi are not enabled on remote computer" {
-        Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
+        Mock Invoke-Command -ParameterFilter{$computerName -ne $myIp -and ($Session -eq $null -or $Session.ComputerName -ne $myIp)}
         Mock Invoke-WmiMethod
         Mock Invoke-Command { New-Object System.Object }
 
@@ -322,7 +324,7 @@ Describe "Install-BoxstarterPackage" {
     }    
 
     Context "When remoting not enabled on remote computer but WMI is and the force switch is not set" {
-        Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
+        Mock Invoke-Command -ParameterFilter{$computerName -ne $myIp -and ($Session -eq $null -or $Session.ComputerName -ne $myIp)}
         Mock Confirm-Choice
         Mock Invoke-Command { New-Object System.Object }
 
@@ -334,7 +336,7 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When remoting not enabled on remote computer but WMI is and the force switch is set" {
-        Mock Invoke-Command -ParameterFilter{$computerName -ne "localhost" -and ($Session -eq $null -or $Session.ComputerName -ne "localhost")}
+        Mock Invoke-Command -ParameterFilter{$computerName -ne $myIp -and ($Session -eq $null -or $Session.ComputerName -ne $myIp)}
         Mock Confirm-Choice
         Mock Invoke-Command { New-Object System.Object }
 
@@ -349,8 +351,8 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When using a session and remoting enabled on remote and local computer" {
-        $session = New-PSSession localhost
-        $session2 = New-PSSession .
+        $session = New-PSSession $myIp
+        $session2 = New-PSSession $myIpv6
         $session, $session2 | % { Invoke-Command -session $_ { $Env:TestingBoxstarter = $true } }
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\chocolatey\testpackage.txt" -Force -ErrorAction SilentlyContinue
@@ -372,8 +374,8 @@ Describe "Install-BoxstarterPackage" {
             ((Get-Content "$env:temp\chocolatey\testpackage.txt") -join ",") | should be "test-package,test-package"
         }
         It "will output correct computers in results"{
-            $result[0].ComputerName | should be "localhost"
-            $result[1].ComputerName | should be "localhost"
+            $result[0].ComputerName | should be $myIp
+            $result[1].ComputerName | should be "[$myIpv6]"
         }
         It "will report success in results" {
             $result[0].Completed | should be $true
@@ -386,7 +388,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Invoke-Remotely
         $repo=(Get-PSDrive TestDrive).Root
         Copy-Item "$($Boxstarter.LocalRepo)\example.*.nupkg" "$repo\mylocalrepo.nupkg"
-        $session = New-PSSession localhost
+        $session = New-PSSession $myIp
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         $currentRepo=$Boxstarter.LocalRepo
     
@@ -403,7 +405,7 @@ Describe "Install-BoxstarterPackage" {
         Mock Invoke-Remotely
         $repo=(Get-PSDrive TestDrive).Root
         Copy-Item "$($Boxstarter.LocalRepo)\example.*.nupkg" "$repo\mylocalrepo.nupkg"
-        $session = New-PSSession localhost
+        $session = New-PSSession $myIp
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         $currentConfig=Get-Content "$($Boxstarter.BaseDir)\Boxstarter.Config"
         $currentRepo=$Boxstarter.LocalRepo
@@ -428,7 +430,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\chocolatey\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        $result = ("localhost",$env:COMPUTERNAME) | Install-BoxstarterPackage -PackageName test-package3 -DisableReboots
+        $result = ($myIp,$myIpv6) | Install-BoxstarterPackage -PackageName test-package3 -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -448,8 +450,8 @@ Describe "Install-BoxstarterPackage" {
             $result.Count | Should be 2
         }
         It "will output correct computers in results"{
-            $result[0].ComputerName | should be "localhost"
-            $result[1].ComputerName | should be $env:COMPUTERNAME
+            $result[0].ComputerName | should be $myIp
+            $result[1].ComputerName | should be $myIpv6
         }
         It "will report success in results" {
             $result[0].Completed | should be $true
@@ -464,7 +466,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "$env:temp\chocolatey\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
-        $result = ([URI]"http://localhost:5985/wsman",[URI]"http://$($env:computername):5985/wsman") | Install-BoxstarterPackage -PackageName test-package3 -DisableReboots
+        $result = ([URI]"http://${myIp}:5985/wsman",[URI]"http://[${myIpv6}]:5985/wsman") | Install-BoxstarterPackage -PackageName test-package3 -DisableReboots
 
         It "will copy boxstarter modules"{
             "$env:temp\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" | should exist
@@ -474,15 +476,14 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will copy boxstarter build packages"{
             Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % {
-                "$env:temp\boxstarter\buildpackages\$($_.Name)" | should exist
+                    "$env:temp\boxstarter\buildpackages\$($_.Name)" | should exist
             }
         }
         It "will execute package"{
             ((Get-Content "$env:temp\chocolatey\testpackage.txt") -join ",") | should be "test-package,test-package"
         }
         It "will output correct computers in results"{
-            $result[0].ComputerName | should be "localhost"
-            $result[1].ComputerName | should be $env:COMPUTERNAME
+            $result[0].ComputerName | should be $myIp
         }
         It "will report success in results" {
             $result[0].Completed | should be $true
@@ -491,7 +492,7 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When passing in a session and no reboots" {
-        $session = New-PSSession localhost
+        $session = New-PSSession $myIp
         Mock Enable-BoxstarterClientRemoting
         Mock Enable-BoxstarterCredSSP
         Mock Enable-RemotingOnRemote
@@ -513,14 +514,14 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When passing in a session that reboots" {
-        $session = New-PSSession -ComputerName localhost -Name "testSession"
+        $session = New-PSSession -ComputerName $myIp -Name "testSession"
         Mock Enable-BoxstarterClientRemoting
         Mock Enable-BoxstarterCredSSP
         Mock Enable-RemotingOnRemote
         Mock Setup-BoxstarterModuleAndLocalRepo
         Mock Invoke-Command { return @{Result="Completed"} } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*ChocolateyBoxstarter*"}
         Mock Invoke-Command { Remove-PSSession -Name "testSession" } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*ChocolateyBoxstarter*" -and $Session.Name -eq "testSession" }
-        Mock New-PSSession { return Microsoft.PowerShell.Core\New-PSSession localhost }
+        Mock New-PSSession { return Microsoft.PowerShell.Core\New-PSSession $myIp }
 
         Install-BoxstarterPackage -session $session -PackageName test-package3 -DisableReboots | Out-Null
 
@@ -531,12 +532,12 @@ Describe "Install-BoxstarterPackage" {
             Assert-MockCalled Enable-RemotingOnRemote -Times 0
         }
         It "will reconnect with the correct Uri"{
-            Assert-MockCalled New-PSSession -ParameterFilter { $ConnectionURI -like "http://localhost:5985/wsman?PSVersion=*"}
+            Assert-MockCalled New-PSSession -ParameterFilter { $ConnectionURI -like "http://${myIp}:5985/wsman?PSVersion=*"}
         }
     }
 
     Context "When passing in a session that reboots and cant find port" {
-        $session = New-PSSession -ComputerName localhost -Name "testSession"
+        $session = New-PSSession -ComputerName $myIp -Name "testSession"
         Mock Enable-BoxstarterClientRemoting
         Mock Enable-BoxstarterCredSSP
         Mock Enable-RemotingOnRemote
@@ -545,17 +546,17 @@ Describe "Install-BoxstarterPackage" {
         Mock Invoke-Command { return @{Result="Completed"} } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*ChocolateyBoxstarter*"}
         Mock Invoke-Command { Remove-PSSession -Name "testSession" } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*ChocolateyBoxstarter*" -and $Session.Name -eq "testSession" }
         Mock Invoke-Command -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*PSSenderInfo*"}
-        Mock New-PSSession { return Microsoft.PowerShell.Core\New-PSSession localhost }
+        Mock New-PSSession { return Microsoft.PowerShell.Core\New-PSSession $myIp }
 
         Install-BoxstarterPackage -session $session -PackageName test-package3 -DisableReboots | Out-Null
 
         It "will reconnect with the computer name"{
-            Assert-MockCalled New-PSSession -ParameterFilter {$computerName -eq "localhost"}
+            Assert-MockCalled New-PSSession -ParameterFilter {$computerName -eq $myIp}
         }
     }
 
     Context "When passing in an unavailable session" {
-        $session = New-PSSession localhost
+        $session = New-PSSession $myIp
         Remove-PSSession $session
 
         $result = Install-BoxstarterPackage -session $session -PackageName test-package3 -DisableReboots 2> $null
