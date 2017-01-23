@@ -42,14 +42,14 @@ PS:>Get-Help Boxstarter
     Write-Host $successMsg
 
     if($ModuleName -eq "Boxstarter.Chocolatey" -and !$env:appdata.StartsWith($env:windir)) {
-        $desktop = $([System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::CommonDesktopDirectory))
+        $desktop = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::CommonDesktopDirectory)
         $startMenu = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::CommonStartMenu)
         $startMenu += "\Programs\Boxstarter"
         if(!(Test-Path $startMenu)){
             mkdir $startMenu
         }
         $target="powershell.exe"
-        $targetArgs="-ExecutionPolicy bypass -NoExit -Command `"&'$boxstarterPath\BoxstarterShell.ps1'`""
+        $targetArgs='-ExecutionPolicy bypass -NoExit -Command & "'+$boxstarterPath+'\BoxstarterShell.ps1"'
 
 		if($installArgs -inotcontains "nodesktopicon") {
 			$link = Join-Path $desktop "Boxstarter Shell.lnk"
@@ -70,7 +70,10 @@ function Create-Shortcut($location, $target, $targetArgs, $boxstarterPath) {
     $lnk.WorkingDirectory = $boxstarterPath
     $lnk.IconLocation="$boxstarterPath\BoxLogo.ico"
     $lnk.Save()
+    
 
+    #Commted this out because I don't know what it does. Seems to be working without it.
+    <#
 	$tempFile = "$env:temp\TempShortcut.lnk"
 		
 	$writer = new-object System.IO.FileStream $tempFile, ([System.IO.FileMode]::Create)
@@ -89,6 +92,7 @@ function Create-Shortcut($location, $target, $targetArgs, $boxstarterPath) {
 	$writer.Close()
 				
 	Move-Item -Path $tempFile $location -Force
+    #>
 }
 function PersistBoxStarterPathToEnvironmentVariable($variableName){
     $value = [Environment]::GetEnvironmentVariable($variableName, 'Machine')
