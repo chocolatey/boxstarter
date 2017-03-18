@@ -4,9 +4,9 @@ function Set-NotificationAreaOptions {
 Sets options for the Windows Notification Area
 
 .PARAMETER AlwaysShowIconsOn
-Turn on always how all icons in the notification area
+Turn on always show all icons in the notification area
 .PARAMETER AlwaysShowIconsOff
-Turn off always how all icons in the notification area
+Turn off always show all icons in the notification area
 #>
 
 	[CmdletBinding()]
