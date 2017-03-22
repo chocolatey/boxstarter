@@ -18,6 +18,12 @@ Changes the location in which the Taskbar is docked.  Valid inputs are Top, Left
 .PARAMETER Combine
 Changes the Taskbar Icon combination style. Valid inputs are Always, Full, and Never.
 
+.PARAMETER AlwaysShowIconsOn
+Turn on always show all icons in the notification area
+
+.PARAMETER AlwaysShowIconsOff
+Turn off always show all icons in the notification area
+
 #>
 	[CmdletBinding(DefaultParameterSetName='unlock')]
 	param(
@@ -25,6 +31,10 @@ Changes the Taskbar Icon combination style. Valid inputs are Always, Full, and N
         [switch]$Lock,
         [Parameter(ParameterSetName='unlock')]
         [switch]$UnLock,
+		[Parameter(ParameterSetName='AlwaysShowIconsOn')]
+		[switch]$AlwaysShowIconsOn,
+		[Parameter(ParameterSetName='AlwaysShowIconsOff')]
+		[switch]$AlwaysShowIconsOff,
 		[ValidateSet('Small','Large')]
 		$Size,
 		[ValidateSet('Top','Left','Bottom','Right')]
@@ -33,6 +43,7 @@ Changes the Taskbar Icon combination style. Valid inputs are Always, Full, and N
 		$Combine
 	)
 
+	$explorerKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer'
 	$key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
 	$dockingKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects2'
 
@@ -72,5 +83,10 @@ Changes the Taskbar Icon combination style. Valid inputs are Always, Full, and N
 		}
 
 		Restart-Explorer
+	}
+
+	if(Test-Path -Path $explorerKey) {
+		if($AlwaysShowIconsOn) { Set-ItemProperty -Path $explorerKey -Name 'EnableAutoTray' -Value 0 }
+		if($alwaysShowIconsOff) { Set-ItemProperty -Path $explorerKey -Name 'EnableAutoTray' -Value 1 }
 	}
 }
