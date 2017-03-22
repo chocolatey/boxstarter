@@ -75,13 +75,14 @@ Set-WindowsExplorerOptions -DisableShowHiddenFilesFoldersDrives -DisableShowProt
 </pre>
 
 <h3>Set-TaskbarOptions</h3>
-<p>Sets options on the Windows Taskbar</p>
+<p>Sets options on the Windows Taskbar
+AlwaysShowIconsOn/AlwaysShowIconsOff allows turning on or off always show all icons in the notification area</p>
 <pre>
-Set-TaskbarOptions -Size Small -Lock -Dock Top -Combine Always
+Set-TaskbarOptions -Size Small -Lock -Dock Top -Combine Always -AlwaysShowIconsOn
 </pre>
 <p>It is also possible to do the converse actions, if required.</p>
 <pre>
-    Set-TaskbarOptions -Size Large -UnLock -Dock Bottom -Combine Never
+    Set-TaskbarOptions -Size Large -UnLock -Dock Bottom -Combine Never -AlwaysShowIconsOff
 </pre>
 
 <h3>Update-ExecutionPolicy</h3>
