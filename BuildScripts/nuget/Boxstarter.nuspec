@@ -19,22 +19,11 @@
       <dependency id="Boxstarter.HyperV" version="$version$" />
     </dependencies>
     <releaseNotes>
-- Silence errors from Move-LibraryDirectory about file conflicts from old location
-- Fix RebootOk setting always being set to false
-- Fix pending reboot check from always returning false
-- Persist RebootOk setting in nested installs
-- Suppress bogus Invalid Namespace errors
-- Added ability to configure "Expand to open folder" in Set-WindowsExplorerOptions
-- Added ability to configure QuickAccess options in Set-WindowsExplorerOption
-- Added Disable-GameBarTips to WinConfig module
-- Added Disable-BingSearch to WinConfig module
-- Updated to latest Get-PendingReboot
-- Eliminate multiple explorer restarts in Set-WindowsExplorerOption
-- Fix scenarios where providing multiple packages to Install-BoxstarterPackage fails
-- Added improved error logging where stacktrace was being dropped
-- Fix errors caused by using Int64 RebootCodes
-- Fix parameter typo in Set-ExplorerOptions
-- Update to latest Pester and ensure tests pass on clean VM
+- Update vendored Chocolatey to 0.10.4 beta
+- Add Icon toggling of task bar notifications in Set-TaskbarOptions
+- Fix registry key name in Set-TaskbarOptions on some Windows 10 versions
+- Fix Default of RebootOk in boxstarter shell
+- Stop powershell profile loading when in powershell v2
 </releaseNotes>
   </metadata>
   <files>
