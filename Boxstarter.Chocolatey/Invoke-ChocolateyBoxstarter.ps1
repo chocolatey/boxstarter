@@ -169,7 +169,7 @@ function Resolve-LocalRepo([string]$localRepo) {
 function Download-Package([string[]]$bootstrapPackage) {
     $BootstrapPackage = $BootstrapPackage | % {
         if($_ -like "*://*" -or (Test-Path $_ -PathType Leaf)){
-            New-PackageFromScript $_
+            New-PackageFromScript -Source $_ -PackageName $( split-path -leaf ([System.IO.Path]::GetTempFileName()))
         }
         else {
             $_

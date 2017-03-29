@@ -10,7 +10,7 @@ Describe "GistPackage" {
 
     it "installed temp-package" {
         $result.InvokeOnTarget($result.Session, {
-            Test-Path "c:\ProgramData\chocolatey\lib\temp_boxstarterPackage"
+            Test-Path "c:\ProgramData\chocolatey\lib\tmp*.tmp"
         }) | should be $true
     }
     it "had no errors" {
