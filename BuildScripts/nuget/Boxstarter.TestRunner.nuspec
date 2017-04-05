@@ -16,6 +16,8 @@
       <dependency id="Boxstarter.Azure" version="$version$" />
     </dependencies>
     <releaseNotes>
+- Update vendored chocolatey to stable 0.10.4
+- Randomize package names generated from script to avoid file locks
 - Update vendored Chocolatey to 0.10.4 beta
 - Add Icon toggling of task bar notifications in Set-TaskbarOptions
 - Fix registry key name in Set-TaskbarOptions on some Windows 10 versions
