@@ -12,8 +12,8 @@
     <description>Boxstarter's HyperV module includes functionality for targeting Hyper-V guest VMs with the ability to automatically configure them for remote installation and to create or restore snapshots at installation time.</description>
     <tags>Boxstarter bootstrapper environment setup VM virtualization HyperV</tags>
     <dependencies>
-      <dependency id="Boxstarter.Common" version="$version$" />
-      <dependency id="Boxstarter.Chocolatey" version="$version$" />
+      <dependency id="Boxstarter.Common" version="[$version$]" />
+      <dependency id="Boxstarter.Chocolatey" version="[$version$]" />
     </dependencies>
     <releaseNotes>
 - Update vendored chocolatey to stable 0.10.4

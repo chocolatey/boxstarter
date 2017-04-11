@@ -12,8 +12,8 @@
     <description>Boxstarter's Test Runner module makes it easy to automate the testing and publishing of Chocolatey packages.</description>
     <tags>Boxstarter testing environment setup</tags>
     <dependencies>
-      <dependency id="Boxstarter" version="$version$" />
-      <dependency id="Boxstarter.Azure" version="$version$" />
+      <dependency id="Boxstarter" version="[$version$]" />
+      <dependency id="Boxstarter.Azure" version="[$version$]" />
     </dependencies>
     <releaseNotes>
 - Update vendored chocolatey to stable 0.10.4

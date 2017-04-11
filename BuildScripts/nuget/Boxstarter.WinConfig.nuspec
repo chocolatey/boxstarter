@@ -13,7 +13,7 @@
     <description>Functions that Boxstarter uses to customize the windows environment.</description>
     <tags>devops bootstraper setup windows customizations</tags>
     <dependencies>
-      <dependency id="Boxstarter.Common" version="$version$" />
+      <dependency id="Boxstarter.Common" version="[$version$]" />
     </dependencies>
     <releaseNotes xmlns="">
 - Update vendored chocolatey to stable 0.10.4

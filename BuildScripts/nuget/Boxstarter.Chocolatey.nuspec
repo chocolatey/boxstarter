@@ -12,9 +12,9 @@
     <description>Creates a fresh developer (or non developer) environment from a bare OS utilizing powershell and chocolatey. Installs chocolatey, cutomizes windows settings, installs windows updates, handles reboots, installs windows features and your favorite applications.</description>
     <tags>Boxstarter environment setup</tags>
     <dependencies>
-      <dependency id="Boxstarter.Common" version="$version$" />
-      <dependency id="Boxstarter.WinConfig" version="$version$" />
-      <dependency id="Boxstarter.Bootstrapper" version="$version$" />
+      <dependency id="Boxstarter.Common" version="[$version$]" />
+      <dependency id="Boxstarter.WinConfig" version="[$version$]" />
+      <dependency id="Boxstarter.Bootstrapper" version="[$version$]" />
     </dependencies>
     <releaseNotes>
 - Update vendored chocolatey to stable 0.10.4
