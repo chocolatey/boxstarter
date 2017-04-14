@@ -27,6 +27,6 @@ http://boxstarter.org
 	Write-Warning "Your call to this function will now be routed to the Set-WindowsExplorerOptions function."
 
 	if($showHiddenFilesFoldersDrives) { Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives }
-    if($showFileExtensions) { Set-WindowsExplorerOptions -EnableShowProtectedOSFiles }
-    if($showProtectedOSFiles) { Set-WindowsExplorerOptions -EnableShowFileExtensions }
+    if($showFileExtensions) { Set-WindowsExplorerOptions -EnableShowFileExtensions }
+    if($showProtectedOSFiles) { Set-WindowsExplorerOptions -EnableShowProtectedOSFiles }
 }
