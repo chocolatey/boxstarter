@@ -43,7 +43,7 @@ about_boxstarter_variable_in_bootstrapper
         New-Item "$startup\boxstarter-post-restart.bat" -type file -force -value $restartScript | Out-Null
     }
     try {
-        if(Get-Module Bitlocker -ListAvailable){
+        if(Get-Module Bitlocker -ListAvailable -ErrorAction Stop){
             Get-BitlockerVolume | ? {$_.ProtectionStatus -eq "On"  -and $_.VolumeType -eq "operatingSystem"} | Suspend-Bitlocker -RebootCount 1 | out-null
         }
     }
