@@ -11,6 +11,7 @@
     <title>Boxstarter Common Module</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
+    <tags>boxstarter</tags>
     <releaseNotes xmlns="">
 - Update vendored chocolatey to stable 0.10.4
 - Randomize package names generated from script to avoid file locks
