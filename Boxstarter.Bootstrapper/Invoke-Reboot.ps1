@@ -44,10 +44,12 @@ about_boxstarter_variable_in_bootstrapper
     }
     try {
         if(Get-Module Bitlocker -ListAvailable -ErrorAction Stop){
-            Get-BitlockerVolume | ? {$_.ProtectionStatus -eq "On"  -and $_.VolumeType -eq "operatingSystem"} | Suspend-Bitlocker -RebootCount 1 | out-null
+            Get-BitlockerVolume -ErrorAction Stop | ? {$_.ProtectionStatus -eq "On"  -and $_.VolumeType -eq "operatingSystem"} | Suspend-Bitlocker -RebootCount 1 | out-null
         }
     }
-    catch {} # There are several reports of the bitlocker module throwing errors
+    catch {
+        $Global:Error.RemoveAt(0)
+    } # There are several reports of the bitlocker module throwing errors
     $Boxstarter.IsRebooting=$true
 
     if($Boxstarter.SourcePID -ne $Null) {
