@@ -16,6 +16,10 @@
       <dependency id="Boxstarter.Chocolatey" version="[$version$]" />
     </dependencies>
     <releaseNotes>
+- Update vendored chocolatey to stable 0.10.5
+- Add required tags element to boxstarter.common nuspec
+- Fix Set-ExplorerOption argument names
+- Fix Nuspec dependencies to be exact
 - Update vendored chocolatey to stable 0.10.4
 - Randomize package names generated from script to avoid file locks
 - Update vendored Chocolatey to 0.10.4 beta
