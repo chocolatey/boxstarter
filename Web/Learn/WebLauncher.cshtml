@@ -8,15 +8,16 @@
 <p class="lead"><span class="text-primary">Well buckle up! Boxstarter makes this a snap!</span></p>
 }
 <h3>Step 1</h3>
-<h4><span class="text-primary">Compose the installation script.</span></h4>
+<h4><span class="text-primary">Compose the installation script (with comments if desired).</span></h4>
 <pre>
 Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowProtectedOSFiles -EnableShowFileExtensions
 Enable-RemoteDesktop
 
+# Standard tools
 cinst fiddler4
 cinst git-credential-winstore
 cinst console-devel
-cinst sublimetext2
+cinst sublimetext2 # Awesome text editor
 cinst poshgit
 cinst dotpeek
 
