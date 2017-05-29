@@ -42,6 +42,7 @@
     <Compile Include="Restart-Explorer.ps1" />
     <Compile Include="Set-CornerNavigationOptions.ps1" />
     <Compile Include="Set-ExplorerOptions.ps1" />
+    <Compile Include="Set-NotificationAreaOptions.ps1" />
     <Compile Include="Set-TaskbarSmall.ps1" />
     <Compile Include="Update-ExecutionPolicy.ps1" />
   </ItemGroup>

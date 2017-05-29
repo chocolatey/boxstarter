@@ -85,6 +85,19 @@ Set-TaskbarOptions -Size Small -Lock -Dock Top -Combine Always -AlwaysShowIconsO
     Set-TaskbarOptions -Size Large -UnLock -Dock Bottom -Combine Never -AlwaysShowIconsOff
 </pre>
 
+<h3>Set-NotificationAreaOptions</h3>
+<p>Sets options for the Windows Notification Area. 
+Turn on always show all icons in the notification area</p>
+<pre>
+Set-NotificationAreaOptions -AlwaysShowIconsOn
+</pre>
+<p>It is also possible to do the converse actions, if required.
+Turn off always show all icons in the notification area
+</p>
+<pre>
+Set-NotificationAreaOptions -AlwaysShowIconsOff
+</pre>
+
 <h3>Update-ExecutionPolicy</h3>
 <p>The execution policy is set in a separate elevated PowerShell process. If running in the Chocolatey runner, the current window cannot be used because its execution policy has been explicitly set.</p>
 
