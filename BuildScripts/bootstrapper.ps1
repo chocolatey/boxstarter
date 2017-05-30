@@ -1,28 +1,44 @@
 function Get-Boxstarter {
     Param(
+        [string] $Version = "2.9.14",
         [switch] $Force
     )
     if(!(Test-Admin)) {
-        Write-Host "User is not running with administrative rights. Attempting to elevate..."
-        $command = "-ExecutionPolicy bypass -noexit -command . '$(${function:Get-Boxstarter}.File)';Get-Boxstarter $($args)"
-        Start-Process powershell -verb runas -argumentlist $command
+        $bootstrapperFile = ${function:Get-Boxstarter}.File
+        if($bootstrapperFile) {
+            Write-Host "User is not running with administrative rights. Attempting to elevate..."
+            $command = "-ExecutionPolicy bypass -noexit -command . '$bootstrapperFile';Get-Boxstarter $($args)"
+            Start-Process powershell -verb runas -argumentlist $command
+        }
+        else {
+            Write-Host "User is not running with administrative rights.`nPlease open a powershell console as administrator and try again."
+        }
         return
     }
+
+    $badPolicy = $false
+    @("Restricted", "AllSigned") | ? { $_ -eq (Get-ExecutionPolicy).ToString() } | % {
+        Write-Host "Your current Powershell Execution Policy is set to '$(Get-ExecutionPolicy)' and will prohibit boxstarter from operating propperly."
+        Write-Host "Please use Set-ExecutionPolicy to change the policy to RemoteSigned or Unrestricted."
+        $badPolicy = $true
+    }
+    if($badPolicy) { return }
 
     Write-Output "Welcome to the Boxstarter Module installer!"
     if(Check-Chocolatey -Force:$Force){
         Write-Output "Chocolatey installed, Installing Boxstarter Modules."
-        $version = choco -v
+        $chocoVersion  = "2.9.17"
         try {
-            New-Object -TypeName Version -ArgumentList $version.split('-')[0] | Out-Null
+            New-Object -TypeName Version -ArgumentList $chocoVersion.split('-')[0] | Out-Null
             $command = "cinst Boxstarter -y"
         }
         catch{
             # if there is no -v then its an older version with no -y
             $command = "cinst Boxstarter"
         }
-        $command += " -version 2.9.14"
+        $command += " --version $version"
         Invoke-Expression $command
+        Import-Module "$env:APPDATA\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" -Force
         $Message = "Boxstarter Module Installer completed"
     }
     else {
@@ -40,7 +56,7 @@ function Check-Chocolatey {
     Param(
         [switch] $Force
     )
-    if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
+    if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall\bin\choco.exe")){
         $message = "Chocolatey is going to be downloaded and installed on your machine. If you do not have the .NET Framework Version 4 or greater, that will also be downloaded and installed."
         Write-Host $message
         if($Force -OR (Confirm-Install)){

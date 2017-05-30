@@ -49,22 +49,27 @@ cinst IIS-WebServerRole -source windowsfeatures
 <img src="~/images/gist3.png"/>
 
 <h3>Step 3</h3>
-<h4><span class="text-primary">Run the script</span></h4>
-<p>In either Internet Explorer (other browsers likely will not work) or from a console (CMD or PowerShell), invoke the Boxstarter launcher:</p>
+<h4><span class="text-primary">Install the Boxstarter Modules</span></h4>
+<p>You can download the Boxstarter module installer from this web site or you can use Chocolatey to install the Boxstarter. Alternatively, you may invoke the module installer over the web using powershell.</p>
+
+<p>If you are running powershell v3 or higher:</p>
 <pre>
-START http://boxstarter.org/package/nr/url?https://gist.github.com/mwrock/7382880/raw/f6525387b4b524b8eccef6ed4d5ec219c82c0ac7/gistfile1.txt        
+. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
 </pre>
-<p>Note this URL is a simple Boxstarter URL: http://boxstarter.org/package/nr/url. The /nr/ tells Boxstarter not to reboot the machine. Depending on what you are installing, you may not want to include that. Especially if you are including more heavy weight applications, frameworks or Windows Updates.</p>
 
-<p>We add our raw Gist URL to the Boxstarter URL separated by a '?'.</p>
+<p/><p/>
+<p>If you are running powershell v2:</p>
+<pre>
+iex ((New-Object System.Net.WebClient).DownloadString('http://boxstarter.org/bootstrapper.ps1')); get-boxstarter -Force
+</pre>
 
-<p>This invokes a Boxstarter installer that will install everything according to your script. </p>
-<img src="~/images/install.png"/>
+<p/><p/>
+<p>This will install Chocolatey if necessary and then install the necessary boxstarter modules.</p>
 
-<p>If not already installed, this will install Chocolatey and any of its prerequisites. If you did not include /nr/ in the Boxstarter URL, it will manage reboots and automatically log the machine back in so you do not have to attend to it throughout the installation.</p>
-
-<h4>Other facts about the Boxstarter web installer:</h4>
-<ul>
-<li>You can also install any package on the public <a href="http://chocolatey.org/packages">Chocolatey.org</a> feed as well as the <a href="https://www.myget.org/gallery/boxstarter">Boxstarter community feed</a> on <a href="http://myget.org">MyGet.org</a>. To install these packages, use the package name instead of URL. So if you wanted to install FireFox, you would use http://boxstarter.org/package/nr/firefox.</li>
-<li>As briefly noted above, by default the web launch URLs will not work outside of Internet Explorer or from the START command if Internet Explorer is not your default browser. You need to install a "Click-Once" extension for <a href="https://chrome.google.com/webstore/detail/windows-remix-clickonce-h/dgpgholdldjjbcmpeckiephjigdpikan">chrome</a> or <a href="https://addons.mozilla.org/en-us/firefox/addon/microsoft-net-framework-assist/">firefox</a> to invoke the launcher.</li>        
-</ul>
+<h3>Step 4</h3>
+<h4><span class="text-primary">Run the script</span></h4>
+<p>Invoke the the Install-BoxstarterPackage command pointing to your gist created above:</p>
+<pre>
+Install-BoxstarterPackage -PackgeName https://gist.github.com/mwrock/7382880/raw/f6525387b4b524b8eccef6ed4d5ec219c82c0ac7/gistfile1.txt -DisableReboots
+</pre>
+<p>While you can use the -PackageName argument to point to any public Chocolatey package, you can also point to any URL that resolves to a plain text script like the gist we created. Note that we use the -DisableReboots argument to suppress automatic reboots.</p>

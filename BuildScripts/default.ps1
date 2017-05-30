@@ -20,11 +20,11 @@ properties {
 
 Task default -depends Build
 Task Build -depends Build-Clickonce, Build-Web, Install-ChocoLib, Test, Package
-Task Deploy -depends Build, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
+Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Chocolatey, Push-Github, Publish-Web
 Task All-Tests -depends Test, Integration-Test
-Task Quick-Deploy -depends Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Publish-Clickonce, Update-Homepage
+Task Quick-Deploy -depends Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage
 
 task Create-ModuleZipForRemoting {
     if (Test-Path "$basedir\Boxstarter.Chocolatey\Boxstarter.zip") {
@@ -103,7 +103,7 @@ Task Version-Module -description 'Stamps the psd1 with the version and last chan
                     Set-Content $path
     }
     (Get-Content "$baseDir\BuildScripts\bootstrapper.ps1") |
-        % {$_ -replace " -version .*`$", " -version $version`"" } | 
+        % {$_ -replace "Version = .*`$", "Version = `"$version`"," } | 
             Set-Content "$baseDir\BuildScripts\bootstrapper.ps1"
 }
 
@@ -138,6 +138,11 @@ Task Deploy-DownloadZip -depends Package-DownloadZip {
     Remove-Item "$basedir\web\downloads" -Recurse -Force -ErrorAction SilentlyContinue
     mkdir "$basedir\web\downloads"
     Copy-Item "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\web\downloads"
+}
+
+Task Deploy-Bootstrapper {
+    Remove-Item "$basedir\web\bootstrapper.ps1" -Force -ErrorAction SilentlyContinue
+    Copy-Item "$basedir\buildscripts\bootstrapper.ps1" "$basedir\web\bootstrapper.ps1"
 }
 
 Task Push-Nuget -description 'Pushes the module to MyGet feed' {
