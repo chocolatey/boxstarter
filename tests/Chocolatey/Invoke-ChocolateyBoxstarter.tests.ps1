@@ -155,5 +155,31 @@ Describe "Invoke-ChocolateyBoxstarter" {
             Assert-MockCalled chocolatey -ParameterFilter { (Compare-Object $packageNames $packages) -eq $null }
         }
     }
+	
+    Context "When DisableReboots switch absent"{
+        Mock Invoke-Boxstarter
+		Invoke-ChocolateyBoxstarter test-package3 | Out-Null
+		
+		It "should enable RebootOk when invoking Boxstarter" {
+			Assert-MockCalled Invoke-Boxstarter -ParameterFilter {$RebootOk -eq $true}
+		}
+    }
 
+    Context "When DisableReboots switch enabled"{
+        Mock Invoke-Boxstarter
+		Invoke-ChocolateyBoxstarter test-package3 -DisableReboots | Out-Null
+		
+		It "should disable RebootOk when invoking Boxstarter" {
+			Assert-MockCalled Invoke-Boxstarter -ParameterFilter {$RebootOk -eq $false}
+		}
+    }
+
+	Context "When Shutdown switch enabled" {
+		Mock Invoke-Boxstarter
+		Invoke-ChocolateyBoxstarter test-package3 -Shutdown | Out-Null
+
+		It "should pass shutdown on to Invoke-Boxstarter" {
+			Assert-MockCalled Invoke-Boxstarter -ParameterFilter {Shutdown -eq $true}
+		}
+	}
 }

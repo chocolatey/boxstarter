@@ -278,7 +278,8 @@ about_boxstarter_chocolatey
         [parameter(ParameterSetName="Package")]
         [switch]$KeepWindowOpen,
         [string]$LocalRepo,
-        [switch]$DisableRestart
+        [switch]$DisableRestart,
+		[switch]$Shutdown
     )
     $CurrentVerbosity=$global:VerbosePreference
     try {
@@ -519,7 +520,8 @@ function Invoke-Locally {
         [switch]$DisableReboots,
         [switch]$KeepWindowOpen,
         [switch]$DisableRestart,
-        [string]$LocalRepo
+        [string]$LocalRepo,
+		[switch]$Shutdown
     )
     if($PSBoundParameters.ContainsKey("Credential")){
         if($Credential -ne $null) {

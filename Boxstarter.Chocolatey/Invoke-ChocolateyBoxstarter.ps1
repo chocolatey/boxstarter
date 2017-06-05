@@ -121,9 +121,11 @@ Set-BoxstarterConfig
       [System.Security.SecureString]$Password,
       [switch]$KeepWindowOpen,
       [switch]$NoPassword,
-      [switch]$DisableRestart
+      [switch]$DisableRestart,
+      [switch]$Shutdown
     )
     try{
+		$Boxstarter.RebootOk=$true
         if($DisableReboots){
             Write-BoxstarterMessage "Disabling reboots" -Verbose
             $Boxstarter.RebootOk=$false
