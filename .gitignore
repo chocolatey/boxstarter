@@ -26,3 +26,4 @@ Web/bootstrapper.ps1
 PublishProfiles
 *.pfx
 .vagrant
+.vs
