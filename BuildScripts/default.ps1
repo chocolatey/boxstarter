@@ -233,13 +233,13 @@ task Install-WebDeploy {
 }
 
 task Install-ChocoLib {
-    exec { .$nugetExe install chocolatey.lib -Version 0.10.6 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
+    exec { .$nugetExe install chocolatey.lib -Version 0.10.7 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
     exec { .$nugetExe install log4net -Version 2.0.3 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
     MkDir $basedir\Boxstarter.Chocolatey\chocolatey -ErrorAction SilentlyContinue
     Copy-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3\lib\net40-full\* $basedir\Boxstarter.Chocolatey\chocolatey
-    Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.6\lib\* $basedir\Boxstarter.Chocolatey\chocolatey
+    Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.7\lib\* $basedir\Boxstarter.Chocolatey\chocolatey
     Remove-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3 -Recurse -Force
-    Remove-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.6 -Recurse -Force
+    Remove-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.7 -Recurse -Force
 }
 
 function PackDirectory($path, [switch]$AddReleaseNotes){
