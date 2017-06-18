@@ -16,6 +16,7 @@
       <dependency id="WindowsAzurePowershell" />
     </dependencies>
     <releaseNotes>
+- Update vendored chocolatey to stable 0.10.7
 - Update vendored chocolatey to stable 0.10.5
 - Add required tags element to boxstarter.common nuspec
 - Fix Set-ExplorerOption argument names
