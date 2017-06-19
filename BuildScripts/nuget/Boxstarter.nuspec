@@ -19,6 +19,7 @@
       <dependency id="Boxstarter.HyperV" version="[$version$]" />
     </dependencies>
     <releaseNotes>
+- Fix for missing AlphaFS.dll
 - Update vendored chocolatey to stable 0.10.7
 - Update vendored chocolatey to stable 0.10.5
 - Add required tags element to boxstarter.common nuspec
