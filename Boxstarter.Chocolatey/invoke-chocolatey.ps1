@@ -2,8 +2,7 @@ function Invoke-Chocolatey($chocoArgs) {
     Write-BoxstarterMessage "Current runtime is $($PSVersionTable.CLRVersion)" -Verbose
     $refs = @( 
         "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/log4net.dll",
-        "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/chocolatey.dll",
-        "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/AlphaFS.dll"
+        "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/chocolatey.dll"
     )
     $refs | % {
         Write-BoxstarterMessage "Adding types from $_" -Verbose
