@@ -111,6 +111,7 @@
     <Content Include="App_Code\Helper.cshtml" />
     <Content Include="Launch\Boxstarter.WebLaunch.application" />
     <Content Include="Blog.cshtml" />
+    <Content Include="bootstrapper.ps1" />
     <Content Include="Learn\_ContentLayout.cshtml" />
     <Content Include="Learn\SimplePackage.cshtml" />
     <Content Include="Learn\RemotePackageWithArtifacts.cshtml" />
