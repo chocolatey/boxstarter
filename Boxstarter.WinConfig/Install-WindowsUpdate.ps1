@@ -138,11 +138,43 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
 }
 
 function Download-Update($update) {
-    $downloadSession=Start-TimedSection "Download of $($update.Title)"
-    $updates= new-Object -com "Microsoft.Update.UpdateColl"
+    $downloadSession = Start-TimedSection "Download of $($update.Title)"
+    $updates = new-Object -com "Microsoft.Update.UpdateColl"
     $updates.Add($update) | out-null
     $Downloader.Updates = $updates
-    $Downloader.Download() | Out-Null
+
+    $retry = $true
+    [int]$retries = "10"
+    [int]$currentRetry = "0"
+    [int]$retrySeconds = 30
+
+    do {
+        try {
+            $Downloader.Download() | Out-Null
+            $retry = $false
+        }
+        catch {
+            # Check for WU_E_SELFUPDATE_IN_PROGRESS
+            if($_.Exception.HResult -eq -2145124325) {
+                if ($currentRetry -gt $retries) {
+                    # We can't wait forever...
+                    Out-BoxstarterLog "Windows Update Agent took too long to update itself."
+                    throw
+                }
+
+                Out-BoxstarterLog "Windows Update Agent is self-updating... Waiting."
+                $global:error.RemoveAt(0)
+
+                Start-Sleep -Seconds $retrySeconds
+                $currentRetry = $currentRetry + 1
+            }
+            # Some other execption happened...
+            else {
+                throw
+            }
+        }
+    } while ($retry -eq $true)
+
     Stop-TimedSection $downloadSession
 }
 
