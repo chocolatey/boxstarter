@@ -21,10 +21,10 @@ The criteria used for searching updates. The default criteria is "IsHidden=0 and
 .LINK
 http://boxstarter.org
 
-#>    
+#>
     param(
-        [switch]$getUpdatesFromMS, 
-        [switch]$acceptEula, 
+        [switch]$getUpdatesFromMS,
+        [switch]$acceptEula,
         [switch]$SuppressReboots,
         [string]$criteria="IsHidden=0 and IsInstalled=0 and Type='Software' and BrowseOnly=0"
     )
@@ -41,7 +41,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
     }
 
     try{
-        $searchSession=Start-TimedSection "Checking for updates..."        
+        $searchSession=Start-TimedSection "Checking for updates..."
         $updateSession =new-object -comobject "Microsoft.Update.Session"
         $Downloader =$updateSession.CreateUpdateDownloader()
         $Installer =$updateSession.CreateUpdateInstaller()
@@ -118,7 +118,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
                 }
             }
         }
-        else{Out-BoxstarterLog "There is no update applicable to this machine"}    
+        else{Out-BoxstarterLog "There is no update applicable to this machine"}
     }
     catch {
         Out-BoxstarterLog "There were problems installing updates: $($_.ToString())"
@@ -154,12 +154,12 @@ function Install-Update($update, $currentCount, $totalUpdates) {
     try { $result = $Installer.Install() } catch {
         if(!($SuppressReboots) -and (test-path function:\Invoke-Reboot)){
             if(Test-PendingReboot){
-                $global:error.RemoveAt(0)            
+                $global:error.RemoveAt(0)
                 Invoke-Reboot
             }
         }
-        # Check for WU_E_INSTALL_NOT_ALLOWED  
-        if($_.Exception.HResult -eq -2146233087) {
+        # Check for WU_E_INSTALL_NOT_ALLOWED
+        if($_.Exception.HResult -eq -2145124330) {
             Out-BoxstarterLog "There is either an update in progress or there is a pending reboot blocking the install."
             $global:error.RemoveAt(0)
         }
