@@ -158,11 +158,11 @@ function Download-Update($update) {
             if($_.Exception.HResult -eq -2145124325) {
                 if ($currentRetry -gt $retries) {
                     # We can't wait forever...
-                    Out-BoxstarterLog "Windows Update Agent took too long to update itself."
+                    Write-BoxstarterMessage "Windows Update Agent took too long to update itself."
                     throw
                 }
 
-                Out-BoxstarterLog "Windows Update Agent is self-updating... Waiting."
+                Write-BoxstarterMessage "Windows Update Agent is self-updating... Waiting."
                 $global:error.RemoveAt(0)
 
                 Start-Sleep -Seconds $retrySeconds
