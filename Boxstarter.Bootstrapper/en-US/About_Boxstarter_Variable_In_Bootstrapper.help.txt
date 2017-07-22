@@ -18,7 +18,7 @@ BOXSTARTER VARIABLE SETTINGS
 
 	BaseDir
 		The Root directory containing the Boxstarter Modules and local 
-		package repository. By default this is in the users AppData 
+		package repository. By default this is in the ProgramData 
 		directory.
 
 	IsRebooting

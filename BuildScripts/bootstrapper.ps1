@@ -38,7 +38,7 @@ function Get-Boxstarter {
         }
         $command += " --version $version"
         Invoke-Expression $command
-        Import-Module "$env:APPDATA\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" -Force
+        Import-Module "$env:ProgramData\boxstarter\boxstarter.chocolatey\boxstarter.chocolatey.psd1" -Force
         $Message = "Boxstarter Module Installer completed"
     }
     else {

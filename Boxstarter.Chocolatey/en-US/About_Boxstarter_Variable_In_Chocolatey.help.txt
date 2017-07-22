@@ -25,7 +25,7 @@ BOXSTARTER VARIABLE SETTINGS
 		Path to the local directory containing packages that 
 		boxstarter will scan when looking for a package. By default 
 		this is the BuildPackeged directory under the base Boxstarter 
-		directory usually in the user's AppData directory. The 
+		directory usually in the ProgramData directory. The 
 		default can be changed by using the	Set-BoxstarterConfig 
 		function with the -LocalRepo argument.
 

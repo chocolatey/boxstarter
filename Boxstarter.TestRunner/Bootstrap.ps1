@@ -16,10 +16,10 @@ function Bootstrap-Boxstarter {
     }
 
     if(!(Get-Module Boxstarter.Azure)){
-        Import-Module $env:AppData\Boxstarter\Boxstarter.Azure\Boxstarter.Azure.psd1
+        Import-Module $env:ProgramData\Boxstarter\Boxstarter.Azure\Boxstarter.Azure.psd1
     }
     if(!(Get-Module Boxstarter.TestRunner)){
-        Import-Module $env:AppData\Boxstarter\Boxstarter.TestRunner\Boxstarter.TestRunner.psd1
+        Import-Module $env:ProgramData\Boxstarter\Boxstarter.TestRunner\Boxstarter.TestRunner.psd1
     }
 }
 
