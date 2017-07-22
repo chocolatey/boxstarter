@@ -1,5 +1,5 @@
 function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
-    $boxstarterPath=Join-Path $env:AppData Boxstarter
+    $boxstarterPath = Join-Path $env:ProgramData Boxstarter
     if(!(test-Path $boxstarterPath)){
         mkdir $boxstarterPath
     }
@@ -42,8 +42,9 @@ PS:>Get-Help Boxstarter
     Write-Host $successMsg
 
     if($ModuleName -eq "Boxstarter.Chocolatey" -and !$env:appdata.StartsWith($env:windir)) {
-        $desktop = $([System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::DesktopDirectory))
-        $startMenu=$("$env:appdata\Microsoft\Windows\Start Menu\Programs\Boxstarter")
+        $desktop = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::CommonDesktopDirectory)
+        $startMenu = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::CommonStartMenu)
+        $startMenu += "\Programs\Boxstarter"
         if(!(Test-Path $startMenu)){
             mkdir $startMenu
         }
@@ -70,6 +71,7 @@ function Create-Shortcut($location, $target, $targetArgs, $boxstarterPath) {
     $lnk.IconLocation="$boxstarterPath\BoxLogo.ico"
     $lnk.Save()
 
+    #This adds a bit to the shortcut link that causes it to open with admin privileges
 	$tempFile = "$env:temp\TempShortcut.lnk"
 		
 	$writer = new-object System.IO.FileStream $tempFile, ([System.IO.FileMode]::Create)
@@ -90,13 +92,13 @@ function Create-Shortcut($location, $target, $targetArgs, $boxstarterPath) {
 	Move-Item -Path $tempFile $location -Force
 }
 function PersistBoxStarterPathToEnvironmentVariable($variableName){
-    $value = [Environment]::GetEnvironmentVariable($variableName, 'User')
+    $value = [Environment]::GetEnvironmentVariable($variableName, 'Machine')
     if($value){
         $values=($value -split ';' | ?{ !($_.ToLower() -match "\\boxstarter$")}) -join ';'
         $values+=";$boxstarterPath"
     } 
     elseif($variableName -eq "PSModulePath") {
-        $values=[environment]::getfolderpath("mydocuments")
+        $values=[environment]::getfolderpath("ProgramFiles")
         $values +="\WindowsPowerShell\Modules;$boxstarterPath"
     }
     else {
@@ -104,7 +106,7 @@ function PersistBoxStarterPathToEnvironmentVariable($variableName){
     }
     if(!$value -or !($values -contains $boxstarterPath)){
         $values = $values.Replace(';;',';')
-        [Environment]::SetEnvironmentVariable($variableName, $values, 'User')
+        [Environment]::SetEnvironmentVariable($variableName, $values, 'Machine')
         $varValue = Get-Content env:\$variableName
         $varValue += ";$boxstarterPath"
         $varValue = $varValue.Replace(';;',';')
