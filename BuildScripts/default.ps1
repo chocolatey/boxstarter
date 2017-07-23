@@ -19,12 +19,12 @@ properties {
 }
 
 Task default -depends Build
-Task Build -depends Build-Clickonce, Build-Web, Install-ChocoLib, Test, Package
-Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
+Task Build -depends Build-Web, Install-ChocoLib, Test, Package
+Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Update-Homepage -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Chocolatey, Push-Github, Publish-Web
 Task All-Tests -depends Test, Integration-Test
-Task Quick-Deploy -depends Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage
+Task Quick-Deploy -depends Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Update-Homepage
 
 task Create-ModuleZipForRemoting {
     if (Test-Path "$basedir\Boxstarter.Chocolatey\Boxstarter.zip") {
@@ -46,24 +46,10 @@ task Create-ModuleZipForRemoting {
     Move-Item "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.chocolatey\Boxstarter.zip"
 }
 
-task Build-ClickOnce -depends Install-MSBuild, Install-Win8SDK {
-    Update-AssemblyInfoFiles $version $changeset
-    exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
-    exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
-}
-
 task Build-Web -depends Install-MSBuild, Install-WebAppTargets {
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Build /v:minimal /p:DownloadNuGetExe="true" }
     copy-Item "$baseDir\packages\bootstrap.3.0.2\content\*" "$baseDir\Web" -Recurse -Force -ErrorAction SilentlyContinue
-}
-
-task Publish-ClickOnce -depends Install-MSBuild {
-    exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version.0" }
-    Remove-Item "$basedir\web\Launch" -Recurse -Force -ErrorAction SilentlyContinue
-    MkDir "$basedir\web\Launch"
-    Set-Content "$basedir\web\Launch\.gitattributes" -Value "* -text"
-    Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\web\Launch" -Recurse -Force
 }
 
 task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
