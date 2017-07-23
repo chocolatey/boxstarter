@@ -16,19 +16,10 @@
       <dependency id="Boxstarter.WinConfig" version="[$version$]" />
     </dependencies>
     <releaseNotes>
-- Fix for missing AlphaFS.dll
-- Update vendored chocolatey to stable 0.10.7
-- Update vendored chocolatey to stable 0.10.5
-- Add required tags element to boxstarter.common nuspec
-- Fix Set-ExplorerOption argument names
-- Fix Nuspec dependencies to be exact
-- Update vendored chocolatey to stable 0.10.4
-- Randomize package names generated from script to avoid file locks
-- Update vendored Chocolatey to 0.10.4 beta
-- Add Icon toggling of task bar notifications in Set-TaskbarOptions
-- Fix registry key name in Set-TaskbarOptions on some Windows 10 versions
-- Fix Default of RebootOk in boxstarter shell
-- Stop powershell profile loading when in powershell v2
+- Revert vendored chocolatey to stable 0.10.5
+- Fix HRESULT code for WU_E_INSTALL_NOT_ALLOWED
+- Handle the case where the Windows Update Agent is updating itself
+- Install boxstarter to macine instead of user
 </releaseNotes>
   </metadata>
   <files>

@@ -4,7 +4,7 @@ Description = 'The Boxstarter Test Runner module makes it easy to automate the t
 ModuleToProcess = './Boxstarter.TestRunner.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.9.27'
+ModuleVersion = '2.10.0'
 
 # ID used to uniquely identify this module
 GUID = '087b5fe9-4a6e-40b5-a0fb-e670b86563b3'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = '3e9916ed22217c36fe8c20d2e10878ff6f6ba9dd'
+PrivateData = '6b50751ade4016761b70a2fa2f2396c794f9873c'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
