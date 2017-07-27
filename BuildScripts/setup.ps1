@@ -101,7 +101,6 @@ function PersistBoxStarterPathToEnvironmentVariable($variableName, $boxstarterPa
         $userValues = [environment]::getfolderpath("mydocuments")
         $userValues +="\WindowsPowerShell\Modules"
     }
-    $userValues = $userValues.Replace(';;',';')
     [Environment]::SetEnvironmentVariable($variableName, $userValues, 'User')
 
     $value = [Environment]::GetEnvironmentVariable($variableName, 'Machine')
@@ -118,7 +117,6 @@ function PersistBoxStarterPathToEnvironmentVariable($variableName, $boxstarterPa
         $values ="$boxstarterPath"
     }
 
-    $values = $values.Replace(';;',';')
     [Environment]::SetEnvironmentVariable($variableName, $values, 'Machine')
     $varValue = Get-Content env:\$variableName
     $varValue = "$boxstarterPath;$varValue"
