@@ -70,6 +70,6 @@ iex ((New-Object System.Net.WebClient).DownloadString('http://boxstarter.org/boo
 <h4><span class="text-primary">Run the script</span></h4>
 <p>Invoke the the Install-BoxstarterPackage command pointing to your gist created above:</p>
 <pre>
-Install-BoxstarterPackage -PackgeName https://gist.github.com/mwrock/7382880/raw/f6525387b4b524b8eccef6ed4d5ec219c82c0ac7/gistfile1.txt -DisableReboots
+Install-BoxstarterPackage -PackageName https://gist.github.com/mwrock/7382880/raw/f6525387b4b524b8eccef6ed4d5ec219c82c0ac7/gistfile1.txt -DisableReboots
 </pre>
 <p>While you can use the -PackageName argument to point to any public Chocolatey package, you can also point to any URL that resolves to a plain text script like the gist we created. Note that we use the -DisableReboots argument to suppress automatic reboots.</p>
