@@ -598,10 +598,41 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
     Write-BoxstarterMessage "Expanding modules on $($Session.ComputerName)" -Verbose
     Invoke-Command -Session $Session {
         Set-ExecutionPolicy Bypass -Force
-        $shellApplication = new-object -com shell.application 
-        $zipPackage = $shellApplication.NameSpace("$env:temp\Boxstarter\Boxstarter.zip") 
-        $destinationFolder = $shellApplication.NameSpace("$env:temp\boxstarter") 
-        $destinationFolder.CopyHere($zipPackage.Items(),0x10)
+        if ($PSVersionTable.PSVersion.Major -ge 4) {
+            try
+            {
+                Add-Type -AssemblyName System.IO.Compression.FileSystem 
+                $archive = [System.IO.Compression.ZipFile]::OpenRead("$env:temp\Boxstarter\Boxstarter.zip")
+
+                foreach ($entry in $archive.Entries) 
+                { 
+                    $entryTargetFilePath = [System.IO.Path]::Combine("$env:temp\boxstarter", $entry.FullName) 
+                    $entryDir = [System.IO.Path]::GetDirectoryName($entryTargetFilePath) 
+        
+                    if(!(Test-Path $entryDir))
+                    { 
+                        New-Item -ItemType Directory -Path $entryDir -Force | Out-Null  
+                    } 
+         
+                    if(!$entryTargetFilePath.EndsWith("/"))
+                    { 
+                        [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $entryTargetFilePath, $true); 
+                    } 
+                } 
+            }
+            catch
+            {
+                throw $_
+            }
+        }
+        else {
+            #original method
+            $shellApplication = new-object -com shell.application 
+            $zipPackage = $shellApplication.NameSpace("$env:temp\Boxstarter\Boxstarter.zip") 
+            $destinationFolder = $shellApplication.NameSpace("$env:temp\boxstarter") 
+            $destinationFolder.CopyHere($zipPackage.Items(),0x10)   
+        }              
+
         [xml]$configXml = Get-Content (Join-Path $env:temp\Boxstarter BoxStarter.config)
         if($configXml.config.LocalRepo -ne $null) {
             $configXml.config.RemoveChild(($configXml.config.ChildNodes | ? { $_.Name -eq "LocalRepo"}))
@@ -935,3 +966,5 @@ function Rollback-ClientRemoting($ClientRemotingStatus, $CredSSPStatus) {
         }
     }
 }
+
+<# Support for expanding Boxstarter modules on Server Core by (C) 2017 United Parcel Service of America, Inc. #>
