@@ -56,6 +56,7 @@ Intercepts Chocolatey call to check for reboots
         [string[]]$packageNames=@('')
     )
     chocolatey Install @PSBoundParameters @args
+    return $LastExitCode
 }
 
 function choco {
@@ -69,6 +70,7 @@ Intercepts Chocolatey call to check for reboots
         [string[]]$packageNames=@('')
     )
     chocolatey @PSBoundParameters @args
+    return $LastExitCode
 }
 
 function cup {
@@ -81,6 +83,7 @@ Intercepts Chocolatey call to check for reboots
         [string[]]$packageNames=@('')
     )
     chocolatey Update @PSBoundParameters @args
+    return $LastExitCode
 }
 
 function chocolatey {
@@ -159,6 +162,9 @@ Intercepts Chocolatey call to check for reboots
                     if($RebootCodes -contains $errorCode) {
                        Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code" -verbose
                        $rebootable = $true
+                    } else {
+                        Write-BoxStarterMessage "Exiting..."
+                        return 1
                     }
                 }
                 $idx += 1
@@ -170,6 +176,7 @@ Intercepts Chocolatey call to check for reboots
             Invoke-Reboot
         }
     }
+    return 0
 }
 
 function Get-PassedArg($argName, $origArgs) {
