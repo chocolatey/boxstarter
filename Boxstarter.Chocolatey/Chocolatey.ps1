@@ -1,6 +1,6 @@
 function Install-ChocolateyInstallPackageOverride {
 param(
-  [string] $packageName, 
+  [string] $packageName,
   [string] $fileType = 'exe',
   [string] $silentArgs = '',
   [string] $file,
@@ -21,8 +21,8 @@ Install-ChocolateyInstallPackage $(Expand-Splat $PSBoundParameters)
 function Write-HostOverride {
 param(
   [Parameter(Position=0,Mandatory=$false,ValueFromPipeline=$true, ValueFromRemainingArguments=$true)][object] $Object,
-  [Parameter()][switch] $NoNewLine, 
-  [Parameter(Mandatory=$false)][ConsoleColor] $ForegroundColor, 
+  [Parameter()][switch] $NoNewLine,
+  [Parameter(Mandatory=$false)][ConsoleColor] $ForegroundColor,
   [Parameter(Mandatory=$false)][ConsoleColor] $BackgroundColor,
   [Parameter(Mandatory=$false)][Object] $Separator
 )
@@ -51,12 +51,12 @@ function cinst {
 .SYNOPSIS
 Intercepts Chocolatey call to check for reboots
 
-#>    
+#>
     param(
         [string[]]$packageNames=@('')
     )
-    chocolatey Install @PSBoundParameters @args
-    return $LastExitCode
+    $ec = (chocolatey Install @PSBoundParameters @args)
+    return $ec
 }
 
 function choco {
@@ -64,13 +64,13 @@ function choco {
 .SYNOPSIS
 Intercepts Chocolatey call to check for reboots
 
-#>    
+#>
     param(
         [string]$command,
         [string[]]$packageNames=@('')
     )
-    chocolatey @PSBoundParameters @args
-    return $LastExitCode
+    $ec = (chocolatey @PSBoundParameters @args)
+    return $ec
 }
 
 function cup {
@@ -78,12 +78,12 @@ function cup {
 .SYNOPSIS
 Intercepts Chocolatey call to check for reboots
 
-#>    
+#>
     param(
         [string[]]$packageNames=@('')
     )
-    chocolatey Update @PSBoundParameters @args
-    return $LastExitCode
+    $ec = (chocolatey Update @PSBoundParameters @args)
+    return $ec
 }
 
 function chocolatey {
@@ -91,7 +91,7 @@ function chocolatey {
 .SYNOPSIS
 Intercepts Chocolatey call to check for reboots
 
-#>  
+#>
     param(
         [string]$command,
         [string[]]$packageNames=@('')
@@ -100,14 +100,15 @@ Intercepts Chocolatey call to check for reboots
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
     $packageNames=-split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
-    
+
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
+
         if((Get-PassedArg @("source", "s") $args) -eq "WindowsFeatures"){
             $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
             if($dismInfo -contains "State : Enabled" -or $dismInfo -contains "State : Enable Pending") {
                 Write-BoxstarterMessage "$packageName is already installed"
-                return
+                return 0
             }
         }
         if(((Test-PendingReboot) -or $Boxstarter.IsRebooting) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
@@ -127,13 +128,12 @@ Intercepts Chocolatey call to check for reboots
                 $env:PSModulePath += ";" + $machineModPath
             }
 
-            Write-BoxstarterMessage "Exit Code: $ec" -Verbose
             if($ec -ne 0) {
                 Write-Error "Chocolatey reported an unsuccessful exit code of $ec. See $($Boxstarter.Log) for details."
                 $currentErrorCount += 1
             }
         }
-        catch { 
+        catch {
             #Only write the error to the error stream if it was not previously
             #written by chocolatey
             $chocoErrors = $global:error.Count - $currentErrorCount
@@ -151,7 +151,9 @@ Intercepts Chocolatey call to check for reboots
                 }
             }
         }
+
         $chocoErrors = $global:error.Count - $currentErrorCount
+
         if($chocoErrors -gt 0){
             Write-BoxstarterMessage "There was an error calling chocolatey" -Verbose
             $idx = 0
@@ -175,6 +177,10 @@ Intercepts Chocolatey call to check for reboots
             Remove-ChocolateyPackageInProgress $packageName
             Invoke-Reboot
         }
+    }
+    if ($currentErrorCount -gt 0) {
+        Write-Error "Chocolatey wrapper has errors"
+        return 1
     }
     return 0
 }
@@ -200,7 +206,7 @@ function Get-PassedArg($argName, $origArgs) {
             $parts = $_.split("=", 2)
             $nextIsValue = $false
             $val = $parts[1]
-        }        
+        }
     }
 
     return $val
@@ -234,7 +240,7 @@ function Call-Chocolatey {
     }
 
     $restartFile = "$(Get-BoxstarterTempDir)\Boxstarter.$PID.restart"
-    if(Test-Path $restartFile) { 
+    if(Test-Path $restartFile) {
         Write-BoxstarterMessage "found $restartFile we are restarting"
         $Boxstarter.IsRebooting = $true
         remove-item $restartFile -Force
@@ -250,7 +256,7 @@ function Invoke-LocalChocolatey($chocoArgs) {
         $global:Boxstarter.DisableRestart = $true
     }
     Export-BoxstarterVars
- 
+
     Enter-DotNet4 {
         if($env:BoxstarterVerbose -eq 'true'){
             $global:VerbosePreference = "Continue"
@@ -313,14 +319,14 @@ function Remove-ChocolateyPackageInProgress($packageName) {
     $pkgDir = "$env:ChocolateyInstall\lib\$packageName"
     if(Test-Path $pkgDir) {
         Write-BoxstarterMessage "Removing $pkgDir in progress" -Verbose
-        remove-item $pkgDir -Recurse -Force -ErrorAction SilentlyContinue  
+        remove-item $pkgDir -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
 function Expand-Splat($splat){
     $ret=""
     ForEach($item in $splat.KEYS.GetEnumerator()) {
-        $ret += "-$item$(Resolve-SplatValue $splat[$item]) " 
+        $ret += "-$item$(Resolve-SplatValue $splat[$item]) "
     }
     Write-BoxstarterMessage "Expanded splat to $ret"
     return $ret
@@ -412,7 +418,7 @@ function Import-BoxstarterVars {
 
     $varsToImport = @()
     Get-ChildItem -Path env: | ? { $_.Name.StartsWith('BEX.') } | % { $varsToImport += $_.Name }
-    
+
     $varsToImport | % { Import-FromEnvironment $_ global }
 
     $boxstarter.SourcePID = $env:BoxstarterSourcePID
