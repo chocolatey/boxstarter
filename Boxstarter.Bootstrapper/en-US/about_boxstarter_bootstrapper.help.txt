@@ -55,7 +55,7 @@ AUTOMATIC LOGON
 WRITING BOXSTARTER SCRIPTS FOR REBOOTS
 	When Boxstarter reboots, it simply reruns the script as it was 
 	provided. Currently Boxstarter has no checkpointing mechanism to 
-	start your script from a specific location. Of coarse, the script 
+	start your script from a specific location. Of course, the script 
 	author can include such logic. Therefore, it is best to write 
 	scripts that can be run in a repeatable manner. For example, the 
 	script may want to do its own checks to determine if long running 
