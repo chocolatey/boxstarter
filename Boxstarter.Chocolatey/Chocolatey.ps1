@@ -3,7 +3,8 @@ param(
   [string] $packageName, 
   [string] $fileType = 'exe',
   [string] $silentArgs = '',
-  [string] $file,
+  [alias("fileFullPath")][string] $file,
+  [alias("fileFullPath64")][string] $file64,
   $validExitCodes = @(0)
 )
     Wait-ForMSIEXEC
