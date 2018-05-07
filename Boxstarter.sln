@@ -68,8 +68,6 @@ Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.Azure", "Boxstar
 EndProject
 Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "Boxstarter.TestRunner", "Boxstarter.TestRunner\Boxstarter.TestRunner.pssproj", "{C950BEFC-B3EE-4DCD-A0A6-A2244584D1E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "boxstarter.choco", "boxstarter.choco\boxstarter.choco.csproj", "{77A5F643-206B-4FDD-B21A-0511EBC12C74}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
