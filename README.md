@@ -13,9 +13,11 @@ Repeatable, reboot resilient windows environment installations made easy using C
 
 ## Quickly Load up your favorite apps and settings on any machine with a gist! No preinstalled software needed
 **Grab your Gist**
+
 ![gist](Web/Images/gist3.PNG)
 
 **Launch the Boxstrter launcher**
+
 ![boxstarter weblauncher](Web/Images/start.png)
 
 ## Easily package installation scripts and resources in a Nuget package
