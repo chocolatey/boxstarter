@@ -114,10 +114,19 @@ Task Clean-Artifacts {
     if (Test-Path "$baseDir\buildArtifacts") {
       Remove-Item "$baseDir\buildArtifacts" -Recurse -Force
     }
+
     mkdir "$baseDir\buildArtifacts"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.Azure"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.Bootstrapper"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.Chocolatey"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.Common"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.HyperV"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.TestRunner"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.WinConfig"
 }
 
-Task Pack-Nuget -depends Clean-Artifacts -description 'Packs the modules and example packages' {
+Task Pack-Nuget -depends Sign-PowerShellFiles -description 'Packs the modules and example packages' {
     if (Test-Path "$baseDir\buildPackages\*.nupkg") {
       Remove-Item "$baseDir\buildPackages\*.nupkg" -Force
     }
@@ -243,6 +252,41 @@ task Install-ChocoLib {
     Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.5\lib\* $basedir\Boxstarter.Chocolatey\chocolatey
     Remove-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3 -Recurse -Force
     Remove-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.5 -Recurse -Force
+}
+
+task Copy-PowerShellFiles -depends Clean-Artifacts {
+    $tempNuGetDirectory = "$basedir\buildArtifacts\tempNuGetFolders"
+    $exclude = @("bin", "obj")
+
+    Copy-Item -Path $basedir\BuildScripts\chocolateyinstall.ps1 -Destination $tempNuGetDirectory
+    Copy-Item -Path $basedir\BuildScripts\setup.ps1 -Destination $tempNuGetDirectory
+    Copy-Item -Path $basedir\BuildScripts\nuget\Boxstarter.Azure.PreInstall.ps1 -Destination $tempNuGetDirectory
+    Copy-Item -Path $basedir\BuildScripts\BoxstarterChocolateyInstall.ps1 -Destination $tempNuGetDirectory
+    Copy-Item -Path $basedir\BoxstarterShell.ps1 -Destination $tempNuGetDirectory
+
+    Copy-Item -Path $basedir\Boxstarter.Azure\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.Azure -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.Bootstrapper\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.Bootstrapper -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.Chocolatey\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.Chocolatey -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.Common\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.Common -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.HyperV\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.HyperV -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.TestRunner\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.TestRunner -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.WinConfig\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.WinConfig -Exclude $exclude
+}
+
+task Sign-PowerShellFiles -depends Copy-PowerShellFiles {
+    $timestampServer = "http://timestamp.digicert.com"
+    $certPfx = "$env:CHOCOLATEY_OFFICIAL_CERT"
+    $certPassword = Get-Content "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
+
+    if((Test-Path $certPfx) -And $certPassword) {
+        $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPfx, $certPassword)
+        $tempNuGetDirectory = "$basedir\buildArtifacts\tempNuGetFolders"
+        $powerShellFiles = Get-ChildItem -Path $tempNuGetDirectory -Recurse -Include @("*.ps1", "*.psm1", "*.psd1") -File
+        Set-AuthenticodeSignature -Filepath $powerShellFiles -Cert $cert -TimeStampServer $timestampServer -IncludeChain NotRoot -HashAlgorithm SHA256
+    }
+    else {
+        Write-Host "Unable to sign PowerShell files, as unable to locate certificate and/or password."
+    }
 }
 
 function PackDirectory($path, [switch]$AddReleaseNotes){
