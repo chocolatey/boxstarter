@@ -14,7 +14,7 @@ Repeatable, reboot resilient windows environment installations made easy using C
 * Works on Window 7/2008 R2 and up with Powershell 2.0 and higher
 * Lots of Windows configuration utilities including installing critical updates, changing windows explorer options, and more.
 
-## Quickly Load up your favorite apps and settings on any machine with a gist! No pre-installed software needed
+## Quickly install your favorite applications and settings, on any machine, with a gist! No pre-installed software needed.
 
 ### Grab your Gist
 
@@ -24,7 +24,7 @@ Repeatable, reboot resilient windows environment installations made easy using C
 
 ![boxstarter weblauncher](Web/Images/start.png)
 
-## Easily package installation scripts and resources in a Nuget package
+## Easily package installation scripts and resources in a NuGet package
 
 ### A simple Hello World
 
