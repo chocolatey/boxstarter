@@ -19,11 +19,11 @@ Remove-AzureVMCheckpoint -VM $VM -CheckpointName "Clean"
 Deletes the "clean" checkpoint associated with the MyVM VM
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Get-AzureVMCheckpoint
 Set-AzureVMCheckpoint
 Restore-AzureVMCheckpoint
-#>    
+#>
     [CmdletBinding()]
     param (
         [parameter(Mandatory=$true, Position=0)]

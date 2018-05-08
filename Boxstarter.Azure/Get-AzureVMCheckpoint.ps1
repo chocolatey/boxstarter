@@ -4,14 +4,14 @@ function Get-AzureVMCheckpoint {
 Retrieves Azure Blob Snapshots for a VM
 
 .DESCRIPTION
-Blob snapshots created for a VM are returned. This command can return all 
+Blob snapshots created for a VM are returned. This command can return all
 snapshots for a specific VM or for a single checkpoint specified by name.
 
 .PARAMETER $VM
 The VM Instance of the Azure Virtual Machine to query for checkpoints.
 
 .PARAMETER $CheckpointName
-The Name of a specific checkpoint to return. If not provided, all 
+The Name of a specific checkpoint to return. If not provided, all
 checkpoints for the VM will be returned.
 
 .EXAMPLE
@@ -27,7 +27,7 @@ Get-AzureVMCheckpoint -VM $VM
 Retrieves all checkpoints associated with the MyVM VM
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Set-AzureVMCheckpoint
 Remove-AzureVMCheckpoint
 Restore-AzureVMCheckpoint
@@ -49,14 +49,14 @@ Restore-AzureVMCheckpoint
     $options.UseFlatBlobListing = $true
     $snapshots = Query-BlobSnapshots $blob $options
 
-    return $snapshots | ? { 
+    return $snapshots | ? {
         ($CheckpointName -eq $null -or $CheckpointName.Length -eq 0 -or $_.Metadata["name"] -eq $CheckpointName) -and $_.SnapshotTime -ne $null
-    } | % { 
+    } | % {
         if($_.Metadata["name"].ToLower().StartsWith((Get-CheckpointPrefix $VM).ToLower())) {
             New-Object PSObject -Prop @{
                 Name=$_.Metadata["name"].Substring((Get-CheckpointPrefix $VM).Length+1)
                 Snapshot=$_
-            } 
+            }
         }
     }
  }

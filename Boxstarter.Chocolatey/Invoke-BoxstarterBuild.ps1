@@ -6,7 +6,7 @@ Packs a specific package or all packages in the Boxstarter Repository
 .DESCRIPTION
 Invoke-BoxStarterBuild packs either a single package or all packages
 in the local repository. The packed .nupkg is placed in the root of
-the LocalRepo and is then able to be consumed by 
+the LocalRepo and is then able to be consumed by
 Invoke-ChocolateyBoxstarter.
 
 .PARAMETER Name
@@ -16,7 +16,7 @@ The name of the package to pack
 Indicates that all package directories in the repository should be packed
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 about_boxstarter_chocolatey
 Invoke-BoxstarterBuild
 New-BoxstarterPackage
@@ -53,7 +53,7 @@ New-BoxstarterPackage
                     if(Test-Path (join-path $_.name "$($_.name).nuspec")){
                         Call-Chocolatey Pack (join-path . "$($_.Name)\$($_.Name).nuspec") | out-null
                         if(!$quiet){
-                            Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Install-BoxstarterPackage $($_.Name) will run this package." -nologo                        
+                            Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Install-BoxstarterPackage $($_.Name) will run this package." -nologo
                         }
                     }
                 }

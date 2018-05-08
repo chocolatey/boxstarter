@@ -1,15 +1,15 @@
 function Enter-BoxstarterLogable{
 <#
 .SYNOPSIS
-Logs the output and error streams of the script to the 
+Logs the output and error streams of the script to the
 console and Boxstarter log.
 
 .DESCRIPTION
-Boxstarter runs the provided script and redirects the 
+Boxstarter runs the provided script and redirects the
 standard output and standard error streams to the host
 console and to the Boxstarter log. This will include both
 PowerShell write-output and errors as well as the output
-from any standard command line executables that use 
+from any standard command line executables that use
 standard output and error streams.
 
 .PARAMETER script
@@ -26,7 +26,7 @@ cmdlet and the Netstat command line utility to the screen
 as well as th boxstarter log.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 about_boxstarter_logging
 
 #>
@@ -38,7 +38,7 @@ about_boxstarter_logging
 function Out-BoxstarterLog {
 <#
 .SYNOPSIS
-Logs provided text or objects to the console and 
+Logs provided text or objects to the console and
 Boxstarter log.
 
 .DESCRIPTION
@@ -56,10 +56,10 @@ Out-BoxstarterLog "This can be seen on the screen and in the log file"
 "This can be seen on the screen and in the log file" | Out-BoxstarterLog
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 about_boxstarter_logging
 
-#>    
+#>
     param(
         [Parameter(position=0,ValueFromPipeline=$True)]
         [object]$object,

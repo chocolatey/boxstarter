@@ -4,8 +4,8 @@ function Enable-BoxstarterVHD {
 Enables WMI and LocalAccountTokenFilterPolicy in a VHD's Windows Registry
 
 .DESCRIPTION
-Prepares a VHD for Boxstarter Installation. Opening WMI ports and enabling 
-LocalAccountTokenFilterPolicy so that Boxstarter can later enable 
+Prepares a VHD for Boxstarter Installation. Opening WMI ports and enabling
+LocalAccountTokenFilterPolicy so that Boxstarter can later enable
 PowerShell Remoting.
 
 .PARAMETER VHDPath
@@ -39,7 +39,7 @@ $ComputerName = Enable-BoxstarterVHD $pathToVHD -IgnoreLocalAccountTokenFilterPo
 Enables WMI ports in the Windows registry
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 
 #>
     [CmdletBinding()]
@@ -65,7 +65,7 @@ http://boxstarter.org
 
         if((Get-ItemProperty $VHDPath -Name IsReadOnly).IsReadOnly){
             throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD is Read-Only"
-        }    
+        }
         $before = (Get-Volume).DriveLetter | ? { $_ -ne $null }
         mount-vhd $VHDPath
         $after = (Get-Volume).DriveLetter | ? { $_ -ne $null }
@@ -76,7 +76,7 @@ http://boxstarter.org
             $sysVolume = $winVolume | ? {Test-Path "$($_):\windows\System32\config"}
             if($sysVolume -eq $null){
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "The VHD does not contain system volume"
-            }    
+            }
             Write-BoxstarterMessage "Mounted $VHDPath with system volume to Drive $($sysVolume)"
             if(!$IgnoreLocalAccountTokenFilterPolicy) {
                 reg load HKLM\VHDSOFTWARE "$($sysVolume):\windows\system32\config\software" | out-null

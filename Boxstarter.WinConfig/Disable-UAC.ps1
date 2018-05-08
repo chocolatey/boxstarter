@@ -4,7 +4,7 @@ function Disable-UAC {
 Turns off Windows User Access Control
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Enable-UAC
 
 #>

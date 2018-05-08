@@ -4,13 +4,13 @@ function Enable-BoxstarterVM {
 Opens WMI ports and LocalAccountTokenFilterPolicy for Workgroup Hyper-V VMs
 
 .DESCRIPTION
-Prepares a Hyper-V VM for Boxstarter Installation. Opening WMI 
-ports if remoting is not enabled and enabling 
-LocalAccountTokenFilterPolicy if the VM is not in a domain so 
+Prepares a Hyper-V VM for Boxstarter Installation. Opening WMI
+ports if remoting is not enabled and enabling
+LocalAccountTokenFilterPolicy if the VM is not in a domain so
 that Boxstarter can later enable PowerShell Remoting.
 
-Enable-BoxstarterVM will also restore the VM to a specified 
-checkpoint or create a new checkpoint if the given checkpoint 
+Enable-BoxstarterVM will also restore the VM to a specified
+checkpoint or create a new checkpoint if the given checkpoint
 does not exist.
 
 .Parameter Provider
@@ -26,19 +26,19 @@ The Credential to use to test PSRemoting.
 If a Checkpoint exists by this name, it will be restored. Otherwise one will be created.
 
 .NOTES
-PSRemoting must be enabled in order for Boxstarter to install to a remote machine. Bare 
-Metal machines require a manual step of enabling it before remote Boxstarter installs 
-will work. However, on a Hyper-V VM, Boxstarter can manage this by mounting and 
-manipulating the VM's VHD. Boxstarter can open the WMI ports which enable it to create a 
-Scheduled Task that will enable PSRemoting. For VMs that are not domain joined, 
-Boxstarter will also enable LocalAccountTokenFilterPolicy so that local accounts can 
+PSRemoting must be enabled in order for Boxstarter to install to a remote machine. Bare
+Metal machines require a manual step of enabling it before remote Boxstarter installs
+will work. However, on a Hyper-V VM, Boxstarter can manage this by mounting and
+manipulating the VM's VHD. Boxstarter can open the WMI ports which enable it to create a
+Scheduled Task that will enable PSRemoting. For VMs that are not domain joined,
+Boxstarter will also enable LocalAccountTokenFilterPolicy so that local accounts can
 authenticate remotely.
 
-For Non-HyperV VMs, use Enable-BoxstarterVHD to perform these adjustments on the VHD of 
+For Non-HyperV VMs, use Enable-BoxstarterVHD to perform these adjustments on the VHD of
 the VM. The VM must be powered off and accessible.
 
 .OUTPUTS
-A BoxstarterConnectionConfig that contains the ConnectionURI of the VM Computer and 
+A BoxstarterConnectionConfig that contains the ConnectionURI of the VM Computer and
 the PSCredential needed to authenticate.
 
 .EXAMPLE
@@ -63,7 +63,7 @@ Enable-BoxstarterVM -Provider HyperV -VMName MyVM $cred NewSnapshot | Install-Bo
 Prepares MyVM, Creates a new snapshot named NewSnapshot and then installs MyPackage
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Enable-BoxstarterVHD
 Install-BoxstarterPackage
 #>
@@ -97,7 +97,7 @@ Install-BoxstarterPackage
     }
 
     Process {
-        $VMName | % { 
+        $VMName | % {
 
             $vm=Get-VM $_ -ErrorAction SilentlyContinue
             if($vm -eq $null){
@@ -126,19 +126,19 @@ Install-BoxstarterPackage
             do {
                 Start-Sleep -milliseconds 100
                 $ComputerName=Get-VMGuestComputerName $_
-            } 
+            }
             until ($ComputerName -ne $null)
             $clientRemoting = Enable-BoxstarterClientRemoting $ComputerName
             Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
             $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
-        
+
             $params=@{}
             if(!$remotingTest) {
                 Log-BoxstarterMessage "PowerShell remoting connection failed:"
                 if($global:Error.Count -gt 0) { Log-BoxstarterMessage $global:Error[0] }
                 write-BoxstarterMessage "Testing WSMAN..."
                 $WSManResponse = Test-WSMan $ComputerName -ErrorAction SilentlyContinue
-                if($WSManResponse) { 
+                if($WSManResponse) {
                     Write-BoxstarterMessage "WSMAN responded. Will not enable WMI." -verbose
                     $params["IgnoreWMI"]=$true
                 }
@@ -147,7 +147,7 @@ Install-BoxstarterPackage
                     if($global:Error.Count -gt 0) { Log-BoxstarterMessage $global:Error[0] }
                     write-BoxstarterMessage "Testing WMI..."
                     $wmiTest=try { Invoke-WmiMethod -ComputerName $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue } catch {$ex=$_}
-                    if($wmiTest -or ($ex -ne $null -and $ex.CategoryInfo.Reason -eq "UnauthorizedAccessException")) { 
+                    if($wmiTest -or ($ex -ne $null -and $ex.CategoryInfo.Reason -eq "UnauthorizedAccessException")) {
                         Write-BoxstarterMessage "WMI responded. Will not enable WMI." -verbose
                         $params["IgnoreWMI"]=$true
                     }
@@ -168,7 +168,7 @@ Install-BoxstarterPackage
 
             }
 
-            if(!$remotingTest -and ($params.Count -lt 2)) { 
+            if(!$remotingTest -and ($params.Count -lt 2)) {
                 Write-BoxstarterMessage "Stopping $_"
                 Stop-VM $_ -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
                 $vhd=Get-VMHardDiskDrive -VMName $_
@@ -197,16 +197,16 @@ function Get-VMGuestComputerName($vmName) {
     $vm = Get-WmiObject -Namespace root\virtualization\v2 -Class Msvm_ComputerSystem -Filter "ElementName='$vmName'"
     $vm.GetRelated("Msvm_KvpExchangeComponent").GuestIntrinsicExchangeItems | % {
         if(([XML]$_) -ne $null){
-            $GuestExchangeItemXml = ([XML]$_).SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Name']/VALUE[child::text()='FullyQualifiedDomainName']") 
-        
-            if ($GuestExchangeItemXml -ne $null) { 
-                $GuestExchangeItemXml.SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Data']/VALUE/child::text()").Value 
+            $GuestExchangeItemXml = ([XML]$_).SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Name']/VALUE[child::text()='FullyQualifiedDomainName']")
+
+            if ($GuestExchangeItemXml -ne $null) {
+                $GuestExchangeItemXml.SelectSingleNode("/INSTANCE/PROPERTY[@NAME='Data']/VALUE/child::text()").Value
             }
         }
-    }    
+    }
 }
 
 function Wait-HeartBeat($vmName) {
-    do {Start-Sleep -milliseconds 100} 
+    do {Start-Sleep -milliseconds 100}
     until ((Get-VMIntegrationService -VMName $vmName | ?{$_.id.endswith("\\84EAAE65-2F2E-45F5-9BB5-0E857DC8EB47") -or ($_.name -eq "Heartbeat")}).PrimaryStatusDescription -eq "OK")
 }

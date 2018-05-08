@@ -16,7 +16,7 @@ A chocolatey command
 Invoke-BoxstarterFromTask "cinst rsat"
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey
 Invoke-Chocolatey

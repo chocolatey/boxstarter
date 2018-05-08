@@ -4,7 +4,7 @@ function Disable-InternetExplorerESC {
 Turns off IE Enhanced Security Configuration that is on by default on Server OS versions
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 
 #>
     $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"

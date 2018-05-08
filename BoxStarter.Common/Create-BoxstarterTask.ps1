@@ -1,20 +1,20 @@
 function Create-BoxstarterTask{
 <#
 .SYNOPSIS
-Creates a Scheduled Task for Boxstarter operations that require a local 
+Creates a Scheduled Task for Boxstarter operations that require a local
 administrative token
 
 .DESCRIPTION
-Create-BoxstarterTask creates a scheduled task.  This task is present 
+Create-BoxstarterTask creates a scheduled task.  This task is present
 throughout a boxstarter installation process and is used when Boxstarter
-needs to complete a task that cannot use a remote token. This function 
+needs to complete a task that cannot use a remote token. This function
 does not run the task. It simply creates it.
 
 .Parameter Credential
 The credentials under which the task will run.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Invoke-FromTask
 Remove-BoxstarterTask
 

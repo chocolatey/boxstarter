@@ -13,7 +13,7 @@ If this flag is set, hidden Operating System files will be shown in windows expl
 Setting this switch will cause windows explorer to include the file extension in file names
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 
 #>
     param(

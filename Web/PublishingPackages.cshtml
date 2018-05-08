@@ -20,7 +20,7 @@
 <ul>
     <li>The Boxstarter Local Repository <code>$Boxstarter.LocalRepo</code> where packages are saved using <code>New-BoxstarterPackage</code></li>
     <li>The <a href="https://chocolatey.org/packages">Chocolatey.org</a> public feed</li>
-    <li>The <a href="https://www.myget.org/gallery/boxstarter">Boxstarter Community feed</a> hosted on <a href="http://myget.org">MyGet.org</a></li>
+    <li>The <a href="https://www.myget.org/gallery/boxstarter">Boxstarter Community feed</a> hosted on <a href="https://myget.org">MyGet.org</a></li>
 </ul>
 <p>The first location that contains a package name that Boxstarter is looking for will be the last location Boxstarter probes. So, for example, if the local repository and the MyGet feed have a package with the same name, the package in the local repository will be chosen.</p>
 <h3>Configuring where Boxstarter looks for packages</h3>
@@ -30,16 +30,16 @@ Set-BoxstarterConfig -LocalRepo "\\server\share\myRepo"
 </pre>
 <p>This will cause Boxstarter to search for packages in \\server\share\myRepo</p>
 <pre>
-Set-BoxstarterConfig -NugetSources "http://www.myget.org/F/MyNugetFeed/api/v2"
+Set-BoxstarterConfig -NugetSources "https://www.myget.org/F/MyNugetFeed/api/v2"
 </pre>
 <p>This will cause Boxstarter to search for packages in the local repository and then in your MyNugetFeed hosted by MyGet.org. No other feed will be searched.</p>
 <pre>
-Set-BoxstarterConfig -NugetSources "http://www.myget.org/F/MyNugetFeed/api/v2;https://chocolatey.org/api/v2;http://www.myget.org/F/boxstarter/api/v2"
+Set-BoxstarterConfig -NugetSources "https://www.myget.org/F/MyNugetFeed/api/v2;https://chocolatey.org/api/v2;https://www.myget.org/F/boxstarter/api/v2"
 </pre>
 <p>This will cause Boxstarter to search for packages in the local repository and then in your MyNugetFeed followed by the Chocolatey.org feed and then the Boxstarter community feed on MyGet.</p>
 
 <h3>Pushing packages to a feed</h3>
-<p>Boxstarter does not provide any functionality for publishing packages to a Nuget feed. However, you can use nuget.exe which does provide this capability. You can obtain the nuget.exe command line interface by installing the nuget.commandline package. Calling the Nuget command line with the <a href="http://docs.nuget.org/docs/reference/command-line-reference#Push_Command">Push</a> command and the feed URL will publish your package to that feed.</p>
+<p>Boxstarter does not provide any functionality for publishing packages to a Nuget feed. However, you can use nuget.exe which does provide this capability. You can obtain the nuget.exe command line interface by installing the nuget.commandline package. Calling the Nuget command line with the <a href="https://docs.nuget.org/docs/reference/command-line-reference#Push_Command">Push</a> command and the feed URL will publish your package to that feed.</p>
 <pre>
 nuget" push MyPackage.1.0.0.nupkg &lt;Your MyGet API Key&gt; -Source https://www.myget.org/F/boxstarter/api/v2/package
 </pre>

@@ -58,9 +58,9 @@ Setting this switch will cause Windows Explorer to show the Ribbon menu so that 
 Disables the showing of the Ribbon menu in Windows Explorer so that it shows only the tab names, see EnableShowRibbon
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 
-#>   
+#>
 
     [CmdletBinding()]
     param(
@@ -128,11 +128,11 @@ http://boxstarter.org
         if($EnableShowFullPathInTitleBar) {Set-ItemProperty $cabinetStateKey FullPath  1}
         if($DisableShowFullPathInTitleBar) {Set-ItemProperty $cabinetStateKey FullPath  0}
     }
-    
+
     if(Test-Path -Path $ribbonKey) {
         if($EnableShowRibbon) {Set-ItemProperty $ribbonKey MinimizedStateTabletModeOff 0}
         if($DisableShowRibbon) {Set-ItemProperty $ribbonKey MinimizedStateTabletModeOff 1}
     }
 
-    Restart-Explorer        
+    Restart-Explorer
 }

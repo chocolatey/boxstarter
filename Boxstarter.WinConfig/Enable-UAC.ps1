@@ -4,7 +4,7 @@ function Enable-UAC {
 Turns on Windows User Access Control
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 
 #>
     Write-BoxstarterMessage "Enabling UAC"

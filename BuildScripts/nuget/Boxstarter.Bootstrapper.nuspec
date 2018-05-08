@@ -7,8 +7,8 @@
     <owners>Matt Wrock</owners>
     <title>Boxstarter Bootstrapper Module</title>
     <iconUrl>https://cdn.rawgit.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
-    <projectUrl>http://Boxstarter.org</projectUrl>
-    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://Boxstarter.org</projectUrl>
+    <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <description>Boxstarter's Bootstrapper module provides a powershell wrapper that supports reboots and automatic logons and exposes commands that can detect pending reboots, perform logging and messaging, and several commands that can configure various windows settings.</description>
     <tags>Boxstarter bootstrapper environment setup</tags>
     <dependencies>

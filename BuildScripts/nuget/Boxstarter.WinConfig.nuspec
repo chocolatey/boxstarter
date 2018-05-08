@@ -4,8 +4,8 @@
     <version>$version$</version>
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
-    <projectUrl>http://Boxstarter.org</projectUrl>
-    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://Boxstarter.org</projectUrl>
+    <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <id>Boxstarter.WinConfig</id>
     <title>Boxstarter WinConfig Module</title>
     <iconUrl>https://cdn.rawgit.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>

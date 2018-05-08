@@ -3,14 +3,14 @@ function Bootstrap-Boxstarter {
         Write-Output "Chocolatey not installed. Downloading and installing..."
         $env:ChocolateyInstall = "$env:programdata\chocolatey"
         New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
-        Get-HttpToFile "http://chocolatey.org/install.ps1" "$env:temp\choco.ps1"
+        Get-HttpToFile "https://chocolatey.org/install.ps1" "$env:temp\choco.ps1"
         . "$env:temp\choco.ps1"
     }
 
-    if(!(Get-Module -ListAvailable -Name boxstarter.testrunner -ErrorAction SilentlyContinue)) { 
+    if(!(Get-Module -ListAvailable -Name boxstarter.testrunner -ErrorAction SilentlyContinue)) {
             Write-Output "Boxstarter TestRunner not installed. Installing..."
             if($debug.length -gt 0) {
-                ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Boxstarter.TestRunner -source "$PSScriptRoot" 
+                ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Boxstarter.TestRunner -source "$PSScriptRoot"
             }
             ."$env:ChocolateyInstall\chocolateyinstall\chocolatey.ps1" Install Boxstarter.TestRunner
     }
@@ -44,7 +44,7 @@ function Get-HttpToFile ($url, $file){
 function Invoke-RetriableScript{
 <#
 .SYNOPSIS
-Retries a script 5 times or until it completes without terminating errors. 
+Retries a script 5 times or until it completes without terminating errors.
 All Unnamed arguments will be passed as arguments to the script
 #>
     param([ScriptBlock]$RetryScript)

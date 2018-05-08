@@ -1,13 +1,13 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.TestRunner){Remove-Module Boxstarter.TestRunner}
-Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.TestRunner\*.ps1 | 
-    ? { $_.Path -like "*-*" } | 
+Resolve-Path $here\..\..\Boxstarter.TestRunner\*.ps1 |
+    ? { $_.Path -like "*-*" } |
     % { . $_.ProviderPath }
 
 Describe "Get-BoxstarterDeployOptions" {
@@ -20,7 +20,7 @@ Describe "Get-BoxstarterDeployOptions" {
         $result = Get-BoxstarterDeployOptions
 
         it "should return the chocolatey feed as the default nuget feed" {
-            $result.DefaultNugetFeed | should be "http://chocolatey.org/api/v2"
+            $result.DefaultNugetFeed | should be "https://chocolatey.org/api/v2"
         }
         it "should return localhost as the default deployment target" {
             $result.DeploymentTargetNames | should be "localhost"
@@ -33,7 +33,7 @@ Describe "Get-BoxstarterDeployOptions" {
         Set-BoxstarterDeployOptions -DeploymentTargetPassword passwd `
                                     -DeploymentTargetUserName Admin
         $Boxstarter.LocalRepo=Join-Path $Boxstarter.BaseDir LocalRepo
-    
+
         $result = Get-BoxstarterDeployOptions
 
         it "should return the credential in the default repo" {
@@ -49,7 +49,7 @@ Describe "Get-BoxstarterDeployOptions" {
                                     -DeploymentCloudServiceName myservice `
                                     -DeploymentTargetPassword passwd `
                                     -DeploymentTargetUserName Admin `
-                                    -DefaultNugetFeed "http://www.myget.org/F/boxstarter/api/v2" `
+                                    -DefaultNugetFeed "https://www.myget.org/F/boxstarter/api/v2" `
                                     -DefaultFeedAPIKey $key
         $result = Get-BoxstarterDeployOptions
 
@@ -75,10 +75,10 @@ Describe "Get-BoxstarterDeployOptions" {
             "$($Boxstarter.LocalRepo)\BoxstarterScripts\$env:computername-$env:USERNAME-options.xml" | should exist
         }
         it "should get default nuget feed" {
-            $result.DefaultNugetFeed | should be "http://www.myget.org/F/boxstarter/api/v2"
+            $result.DefaultNugetFeed | should be "https://www.myget.org/F/boxstarter/api/v2"
         }
         it "should get default nuget feed API key" {
-            $result.DefaultFeedAPIKey | should be $key 
+            $result.DefaultFeedAPIKey | should be $key
         }
     }
 }

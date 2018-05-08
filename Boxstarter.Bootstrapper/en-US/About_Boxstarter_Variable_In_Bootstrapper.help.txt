@@ -4,53 +4,53 @@ TOPIC
 SYNOPSIS
 	A Hashtable for persisting Boxstarter settings.
 
-DESCRIPTION	
-	The Boxstarter variable is a hashtable that is globaly accesible. 
+DESCRIPTION
+	The Boxstarter variable is a hashtable that is globaly accesible.
 	Different Boxstarter modules may store different settings.
-	Some of the bootstrapper module settings available from the 
-	Boxstarter variable can also be set from the Invoke-Boxstarter 
+	Some of the bootstrapper module settings available from the
+	Boxstarter variable can also be set from the Invoke-Boxstarter
 	Command.
 
 BOXSTARTER VARIABLE SETTINGS
 	AutoLogon
-		Indicates if the current session was automatically loged on by 
+		Indicates if the current session was automatically loged on by
 		Boxstarter after a reboot.
 
 	BaseDir
-		The Root directory containing the Boxstarter Modules and local 
-		package repository. By default this is in the ProgramData 
+		The Root directory containing the Boxstarter Modules and local
+		package repository. By default this is in the ProgramData
 		directory.
 
 	IsRebooting
 		Indicates if Boxstarter has intiated a reboot.
 
 	Log
-		This points to the path of the Boxstarter log file. By default 
-		this is $env:LocalAppData\Boxstarter\boxstarter.log. You may 
+		This points to the path of the Boxstarter log file. By default
+		this is $env:LocalAppData\Boxstarter\boxstarter.log. You may
 		edit this variable to change the location of the log.
 
 	RebootOk
-		A boolean value indicating if automatic reboots are permited. 
-		This is false by default but true if the -RebootOk switch is 
-		used when calling Invoke-Boxstarter. You may edit this value 
+		A boolean value indicating if automatic reboots are permited.
+		This is false by default but true if the -RebootOk switch is
+		used when calling Invoke-Boxstarter. You may edit this value
 		to suppress or enable reboots.
 
 	ScriptToCall
 		The script that is wraped  by Boxstarter.
 
 	SuppressLogging
-		A boolean value that specifies if log messages should be 
-		suppressed. The default is false and can be changed at any 
-		time. If true, any message logged via Write-BoxstarterMessage 
-		or Star-TimedSection will not log to the console or to the 
+		A boolean value that specifies if log messages should be
+		suppressed. The default is false and can be changed at any
+		time. If true, any message logged via Write-BoxstarterMessage
+		or Star-TimedSection will not log to the console or to the
 		file.
 
 SEE ALSO
 
-	http://boxstarter.org
+	https://boxstarter.org
 	Invoke-Boxstarter
 	Write-BoxstarterMessage
 	Start-TimedSection
 	about_boxstarter_logging
 	Invoke-Reboot
-	about_boxstarter_bootstrapper	
+	about_boxstarter_bootstrapper

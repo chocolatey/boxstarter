@@ -101,12 +101,12 @@ Task Version-Module -description 'Stamps the psd1 with the version and last chan
     Get-ChildItem "$baseDir\**\*.psd1" | % {
        $path = $_
         (Get-Content $path) |
-            % {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$version'" } | 
-                % {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } | 
+            % {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$version'" } |
+                % {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } |
                     Set-Content $path
     }
     (Get-Content "$baseDir\BuildScripts\bootstrapper.ps1") |
-        % {$_ -replace "Version = .*`$", "Version = `"$version`"," } | 
+        % {$_ -replace "Version = .*`$", "Version = `"$version`"," } |
             Set-Content "$baseDir\BuildScripts\bootstrapper.ps1"
 }
 
@@ -154,8 +154,8 @@ Task Push-Nuget -description 'Pushes the module to MyGet feed' {
 }
 
 Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
-    exec { 
-        Get-ChildItem "$baseDir\buildArtifacts\*.nupkg" | 
+    exec {
+        Get-ChildItem "$baseDir\buildArtifacts\*.nupkg" |
             % { cpush $_  }
     }
 }
@@ -226,8 +226,8 @@ task Install-Win8SDK {
 }
 
 task Install-WebAppTargets {
-    if(!(Test-Path "$env:ChocolateyInstall\lib\MSBuild.Microsoft.VisualStudio.Web.targets\tools\VSToolsPath\WebApplications\Microsoft.WebApplication.targets")) { 
-        cinst MSBuild.Microsoft.VisualStudio.Web.targets -source http://packages.nuget.org/v1/FeedService.svc/ -version '12.0.4' -y
+    if(!(Test-Path "$env:ChocolateyInstall\lib\MSBuild.Microsoft.VisualStudio.Web.targets\tools\VSToolsPath\WebApplications\Microsoft.WebApplication.targets")) {
+        cinst MSBuild.Microsoft.VisualStudio.Web.targets -source https://packages.nuget.org/v1/FeedService.svc/ -version '12.0.4' -y
     }
 }
 
@@ -246,18 +246,18 @@ task Install-ChocoLib {
 }
 
 function PackDirectory($path, [switch]$AddReleaseNotes){
-    exec { 
+    exec {
         $releaseNotes = Get-ReleaseNotes
-        Get-ChildItem $path -Recurse -include *.nuspec | 
-            % { 
+        Get-ChildItem $path -Recurse -include *.nuspec |
+            % {
                  if($AddReleaseNotes) {
                    [xml]$nuspec = Get-Content $_
                    $oldReleaseNotes = $nuspec.package.metadata.ChildNodes| ? { $_.Name -eq 'releaseNotes' }
                    $newReleaseNotes = $nuspec.ImportNode($releaseNotes.DocumentElement, $true)
-                   $nuspec.package.metadata.ReplaceChild($newReleaseNotes, $oldReleaseNotes) | Out-Null 
+                   $nuspec.package.metadata.ReplaceChild($newReleaseNotes, $oldReleaseNotes) | Out-Null
                    $nuspec.Save($_)
                  }
-                 .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $version 
+                 .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $version
               }
     }
 }
@@ -267,9 +267,9 @@ function Get-ReleaseNotes {
 }
 
 function PushDirectory($path){
-    exec { 
-        Get-ChildItem "$path\*.nupkg" | 
-            % { cpush $_ -source "http://www.myget.org/F/boxstarter/api/v2/package" }
+    exec {
+        Get-ChildItem "$path\*.nupkg" |
+            % { cpush $_ -source "https://www.myget.org/F/boxstarter/api/v2/package" }
     }
 }
 
@@ -285,12 +285,12 @@ function Update-AssemblyInfoFiles ([string] $version, [string] $commit) {
     Get-ChildItem -path $baseDir -r -filter AssemblyInfo.cs | ForEach-Object {
         $filename = $_.Directory.ToString() + '\' + $_.Name
         $filename + ' -> ' + $version
-        
-        # If you are using a source control that requires to check-out files before 
+
+        # If you are using a source control that requires to check-out files before
         # modifying them, make sure to check-out the file here.
         # For example, TFS will require the following command:
         # tf checkout $filename
-    
+
         (Get-Content $filename) | ForEach-Object {
             % {$_ -replace $assemblyVersionPattern, $assemblyVersion } |
             % {$_ -replace $fileVersionPattern, $fileVersion } |

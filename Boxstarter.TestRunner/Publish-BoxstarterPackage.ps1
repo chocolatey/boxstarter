@@ -4,16 +4,16 @@ function Publish-BoxstarterPackage {
 Publishes a package to a Nuget feed
 
 .DESCRIPTION
-Publishes a package in the Boxstarter local repository to the Nuget feed 
-it is associated with and using the API key that the feed has been 
-assigned to. Set-BoxstarterPackageNugetFeed and Set-BoxstarterFeedAPIKey 
-can be used to set the feed assigned to a package and the API key assigned 
-to a feed. If no feed is explicitly assigned to a package, then the 
-Default Nuget Feed of the BoxstarterDeployOptions is used. This can be set 
-using Set-BoxstarterDeployOptions and if no default feed is set, the public 
-chocolatey feed is used. A package feed can be cleared by using 
-Remove-BoxstarterPackageNugetFeed. It will then use the default nuget feed. 
-If you want to ensure that a package is never associated with a feed 
+Publishes a package in the Boxstarter local repository to the Nuget feed
+it is associated with and using the API key that the feed has been
+assigned to. Set-BoxstarterPackageNugetFeed and Set-BoxstarterFeedAPIKey
+can be used to set the feed assigned to a package and the API key assigned
+to a feed. If no feed is explicitly assigned to a package, then the
+Default Nuget Feed of the BoxstarterDeployOptions is used. This can be set
+using Set-BoxstarterDeployOptions and if no default feed is set, the public
+chocolatey feed is used. A package feed can be cleared by using
+Remove-BoxstarterPackageNugetFeed. It will then use the default nuget feed.
+If you want to ensure that a package is never associated with a feed
 including the default feed, use Set-BoxstarterPackageNugetFeed and set
 the feed to $null.
 
@@ -26,13 +26,13 @@ Set-BoxstarterPackageNugetFeed -PackageName MyPackage -NugetFeed https://www.myg
 Set-BoxstarterFeedAPIKey -NugetFeed https://www.myget.org/F/MyFeed/api/v2 -APIKey 2d2cfb67-8203-45d8-8a00-4e737f517c79
 Publish-BoxstarterPackage MyPackage
 
-Assigns the MyGet MyFeed to MyPackage and sets 
-2d2cfb67-8203-45d8-8a00-4e737f517c79 as its API Key. When 
-Publish-BoxstarterPackage is called for MyPackage, it is published to the 
+Assigns the MyGet MyFeed to MyPackage and sets
+2d2cfb67-8203-45d8-8a00-4e737f517c79 as its API Key. When
+Publish-BoxstarterPackage is called for MyPackage, it is published to the
 MyFeed feed on MyGet.org using 2d2cfb67-8203-45d8-8a00-4e737f517c79.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Get-BoxstarterPackageNugetFeed
 Set-BoxstarterPackageNugetFeed
 Remove-BoxstarterPackageNugetFeed
@@ -48,7 +48,7 @@ Set-BoxstarterFeedAPIKey
     process {
         $PackageName | % {
             $err = $null
-            $pkg = Get-BoxstarterPackage $_ 
+            $pkg = Get-BoxstarterPackage $_
             if($pkg -eq $null) {
                 $err = "Could not find a package with ID $_ in the repository."
                 Write-Error $err -Category InvalidArgument

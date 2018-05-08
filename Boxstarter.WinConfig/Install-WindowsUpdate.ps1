@@ -19,7 +19,7 @@ Setting this switch will suppress a reboot in the event that any update requires
 The criteria used for searching updates. The default criteria is "IsHidden=0 and IsInstalled=0 and Type='Software'" which is effectively just critical updates.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 
 #>
     param(

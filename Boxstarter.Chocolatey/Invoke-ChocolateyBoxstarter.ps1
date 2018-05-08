@@ -19,23 +19,23 @@ This essentially wraps Chocolatey Install and provides these additional features
  - The Boxstarter feed on MyGet
  This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
 
- If the package name provided is a URL or resolves to a file. Then 
+ If the package name provided is a URL or resolves to a file. Then
  it is assumed that this contains the chocolatey install script and
  a .nupkg file will be created using the script.
- 
+
  .PARAMETER BootstrapPackage
- The names of one or more Nuget Packages to be installed or URIs or 
+ The names of one or more Nuget Packages to be installed or URIs or
  file paths pointing to a chocolatey script. If using package names,
- the .nupkg file for the provided package names are searched in the 
+ the .nupkg file for the provided package names are searched in the
  following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
  - The Chocolatey feed
  - The Boxstarter feed on MyGet
 
 .Parameter LocalRepo
-This is the path to the local boxstarter repository where boxstarter 
-should look for .nupkg files to install. By default this is located 
-in the BuildPackages directory just under the root Boxstarter 
+This is the path to the local boxstarter repository where boxstarter
+should look for .nupkg files to install. By default this is located
+in the BuildPackages directory just under the root Boxstarter
 directory but can be changed with Set-BoxstarterConfig.
 
 .PARAMETER DisableReboots
@@ -43,12 +43,12 @@ If set, reboots are suppressed.
 
 .PARAMETER Password
 User's password as a Secure string to be used for reboot autologon's.
-This will suppress the password prompt at the beginning of the 
+This will suppress the password prompt at the beginning of the
 Boxstarter installer.
 
 .PARAMETER KeepWindowOpen
-Enabling this switch will prevent the command window from closing and 
-prompt the user to pres the Enter key before the window closes. This 
+Enabling this switch will prevent the command window from closing and
+prompt the user to pres the Enter key before the window closes. This
 is ideal when not invoking boxstarter from a console.
 
 .PARAMETER NoPassword
@@ -56,24 +56,24 @@ When set, Boxstarter will never prompt for logon. Use this if using
 an account without password validation.
 
 .NOTES
-If specifying only one package, Boxstarter calls chocolatey with the 
--force argument and deletes the previously installed package directory. 
-This means that regardless of whether or not the package had been 
+If specifying only one package, Boxstarter calls chocolatey with the
+-force argument and deletes the previously installed package directory.
+This means that regardless of whether or not the package had been
 installed previously, Boxstarter will attempt to download and reinstall it.
-This only holds true for the outer package. If the package contains calls 
-to CINST for additional packages, those installs will not reinstall if 
+This only holds true for the outer package. If the package contains calls
+to CINST for additional packages, those installs will not reinstall if
 previously installed.
 
-If an array of package names are passed to Invoke-ChocolateyBoxstarter, 
-Boxstarter will NOT apply the above reinstall logic and will skip the 
+If an array of package names are passed to Invoke-ChocolateyBoxstarter,
+Boxstarter will NOT apply the above reinstall logic and will skip the
 install for any package that had been previously installed.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter "example1","example2"
 
-This invokes boxstarter and installs the example1 and example2 .nupkg 
-files. If pending reboots are detected, boxstarter will restart the 
-machine. Boxstarter will prompt the user to enter a password which will 
+This invokes boxstarter and installs the example1 and example2 .nupkg
+files. If pending reboots are detected, boxstarter will restart the
+machine. Boxstarter will prompt the user to enter a password which will
 be used for automatic logins in the event a restart is required.
 
 .EXAMPLE
@@ -84,35 +84,35 @@ This invokes boxstarter and installs the script uploaded to the github gist.
 .EXAMPLE
 Invoke-ChocolateyBoxstarter script.ps1
 
-This invokes boxstarter and installs the script located at script.ps1 
+This invokes boxstarter and installs the script located at script.ps1
 in the command line's current directory.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter \\server\share\script.ps1
 
-This invokes boxstarter and installs the script located at the 
+This invokes boxstarter and installs the script located at the
 specified share.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter win8Install -LocalRepo \\server\share\boxstarter
 
-This installs the Win8Install .nupkg and specifies that it is OK to 
-reboot the machine if a pending reboot is needed. Boxstarter will look 
-for the Win8Install .nupkg file in the \\serer\share\boxstarter 
+This installs the Win8Install .nupkg and specifies that it is OK to
+reboot the machine if a pending reboot is needed. Boxstarter will look
+for the Win8Install .nupkg file in the \\serer\share\boxstarter
 directory.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter example -Password (ConvertTo-SecureString "mypassword" -AsPlainText -Force)
 
-This installs the example package and uses "mypassword" for any reboot 
+This installs the example package and uses "mypassword" for any reboot
 autologon's. The user is now not prompted for a password.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey
 Set-BoxstarterConfig
-#>    
+#>
     [CmdletBinding()]
     param(
       [string[]]$BootstrapPackage=$null,

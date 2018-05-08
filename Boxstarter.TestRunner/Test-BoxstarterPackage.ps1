@@ -1,31 +1,31 @@
 function Test-BoxstarterPackage {
 <#
 .SYNOPSIS
-Tests a set of Boxstarter Packages or all changed packages in the 
+Tests a set of Boxstarter Packages or all changed packages in the
 Boxstarter Local Repository.
 
 .DESCRIPTION
-Test-BoxstarterPackage can be called with an array of packages which 
-boxstarter will then build their .nupkg files and attempt to install 
-them on the deployment targets specified with 
-Set-BoxstarterDeploymentOptions. Boxstrtr will use the credentials 
-provided in the deployment options. You can provide several targets to 
-Set-BoxstarterDeploymentOptions. One may wish to supply different 
-machines running different versions of windows. If a package install runs 
-to completion with no exceptions or returned error codes, Boxstarter 
-considers the install a PASSED test. If Test-BoxstarterPackage is called 
-with no packages specified, Boxstarter will iterate over each package in 
-its local repository. It will build the nupkg and compare its version to 
-the version on the package's published feed. If the version in the repo 
-is greater then the published version, Boxstarter will initiate a test on 
+Test-BoxstarterPackage can be called with an array of packages which
+boxstarter will then build their .nupkg files and attempt to install
+them on the deployment targets specified with
+Set-BoxstarterDeploymentOptions. Boxstrtr will use the credentials
+provided in the deployment options. You can provide several targets to
+Set-BoxstarterDeploymentOptions. One may wish to supply different
+machines running different versions of windows. If a package install runs
+to completion with no exceptions or returned error codes, Boxstarter
+considers the install a PASSED test. If Test-BoxstarterPackage is called
+with no packages specified, Boxstarter will iterate over each package in
+its local repository. It will build the nupkg and compare its version to
+the version on the package's published feed. If the version in the repo
+is greater then the published version, Boxstarter will initiate a test on
 the deployment targets otherwise the package test will be skipped.
 
 If any of the deployment targets are Azure VMs in a stopped state, Boxstarter
 will shutdown those machines when all testing is complete.
 
 .PARAMETER
-One or more package names of packages located in Boxstarter's local 
-repository to test. If no package names are provided, all packages with a 
+One or more package names of packages located in Boxstarter's local
+repository to test. If no package names are provided, all packages with a
 version greater than the package's published version will be tested.
 
 .EXAMPLE
@@ -38,21 +38,21 @@ Set-BoxstarterDeployOptions -DeploymentTargetCredentials $cred `
   -DefaultNugetFeed https://www.myget.org/F/myfeed/api/v2 `
 Test-BoxstarterPackage
 
-All chocolatey packages in c:\dev\boxstarterRepo are built and their 
-versions are evaluated against the versions published on the myFeed feed 
+All chocolatey packages in c:\dev\boxstarterRepo are built and their
+versions are evaluated against the versions published on the myFeed feed
 at MyGet.org. Those with a local version higher than the one published will
 be installed on testVM1 and testVM2.
 
 .EXAMPLE
 Test-BoxstarterPackage MyPackage
 
-The MyPackage package in the local boxstarter repo is built and installed on 
-the configured deployment target machines regardless of the version of 
+The MyPackage package in the local boxstarter repo is built and installed on
+the configured deployment target machines regardless of the version of
 MyPackage.
 
 .LINK
-http://boxstarter.org
-Set-BoxstarterDeployOptions 
+https://boxstarter.org
+Set-BoxstarterDeployOptions
 Set-BoxstarterFeedAPIKey
 Set-BoxstarterPackageNugetFeed
 
@@ -128,7 +128,7 @@ Set-BoxstarterPackageNugetFeed
 
         $cloudVMStates.Keys | ? { $cloudVMStates.$_ -eq $false -and (Test-VMStarted $options.DeploymentCloudServiceName $_)} | % {
             Write-BoxStarterMessage "Stopping $_..."
-            Stop-AzureVM  -ServiceName $options.DeploymentCloudServiceName -Name $_ -Force | Out-Null 
+            Stop-AzureVM  -ServiceName $options.DeploymentCloudServiceName -Name $_ -Force | Out-Null
         }
     }
 
@@ -150,14 +150,14 @@ function Write-Result($package, $result) {
 }
 
 function Test-PackageVersionGreaterThanPublished ($package) {
-    if(!$package.Feed) { 
+    if(!$package.Feed) {
         Write-BoxstarterMessage "No feed has been assigned to $($package.Name). It will not be built and tested" -verbose
-        return $false 
+        return $false
     }
 
     if(!$package.PublishedVersion) {
         Write-BoxstarterMessage "$($package.Name) has not yet been published. It will be built and tested" -verbose
-        return $true 
+        return $true
     }
 
     try {
@@ -170,11 +170,11 @@ function Test-PackageVersionGreaterThanPublished ($package) {
 
     if($pkgVersion -gt $pubVersion) {
         Write-BoxstarterMessage "The repository version '$($package.Version)' for $($package.Name) is greater than the published version '$($package.PublishedVersion)'. It will be built and tested" -verbose
-        return $true 
+        return $true
     }
     else {
         Write-BoxstarterMessage "The repository version '$($package.Version)' for $($package.Name) is not greater than the published version '$($package.PublishedVersion)'. It will not be built and tested" -verbose
-        return $false 
+        return $false
     }
 }
 
@@ -184,7 +184,7 @@ function Remove-PreRelease ([string]$versionString) {
         return $versionString.Substring(0,$idx)
     }
     else {
-        return $versionString 
+        return $versionString
     }
 }
 
@@ -192,14 +192,14 @@ function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
     $origLogSetting=$Boxstarter.SuppressLogging
     if($global:VerbosePreference -eq "Continue") {
         Write-BoxstarterMessage "Verbosity is on" -verbose
-        $verbose = $true 
+        $verbose = $true
     }
     else {
         Write-BoxstarterMessage "Verbosity is off" -verbose
-        $verbose = $false 
+        $verbose = $false
     }
-    if(!$verbose){ 
-        $Boxstarter.SuppressLogging=$true 
+    if(!$verbose){
+        $Boxstarter.SuppressLogging=$true
     }
     $progressId=5000 #must be a unique int. This is likely not to conflict with anyone else
     try {
@@ -241,13 +241,13 @@ function Invoke-BuildAndTest($packageName, $options, $vmArgs) {
                 $status="FAILED"
             }
             new-Object PSObject -Property @{
-                Package=$packageName 
+                Package=$packageName
                 TestComputerName=$target
                 ResultDetails=$result
                 Status=$status
             }
         }
-    }finally { 
+    }finally {
         $Boxstarter.SuppressLogging = $origLogSetting
         $global:Boxstarter.Remove("ProgressArgs")
     }

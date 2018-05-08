@@ -21,8 +21,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>http://boxstarter.org/launch/</InstallUrl>
-    <SupportUrl>http://boxstarter.org</SupportUrl>
+    <InstallUrl>https://boxstarter.org/launch/</InstallUrl>
+    <SupportUrl>https://boxstarter.org</SupportUrl>
     <ProductName>Boxstarter.WebLaunch</ProductName>
     <PublisherName>Boxstarter.org</PublisherName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
@@ -137,7 +137,7 @@
   <PropertyGroup>
     <PostBuildEvent>"$(WindowsSDK80Path)bin\x64\signtool.exe" sign /n "Open Source Developer, Matthew Wrock" "$(ProjectDir)obj\debug\Boxstarter.WebLaunch.exe"</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

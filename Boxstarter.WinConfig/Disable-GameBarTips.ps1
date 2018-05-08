@@ -4,7 +4,7 @@ function Disable-GameBarTips {
 Turns off the tips displayed by the XBox GameBar
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 
 #>
     $path = "HKCU:\SOFTWARE\Microsoft\GameBar"

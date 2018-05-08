@@ -7,7 +7,7 @@ param (
 )
 $here = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
-    iex ((new-object net.webclient).DownloadString("http://bit.ly/psChocInstall"))
+    iex ((new-object net.webclient).DownloadString("https://bit.ly/psChocInstall"))
 }
 
 if(!(Test-Path $env:ChocolateyInstall\lib\Psake*)) { cinst psake -y }
@@ -17,7 +17,7 @@ if(!(Test-Path $env:ChocolateyInstall\lib\WindowsAzurePowershell*)) { cinst Wind
 if(!(Test-Path $env:ChocolateyInstall\lib\WindowsAzureLibsForNet*)) { cinst WindowsAzureLibsForNet --version 2.5 -y }
 if(!(Test-Path $env:ChocolateyInstall\bin\nuget.exe)) { cinst nuget.commandline -y }
 
-if($Help){ 
+if($Help){
   try {
     Write-Host "Available build tasks:"
     psake -nologo -docs | Out-Host -paging

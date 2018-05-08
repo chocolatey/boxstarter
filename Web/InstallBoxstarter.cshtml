@@ -26,18 +26,18 @@ CINST Boxstarter
 <img src="Images/setup.png"/>
 <p>Boxstarter is now installed in your modules path!</p>
 
-<p>Both the Chocolatey Boxstarter package and the downloaded zip file available on this website install all Boxstarter modules except the Boxstarter.Azure module which provides integration with Windows Azure VMs. You can install the Azure module by running <code>CINST Boxstarter.Azure</code>. In addition to the Boxstarter.Azure module, it also installs the Windows Azure PowerShell toolkit, the Azure SDK for .Net Libraries and .Net 4.5. It requires PowerShell 3 or higher (the version installed with Windows 8/server 2012 and higher but also <a href="http://www.microsoft.com/en-us/download/details.aspx?id=40855">freely available for download</a> on older versions) to install successfully.</p>
+<p>Both the Chocolatey Boxstarter package and the downloaded zip file available on this website install all Boxstarter modules except the Boxstarter.Azure module which provides integration with Windows Azure VMs. You can install the Azure module by running <code>CINST Boxstarter.Azure</code>. In addition to the Boxstarter.Azure module, it also installs the Windows Azure PowerShell toolkit, the Azure SDK for .Net Libraries and .Net 4.5. It requires PowerShell 3 or higher (the version installed with Windows 8/server 2012 and higher but also <a href="https://www.microsoft.com/en-us/download/details.aspx?id=40855">freely available for download</a> on older versions) to install successfully.</p>
 
 <p>After Boxstarter is installed, a new PowerShell console must be opened before you can load the modules and run its commands. For convenience you can use the <a href="/UsingBoxstarter">Boxstarter Shell</a> for running Boxstarter commands which is the easiest way to ensure that all Boxstarter modules are properly loaded regardless of the version of Windows and PowerShell you are running.</p>
 
 <h3>Installing from the web</h3>
 <p>If you are running powershell v3 or higher:</p>
 <pre>
-. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
+. { iwr -useb https://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
 </pre>
 
 <p/><p/>
 <p>If you are running powershell v2:</p>
 <pre>
-iex ((New-Object System.Net.WebClient).DownloadString('http://boxstarter.org/bootstrapper.ps1')); get-boxstarter -Force
+iex ((New-Object System.Net.WebClient).DownloadString('https://boxstarter.org/bootstrapper.ps1')); get-boxstarter -Force
 </pre>

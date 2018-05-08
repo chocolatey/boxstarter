@@ -4,7 +4,7 @@ function Disable-MicrosoftUpdate {
 Turns off Microsoft Update, so additional updates for other Microsoft products, installed on the system, will not be included when running Windows Update.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Enable-MicrosoftUpdate
 
 #>

@@ -4,18 +4,18 @@
 Shares the Boxstarter root directory - $Boxstarter.BaseDir
 
 .DESCRIPTION
-Shares the Boxstarter root directory - $Boxstarter.BaseDir - so that 
-it can be accessed remotely. This allows remote machines to Invoke 
-ChocolateyBoxstarter via \\server\shareName\Boxstarter.bat. Unless 
-specified otherwise, the share name is Boxstarter and Everyone is 
+Shares the Boxstarter root directory - $Boxstarter.BaseDir - so that
+it can be accessed remotely. This allows remote machines to Invoke
+ChocolateyBoxstarter via \\server\shareName\Boxstarter.bat. Unless
+specified otherwise, the share name is Boxstarter and Everyone is
 given Read permissions.
 
 .PARAMETER ShareName
-The name to give to the share. This is the name by which other 
+The name to give to the share. This is the name by which other
 machines can access it. Boxstarter is the default.
 
 .PARAMETER Accounts
-A list of accounts to be given read access to the share. Everyone is 
+A list of accounts to be given read access to the share. Everyone is
 the default.
 
 .EXAMPLE
@@ -34,7 +34,7 @@ Set-BoxstarterShare -Accounts "corp\mwrock","corp\gmichaels"
 Shares the Boxstarter root as Boxstarter to mwrock and gmichaels in the corp domain.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 about_boxstarter_chocolatey
 Invoke-ChocolateyBoxstarter
 New-BoxstarterPackage

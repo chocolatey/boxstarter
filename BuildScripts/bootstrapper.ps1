@@ -88,7 +88,7 @@ function Enable-Net40 {
     if(Is64Bit) {$fx="framework64"} else {$fx="framework"}
     if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
         Write-Host "Downloading .net 4.5..."
-        Get-HttpToFile "http://download.microsoft.com/download/b/a/4/ba4a7e71-2906-4b2d-a0e1-80cf16844f5f/dotnetfx45_full_x86_x64.exe" "$env:temp\net45.exe"
+        Get-HttpToFile "https://download.microsoft.com/download/b/a/4/ba4a7e71-2906-4b2d-a0e1-80cf16844f5f/dotnetfx45_full_x86_x64.exe" "$env:temp\net45.exe"
         Write-Host "Installing .net 4.5..."
         $pinfo = New-Object System.Diagnostics.ProcessStartInfo
         $pinfo.FileName = "$env:temp\net45.exe"

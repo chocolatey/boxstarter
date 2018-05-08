@@ -5,7 +5,7 @@ function Get-UAC {
 Checks if User Access Control is turned on
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 
 #>
     $uac=Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA

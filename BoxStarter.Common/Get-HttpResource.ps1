@@ -26,7 +26,7 @@ saves it to a file at c:\myfile.txt and also returns
 the downloaded string.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 
 #>
     param (
@@ -58,7 +58,7 @@ http://boxstarter.org
         }
     } $Url $OutputPath
 
-    if($PassThru) { 
+    if($PassThru) {
         if($str) {
             Write-Output $str
         }

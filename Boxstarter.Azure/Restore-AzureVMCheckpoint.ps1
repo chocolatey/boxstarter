@@ -19,11 +19,11 @@ Restore-AzureVMCheckpoint -VM $VM -CheckpointName "Clean"
 Restores MyVM to the state it was in when the "clean" checkpoint was created
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Set-AzureVMCheckpoint
 Get-AzureVMCheckpoint
 Remove-AzureVMCheckpoint
-#>    
+#>
     [CmdletBinding()]
     param (
         [parameter(Mandatory=$true, Position=0)]
@@ -54,7 +54,7 @@ Remove-AzureVMCheckpoint
     do {
         write-BoxstarterMessage "Still waiting..." -verbose
         Start-Sleep -milliseconds 100
-    } 
+    }
     until ((Invoke-RetriableScript { (Get-AzureDisk -DiskName $args[0]).AttachedTo } $vmOSDisk.DiskName ) -eq $null)
 
     Write-BoxstarterMessage "Removing disk $($vmOSDisk.DiskName)..."

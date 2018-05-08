@@ -4,19 +4,19 @@ function Invoke-FromTask {
 Invokes a command inside of a scheduled task
 
 .DESCRIPTION
-This invokes the boxstarter scheduled task. 
-The task is run in an elevated session using the provided 
-credentials. If the processes started by the task become idle for 
-more that the specified timeout, the task will be terminated. All 
-output and any errors from the task will be streamed to the calling 
-session. 
+This invokes the boxstarter scheduled task.
+The task is run in an elevated session using the provided
+credentials. If the processes started by the task become idle for
+more that the specified timeout, the task will be terminated. All
+output and any errors from the task will be streamed to the calling
+session.
 
  .PARAMETER Command
  The command to run in the task.
 
 .PARAMETER IdleTimeout
-The number of seconds after which the task will be terminated if it 
-becomes idle. The value 0 is an indefinite timeout and 120 is the 
+The number of seconds after which the task will be terminated if it
+becomes idle. The value 0 is an indefinite timeout and 120 is the
 default.
 
 .PARAMETER TotalTimeout
@@ -31,11 +31,11 @@ This will install Windows Updates in a scheduled task
 .EXAMPLE
 Invoke-FromTask "DISM /Online /NoRestart /Enable-Feature:TelnetClient" -IdleTimeout 20
 
-This will use DISM.exe to install the telnet client and will kill 
+This will use DISM.exe to install the telnet client and will kill
 the task if it becomes idle for more that 20 seconds.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Create-BoxstarterTask
 Remove-BoxstarterTask
 #>
@@ -52,8 +52,8 @@ Remove-BoxstarterTask
 
     if($taskProc -ne $null){
         Write-BoxstarterMessage "Command launched in process $taskProc" -Verbose
-        try { 
-            $waitProc=get-process -id $taskProc -ErrorAction Stop 
+        try {
+            $waitProc=get-process -id $taskProc -ErrorAction Stop
             Write-BoxstarterMessage "Waiting on $($waitProc.Id)" -Verbose
         } catch { $global:error.RemoveAt(0) }
     }
@@ -101,7 +101,7 @@ function Get-ChildProcessMemoryUsage {
         $ID=$PID,
         [int]$res=0
     )
-    Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
+    Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % {
         if($_.ProcessID -ne $null) {
             try {
                 $proc = Get-Process -ID $_.ProcessID -ErrorAction Stop
@@ -213,11 +213,11 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
         if($waitProc -ne $null -and !$waitProc.HasExited){
             KillTree $waitProc.ID
         }
-    }    
+    }
 }
 
 function KillTree($id){
-    Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % { 
+    Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % {
         if($_.ProcessID -ne $null) {
             Invoke-SilentKill $_.ProcessID
             Write-BoxstarterMessage "Killing $($_.Name)" -Verbose
@@ -235,7 +235,7 @@ function Invoke-SilentKill($id, [switch]$wait) {
                 Start-Sleep 1
             }
         }
-    } 
+    }
     catch {
         $global:error.RemoveAt(0)
     }

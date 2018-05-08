@@ -4,13 +4,13 @@
 
 @section headerBody {
     <h1>Installing packages on a Virtual Machine</h1>
-    <p class="lead">Boxstarter provides convenient integration with both <a href="#HyperV">Hyper-V</a> and <a href="#azure">Windows Azure</a> Virtual Machines with support for auto configuration of remote connectivity as well as setting and restoring checkpoints. Of course Boxstarter can run on any VM guest as long as PowerShell remoting is enabled. 
+    <p class="lead">Boxstarter provides convenient integration with both <a href="#HyperV">Hyper-V</a> and <a href="#azure">Windows Azure</a> Virtual Machines with support for auto configuration of remote connectivity as well as setting and restoring checkpoints. Of course Boxstarter can run on any VM guest as long as PowerShell remoting is enabled.
 }
 <h2 id="HyperV">Hyper-V</h2>
 <h3>Limitations and Prerequisites</h3>
 <p>Boxstarter's Hyper-V support is limited to:</p>
 <ul>
-    <li>PowerShell Version 3 Hyper-V Hosts and above. This is automatically installed on Windows 8, 8.1 and Server 2012 and 2012 R2. Windows Server 2008 R2 can be upgraded to Version 3 (or 4) by installing version 3 or 4 of the <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34595">Windows Management Framework</a>.</li>
+    <li>PowerShell Version 3 Hyper-V Hosts and above. This is automatically installed on Windows 8, 8.1 and Server 2012 and 2012 R2. Windows Server 2008 R2 can be upgraded to Version 3 (or 4) by installing version 3 or 4 of the <a href="https://www.microsoft.com/en-us/download/details.aspx?id=34595">Windows Management Framework</a>.</li>
     <li>Microsoft's Hyper-V virtualization technology comes with Windows Server and also the Windows client operating systems 8 and 8.1 professional and enterprise. It cannot be installed on Home editions of Windows 8 or on any version of Windows 7.</li>
     <li>If Boxstarter determines that configuration is necessary for PowerShell Remoting, the VHD file of the VM must be accessible and writable to the user issuing the <code>Enable-BoxstarterVM</code> command.</li>
     <li>Boxstarter's Hyper-V commands must be run on the Hyper-V host machine.</li>
@@ -23,12 +23,12 @@
 $cred=Get-Credential domain\username
 Enable-BoxstarterVM -VMName myVM -Credential $cred
 </pre>
-<p>This will perform any of the configuration mentioned above if necessary and return a <code>BoxstarterConnectionConfig</code> object holding the DNS name of the guest machine and the Credential passed to the command.</p> 
+<p>This will perform any of the configuration mentioned above if necessary and return a <code>BoxstarterConnectionConfig</code> object holding the DNS name of the guest machine and the Credential passed to the command.</p>
 <p>This object can be piped to Boxstarter's Install-BoxstarterPackage command.</p>
 <pre>
 $cred=Get-Credential domain\username
 "myVM1","myVM2" |
-  Enable-BoxstarterVM -Credential $cred | 
+  Enable-BoxstarterVM -Credential $cred |
     Install-BoxstarterPackage -PackageName myPackage
 </pre>
 <p>This installs myPackage on myVM1 and myVM2 after ensuring that both are properly configured for a remote install.</p>
@@ -38,7 +38,7 @@ $cred=Get-Credential domain\username
 <p>This is particularly useful when you want to restore a machine to a known state before performing an installation.</p>
 <pre>
 $cred=Get-Credential domain\username
-Enable-BoxstarterVM -VMName myVM1 -Credential $cred -CheckPointName BareOS | 
+Enable-BoxstarterVM -VMName myVM1 -Credential $cred -CheckPointName BareOS |
     Install-BoxstarterPackage -PackageName myPackage
 </pre>
 <p>This resets the VM to its BareOS state before Installing the myPackage package.</p>
@@ -61,9 +61,9 @@ Install-WindowsFeature -name hyper-v -IncludeManagementTools
 <p>You don't need a purchased copy of Windows or a fancy shmancy MSDN subscription to test out Boxstarter Installs on a VM. Microsoft provides evaluation copies of many of its OS versions on VHD that can be used for a limited number of days (usually 90). You can legally reinstall a new copy when the evaluation expires. While this is unfit for a production environment, its a great way to test your Boxstarter or Chocolatey installs.</p>
 <p>Here are links to free Windows evaluation VHDs:</p>
 <ul>
-    <li><a href="http://technet.microsoft.com/en-US/evalcenter/evaluate-windows-8-1-enterprise">Windows 8.1</a></li>
-    <li><a href="http://www.microsoft.com/en-us/download/details.aspx?id=16572">Windows 2008 R2</a></li>
-    <li><a href="http://technet.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2">Windows 2012 R2</a></li>
+    <li><a href="https://technet.microsoft.com/en-US/evalcenter/evaluate-windows-8-1-enterprise">Windows 8.1</a></li>
+    <li><a href="https://www.microsoft.com/en-us/download/details.aspx?id=16572">Windows 2008 R2</a></li>
+    <li><a href="https://technet.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2">Windows 2012 R2</a></li>
 </ul>
 
 <h2 id="azure">Windows Azure VMs</h2>
@@ -71,7 +71,7 @@ Install-WindowsFeature -name hyper-v -IncludeManagementTools
 <h3>Prerequisites</h3>
 <p>Boxstarter's Windows Azure VM support is limited to:</p>
 <ul>
-    <li>PowerShell Version 3 or above. Boxstarter leverages the Windows Azure PowerShell toolkit which requires at least PowerShell version 3. This is automatically installed on Windows 8, 8.1 and Server 2012 and 2012 R2. Windows 7 and Server 2008 R2 can be upgraded to Version 3 (or 4) by installing version 3 or 4 of the <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34595">Windows Management Framework</a>.</li>
+    <li>PowerShell Version 3 or above. Boxstarter leverages the Windows Azure PowerShell toolkit which requires at least PowerShell version 3. This is automatically installed on Windows 8, 8.1 and Server 2012 and 2012 R2. Windows 7 and Server 2008 R2 can be upgraded to Version 3 (or 4) by installing version 3 or 4 of the <a href="https://www.microsoft.com/en-us/download/details.aspx?id=34595">Windows Management Framework</a>.</li>
     <li>The default PowerShell remoting and endpoints that Azure creates on new VMs mus be present. By default, Windows Azure enables PowerShell remoting on all Windows VMs and it creates an endpoint that maps to the WINRM secure port.</li>
 </ul>
 
@@ -108,7 +108,7 @@ New-AzureQuickVM -ServiceName MyService -Windows -Name MyVM `
 <pre>
 $cred=Get-Credential AzureAdmin
 "myVM1","myVM2" |
-  Enable-BoxstarterVM -provider Azure -CloudServiceName MyService -Credential $cred | 
+  Enable-BoxstarterVM -provider Azure -CloudServiceName MyService -Credential $cred |
     Install-BoxstarterPackage -PackageName myPackage
 </pre>
 <p>This installs myPackage on myVM1 and myVM2.</p>
@@ -120,7 +120,7 @@ $cred=Get-Credential AzureAdmin
 <pre>
 $cred=Get-Credential domain\username
 Enable-BoxstarterVM -Provider azure -CloudServiceName MyService `
-  -VMName myVM1 -Credential $cred -CheckPointName BareOS | 
+  -VMName myVM1 -Credential $cred -CheckPointName BareOS |
     Install-BoxstarterPackage -PackageName myPackage
 </pre>
 <p>This resets the VM to its BareOS state before Installing the myPackage package.</p>

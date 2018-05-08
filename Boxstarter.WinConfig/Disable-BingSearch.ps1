@@ -4,7 +4,7 @@ function Disable-BingSearch {
 Disables the Bing Internet Search when searching from the search field in the Taskbar or Start Menu.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 https://www.privateinternetaccess.com/forum/discussion/18301/how-to-uninstall-core-apps-in-windows-10-and-miscellaneous
 
 #>

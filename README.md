@@ -1,13 +1,13 @@
 # BoxStarter
 Repeatable, reboot resilient windows environment installations made easy using Chocolatey packages
-## For more information and How Tos, visit [the official Boxstarter website](http://boxstarter.org)
+## For more information and How Tos, visit [the official Boxstarter website](https://boxstarter.org)
 
 ## Windows environment creation made easy!
 * 100% Unattended Install with *pending reboot detection* and *automatic logon*.
 * Remote machine deployments
 * Integrates with Hyper-V and Windows Azure VMs supporting checkpoint restore and creation
-* Installation packages build on top of [Chocolatey Nuget](http://chocolatey.org) package management
-* Easily install with just a [Gist and the Boxstarter Web Launcher](http://boxstarter.org/WebLauncher) or [create a private repo on a Thumb drive or network share](http://boxstarter.org/InstallingPackages#InstallFromShare)
+* Installation packages build on top of [Chocolatey](https://chocolatey.org) package management
+* Easily install with just a [Gist and the Boxstarter Web Launcher](https://boxstarter.org/WebLauncher) or [create a private repo on a Thumb drive or network share](https://boxstarter.org/InstallingPackages#InstallFromShare)
 * Works on Window 7/2008 R2 and up with Powershell 2.0 and higher
 * Lots of Windows configuration utilities including installing critical updates, changing windows explorer options, and more.
 

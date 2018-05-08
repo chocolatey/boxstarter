@@ -4,24 +4,24 @@ function Enable-BoxstarterClientRemoting {
 Enables and configures PowerShell remoting from the client
 
 .DESCRIPTION
-Enable-BoxstarterClientRemoting will check if PowerShell Remoting is enabled on the local 
-machine. If not, it will enable it and it will also add all remote hosts to trust to the 
-WSMAN trusted hosts list. The original trusted host list will be returned. When running 
-Install-BoxstarterPackage, Boxstarter will roll back to the original trusted hosts when 
+Enable-BoxstarterClientRemoting will check if PowerShell Remoting is enabled on the local
+machine. If not, it will enable it and it will also add all remote hosts to trust to the
+WSMAN trusted hosts list. The original trusted host list will be returned. When running
+Install-BoxstarterPackage, Boxstarter will roll back to the original trusted hosts when
 the package install is complete.
 
 .PARAMETER RemoteHostsToTrust
 A list of ComputerNames to add to the WSMAN Trusted hosts list.
 
 .OUTPUTS
-A list of the original trusted hosts on the local machine as well as a bool indicating 
+A list of the original trusted hosts on the local machine as well as a bool indicating
 if PowerShell Remoting was successfully completed.
 
 .EXAMPLE
 Enable-BoxstarterClientRemoting box1,box2
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Install-BoxstarterPackage
 
 #>
@@ -30,12 +30,12 @@ Install-BoxstarterPackage
     )
     if(Test-Admin) { $elevated = $true }
 
-    $Result=@{    
+    $Result=@{
         Success=$False;
         PreviousTrustedHosts=$null;
     }
     Write-BoxstarterMessage "Configuring local PowerShell Remoting settings..."
-    
+
     if(!(Get-Command Test-WSMan -ErrorAction SilentlyContinue)) {
         #I have only seen this on VisualStudio.Com Hosted build servers
         $Result.Success=$True

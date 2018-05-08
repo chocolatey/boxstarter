@@ -15,11 +15,11 @@ The path where Boxstarter will search for local packages.
 A semicolon delimited list of Nuget Feed URLs where Boxstarter will search for packages
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey
 Get-BoxstarterConfig
-#>    
+#>
     [CmdletBinding()]
     param([string]$LocalRepo, [string]$NugetSources)
 

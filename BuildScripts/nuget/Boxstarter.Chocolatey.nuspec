@@ -7,8 +7,8 @@
     <owners>Matt Wrock</owners>
     <iconUrl>https://cdn.rawgit.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <title>Boxstarter Chocolatey Module</title>
-    <projectUrl>http://Boxstarter.org</projectUrl>
-    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://Boxstarter.org</projectUrl>
+    <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <description>Creates a fresh developer (or non developer) environment from a bare OS utilizing powershell and chocolatey. Installs chocolatey, cutomizes windows settings, installs windows updates, handles reboots, installs windows features and your favorite applications.</description>
     <tags>Boxstarter environment setup</tags>
     <dependencies>

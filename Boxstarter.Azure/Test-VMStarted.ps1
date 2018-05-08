@@ -18,7 +18,7 @@ $isStarted = Test-VMStarted -ServiceName "mycloudService" -Name "MyVM"
 $isStarted will be $true if MyVM is running
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Enable-BoxstarterVM
 #>
     [CmdletBinding()]
@@ -30,7 +30,7 @@ Enable-BoxstarterVM
     )
 
     Process {
-        $VMName | % { 
+        $VMName | % {
             $vm = Invoke-RetriableScript { Get-AzureVM -ServiceName $args[0] -Name $args[1] } $CloudServiceName $_
             if($vm -eq $null){
                 throw New-Object -TypeName InvalidOperationException -ArgumentList "Could not find VM: $_"

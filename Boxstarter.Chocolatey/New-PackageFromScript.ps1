@@ -4,9 +4,9 @@ function New-PackageFromScript {
 Creates a Nuget package from a Chocolatey script
 
 .DESCRIPTION
-This creates a .nupkg file from a script file. It adds a dummy nuspec 
-and packs the nuspec and script to a nuget package saved to 
-$Boxstarter.LocalRepo. The function returns a string that is the 
+This creates a .nupkg file from a script file. It adds a dummy nuspec
+and packs the nuspec and script to a nuget package saved to
+$Boxstarter.LocalRepo. The function returns a string that is the
 Package Name of the package.
 
  .PARAMETER Source
@@ -42,9 +42,9 @@ Creates a Package from the gist located at
 https://gist.github.com/mwrock/6771863/raw/b579aa269c791a53ee1481ad01711b60090db1e2/gistfile1.txt
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 about_boxstarter_chocolatey
-#>        
+#>
     [CmdletBinding()]
 	param (
         [Parameter(Mandatory=1)]

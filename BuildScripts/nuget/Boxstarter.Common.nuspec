@@ -4,9 +4,9 @@
     <version>$version$</version>
     <authors>Matt Wrock</authors>
     <owners>Matt Wrock</owners>
-    <projectUrl>http://Boxstarter.org</projectUrl>
+    <projectUrl>https://Boxstarter.org</projectUrl>
     <id>Boxstarter.Common</id>
-    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <iconUrl>https://raw.githubusercontent.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <title>Boxstarter Common Module</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

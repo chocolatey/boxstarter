@@ -7,8 +7,8 @@
     <owners>Matt Wrock</owners>
     <title>Boxstarter Test Runner Module</title>
     <iconUrl>https://cdn.rawgit.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
-    <projectUrl>http://Boxstarter.org</projectUrl>
-    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://Boxstarter.org</projectUrl>
+    <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <description>Boxstarter's Test Runner module makes it easy to automate the testing and publishing of Chocolatey packages.</description>
     <tags>Boxstarter testing environment setup</tags>
     <dependencies>

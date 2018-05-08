@@ -4,9 +4,9 @@ function Get-IsMicrosoftUpdateEnabled {
 Returns $True if Microsoft Update is currently enabled
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 
-#>    
+#>
 	# Default response to false, unless proven otherwise
 	$installed = $false
 
@@ -15,10 +15,10 @@ http://boxstarter.org
 
 	foreach ($service in $serviceManager.Services) {
 		if( $service.Name -eq "Microsoft Update") {
-			$installed = $true;  
+			$installed = $true;
 			break;
-		} 
+		}
 	}
-	
+
 	return $installed
 }

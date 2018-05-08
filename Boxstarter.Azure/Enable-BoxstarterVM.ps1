@@ -4,16 +4,16 @@ function Enable-BoxstarterVM {
 Finds the PowerShell Remote ConnectionURI of an Azure VM and ensures it can be accessed
 
 .DESCRIPTION
-Ensures that an Azure VM can be accessed by Boxstarter. Checks the Azure PowerShell 
-SDK settings are set correctly and also examines the VM endpoints to ensure the correct 
-settings for PowerShell remoting. If necessary and if running with administrative 
-privileges, the WinRM certificate of the VM is downloaded and installed. If not running 
-with admin privileges, a PowerShell SessionOption is used that skips the CA and CN 
-check. The VM's PowerShell remoting ConnectionURI is located and returned via a 
+Ensures that an Azure VM can be accessed by Boxstarter. Checks the Azure PowerShell
+SDK settings are set correctly and also examines the VM endpoints to ensure the correct
+settings for PowerShell remoting. If necessary and if running with administrative
+privileges, the WinRM certificate of the VM is downloaded and installed. If not running
+with admin privileges, a PowerShell SessionOption is used that skips the CA and CN
+check. The VM's PowerShell remoting ConnectionURI is located and returned via a
 BoxstarterConfig instance.
 
-Enable-BoxstarterVM will also restore the VM to a specified 
-checkpoint or create a new checkpoint if the given checkpoint 
+Enable-BoxstarterVM will also restore the VM to a specified
+checkpoint or create a new checkpoint if the given checkpoint
 does not exist.
 
 .Parameter Provider
@@ -32,16 +32,16 @@ The Credential to use to test PSRemoting.
 If a Checkpoint exists by this name, it will be restored. Otherwise one will be created.
 
 .NOTES
-Boxstarter uses Azure Blob snapshots to create and manage VM checkpoints. These 
-will not be found in the Azure portal, but you can use Boxstarter's checkpoint 
-commands to manage them: Set-AzureVMCheckpoint, Get-AzureVMCheckpoint, 
+Boxstarter uses Azure Blob snapshots to create and manage VM checkpoints. These
+will not be found in the Azure portal, but you can use Boxstarter's checkpoint
+commands to manage them: Set-AzureVMCheckpoint, Get-AzureVMCheckpoint,
 Restore-AzureVMCheckpoint and Remove-AzureVMCheckpoint.
 
-The Windows Azure PowerShell SDK and the .NET Libraries SDK are both used to 
+The Windows Azure PowerShell SDK and the .NET Libraries SDK are both used to
 manage the Azure VMs and Blobs.
 
 .OUTPUTS
-A BoxstarterConnectionConfig that contains the ConnectionURI of the VM Computer and 
+A BoxstarterConnectionConfig that contains the ConnectionURI of the VM Computer and
 the PSCredential needed to authenticate.
 
 .EXAMPLE
@@ -52,8 +52,8 @@ New-AzureQuickVM -ServiceName MyService -Windows -Name MyVM `
   -Location "West US" -WaitForBoot
 Enable-BoxstarterVM -Provider Azure -CloudServiceName MyService -VMName MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
 
-Uses the Azure PowerShell SDK to create a new VM. Enable-BoxstarterVM 
-then installs the WinRM certificate and obtains the VM's ConnectionURI 
+Uses the Azure PowerShell SDK to create a new VM. Enable-BoxstarterVM
+then installs the WinRM certificate and obtains the VM's ConnectionURI
 which is piped to Install-BoxstarterPackage to install MyPackage.
 
 .EXAMPLE
@@ -69,17 +69,17 @@ Obtains the VM ConnectionURI and uses that to install MyPackage
 .EXAMPLE
 Enable-BoxstarterVM -Provider Azure -CloudServiceName MyService -VMName MyVM $cred ExistingSnapshot | Install-BoxstarterPackage MyPackage
 
-Gets MyVM's ConnectionURI, restores it to the state stored in ExistingSnapshot 
+Gets MyVM's ConnectionURI, restores it to the state stored in ExistingSnapshot
 and then installs MyPackage
 
 .EXAMPLE
 Enable-BoxstarterVM -Provider Azure -CloudServiceName MyService -VMName MyVM $cred NewSnapshot | Install-BoxstarterPackage MyPackage
 
-Gets MyVM's ConnectionURI, creates a new snapshot named NewSnapshot and 
+Gets MyVM's ConnectionURI, creates a new snapshot named NewSnapshot and
 then installs MyPackage
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Install-BoxstarterPackage
 Set-AzureVMCheckpoint
 Get-AzureVMCheckpoint
@@ -120,7 +120,7 @@ Once that is done, please run Enable-BoxstarterVM again.
 
     Process {
         try {
-            $VMName | % { 
+            $VMName | % {
                 Write-BoxstarterMessage "Locating Azure VM $_..."
                 $vm = Invoke-RetriableScript { Get-AzureVM -ServiceName $args[0] -Name $args[1] } $CloudServiceName $_
                 if($vm -eq $null){
@@ -167,12 +167,12 @@ Once that is done, please run Enable-BoxstarterVM again.
                 Enable-BoxstarterClientRemoting $ComputerName | out-Null
                 Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
                 try {
-                    Invoke-RetriableScript { Invoke-Command $args[0] { Get-WmiObject Win32_ComputerSystem } -Credential $args[1] -ErrorAction Stop | Out-Null } $uri $Credential 
+                    Invoke-RetriableScript { Invoke-Command $args[0] { Get-WmiObject Win32_ComputerSystem } -Credential $args[1] -ErrorAction Stop | Out-Null } $uri $Credential
                 }
                 catch {
                     Write-BoxstarterMessage "Failed to establish a remote connection with $uri. Use Enable-PSRemoting -Force on the VM to enable PowerShell remoting. Install will continue since this may be a transient error. The error encountered was $($_.ToString())" -Verbose
                 }
-        
+
                 if(!$restored -and $CheckpointName -ne $null -and $CheckpointName.Length -gt 0) {
                     Write-BoxstarterMessage "Creating Checkpoint $CheckpointName for service $CloudServiceName VM $_ at $CheckpointFile"
                     Set-AzureVMCheckpoint -VM $vm -CheckpointName $CheckpointName | Out-Null
@@ -192,6 +192,6 @@ function Wait-ReadyState($ServiceName, $vmName) {
     do {
         Start-Sleep -milliseconds 100
         Write-BoxstarterMessage "Checking VM for ReadyRole status...Hey VM!, are you ready to roll?..." -Verbose
-    } 
+    }
     until (( Invoke-RetriableScript { (Get-AzureVM -ServiceName $args[0] -Name $args[1]).InstanceStatus } $ServiceName $vmName ) -eq "ReadyRole")
 }

@@ -4,22 +4,22 @@ function Start-TimedSection {
 Begins a timed section
 
 .DESCRIPTION
-A timed section is a portion of script that is timed. Used 
-with Stop-TimedSection, the beginning and end of the section 
-are logged to both the console and the log along with the 
+A timed section is a portion of script that is timed. Used
+with Stop-TimedSection, the beginning and end of the section
+are logged to both the console and the log along with the
 amount of time elapsed.
 
-The function returns a guid that is used to identify the 
+The function returns a guid that is used to identify the
 section when stopping it.
 
 .PARAMETER SectionName
-The Title or Label of the section being timed. This string 
+The Title or Label of the section being timed. This string
 is used in the logging to identify the section.
 
 .PARAMETER Verbose
-Instructs Start-TimedSection to write to the Verbose stream. Although 
-this will always log messages to the Boxstarter log, it will only log 
-to the console if the session's VerbosePreference is set to capture 
+Instructs Start-TimedSection to write to the Verbose stream. Although
+this will always log messages to the Boxstarter log, it will only log
+to the console if the session's VerbosePreference is set to capture
 the Verbose stream or the -Verbose switch was set when calling
 Install-BoxstarterPackage.
 
@@ -36,7 +36,7 @@ Some stuff happens here.
 + Boxstarter finished My First Section 00:00:00.2074282
 
 .EXAMPLE
-Timed Sections can be nested or staggered. You can have 
+Timed Sections can be nested or staggered. You can have
 multiple sections running at once.
 
 $session=Start-TimedSection "My First Section"
@@ -66,18 +66,18 @@ Note that the number of '+' chars indicate nesting level.
 $session=Start-TimedSection "My First Section" -Verbose
 Stop-TimedSection $session
 
-This will write the start and finish messages to the 
-Boxstarter log but will not write to the console unless the 
-user has the the VerbosePreference variable or used the 
+This will write the start and finish messages to the
+Boxstarter log but will not write to the console unless the
+user has the the VerbosePreference variable or used the
 Verbose switch of Install-BoxstarterPackage.
 
 .NOTES
-If the SuppressLogging setting of the $Boxstarter variable is true, 
-logging messages will be suppressed and not sent to the console or the 
+If the SuppressLogging setting of the $Boxstarter variable is true,
+logging messages will be suppressed and not sent to the console or the
 log.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Stop-TimedSection
 about_boxstarter_logging
 #>

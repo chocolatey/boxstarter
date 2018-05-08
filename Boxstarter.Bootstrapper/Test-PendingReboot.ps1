@@ -4,20 +4,20 @@ function Test-PendingReboot {
 Checks to see if Windows is pending a reboot
 
 .DESCRIPTION
-Uses a script from Brian Wilhite 
-https://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542 
-that queries the registry, Windows Update and System 
-Configuration Manager to determine if a pending reboot is 
+Uses a script from Brian Wilhite
+https://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542
+that queries the registry, Windows Update and System
+Configuration Manager to determine if a pending reboot is
 required.
 
-One may want to check this before installing software 
-or doing anything that may fail if there is a pending 
+One may want to check this before installing software
+or doing anything that may fail if there is a pending
 reboot. If this command returns $true, one may want to
 call Invoke-Reboot to restart the local machine.
 
 .LINK
-http://boxstarter.org
-https://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542 
+https://boxstarter.org
+https://gallery.technet.microsoft.com/scriptcenter/Get-PendingReboot-Query-bdb79542
 Invoke-Reboot
 about_boxstarter_bootstrapper
 

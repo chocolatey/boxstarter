@@ -9,32 +9,32 @@ This wraps any PowerShell script block and executes it in an environment tailore
  - Imports the Boxstarter.WinConfig module that provides functions for customizing windows
  - Provides Reboot Resiliency by ensuring the package installation is immediately restarted up on reboot if there is a reboot during the installation.
  - Ensures everything runs under administrator permissions
-If the password argument is not included and RebootOk is passed, 
-the user will be prompted for a password immediately after 
-invoking the command and that password will be used for any 
+If the password argument is not included and RebootOk is passed,
+the user will be prompted for a password immediately after
+invoking the command and that password will be used for any
 subsequent reboot during the boxstarter run.
 
 .Parameter ScriptToCall
-The script that Boxstarter wraps. After Boxstarter shuts down 
-the update services and ensures that the console is running as 
-an administrator, it invokes this script. The script may call Invoke-Reboot 
-at any time and Boxstarter will ensure that the machine is 
+The script that Boxstarter wraps. After Boxstarter shuts down
+the update services and ensures that the console is running as
+an administrator, it invokes this script. The script may call Invoke-Reboot
+at any time and Boxstarter will ensure that the machine is
 rebooted, logged in and the script is rerun.
 
 .Parameter Password
-This password will be used to automatically log the user in if a 
+This password will be used to automatically log the user in if a
 reboot is required and reboots are enabled.
 
 .Parameter RebootOk
-If set, a reboot will be performed if boxstarter determines that a 
-reboot is pending. If no password is supplied to the Password 
-parameterBoxstarter will prompt the user to enter a password which 
-will be used for automatic logins in the event a restart is 
+If set, a reboot will be performed if boxstarter determines that a
+reboot is pending. If no password is supplied to the Password
+parameterBoxstarter will prompt the user to enter a password which
+will be used for automatic logins in the event a restart is
 required.
 
 .PARAMETER KeepWindowOpen
-Enabling this switch will prevent the command window from closing and 
-prompt the user to pres the Enter key before the window closes. This 
+Enabling this switch will prevent the command window from closing and
+prompt the user to pres the Enter key before the window closes. This
 is ideal when not invoking boxstarter from a console.
 
 .PARAMETER NoPassword
@@ -44,17 +44,17 @@ an account without password validation.
 .EXAMPLE
 Invoke-Boxstarter {Import-Modler myinstaller;Invoke-MyInstall} -RebootOk
 
-This invokes Boxstarter and invokes MyInstall. If pending 
+This invokes Boxstarter and invokes MyInstall. If pending
 reboots are detected, boxstarter will restart the machine. Boxstarter
-will prompt the user to enter a password which will be used for 
+will prompt the user to enter a password which will be used for
 automatic logins in the event a restart is required.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 about_boxstarter_variable_in_bootstrapper
 about_boxstarter_bootstrapper
 Invoke-Reboot
-#>    
+#>
     [CmdletBinding()]
     param(
       [Parameter(Position=0,Mandatory=0)]
@@ -78,7 +78,7 @@ Invoke-Reboot
         New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | out-null
         Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate..."
         $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psd1")
-        if($password){ 
+        if($password){
             $encryptedPass = convertfrom-securestring -securestring $password
             $passwordArg = "-encryptedPassword $encryptedPass"
         }
@@ -97,7 +97,7 @@ Invoke-Reboot
             Write-BoxstarterMessage "NoPassword is false checking autologin" -verbose
             $boxstarter.NoPassword=$False
             $script:BoxstarterPassword=InitAutologon $password
-        } 
+        }
         if($script:BoxstarterPassword -eq $null) {
             $boxstarter.NoPassword=$True
         }
@@ -158,8 +158,8 @@ function InitAutologon([System.Security.SecureString]$password){
     if($Boxstarter.RebootOk -and !$Password -and !$Boxstarter.AutologedOn) {
         Write-BoxstarterMessage "Please type CTRL+C or close this window to exit Boxstarter if you do not want to risk a reboot during this Boxstarter install.`r`n" -nologo -Color Yellow
         write-BoxstarterMessage @"
-Boxstarter may need to reboot your system. 
-Please provide your password so that Boxstarter may automatically log you on. 
+Boxstarter may need to reboot your system.
+Please provide your password so that Boxstarter may automatically log you on.
 Your password will be securely stored and encrypted.
 "@ -nologo
 

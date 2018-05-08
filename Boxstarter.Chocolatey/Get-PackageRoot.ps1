@@ -7,7 +7,7 @@ Returns the Root path of a Boxstarter Package given the Chocolatey $MyInvocation
 This function is intended to be called from inside a running
 ChocolateyInstall.ps1 file. It returns the root path of the package
 which is one level above the Tools directory. This can be helpful
-when you need to reference any files that you copied to your 
+when you need to reference any files that you copied to your
 Boxstarter Repository which copies them to this location using
 New-BoxstarterPackage.
 
@@ -35,11 +35,11 @@ try {
 }
 
 .NOTES
-Get-PackageRoot is intended to be called from ChocolateyInstall.ps1 
+Get-PackageRoot is intended to be called from ChocolateyInstall.ps1
 and will throw if it is called from another file.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 about_boxstarter_chocolatey
 New_BoxstarterPackage
 Invoke-ChocolateyBoxstarter

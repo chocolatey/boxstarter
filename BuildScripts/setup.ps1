@@ -6,7 +6,7 @@ function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
     $packagePath=Join-Path $boxstarterPath BuildPackages
     if(!(test-Path $packagePath)){
         mkdir $packagePath
-    }    
+    }
     foreach($ModulePath in (Get-ChildItem $here | ?{ $_.PSIsContainer })){
         $target=Join-Path $boxstarterPath $modulePath.BaseName
         if(test-Path $target){
@@ -28,14 +28,14 @@ function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
         Import-Module "$boxstarterPath\$ModuleName" -DisableNameChecking -Force -ErrorAction SilentlyContinue
     }
     $successMsg = @"
-The $ModuleName Module has been copied to $boxstarterPath and added to your Module path. 
+The $ModuleName Module has been copied to $boxstarterPath and added to your Module path.
 You will need to open a new console for the path to be visible.
 Use 'Get-Module Boxstarter.* -ListAvailable' to list all Boxstarter Modules.
 To list all available Boxstarter Commands, use:
 PS:>Import-Module $ModuleName
 PS:>Get-Command -Module Boxstarter.*
 
-To find more info visit http://Boxstarter.org or use:
+To find more info visit https://Boxstarter.org or use:
 PS:>Import-Module $ModuleName
 PS:>Get-Help Boxstarter
 "@
@@ -73,22 +73,22 @@ function Create-Shortcut($location, $target, $targetArgs, $boxstarterPath) {
 
     #This adds a bit to the shortcut link that causes it to open with admin privileges
 	$tempFile = "$env:temp\TempShortcut.lnk"
-		
+
 	$writer = new-object System.IO.FileStream $tempFile, ([System.IO.FileMode]::Create)
 	$reader = new-object System.IO.FileStream $location, ([System.IO.FileMode]::Open)
-		
+
 	while ($reader.Position -lt $reader.Length)
-	{		
+	{
 		$byte = $reader.ReadByte()
 		if ($reader.Position -eq 22) {
 			$byte = 34
 		}
 		$writer.WriteByte($byte)
 	}
-		
+
 	$reader.Close()
 	$writer.Close()
-				
+
 	Move-Item -Path $tempFile $location -Force
 }
 function PersistBoxStarterPathToEnvironmentVariable($variableName, $boxstarterPath){
@@ -96,7 +96,7 @@ function PersistBoxStarterPathToEnvironmentVariable($variableName, $boxstarterPa
     $userValue = [Environment]::GetEnvironmentVariable($variableName, 'User')
     if($userValue){
         $userValues=($userValue -split ';' | ?{ !($_.ToLower() -match "\\boxstarter$")}) -join ';'
-    } 
+    }
     elseif($variableName -eq "PSModulePath") {
         $userValues = [environment]::getfolderpath("mydocuments")
         $userValues +="\WindowsPowerShell\Modules"
@@ -107,7 +107,7 @@ function PersistBoxStarterPathToEnvironmentVariable($variableName, $boxstarterPa
     if($value){
         $values=($value -split ';' | ?{ !($_.ToLower() -match "\\boxstarter$")}) -join ';'
         $values="$boxstarterPath;$values"
-    } 
+    }
     elseif($variableName -eq "PSModulePath") {
         $values = "$boxstarterPath;"
         $values += [environment]::getfolderpath("ProgramFiles")

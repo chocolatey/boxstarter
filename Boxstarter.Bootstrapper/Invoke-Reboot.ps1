@@ -1,17 +1,17 @@
 function Invoke-Reboot {
 <#
 .SYNOPSIS
-Reboots the local machine ensuring Boxstarter restarts 
-automatically after reboot and sets up autologon if it a 
+Reboots the local machine ensuring Boxstarter restarts
+automatically after reboot and sets up autologon if it a
 password was provided.
 
 .DESCRIPTION
-Use this command inside of a boxstarter package instead 
+Use this command inside of a boxstarter package instead
 of calling Restart-Computer
 
 This command will often be used with the Test-PendingReboot
-command. If Test-PendingReboot returns true, one may want 
-to call Invoke-Reboot to restart otherwise the remainder of 
+command. If Test-PendingReboot returns true, one may want
+to call Invoke-Reboot to restart otherwise the remainder of
 the package might fail.
 
 .NOTES
@@ -21,15 +21,15 @@ will not do anything. If Boxstarter was invoked with the -RebootOk
 parameter $Boxstarter.RebootOk is set to True.
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 Test-PendingReeboot
 Invoke-Boxstarter
 about_boxstarter_bootstrapper
 about_boxstarter_variable_in_bootstrapper
 #>
-    if(!$Boxstarter.RebootOk) { 
+    if(!$Boxstarter.RebootOk) {
         Write-BoxstarterMessage "A Reboot was requested but Reboots are suppressed. Either call Invoke-Boxstarter with -RebootOk or set `$Boxstarter.RebootOk to `$true"
-        return 
+        return
     }
     if(!(Get-IsRemote -PowershellRemoting) -and !($Boxstarter.DisableRestart)){
         if(!$Boxstarter.ScriptToCall) {

@@ -4,40 +4,40 @@ TOPIC
 SYNOPSIS
 	A Hashtable for persisting Boxstarter settings.
 
-DESCRIPTION	
-	The Boxstarter variable is a hashtable that is globaly accesible. 
+DESCRIPTION
+	The Boxstarter variable is a hashtable that is globaly accesible.
 	Different Boxstarter modules may store different settings.
-	Some of the Chocolatey module settings available from the 
-	Boxstarter variable can also be set from the 
+	Some of the Chocolatey module settings available from the
+	Boxstarter variable can also be set from the
 	Invoke-ChocolateyBoxstarter Command.
 
 BOXSTARTER VARIABLE SETTINGS
 	ProgramFiles86
-		Unless the environment has been specilly conficured, this 
-		points to the 'Program Files' folder in the system drive on 
-		x86 machines and the 'Program Files (x86)' folder in the 
+		Unless the environment has been specilly conficured, this
+		points to the 'Program Files' folder in the system drive on
+		x86 machines and the 'Program Files (x86)' folder in the
 		system drive on 64 bit machines.
 
 	Package
 		The name of the bootstrapper package running in Boxstarter.
 
 	LocalRepo
-		Path to the local directory containing packages that 
-		boxstarter will scan when looking for a package. By default 
-		this is the BuildPackeged directory under the base Boxstarter 
-		directory usually in the ProgramData directory. The 
-		default can be changed by using the	Set-BoxstarterConfig 
+		Path to the local directory containing packages that
+		boxstarter will scan when looking for a package. By default
+		this is the BuildPackeged directory under the base Boxstarter
+		directory usually in the ProgramData directory. The
+		default can be changed by using the	Set-BoxstarterConfig
 		function with the -LocalRepo argument.
 
 	NugetSources
-		The Nuget feeds that Boxstarter checks for the Boxstarter 
-		Bootstrap package. By default this is the chocolatey and 
-		Myget Boxstarter community feed. This can be changed by 
-		using the Set-BoxstarterConfig function with the -NugetSources 
+		The Nuget feeds that Boxstarter checks for the Boxstarter
+		Bootstrap package. By default this is the chocolatey and
+		Myget Boxstarter community feed. This can be changed by
+		using the Set-BoxstarterConfig function with the -NugetSources
 		argument.
 
 SEE ALSO
-	http://boxstarter.org
+	https://boxstarter.org
 	About_Boxstarter_Variable_In_Bootstrapper
 	Invoke-ChocolateyBoxstarter
 	Set-BoxstarterConfig

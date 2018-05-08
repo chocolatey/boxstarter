@@ -4,15 +4,15 @@ function New-BoxstarterPackage {
 Creates a new Chocolatey package source directory intended for a Boxstarter Install
 
 .DESCRIPTION
-New-BoxstarterPackage creates a new Directory in your local 
+New-BoxstarterPackage creates a new Directory in your local
 Boxstarter repository located at $Boxstarter.LocalRepo. If no path is
-provided, Boxstarter creates a minimal nuspec and 
-ChocolateyInstall.ps1 file. If a path is provided, Boxstarter will 
+provided, Boxstarter creates a minimal nuspec and
+ChocolateyInstall.ps1 file. If a path is provided, Boxstarter will
 copy the contents of the path to the new package directory. If the
 path does not include a nuspec or ChocolateyInstall.ps1, Boxstarter
-will create one. You can use Invoke-BoxstarterBuild to pack the 
-repository directory to a Chocolatey nupkg. If your path includes 
-subdirectories, you can use Get-PackageRoot inside 
+will create one. You can use Invoke-BoxstarterBuild to pack the
+repository directory to a Chocolatey nupkg. If your path includes
+subdirectories, you can use Get-PackageRoot inside
 ChocolateyInstall.ps1 to reference the parent directory of the copied
 content.
 
@@ -26,7 +26,7 @@ Description of the package to be written to the nuspec
 Optional path whose contents will be copied to the repository
 
 .LINK
-http://boxstarter.org
+https://boxstarter.org
 New-PackageFromScript
 about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey

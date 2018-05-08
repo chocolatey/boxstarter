@@ -2,8 +2,8 @@
 ***********************************************************************************
 *   This function was written by Andy Arismendi
 *   Published at http://poshcode.org/2982
-*   Under Creative Commons License 
-*   http://creativecommons.org/publicdomain/zero/1.0/legalcode
+*   Under Creative Commons License
+*   https://creativecommons.org/publicdomain/zero/1.0/legalcode
 ***********************************************************************************
 #>
 function Set-SecureAutoLogon {
@@ -14,16 +14,16 @@ param (
 
     [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [System.Security.SecureString]
     $Password,
-    
+
     [string]
     $Domain,
-    
+
     [Int]
     $AutoLogonCount,
-    
+
     [switch]
     $RemoveLegalPrompt,
-    
+
     [string]
     $BackupFile
 )
@@ -34,7 +34,7 @@ begin {
 
     [string] $Enable = 1
     [string] $Disable = 0
-    
+
     #region C# Code to P-invoke LSA LsaStorePrivateData function.
     Add-Type @"
         using System;
@@ -212,7 +212,7 @@ process {
 
     try {
         $ErrorActionPreference = "Stop"
-        
+
         $decryptedPass = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
             [Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)
         )
@@ -221,7 +221,7 @@ process {
                 # Initialize the hash table with a string comparer to allow case sensitive keys.
                 # This allows differentiation between the winlogon and system policy logon banner strings.
             $OrigionalSettings = New-Object System.Collections.Hashtable ([system.stringcomparer]::CurrentCulture)
-            
+
             $OrigionalSettings.AutoAdminLogon = (Get-ItemProperty $WinlogonPath ).AutoAdminLogon
             $OrigionalSettings.ForceAutoLogon = (Get-ItemProperty $WinlogonPath).ForceAutoLogon
             $OrigionalSettings.DefaultUserName = (Get-ItemProperty $WinlogonPath).DefaultUserName
@@ -231,22 +231,22 @@ process {
                 Remove-ItemProperty -Path $WinlogonPath -Name DefaultPassword -Force
             }
             $OrigionalSettings.AutoLogonCount = (Get-ItemProperty $WinlogonPath).AutoLogonCount
-            
+
                 # The winlogon logon banner settings.
             $OrigionalSettings.LegalNoticeCaption = (Get-ItemProperty $WinlogonPath).LegalNoticeCaption
             $OrigionalSettings.LegalNoticeText = (Get-ItemProperty $WinlogonPath).LegalNoticeText
-            
+
                 # The system policy logon banner settings.
             $OrigionalSettings.legalnoticecaption = (Get-ItemProperty $WinlogonBannerPolicyPath).legalnoticecaption
             $OrigionalSettings.legalnoticetext = (Get-ItemProperty $WinlogonBannerPolicyPath).legalnoticetext
-            
+
             $OrigionalSettings | Export-Clixml -Depth 10 -Path $BackupFile
         }
-        
+
             # Store the password securely.
         $lsaUtil = New-Object ComputerSystem.LSAutil -ArgumentList "DefaultPassword"
         $lsaUtil.SetSecret($decryptedPass)
-        
+
             # Store the autologon registry settings.
         Set-ItemProperty -Path $WinlogonPath -Name AutoAdminLogon -Value $Enable -Force
 
@@ -262,7 +262,7 @@ process {
         if ($RemoveLegalPrompt) {
             Set-ItemProperty -Path $WinlogonPath -Name LegalNoticeCaption -Value $null -Force
             Set-ItemProperty -Path $WinlogonPath -Name LegalNoticeText -Value $null -Force
-            
+
             Set-ItemProperty -Path $WinlogonBannerPolicyPath -Name legalnoticecaption -Value $null -Force
             Set-ItemProperty -Path $WinlogonBannerPolicyPath -Name legalnoticetext -Value $null -Force
         }
@@ -281,16 +281,16 @@ process {
 
     .PARAMETER  Password
         The password for the user to automatically logon as.
-        
+
     .PARAMETER  Domain
         The domain of the user to automatically logon as.
-        
+
     .PARAMETER  AutoLogonCount
         The number of logons that auto logon will be enabled.
-        
+
     .PARAMETER  RemoveLegalPrompt
         Removes the system banner to ensure intervention-less logon.
-        
+
     .PARAMETER  BackupFile
         If specified the existing settings such as the system banner text will be backed up to the specified file.
 
@@ -314,9 +314,9 @@ process {
             2011-09-29 : Andy Arismendi - Changed to use LSA secrets to store password securely.
 
     .LINK
-        http://support.microsoft.com/kb/324737
-        
+        https://support.microsoft.com/kb/324737
+
     .LINK
-        http://msdn.microsoft.com/en-us/library/aa378750
+        https://msdn.microsoft.com/en-us/library/aa378750
 
 #>
