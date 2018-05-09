@@ -19,6 +19,7 @@ properties {
     $nugetExe = "$env:ChocolateyInstall\bin\nuget.exe"
     $ftpHost="waws-prod-bay-001.ftp.azurewebsites.windows.net"
     $msbuildExe="${env:ProgramFiles(x86)}\MSBuild\14.0\Bin\msbuild.exe"
+    $reportUnitExe = "$env:ChocolateyInstall\bin\ReportUnit.exe"
 }
 
 Task default -depends Build
@@ -49,13 +50,13 @@ task Create-ModuleZipForRemoting {
     Move-Item "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.chocolatey\Boxstarter.zip"
 }
 
-task Build-ClickOnce -depends Install-MSBuild, Install-Win8SDK {
+task Build-ClickOnce -depends Install-MSBuild, Install-Win8SDK, Restore-NuGetPackages {
     Update-AssemblyInfoFiles $version $changeset
     exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
     exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
 }
 
-task Build-Web -depends Install-MSBuild, Install-WebAppTargets {
+task Build-Web -depends Install-MSBuild, Restore-NuGetPackages {
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Build /v:minimal /p:DownloadNuGetExe="true" }
     copy-Item "$baseDir\packages\bootstrap.3.0.2\content\*" "$baseDir\Web" -Recurse -Force -ErrorAction SilentlyContinue
@@ -76,12 +77,25 @@ task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
 Task Test -depends Install-ChocoLib, Pack-Nuget, Create-ModuleZipForRemoting {
     pushd "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
+    $pesterTestResultsFile = "$baseDir\buildArtifacts\TestResults.xml"
+    $pesterTestResultsHtmlFile = "$baseDir\buildArtifacts\TestResults.html"
+
     if($testName){
-        exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -testName $testName}
+        ."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -testName $testName -OutputFile $pesterTestResultsFile -OutputFormat NUnitXml
     }
     else{
-        exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests }
+        ."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -OutputFile $pesterTestResultsFile -OutputFormat NUnitXml
     }
+
+    if($LastExitCode -ne 0) {
+        # Generate HTML version of report
+        if(Test-Path $pesterTestResultsFile) {
+            .$reportUnitExe $pesterTestResultsFile $pesterTestResultsHtmlFile
+        }
+
+        throw 'There were failed unit tests.'
+    }
+
     popd
 }
 
@@ -234,14 +248,12 @@ task Install-Win8SDK {
     if(!(Test-Path "$env:ProgramFiles\Windows Kits\8.1\bin\x64\signtool.exe")) { cinst windows-sdk-8.1 -y }
 }
 
-task Install-WebAppTargets {
-    if(!(Test-Path "$env:ChocolateyInstall\lib\MSBuild.Microsoft.VisualStudio.Web.targets\tools\VSToolsPath\WebApplications\Microsoft.WebApplication.targets")) {
-        cinst MSBuild.Microsoft.VisualStudio.Web.targets -source https://packages.nuget.org/v1/FeedService.svc/ -version '12.0.4' -y
-    }
-}
-
 task Install-WebDeploy {
     if(!(Test-Path "$env:ProgramW6432\IIS\Microsoft Web Deploy V3")) { cinst webdeploy -y }
+}
+
+Task Restore-NuGetPackages {
+    exec { .$nugetExe restore "$baseDir\Boxstarter.sln" }
 }
 
 task Install-ChocoLib {
