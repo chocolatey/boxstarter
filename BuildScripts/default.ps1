@@ -290,7 +290,7 @@ task Sign-PowerShellFiles -depends Copy-PowerShellFiles {
     $certPfx = "$env:CHOCOLATEY_OFFICIAL_CERT"
     $certPasswordFile = "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
 
-    if((Test-Path $certPfx) -And (Test-Path $certPasswordFile)) {
+    if($certPfx -And $certPasswordFile -And (Test-Path $certPfx) -And (Test-Path $certPasswordFile)) {
         $certPassword = Get-Content "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
         $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPfx, $certPassword)
         $tempNuGetDirectory = "$basedir\buildArtifacts\tempNuGetFolders"
