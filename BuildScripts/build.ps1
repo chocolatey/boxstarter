@@ -28,3 +28,10 @@ if($Help){
 $psakeDir = (dir $env:ChocolateyInstall\lib\Psake*)
 if($psakeDir.length -gt 0) {$psakerDir = $psakeDir[-1]}
 ."$psakeDir\tools\psake\psake.ps1" "$here/default.ps1" $Action -ScriptPath $psakeDir\tools\psake -parameters $PSBoundParameters
+
+if($psake.build_success -eq $false) {
+  exit 1;
+}
+else {
+  exit 0;
+}
