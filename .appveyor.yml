@@ -2,7 +2,7 @@
 #  Build Script                   #
 #---------------------------------#
 build_script:
-  - ps: .\build.bat
+  - ps: .\buildscripts\build.ps1
 
 # Tests
 test: off
