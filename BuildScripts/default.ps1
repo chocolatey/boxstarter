@@ -288,9 +288,10 @@ task Copy-PowerShellFiles -depends Clean-Artifacts {
 task Sign-PowerShellFiles -depends Copy-PowerShellFiles {
     $timestampServer = "http://timestamp.digicert.com"
     $certPfx = "$env:CHOCOLATEY_OFFICIAL_CERT"
-    $certPassword = Get-Content "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
+    $certPasswordFile = "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
 
-    if((Test-Path $certPfx) -And $certPassword) {
+    if((Test-Path $certPfx) -And (Test-Path $certPasswordFile)) {
+        $certPassword = Get-Content "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
         $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPfx, $certPassword)
         $tempNuGetDirectory = "$basedir\buildArtifacts\tempNuGetFolders"
         $powerShellFiles = Get-ChildItem -Path $tempNuGetDirectory -Recurse -Include @("*.ps1", "*.psm1", "*.psd1") -File
