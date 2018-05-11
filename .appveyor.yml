@@ -2,7 +2,7 @@
 #  Build Script                   #
 #---------------------------------#
 build_script:
-  - ps: .\buildscripts\build.ps1
+  - ps: .\buildscripts\build.ps1 quick-deploy
 
 # Tests
 test: off
