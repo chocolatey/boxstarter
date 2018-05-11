@@ -10,10 +10,10 @@ ModuleVersion = '2.10.3'
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e50'
 
 # Author of this module
-Author = 'Matt Wrock'
+Author = 'Chocolatey Software, Inc'
 
 # Copyright statement for this module
-Copyright = '(c) 2017 Matt Wrock'
+Copyright = '(c) 2018 Chocolatey Software, Inc, 2012 - 2018 Matt Wrock'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '2.0'
