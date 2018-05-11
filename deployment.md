@@ -4,8 +4,9 @@
 
 * You will need a code signing certificate installed in your personal certificate store
 * The thumbprint of that certificate needs to be specified in the `ManifestCertificateThumbprint` property inside the `Boxstarter.ClickOnce` `.csproj` file.
-* You should set `$env:github_api` to your GitHub personal access token which should have rights to add releases to the Boxstarter GitHub repository.
-* You should set `$env:boxstarter_publish_password` to the `boxstarter$` user's password which can be obtained from the Boxstarter Azure Website publisher profile. This assumes you have access to that profile.
+* You should set `$env:BOXSTARTER_GITHUB_USERNAME` to your GitHub username
+* You should set `$env:BOXSTARTER_GITHUB_TOKEN` to your GitHub personal access token which should have rights to add releases to the Boxstarter GitHub repository.
+* You should set `$env:BOXSTARTER_PUBLISH_PASSWORD` to the `boxstarter$` user's password which can be obtained from the Boxstarter Azure Website publisher profile. This assumes you have access to that profile.
 * You should have a Chocolatey community feed api key configured and authorized to push new Boxstarter packages.
 
 ## Build the Deployable artifacts

@@ -72,7 +72,7 @@ task Publish-ClickOnce -depends Install-MSBuild {
 }
 
 task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
-    exec { .$msbuildExe "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:boxstarter_publish_password }
+    exec { .$msbuildExe "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:BOXSTARTER_PUBLISH_PASSWORD }
 }
 
 Task Test -depends Install-ChocoLib, Pack-Nuget, Create-ModuleZipForRemoting {
@@ -188,7 +188,7 @@ Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
 Task Push-Github {
     $headers = @{
         Authorization = 'Basic ' + [Convert]::ToBase64String(
-            [Text.Encoding]::ASCII.GetBytes("mwrock:$($env:github_api)"));
+            [Text.Encoding]::ASCII.GetBytes("$($env:BOXSTARTER_GITHUB_USERNAME):$($env:BOXSTARTER_GITHUB_TOKEN)"));
     }
 
     $releaseNotes = Get-ReleaseNotes
