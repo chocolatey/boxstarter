@@ -21,6 +21,7 @@
   </metadata>
   <files>
     <file src="..\..\LICENSE.txt" target="tools" />
+    <file src="..\..\NOTICE.txt" target="tools" />
     <file src="..\..\buildArtifacts\tempNuGetFolders\chocolateyinstall.ps1" target="tools" />
     <file src="..\..\buildArtifacts\tempNuGetFolders\Setup.ps1" target="tools" />
     <file src="..\..\buildArtifacts\tempNuGetFolders\Boxstarter.Common\**\*.*" target="tools\Boxstarter.Common" />

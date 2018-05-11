@@ -29,6 +29,7 @@
     <file src="..\..\boxstarter.bat" target="tools" />
     <file src="..\..\boxstarter.config" target="tools" />
     <file src="..\..\LICENSE.txt" target="tools" />
+    <file src="..\..\NOTICE.txt" target="tools" />
     <file src="..\..\buildArtifacts\tempNuGetFolders\BoxstarterShell.ps1" target="tools" />
     <file src="..\..\BoxLogo.ico" target="tools" />
     <file src="..\..\buildArtifacts\tempNuGetFolders\Boxstarter.Chocolatey\**\*.*" target="tools\Boxstarter.Chocolatey" />
