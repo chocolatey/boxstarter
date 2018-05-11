@@ -24,13 +24,13 @@
 </releaseNotes>
   </metadata>
   <files>
-    <file src="..\chocolateyinstall.ps1" target="tools" />
-    <file src="..\Setup.ps1" target="tools" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\chocolateyinstall.ps1" target="tools" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\Setup.ps1" target="tools" />
     <file src="..\..\boxstarter.bat" target="tools" />
     <file src="..\..\boxstarter.config" target="tools" />
     <file src="..\..\LICENSE.txt" target="tools" />
-    <file src="..\..\BoxstarterShell.ps1" target="tools" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\BoxstarterShell.ps1" target="tools" />
     <file src="..\..\BoxLogo.ico" target="tools" />
-    <file src="..\..\Boxstarter.Chocolatey\**\*.*" target="tools\Boxstarter.Chocolatey" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\Boxstarter.Chocolatey\**\*.*" target="tools\Boxstarter.Chocolatey" />
   </files>
 </package>

@@ -24,8 +24,8 @@
   </metadata>
   <files>
     <file src="..\..\LICENSE.txt" target="tools" />
-    <file src="..\chocolateyinstall.ps1" target="tools" />
-    <file src="..\Setup.ps1" target="tools" />
-    <file src="..\..\Boxstarter.WinConfig\**\*.*" target="tools\Boxstarter.WinConfig" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\chocolateyinstall.ps1" target="tools" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\Setup.ps1" target="tools" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\Boxstarter.WinConfig\**\*.*" target="tools\Boxstarter.WinConfig" />
   </files>
 </package>

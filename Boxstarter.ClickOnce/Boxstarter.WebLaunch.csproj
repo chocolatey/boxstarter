@@ -65,7 +65,7 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>199e3c519de4bc2465bfa1be6ed60fb64532a05a</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>4BF7DCBC06F6D0BDFA8A0A78DE0EFB62563C4D87</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>
@@ -80,6 +80,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>boxLogo_sm.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -135,7 +138,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(WindowsSDK80Path)bin\x64\signtool.exe" sign /n "Open Source Developer, Matthew Wrock" "$(ProjectDir)obj\debug\Boxstarter.WebLaunch.exe"</PostBuildEvent>
+    <PostBuildEvent Condition="Exists($(CHOCOLATEY_OFFICIAL_CERT))">set /p CertificatePassword=&lt;%25CHOCOLATEY_OFFICIAL_CERT_PASSWORD%25
+"$(WindowsSDK80Path)bin\x64\signtool.exe" sign /f %25CHOCOLATEY_OFFICIAL_CERT%25 /p %25CertificatePassword%25 "$(ProjectDir)obj\debug\Boxstarter.WebLaunch.exe"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

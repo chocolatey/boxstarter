@@ -16,6 +16,7 @@ if(!(Test-Path $env:ChocolateyInstall\lib\pester*)) { cinst pester -v 3.4.0 -y }
 if(!(Test-Path $env:ChocolateyInstall\lib\WindowsAzurePowershell*)) { cinst WindowsAzurePowershell -y }
 if(!(Test-Path $env:ChocolateyInstall\lib\WindowsAzureLibsForNet*)) { cinst WindowsAzureLibsForNet --version 2.5 -y }
 if(!(Test-Path $env:ChocolateyInstall\bin\nuget.exe)) { cinst nuget.commandline -y }
+if(!(Test-Path $env:ChocolateyInstall\bin\ReportUnit.exe)) { choco install reportunit -y --source https://nuget.org/api/v2 }
 
 if($Help){
   try {

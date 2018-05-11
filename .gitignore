@@ -27,3 +27,5 @@ PublishProfiles
 *.pfx
 .vagrant
 .vs
+Backup/
+UpgradeLog.htm

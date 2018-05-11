@@ -24,9 +24,9 @@
   </metadata>
   <files>
     <file src="..\..\LICENSE.txt" target="tools" />
-    <file src="..\chocolateyinstall.ps1" target="tools" />
-    <file src="..\Setup.ps1" target="tools" />
-    <file src="Boxstarter.Azure.PreInstall.ps1" target="tools" />
-    <file src="..\..\Boxstarter.Azure\**\*.*" target="tools\Boxstarter.Azure" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\chocolateyinstall.ps1" target="tools" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\Setup.ps1" target="tools" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\Boxstarter.Azure.PreInstall.ps1" target="tools" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\Boxstarter.Azure\**\*.*" target="tools\Boxstarter.Azure" />
   </files>
 </package>

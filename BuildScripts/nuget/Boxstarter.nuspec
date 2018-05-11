@@ -26,6 +26,6 @@
 </releaseNotes>
   </metadata>
   <files>
-    <file src="..\BoxstarterChocolateyinstall.ps1" target="tools\chocolateyinstall.ps1" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\BoxstarterChocolateyinstall.ps1" target="tools\chocolateyinstall.ps1" />
   </files>
 </package>

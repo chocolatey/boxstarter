@@ -19,6 +19,7 @@ properties {
     $nugetExe = "$env:ChocolateyInstall\bin\nuget.exe"
     $ftpHost="waws-prod-bay-001.ftp.azurewebsites.windows.net"
     $msbuildExe="${env:ProgramFiles(x86)}\MSBuild\14.0\Bin\msbuild.exe"
+    $reportUnitExe = "$env:ChocolateyInstall\bin\ReportUnit.exe"
 }
 
 Task default -depends Build
@@ -49,13 +50,13 @@ task Create-ModuleZipForRemoting {
     Move-Item "$basedir\buildartifacts\Boxstarter.zip" "$basedir\boxstarter.chocolatey\Boxstarter.zip"
 }
 
-task Build-ClickOnce -depends Install-MSBuild, Install-Win8SDK {
+task Build-ClickOnce -depends Install-MSBuild, Install-Win8SDK, Restore-NuGetPackages {
     Update-AssemblyInfoFiles $version $changeset
     exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
     exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
 }
 
-task Build-Web -depends Install-MSBuild, Install-WebAppTargets {
+task Build-Web -depends Install-MSBuild, Restore-NuGetPackages {
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Build /v:minimal /p:DownloadNuGetExe="true" }
     copy-Item "$baseDir\packages\bootstrap.3.0.2\content\*" "$baseDir\Web" -Recurse -Force -ErrorAction SilentlyContinue
@@ -76,12 +77,25 @@ task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
 Task Test -depends Install-ChocoLib, Pack-Nuget, Create-ModuleZipForRemoting {
     pushd "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
+    $pesterTestResultsFile = "$baseDir\buildArtifacts\TestResults.xml"
+    $pesterTestResultsHtmlFile = "$baseDir\buildArtifacts\TestResults.html"
+
     if($testName){
-        exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -testName $testName}
+        ."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -testName $testName -OutputFile $pesterTestResultsFile -OutputFormat NUnitXml
     }
     else{
-        exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests }
+        ."$pesterDir\tools\bin\Pester.bat" $baseDir/Tests -OutputFile $pesterTestResultsFile -OutputFormat NUnitXml
     }
+
+    if($LastExitCode -ne 0) {
+        # Generate HTML version of report
+        if(Test-Path $pesterTestResultsFile) {
+            .$reportUnitExe $pesterTestResultsFile $pesterTestResultsHtmlFile
+        }
+
+        throw 'There were failed unit tests.'
+    }
+
     popd
 }
 
@@ -114,10 +128,19 @@ Task Clean-Artifacts {
     if (Test-Path "$baseDir\buildArtifacts") {
       Remove-Item "$baseDir\buildArtifacts" -Recurse -Force
     }
+
     mkdir "$baseDir\buildArtifacts"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.Azure"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.Bootstrapper"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.Chocolatey"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.Common"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.HyperV"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.TestRunner"
+    mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.WinConfig"
 }
 
-Task Pack-Nuget -depends Clean-Artifacts -description 'Packs the modules and example packages' {
+Task Pack-Nuget -depends Sign-PowerShellFiles -description 'Packs the modules and example packages' {
     if (Test-Path "$baseDir\buildPackages\*.nupkg") {
       Remove-Item "$baseDir\buildPackages\*.nupkg" -Force
     }
@@ -225,14 +248,12 @@ task Install-Win8SDK {
     if(!(Test-Path "$env:ProgramFiles\Windows Kits\8.1\bin\x64\signtool.exe")) { cinst windows-sdk-8.1 -y }
 }
 
-task Install-WebAppTargets {
-    if(!(Test-Path "$env:ChocolateyInstall\lib\MSBuild.Microsoft.VisualStudio.Web.targets\tools\VSToolsPath\WebApplications\Microsoft.WebApplication.targets")) {
-        cinst MSBuild.Microsoft.VisualStudio.Web.targets -source https://packages.nuget.org/v1/FeedService.svc/ -version '12.0.4' -y
-    }
-}
-
 task Install-WebDeploy {
     if(!(Test-Path "$env:ProgramW6432\IIS\Microsoft Web Deploy V3")) { cinst webdeploy -y }
+}
+
+Task Restore-NuGetPackages {
+    exec { .$nugetExe restore "$baseDir\Boxstarter.sln" }
 }
 
 task Install-ChocoLib {
@@ -243,6 +264,42 @@ task Install-ChocoLib {
     Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.5\lib\* $basedir\Boxstarter.Chocolatey\chocolatey
     Remove-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3 -Recurse -Force
     Remove-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.5 -Recurse -Force
+}
+
+task Copy-PowerShellFiles -depends Clean-Artifacts {
+    $tempNuGetDirectory = "$basedir\buildArtifacts\tempNuGetFolders"
+    $exclude = @("bin", "obj")
+
+    Copy-Item -Path $basedir\BuildScripts\chocolateyinstall.ps1 -Destination $tempNuGetDirectory
+    Copy-Item -Path $basedir\BuildScripts\setup.ps1 -Destination $tempNuGetDirectory
+    Copy-Item -Path $basedir\BuildScripts\nuget\Boxstarter.Azure.PreInstall.ps1 -Destination $tempNuGetDirectory
+    Copy-Item -Path $basedir\BuildScripts\BoxstarterChocolateyInstall.ps1 -Destination $tempNuGetDirectory
+    Copy-Item -Path $basedir\BoxstarterShell.ps1 -Destination $tempNuGetDirectory
+
+    Copy-Item -Path $basedir\Boxstarter.Azure\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.Azure -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.Bootstrapper\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.Bootstrapper -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.Chocolatey\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.Chocolatey -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.Common\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.Common -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.HyperV\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.HyperV -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.TestRunner\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.TestRunner -Exclude $exclude
+    Copy-Item -Path $basedir\Boxstarter.WinConfig\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.WinConfig -Exclude $exclude
+}
+
+task Sign-PowerShellFiles -depends Copy-PowerShellFiles {
+    $timestampServer = "http://timestamp.digicert.com"
+    $certPfx = "$env:CHOCOLATEY_OFFICIAL_CERT"
+    $certPasswordFile = "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
+
+    if($certPfx -And $certPasswordFile -And (Test-Path $certPfx) -And (Test-Path $certPasswordFile)) {
+        $certPassword = Get-Content "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
+        $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPfx, $certPassword)
+        $tempNuGetDirectory = "$basedir\buildArtifacts\tempNuGetFolders"
+        $powerShellFiles = Get-ChildItem -Path $tempNuGetDirectory -Recurse -Include @("*.ps1", "*.psm1", "*.psd1") -File
+        Set-AuthenticodeSignature -Filepath $powerShellFiles -Cert $cert -TimeStampServer $timestampServer -IncludeChain NotRoot -HashAlgorithm SHA256
+    }
+    else {
+        Write-Host "Unable to sign PowerShell files, as unable to locate certificate and/or password."
+    }
 }
 
 function PackDirectory($path, [switch]$AddReleaseNotes){
