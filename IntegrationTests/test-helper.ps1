@@ -84,7 +84,7 @@ function New-TestResult($result, $session, $credential) {
 }
 
 function start-task($session, $credential, $packageName) {
-    Invoke-Command -Session $session { 
+    Invoke-Command -Session $session {
         param($Credential, $packageName)
         Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
         # write-host "$(get-command -module boxstarter.chocolatey | fl | out-string)"
@@ -103,16 +103,16 @@ function start-task($session, $credential, $packageName) {
 function Setup-BoxstarterModuleAndLocalRepo($BaseDir, $session){
     Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | out-Null }
     Send-File "$BaseDir\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
-    Get-ChildItem "$BaseDir\BuildPackages\*.nupkg" | % { 
+    Get-ChildItem "$BaseDir\BuildPackages\*.nupkg" | % {
         Write-host "Copying $($_.Name) to $($Session.ComputerName)"
-        Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $session 
+        Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $session
     }
     Write-Host "Expanding modules on $($Session.ComputerName)"
     Invoke-Command -Session $Session {
         Set-ExecutionPolicy Bypass -Force
-        $shellApplication = new-object -com shell.application 
-        $zipPackage = $shellApplication.NameSpace("$env:temp\Boxstarter\Boxstarter.zip") 
-        $destinationFolder = $shellApplication.NameSpace("$env:temp\boxstarter") 
+        $shellApplication = new-object -com shell.application
+        $zipPackage = $shellApplication.NameSpace("$env:temp\Boxstarter\Boxstarter.zip")
+        $destinationFolder = $shellApplication.NameSpace("$env:temp\boxstarter")
         $destinationFolder.CopyHere($zipPackage.Items(),0x10)
         [xml]$configXml = Get-Content (Join-Path $env:temp\Boxstarter BoxStarter.config)
         if($configXml.config.LocalRepo -ne $null) {
@@ -126,14 +126,14 @@ function wait-task([ref]$session, $ConnectionURI, $credential) {
     if(!(Test-Session $session.value)) {
         if($session.value -ne $null) {
             write-host "session failed $($session.value.Availability)"
-            try { 
+            try {
                     Remove-PSSession $session.value -ErrorAction SilentlyContinue
                     Write-Host "removed session after test failure"
-                } 
+                }
                 catch {}
         }
         $session.value = $null
-        try { 
+        try {
                 $session.value = New-PsSession -ConnectionURI $ConnectionURI -Credential $Credential -ErrorAction Stop
                 Write-Host "created new session. Availability: $($session.value.Availability)"
             }

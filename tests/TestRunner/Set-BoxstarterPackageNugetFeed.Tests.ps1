@@ -1,13 +1,13 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.TestRunner){Remove-Module Boxstarter.TestRunner}
-Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.TestRunner\*.ps1 | 
-    ? { $_.Path -like "*-*" } | 
+Resolve-Path $here\..\..\Boxstarter.TestRunner\*.ps1 |
+    ? { $_.Path -like "*-*" } |
     % { . $_.ProviderPath }
 
 Describe "Set-BoxstarterPackageNugetFeed" {
@@ -30,7 +30,7 @@ Describe "Set-BoxstarterPackageNugetFeed" {
         New-BoxstarterPackage -name package1
         [Uri]$feed="http://default"
         Set-BoxstarterDeployOptions -DefaultNugetFeed $feed
-        
+
         $result = Get-BoxstarterPackageNugetFeed -PackageName package1
 
         it "should return the default feed" {
@@ -40,8 +40,8 @@ Describe "Set-BoxstarterPackageNugetFeed" {
 
     Context "setting a feed for an nonexistent package" {
         [Uri]$feed="http://default"
-        
-        try { 
+
+        try {
             Set-BoxstarterPackageNugetFeed -PackageName package1 -NugetFeed $feed
         }
         catch{

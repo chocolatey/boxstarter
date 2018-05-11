@@ -1,13 +1,13 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
-Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
 
 $Boxstarter.BaseDir=(split-path -parent (split-path -parent $here))
 $Boxstarter.SuppressLogging=$true
-Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 
 function DISM { return; }
@@ -22,7 +22,7 @@ Describe "Getting-Chocolatey" {
     Context "When a reboot is pending and reboots are OK" {
         Mock Test-PendingReboot {$true}
         $boxstarter.RebootOk=$true
-        
+
         Chocolatey Install pkg
 
         it "will Invoke-Reboot" {
@@ -30,13 +30,13 @@ Describe "Getting-Chocolatey" {
         }
         it "will not get Chocolatey" {
             Assert-MockCalled Call-Chocolatey -times 0
-        }        
+        }
     }
 
     Context "When Boxstarter is restarting from a nested package" {
         $Boxstarter.IsRebooting=$true
         $boxstarter.RebootOk=$true
-        
+
         Chocolatey Install pkg
 
         it "will Invoke-Reboot" {
@@ -51,7 +51,7 @@ Describe "Getting-Chocolatey" {
     Context "When a reboot is pending but reboots are not OK" {
         Mock Test-PendingReboot {$true}
         $boxstarter.RebootOk=$false
-        
+
         Chocolatey Install pkg
 
         it "will not Invoke-Reboot" {
@@ -59,7 +59,7 @@ Describe "Getting-Chocolatey" {
         }
         it "will get Chocolatey" {
             Assert-MockCalled Call-Chocolatey -times 1
-        }        
+        }
     }
 
     Context "When chocolatry strips the machine module path" {
@@ -72,20 +72,20 @@ Describe "Getting-Chocolatey" {
 
         it "will append machine module path" {
             $env:PSModulePath.EndsWith([System.Environment]::GetEnvironmentVariable("PSModulePath","Machine")) | should be $true
-        }        
+        }
     }
 
     Context "When Installing multiple packages" {
         $packages=@("package1","package2")
-        
+
         Chocolatey Install $packages
 
         it "will get chocolatey for package1" {
             Assert-MockCalled Call-Chocolatey -ParameterFilter {$packageNames -eq "package1"} -times 1
-        }        
+        }
         it "will get chocolatey for package2" {
             Assert-MockCalled Call-Chocolatey -ParameterFilter {$packageNames -eq "package2"} -times 1
-        }        
+        }
     }
 
     Context "When chocolatey throws a reboot error and reboots are OK" {
@@ -107,7 +107,7 @@ Describe "Getting-Chocolatey" {
         $boxstarter.RebootOk=$true
         Mock Remove-Item
         Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '-654'."}
-        
+
         Chocolatey Install pkg -RebootCodes @(56,3010,-654) 2>&1 | out-null
 
         it "will Invoke-Reboot" {
@@ -122,7 +122,7 @@ Describe "Getting-Chocolatey" {
         $boxstarter.RebootOk=$true
         Mock Remove-Item
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'." }
-        
+
         Chocolatey Install pkg -RebootCodes @(56,-654) 2>&1 | out-null
 
         it "will Invoke-Reboot when a default code is called too" {
@@ -146,15 +146,15 @@ Describe "Getting-Chocolatey" {
 
     Context "When WindowsFeature is already installed" {
         Mock DISM {"State : Enabled"}
-        
+
         Chocolatey Install "somefeature" -source "WindowsFeatures" | out-null
 
         it "will not Call Chocolatey" {
             Assert-MockCalled Call-Chocolatey -times 0
         }
-    }   
+    }
 
-    Context "When WindowsFeature is not already installed" {       
+    Context "When WindowsFeature is not already installed" {
         Chocolatey Install "somefeature" -source "WindowsFeatures" | out-null
 
         it "will Call Chocolatey" {
@@ -177,7 +177,7 @@ Describe "Getting-Chocolatey" {
     Context "When chocolatey returns an erroneous exit code" {
         Mock Call-Chocolatey {[System.Environment]::ExitCode=1}
         $Boxstarter.IsRebooting=$false
-        
+
         $error = Chocolatey Install pkg 2>&1
 
         it "will write a warning" {
@@ -186,7 +186,7 @@ Describe "Getting-Chocolatey" {
         [System.Environment]::ExitCode=0
     }
 
-    Context "When a reboot is not pending" {       
+    Context "When a reboot is not pending" {
         Chocolatey Install pkg
 
         it "will not Invoke-Reboot" {
@@ -194,7 +194,7 @@ Describe "Getting-Chocolatey" {
         }
         it "will get Chocolatey" {
             Assert-MockCalled Call-Chocolatey -times 1
-        }        
+        }
     }
 }
 
@@ -446,7 +446,7 @@ Describe "Export-BoxstarterVars" {
         PowerShell -Command {
             Import-Module '$($boxstarter.BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1' -DisableNameChecking -ArgumentList `$true
             `$Boxstarter | ConvertTo-Json | Write-Output
-        } 
+        }
 "@
     $boxstarterJson = ConvertFrom-Json $script:out
 

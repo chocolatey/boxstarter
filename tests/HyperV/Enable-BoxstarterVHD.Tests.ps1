@@ -27,19 +27,19 @@ function Clean-VHD {
 Describe "Enable-BoxstarterVHD" {
     try{
         Remove-Module boxstarter.*
-        Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+        Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
         % { . $_.ProviderPath }
-        Resolve-Path $here\..\..\boxstarter.Chocolatey\*.ps1 | 
+        Resolve-Path $here\..\..\boxstarter.Chocolatey\*.ps1 |
         % { . $_.ProviderPath }
-        Resolve-Path $here\..\..\boxstarter.HyperV\*.ps1 | 
+        Resolve-Path $here\..\..\boxstarter.HyperV\*.ps1 |
         % { . $_.ProviderPath }
         $Boxstarter.SuppressLogging=$true
         mkdir $env:temp\Boxstarter.tests -force | Out-Null
         $testRoot="$env:temp\Boxstarter.tests"
-        $v = new-vhd -Path $testRoot\test.vhdx -SizeBytes 200MB | 
-          Mount-VHD -PassThru | 
-          Initialize-Disk -PartitionStyle mbr -Confirm:$false -PassThru | 
-          New-Partition -UseMaximumSize -AssignDriveLetter -MbrType IFS | 
+        $v = new-vhd -Path $testRoot\test.vhdx -SizeBytes 200MB |
+          Mount-VHD -PassThru |
+          Initialize-Disk -PartitionStyle mbr -Confirm:$false -PassThru |
+          New-Partition -UseMaximumSize -AssignDriveLetter -MbrType IFS |
           Format-Volume -NewFileSystemLabel "VHD" -Confirm:$false
         Get-PSDrive | Out-Null
         mkdir "$($v.DriveLetter):\Windows\System32\config" | Out-Null
@@ -215,7 +215,7 @@ Describe "Enable-BoxstarterVHD" {
             It "Should throw a InvalidOperation Exception"{
                 $err.CategoryInfo.Reason | should be "InvalidOperationException"
             }
-        }        
+        }
     }
     finally{
         [GC]::Collect()

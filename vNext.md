@@ -15,9 +15,9 @@ This is up for debate. The thought being maybe you have a bunch of install autom
 
 **Current workflow**
 ```
-Install-BoxstarterPackage(entry point) -> 
-Invoke-ChocolateyBoxstarter -> 
-Invoke-Boxstarter -> 
+Install-BoxstarterPackage(entry point) ->
+Invoke-ChocolateyBoxstarter ->
+Invoke-Boxstarter ->
 Invoke-ChocolateyBoxstarter
 ```
 
@@ -49,7 +49,7 @@ Once some design decisions have been ironed out, it may make more sense to remai
 ### Boxstarter core as entry point
 
 ```
-Invoke-Boxstarter(includes install boxstarter package) -> 
+Invoke-Boxstarter(includes install boxstarter package) ->
 Invoke-ChocolateyBoxstarter(or other  provisioner(s))
 ```
 
@@ -62,11 +62,11 @@ Invoke-ChocolateyBoxstarter(or other  provisioner(s))
 
 ### Provisioner defines entry point
 ```
-Invoke-ChocolateyBoxstarter -> 
+Invoke-ChocolateyBoxstarter ->
 Invoke-Boxstarter
 ```
 
-* The provisioner is the entry point that adheres to an interface defined by boxstarter core and calls its API 
+* The provisioner is the entry point that adheres to an interface defined by boxstarter core and calls its API
 * Allows for a calling syntax that cators to the specifics of the provisioner
 
 **Problems**

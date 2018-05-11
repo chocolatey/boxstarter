@@ -1,12 +1,12 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 Remove-Module boxstarter.*
-Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Azure\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Azure\*.ps1 |
     % { . $_.ProviderPath }
 Import-AzureModule
 
@@ -113,9 +113,9 @@ Describe "Enable-BoxstarterVM.Azure" {
     }
 
     Context "When CurrentStorageAccountName has not been set"{
-        Mock Get-AzureSubscription {@{ 
+        Mock Get-AzureSubscription {@{
             SubscriptionName="subName"
-            CurrentStorageAccountName=$null 
+            CurrentStorageAccountName=$null
         }}
         Mock Get-AzureStorageAccount {@(
             @{

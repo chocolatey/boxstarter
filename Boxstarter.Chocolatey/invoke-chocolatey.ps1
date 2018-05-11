@@ -1,6 +1,6 @@
 function Invoke-Chocolatey($chocoArgs) {
     Write-BoxstarterMessage "Current runtime is $($PSVersionTable.CLRVersion)" -Verbose
-    $refs = @( 
+    $refs = @(
         "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/log4net.dll",
         "$($Boxstarter.BaseDir)/boxstarter.chocolatey/chocolatey/chocolatey.dll"
     )
@@ -33,7 +33,7 @@ namespace Boxstarter
     public class ChocolateyWrapper
     {
         private static GetChocolatey _choco;
-        
+
         public ChocolateyWrapper(string boxstarterSetup, PSHostUserInterface ui, bool logDebug, bool logVerbose, string logPath, bool quiet) {
             if (_choco == null) {
                 _choco = Lets.GetChocolatey();
@@ -91,7 +91,7 @@ namespace Boxstarter
             WriteLog(
                 message,
                 x => {
-                        if(x.Trim().StartsWith("Boxstarter: ") || x.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
+                        if(x.Trim().StartsWith("Boxstarter: ") || x.Replace("+","").Trim().StartsWith("Boxstarter ")){
                             _ui.RawUI.ForegroundColor = ConsoleColor.Green;
                         }
                         else {
@@ -113,7 +113,7 @@ namespace Boxstarter
             WriteLog(
                 message,
                 x => {
-                        if(x.Trim().StartsWith("Boxstarter: ") || x.Replace("+","").Trim().StartsWith("Boxstarter ")){ 
+                        if(x.Trim().StartsWith("Boxstarter: ") || x.Replace("+","").Trim().StartsWith("Boxstarter ")){
                             _ui.RawUI.ForegroundColor = ConsoleColor.Green;
                         }
                         else {
@@ -210,7 +210,7 @@ namespace Boxstarter
             }
             finally{
                 _ui.RawUI.ForegroundColor = origColor;
-            }            
+            }
         }
 
         private void WriteRaw(string message)
@@ -220,7 +220,7 @@ namespace Boxstarter
             try {
                 using (FileStream fs = new FileStream(_path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
                 {
-                    using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8)) 
+                    using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8))
                     {
                         sw.WriteLine(message);
                     }
@@ -244,7 +244,7 @@ namespace Boxstarter
     if(!(Test-Path "$env:ChocolateyInstall\lib")) {
         mkdir "$env:ChocolateyInstall\lib" | Out-Null
     }
-    
+
     if(!$global:choco) {
         Write-BoxstarterMessage "instantiating choco wrapper..." -Verbose
         $global:choco = New-Object -TypeName boxstarter.ChocolateyWrapper -ArgumentList `
@@ -256,7 +256,7 @@ namespace Boxstarter
           $boxstarter.SuppressLogging
     }
 
-    Enter-BoxstarterLogable { 
+    Enter-BoxstarterLogable {
         Write-BoxstarterMessage "calling choco now with $chocoArgs" -Verbose
         $cd = [System.IO.Directory]::GetCurrentDirectory()
         try {

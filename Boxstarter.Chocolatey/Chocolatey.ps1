@@ -1,6 +1,6 @@
 function Install-ChocolateyInstallPackageOverride {
 param(
-  [string] $packageName, 
+  [string] $packageName,
   [string] $fileType = 'exe',
   [string] $silentArgs = '',
   [alias("fileFullPath")][string] $file,
@@ -22,8 +22,8 @@ Install-ChocolateyInstallPackage $(Expand-Splat $PSBoundParameters)
 function Write-HostOverride {
 param(
   [Parameter(Position=0,Mandatory=$false,ValueFromPipeline=$true, ValueFromRemainingArguments=$true)][object] $Object,
-  [Parameter()][switch] $NoNewLine, 
-  [Parameter(Mandatory=$false)][ConsoleColor] $ForegroundColor, 
+  [Parameter()][switch] $NoNewLine,
+  [Parameter(Mandatory=$false)][ConsoleColor] $ForegroundColor,
   [Parameter(Mandatory=$false)][ConsoleColor] $BackgroundColor,
   [Parameter(Mandatory=$false)][Object] $Separator
 )
@@ -52,7 +52,7 @@ function cinst {
 .SYNOPSIS
 Intercepts Chocolatey call to check for reboots
 
-#>    
+#>
     param(
         [string[]]$packageNames=@('')
     )
@@ -64,7 +64,7 @@ function choco {
 .SYNOPSIS
 Intercepts Chocolatey call to check for reboots
 
-#>    
+#>
     param(
         [string]$command,
         [string[]]$packageNames=@('')
@@ -77,7 +77,7 @@ function cup {
 .SYNOPSIS
 Intercepts Chocolatey call to check for reboots
 
-#>    
+#>
     param(
         [string[]]$packageNames=@('')
     )
@@ -89,7 +89,7 @@ function chocolatey {
 .SYNOPSIS
 Intercepts Chocolatey call to check for reboots
 
-#>  
+#>
     param(
         [string]$command,
         [string[]]$packageNames=@('')
@@ -98,7 +98,7 @@ Intercepts Chocolatey call to check for reboots
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
     $packageNames=-split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
-    
+
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
         if((Get-PassedArg @("source", "s") $args) -eq "WindowsFeatures"){
@@ -131,7 +131,7 @@ Intercepts Chocolatey call to check for reboots
                 $currentErrorCount += 1
             }
         }
-        catch { 
+        catch {
             #Only write the error to the error stream if it was not previously
             #written by chocolatey
             $chocoErrors = $global:error.Count - $currentErrorCount
@@ -194,7 +194,7 @@ function Get-PassedArg($argName, $origArgs) {
             $parts = $_.split("=", 2)
             $nextIsValue = $false
             $val = $parts[1]
-        }        
+        }
     }
 
     return $val
@@ -228,7 +228,7 @@ function Call-Chocolatey {
     }
 
     $restartFile = "$(Get-BoxstarterTempDir)\Boxstarter.$PID.restart"
-    if(Test-Path $restartFile) { 
+    if(Test-Path $restartFile) {
         Write-BoxstarterMessage "found $restartFile we are restarting"
         $Boxstarter.IsRebooting = $true
         remove-item $restartFile -Force
@@ -244,7 +244,7 @@ function Invoke-LocalChocolatey($chocoArgs) {
         $global:Boxstarter.DisableRestart = $true
     }
     Export-BoxstarterVars
- 
+
     Enter-DotNet4 {
         if($env:BoxstarterVerbose -eq 'true'){
             $global:VerbosePreference = "Continue"
@@ -307,14 +307,14 @@ function Remove-ChocolateyPackageInProgress($packageName) {
     $pkgDir = "$env:ChocolateyInstall\lib\$packageName"
     if(Test-Path $pkgDir) {
         Write-BoxstarterMessage "Removing $pkgDir in progress" -Verbose
-        remove-item $pkgDir -Recurse -Force -ErrorAction SilentlyContinue  
+        remove-item $pkgDir -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
 function Expand-Splat($splat){
     $ret=""
     ForEach($item in $splat.KEYS.GetEnumerator()) {
-        $ret += "-$item$(Resolve-SplatValue $splat[$item]) " 
+        $ret += "-$item$(Resolve-SplatValue $splat[$item]) "
     }
     Write-BoxstarterMessage "Expanded splat to $ret"
     return $ret
@@ -406,7 +406,7 @@ function Import-BoxstarterVars {
 
     $varsToImport = @()
     Get-ChildItem -Path env: | ? { $_.Name.StartsWith('BEX.') } | % { $varsToImport += $_.Name }
-    
+
     $varsToImport | % { Import-FromEnvironment $_ global }
 
     $boxstarter.SourcePID = $env:BoxstarterSourcePID

@@ -2,11 +2,11 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 Describe "Enable-BoxstarterVM" {
     Remove-Module boxstarter.*
-    Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+    Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
-    Resolve-Path $here\..\..\boxstarter.Chocolatey\*.ps1 | 
+    Resolve-Path $here\..\..\boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
-    Resolve-Path $here\..\..\boxstarter.HyperV\*.ps1 | 
+    Resolve-Path $here\..\..\boxstarter.HyperV\*.ps1 |
     % { . $_.ProviderPath }
     Remove-Item alias:\Enable-BoxstarterVM
 
@@ -99,7 +99,7 @@ Describe "Enable-BoxstarterVM" {
         Mock Enable-BoxstarterClientRemoting {return $True}
         Mock Invoke-Command
         Mock Get-VMGuestComputerName { "SomeComputer" }
-        
+
         Enable-BoxstarterVM Me -Credential $mycreds | Out-Null
 
         It "Should Edit VHD"{
@@ -113,7 +113,7 @@ Describe "Enable-BoxstarterVM" {
         Mock Invoke-Command
         Mock Test-WSMan { return New-Object -TypeName PSObject }
         Mock Get-VMGuestComputerName { "SomeComputer" }
-        
+
         Enable-BoxstarterVM Me -Credential $mycreds | Out-Null
 
         It "Should Edit VHD but ignore wmi"{
@@ -127,7 +127,7 @@ Describe "Enable-BoxstarterVM" {
         Mock Invoke-Command
         Mock Invoke-WmiMethod { return New-Object -TypeName PSObject }
         Mock Get-VMGuestComputerName { "SomeComputer" }
-        
+
         Enable-BoxstarterVM Me -Credential $mycreds | Out-Null
 
         It "Should Edit VHD but ignore wmi"{
@@ -141,7 +141,7 @@ Describe "Enable-BoxstarterVM" {
         Mock Invoke-Command
         Mock Invoke-WmiMethod { throw New-Object -TypeName UnauthorizedAccessException  }
         Mock Get-VMGuestComputerName { "SomeComputer" }
-        
+
         try{Enable-BoxstarterVM Me -Credential $mycreds | Out-Null} catch{}
 
         It "Should Edit VHD but ignore wmi"{
@@ -156,7 +156,7 @@ Describe "Enable-BoxstarterVM" {
         Mock Test-WSMan { return New-Object -TypeName PSObject }
         Mock Get-VMGuestComputerName { "SomeComputer" }
         $admincreds = New-Object System.Management.Automation.PSCredential ("administrator", $secpasswd)
-        
+
         Enable-BoxstarterVM Me -Credential $admincreds | Out-Null
 
         It "Should not Edit VHD"{
@@ -173,7 +173,7 @@ Describe "Enable-BoxstarterVM" {
         Mock Invoke-Command
         Mock Get-VMGuestComputerName { "SomeComputer" }
         $admincreds = New-Object System.Management.Automation.PSCredential ("administrator", $secpasswd)
-        
+
         Enable-BoxstarterVM Me -Credential $admincreds | Out-Null
 
         It "Should Edit VHD but ignore IgnoreLocalAccountTokenFilterPolicy"{
@@ -187,7 +187,7 @@ Describe "Enable-BoxstarterVM" {
         Mock Invoke-Command
         Mock Get-VMGuestComputerName { "SomeComputer" }
         $admincreds = New-Object System.Management.Automation.PSCredential ("SomeComputer\administrator", $secpasswd)
-        
+
         Enable-BoxstarterVM Me -Credential $admincreds | Out-Null
 
         It "Should Edit VHD but ignore IgnoreLocalAccountTokenFilterPolicy"{
@@ -201,7 +201,7 @@ Describe "Enable-BoxstarterVM" {
         Mock Invoke-Command
         Mock Get-VMGuestComputerName { "SomeComputer" }
         $admincreds = New-Object System.Management.Automation.PSCredential ("SomeDomain\administrator", $secpasswd)
-        
+
         Enable-BoxstarterVM Me -Credential $admincreds | Out-Null
 
         It "Should Edit VHD but ignore IgnoreLocalAccountTokenFilterPolicy"{
@@ -214,7 +214,7 @@ Describe "Enable-BoxstarterVM" {
         Mock Enable-BoxstarterClientRemoting {return $True}
         Mock Invoke-Command { return new-Object -TypeName PSObject }
         Mock Get-VMGuestComputerName { "SomeComputer" }
-        
+
         $result = Enable-BoxstarterVM Me -Credential $mycreds
 
         It "Should not Edit VHD"{

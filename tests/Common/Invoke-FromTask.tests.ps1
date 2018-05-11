@@ -8,7 +8,7 @@ schtasks /CREATE /TN 'Boxstarter Task' /SC WEEKLY /RL HIGHEST `
 
 Describe "Invoke-FromTask" {
     Remove-Module boxstarter.*
-    Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+    Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
         % { . $_.ProviderPath }
     $Boxstarter.SuppressLogging=$true
     $mycreds = New-Object System.Management.Automation.PSCredential ("$env:username", (New-Object System.Security.SecureString))

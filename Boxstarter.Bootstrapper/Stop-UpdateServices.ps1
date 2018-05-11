@@ -18,7 +18,7 @@ function Stop-CCMEXEC {
     if($ccm) {
         set-service CCMEXEC -startuptype disabled
         do {
-            if($ccm.CanStop) { 
+            if($ccm.CanStop) {
                 Write-boxstartermessage "Stopping Configuration Manager"
                 Enter-BoxstarterLogable { Stop-Service CCMEXEC }
                 return

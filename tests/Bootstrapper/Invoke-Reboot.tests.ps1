@@ -1,10 +1,10 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.bootstrapper){Remove-Module boxstarter.bootstrapper}
-Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
 $Boxstarter.BoxstarterUser="user"
 $Boxstarter.SuppressLogging=$true
@@ -20,7 +20,7 @@ Describe "Invoke-Reboot" {
     Context "When reboots are suppressed" {
         $Boxstarter.RebootOk=$false
         $Boxstarter.IsRebooting=$false
-        
+
         Invoke-Reboot
 
         it "will not create Restart script file" {

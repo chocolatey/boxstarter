@@ -6,12 +6,12 @@ if(!$Boxstarter.ContainsKey('RebootOk')) { $Boxstarter.RebootOk=$true }
 
 $unNormalized=(Get-Item "$PSScriptRoot\..\Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1")
 Import-Module $unNormalized.FullName -global -DisableNameChecking
-Resolve-Path $PSScriptRoot\*.ps1 | 
+Resolve-Path $PSScriptRoot\*.ps1 |
     % { . $_.ProviderPath }
 
-if($ExportCommands) { 
+if($ExportCommands) {
     Import-BoxstarterVars
-    Export-ModuleMember cinst, cup, choco 
+    Export-ModuleMember cinst, cup, choco
 }
 
 Export-ModuleMember Get-BoxstarterConfig,`

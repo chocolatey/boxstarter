@@ -1,10 +1,10 @@
 ﻿$here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
-Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "Invoke-BoxstarterBuild" {
@@ -38,7 +38,7 @@ Describe "Invoke-BoxstarterBuild" {
 
 
     Context "When LocalRepo is null" {
-        Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}        
+        Mock Write-Host -parameterFilter {$ForegroundColor -eq $null}
         New-BoxstarterPackage $packageName | Out-Null
         $boxstarter.LocalRepo = $null
 

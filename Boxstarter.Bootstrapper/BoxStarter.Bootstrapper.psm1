@@ -1,4 +1,4 @@
-Resolve-Path $PSScriptRoot\*.ps1 | 
+Resolve-Path $PSScriptRoot\*.ps1 |
     % { . $_.ProviderPath }
 
 Import-Module (Join-Path $Boxstarter.BaseDir Boxstarter.WinConfig\BoxStarter.WinConfig.psd1) -global -DisableNameChecking

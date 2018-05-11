@@ -1,10 +1,10 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.bootstrapper){Remove-Module boxstarter.bootstrapper}
-Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
 $Boxstarter.SuppressLogging=$true
 $Boxstarter.BaseDir=(split-path -parent (split-path -parent $here))
@@ -221,7 +221,7 @@ Describe "Invoke-Boxstarter" {
             $result[0] | should Match "ERROR:"
         }
     }
-  
+
       Context "When A reboot is invoked" {
         Mock Get-UAC
         Mock Set-SecureAutoLogon
@@ -403,7 +403,7 @@ Describe "Invoke-Boxstarter" {
         Mock RestartNow
         Mock Read-AuthenticatedPassword
         $Boxstarter.IsRebooting=$true
-        
+
         Invoke-Boxstarter {return} -RebootOk | Out-Null
 
         it "will Not Set AutoLogin" {

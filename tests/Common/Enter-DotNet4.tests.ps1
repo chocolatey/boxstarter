@@ -1,8 +1,8 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 Remove-Module boxstarter.*
-Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
 $Boxstarter.SuppressLogging=$true
 

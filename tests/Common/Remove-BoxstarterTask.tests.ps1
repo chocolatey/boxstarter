@@ -2,7 +2,7 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 Describe "Remove-BoxstarterTask" {
     Remove-Module boxstarter.*
-    Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+    Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
         % { . $_.ProviderPath }
     $Boxstarter.SuppressLogging=$true
 

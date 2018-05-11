@@ -1,13 +1,13 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.TestRunner){Remove-Module Boxstarter.TestRunner}
-Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.TestRunner\*.ps1 | 
-    ? { $_.Path -like "*-*" } | 
+Resolve-Path $here\..\..\Boxstarter.TestRunner\*.ps1 |
+    ? { $_.Path -like "*-*" } |
     % { . $_.ProviderPath }
 
 Describe "Publish-BoxstarterPackage" {
@@ -34,10 +34,10 @@ Describe "Publish-BoxstarterPackage" {
         $result = $pkgName | Publish-BoxstarterPackage
 
         it "Should return the name of the published package" {
-            $result.Package | should be $pkgName 
+            $result.Package | should be $pkgName
         }
         it "Should return the feed of the published package" {
-            $result.Feed | should be $feed 
+            $result.Feed | should be $feed
         }
         it "Should have matching repo and published versions" {
             $result.PublishedVersion | should be $publishedVersion
@@ -48,7 +48,7 @@ Describe "Publish-BoxstarterPackage" {
         $global:Error.Clear()
         $pkgName="package1"
 
-        $result = Publish-BoxstarterPackage "package1" 2>$err 
+        $result = Publish-BoxstarterPackage "package1" 2>$err
 
         it "Package returned should have package name" {
             $result.Package | should be "package1"
@@ -71,7 +71,7 @@ Describe "Publish-BoxstarterPackage" {
             }
         }
 
-        $result = Publish-BoxstarterPackage $pkgName 2>$err 
+        $result = Publish-BoxstarterPackage $pkgName 2>$err
 
         it "should write InvalidArgument error" {
             $global:Error[0].CategoryInfo.Category | should be "InvalidOperation"
@@ -95,7 +95,7 @@ Describe "Publish-BoxstarterPackage" {
             }
         }
 
-        $result = Publish-BoxstarterPackage $pkgName 2>$err 
+        $result = Publish-BoxstarterPackage $pkgName 2>$err
 
         it "should write InvalidArgument error" {
             $global:Error[0].CategoryInfo.Category | should be "InvalidOperation"
@@ -123,7 +123,7 @@ Describe "Publish-BoxstarterPackage" {
         Mock Invoke-NugetPush { & "$env:ChocolateyInstall\bin\Nuget.exe" push "yadayadayada"  }
         Mock Get-BoxstarterPackagePublishedVersion { [Version]"2.0.0.0" }
 
-        $result = Publish-BoxstarterPackage $pkgName 2>$err 
+        $result = Publish-BoxstarterPackage $pkgName 2>$err
 
         it "should write nuget error" {
             $global:Error[0].Exception.Message | should be ($nugetError -Join ", ")
@@ -150,7 +150,7 @@ Describe "Publish-BoxstarterPackage" {
         $restException = new-Object -TypeName Exception -ArgumentList "blah"
         Mock Get-BoxstarterPackagePublishedVersion { throw $restException  }
 
-        $result = Publish-BoxstarterPackage $pkgName 2>$err 
+        $result = Publish-BoxstarterPackage $pkgName 2>$err
 
         it "should write nuget error" {
             $global:Error[0].Exception.Message | should be $restException.Message
@@ -175,7 +175,7 @@ Describe "Publish-BoxstarterPackage" {
             }
         }
         $Script:counter=0
-        Mock Get-BoxstarterPackagePublishedVersion { 
+        Mock Get-BoxstarterPackagePublishedVersion {
             $Script:counter += 1
             if($Script:counter -lt 3) {return "2.0.0.0"}else{return "3.0.0.0"}
         }

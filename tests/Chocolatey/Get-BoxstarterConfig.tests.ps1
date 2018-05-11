@@ -11,7 +11,7 @@ Describe "Get-BoxstarterConfig" {
 
     Context "When No LocalRepo is explicitly configured" {
         Copy-Item "$currentBase\Boxstarter.Config" $testRoot
-        
+
         $result = Get-BoxstarterConfig
 
         It "LocalRepo config value will equal the BuildPackages directory under base"{
@@ -21,7 +21,7 @@ Describe "Get-BoxstarterConfig" {
 
     Context "When NugetSorces have not been changed" {
         Copy-Item "$currentBase\Boxstarter.Config" $testRoot
-        
+
         $result = Get-BoxstarterConfig
 
         It "NugetSources will be the same as those in the original file"{
@@ -32,7 +32,7 @@ Describe "Get-BoxstarterConfig" {
     Context "When Setting NugetSorces to a new value" {
         Copy-Item "$currentBase\Boxstarter.Config" $testRoot
         $expected = "Some Nuget Source"
-        
+
         Set-BoxstarterConfig -NugetSources $expected
 
         It "Get-BoxstarterConfig will reflect the set NugetSources"{
@@ -46,7 +46,7 @@ Describe "Get-BoxstarterConfig" {
     Context "When Setting LocalRepo to a new value" {
         Copy-Item "$currentBase\Boxstarter.Config" $testRoot
         $expected = "$testRoot\CrazyRepo"
-        
+
         Set-BoxstarterConfig -LocalRepo $expected
 
         It "Get-BoxstarterConfig will reflect the set LocalRepo"{
@@ -61,7 +61,7 @@ Describe "Get-BoxstarterConfig" {
         Copy-Item "$currentBase\Boxstarter.Config" $testRoot
         $expected = "$testRoot\CrazyRepo"
         Push-Location $testRoot
-        
+
         Set-BoxstarterConfig -LocalRepo ".\CrazyRepo"
         pop-Location
 

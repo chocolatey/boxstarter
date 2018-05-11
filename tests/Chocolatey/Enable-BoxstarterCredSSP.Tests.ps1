@@ -1,13 +1,13 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.chocolatey){Remove-Module boxstarter.chocolatey}
 
-Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 $Boxstarter.SuppressLogging=$true
 
@@ -38,7 +38,7 @@ Describe "Enable-BoxstarterCredSSP" {
         It "will enable for computer"{
             Assert-MockCalled Enable-WSManCredSSP -ParameterFilter {$DelegateComputer -eq "blah"}
         }
-    }    
+    }
 
     Context "When credential delegation is not set for given computer" {
         New-Item $regRoot -Force | out-null
@@ -53,7 +53,7 @@ Describe "Enable-BoxstarterCredSSP" {
         It "will add computer to list"{
             (Get-ItemProperty -Path "$regRoot\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly" -Name 1).1 | should be "wsman/blah"
         }
-    }    
+    }
 
     Context "When credential delegation is not set for given computer and but it is set for other computers" {
         New-Item $regRoot -Force | out-null
@@ -69,7 +69,7 @@ Describe "Enable-BoxstarterCredSSP" {
         It "will add computer to list"{
             (Get-ItemProperty -Path "$regRoot\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly" -Name 2).2 | should be "wsman/blah"
         }
-    }    
+    }
 
     Context "When credential delegation is already set for given computer" {
         New-Item $regRoot -Force | out-null
@@ -89,5 +89,5 @@ Describe "Enable-BoxstarterCredSSP" {
             (Get-Item -Path "$regRoot\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly").Property.Length | should be 1
 
         }
-    }    
+    }
 }

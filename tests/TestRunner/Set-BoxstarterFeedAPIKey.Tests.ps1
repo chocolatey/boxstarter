@@ -1,14 +1,14 @@
 
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.TestRunner){Remove-Module Boxstarter.TestRunner}
-Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.TestRunner\*.ps1 | 
-    ? { $_.Path -like "*-*" } | 
+Resolve-Path $here\..\..\Boxstarter.TestRunner\*.ps1 |
+    ? { $_.Path -like "*-*" } |
     % { . $_.ProviderPath }
 
 Describe "Set-BoxstarterFeedAPIKey" {
@@ -47,7 +47,7 @@ Describe "Set-BoxstarterFeedAPIKey" {
     Context "feed has no key" {
         $key = [GUID]::NewGuid()
         [Uri]$feed="http://default"
-        
+
         $result = Get-BoxstarterFeedAPIKey -NugetFeed $feed
 
         it "should return null" {

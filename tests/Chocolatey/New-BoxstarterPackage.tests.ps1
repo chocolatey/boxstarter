@@ -1,10 +1,10 @@
 ﻿$here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
-Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "New-BoxstarterPackage" {
@@ -72,8 +72,8 @@ Describe "New-BoxstarterPackage" {
         It "Will Copy existing items" {
             join-path (Join-Path $Boxstarter.LocalRepo "$packageName\mypkg") "test.txt" | Should Exist
             join-path (Join-Path $Boxstarter.LocalRepo "$packageName\mypkg\dir1") "test1.txt" | Should Exist
-        }        
-    }    
+        }
+    }
 
     Context "When a Path is provided that has a nuspec" {
         mkdir (Join-Path $boxstarter.BaseDir "mypkg\dir1") |out-null
@@ -96,7 +96,7 @@ Describe "New-BoxstarterPackage" {
         It "Will not Create the chocolateyInstall" {
             get-content (join-path (Join-Path $Boxstarter.LocalRepo $packageName) "tools\chocolateyInstall.ps1") | Should be "my install"
         }
-    }    
+    }
 
     Context "When a LocalRepo is null" {
         $boxstarter.LocalRepo = $null
@@ -115,7 +115,7 @@ Describe "New-BoxstarterPackage" {
         It "Will throw Invalid Package ID" {
             $ex | Should match "Invalid Package ID"
         }
-    } 
+    }
 
     Context "When a package directory already exists" {
         mkdir (Join-Path $boxstarter.LocalRepo $packageName) |out-null
@@ -125,7 +125,7 @@ Describe "New-BoxstarterPackage" {
         It "Will throw Repo dir exists" {
             $ex | Should match "A LocalRepo already exists*"
         }
-    }    
+    }
 
     Context "When a path is provided that does not exist" {
         try {New-BoxstarterPackage $packageName $Description (Join-Path $boxstarter.BaseDir "mypkg") } catch { $ex=$_ }
@@ -133,5 +133,5 @@ Describe "New-BoxstarterPackage" {
         It "Will throw path does not exist" {
             $ex.exception.Message.EndsWith("could not be found") | Should be $true
         }
-    }    
+    }
 }

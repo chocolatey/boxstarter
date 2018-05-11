@@ -1,13 +1,13 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.chocolatey){Remove-Module boxstarter.chocolatey}
 
-Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 $Boxstarter.SuppressLogging=$true
 

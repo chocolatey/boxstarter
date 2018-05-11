@@ -2,7 +2,7 @@ function Cleanup-Boxstarter {
     param(
         [switch]$KeepWindowOpen,
         [switch]$DisableRestart)
-    if(Get-IsRemote){ 
+    if(Get-IsRemote){
         Remove-BoxstarterTask
     }
     Start-UpdateServices
@@ -11,7 +11,7 @@ function Cleanup-Boxstarter {
         del "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC"
         Enable-UAC
     }
-    if(!$Boxstarter.IsRebooting) { 
+    if(!$Boxstarter.IsRebooting) {
         Write-BoxstarterMessage "Cleaning up and not rebooting" -Verbose
         $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
         if( Test-Path "$Startup\boxstarter-post-restart.bat") {
@@ -38,7 +38,7 @@ function Cleanup-Boxstarter {
             Read-Host 'Type ENTER to exit'
         }
         return
-    } 
+    }
 
     if(!(Get-IsRemote -PowershellRemoting) -and !$DisableRestart){
         if(Get-UAC){

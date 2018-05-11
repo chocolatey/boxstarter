@@ -1,10 +1,10 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
-Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\Boxstarter.Chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 
 Describe "New-PackageFromScript" {
@@ -23,7 +23,7 @@ Describe "New-PackageFromScript" {
             Join-Path $Boxstarter.LocalRepo "$result.1.0.0.nupkg" | Should Exist
         }
         It "Will contain the script" {
-            Rename-Item "$($boxstarter.LocalRepo)\$result.1.0.0.nupkg" "$($boxstarter.LocalRepo)\$result.1.0.0.zip" 
+            Rename-Item "$($boxstarter.LocalRepo)\$result.1.0.0.nupkg" "$($boxstarter.LocalRepo)\$result.1.0.0.zip"
             $shell_app=new-object -com shell.application
             $filename = "$result.1.0.0.zip"
             $zip_file = $shell_app.namespace("$($boxstarter.LocalRepo)\$filename")
@@ -44,7 +44,7 @@ Describe "New-PackageFromScript" {
             Join-Path $Boxstarter.LocalRepo "$result.1.0.0.nupkg" | Should Exist
         }
         It "Will contain the script" {
-            Rename-Item "$($boxstarter.LocalRepo)\$result.1.0.0.nupkg" "$($boxstarter.LocalRepo)\$result.1.0.0.zip" 
+            Rename-Item "$($boxstarter.LocalRepo)\$result.1.0.0.nupkg" "$($boxstarter.LocalRepo)\$result.1.0.0.zip"
             $shell_app=new-object -com shell.application
             $filename = "$result.1.0.0.zip"
             $zip_file = $shell_app.namespace("$($boxstarter.LocalRepo)\$filename")
@@ -65,7 +65,7 @@ Describe "New-PackageFromScript" {
             Assert-MockCalled New-BoxstarterPackage -Times 0
         }
     }
-    
+
     Context "When script file is not found" {
         Mock New-BoxstarterPackage
 
@@ -85,7 +85,7 @@ Describe "New-PackageFromScript" {
         ($result = New-PackageFromScript TestDrive:\script.ps1) | Out-Null
 
         It "Will contain the new script" {
-            Rename-Item "$($boxstarter.LocalRepo)\$result.1.0.0.nupkg" "$($boxstarter.LocalRepo)\$result.1.0.0.zip" 
+            Rename-Item "$($boxstarter.LocalRepo)\$result.1.0.0.nupkg" "$($boxstarter.LocalRepo)\$result.1.0.0.zip"
             $shell_app=new-object -com shell.application
             $filename = "$result.1.0.0.zip"
             $zip_file = $shell_app.namespace("$($boxstarter.LocalRepo)\$filename")

@@ -1,18 +1,18 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.chocolatey){Remove-Module boxstarter.chocolatey}
 
-Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
 $Boxstarter.BaseDir=(split-path -parent (split-path -parent $here))
 $Boxstarter.SuppressLogging=$true
-Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 | 
-    % { . $_.ProviderPath }    
+Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 |
+    % { . $_.ProviderPath }
 
-Describe "Invoke-ChocolateyBoxstarter" {  
+Describe "Invoke-ChocolateyBoxstarter" {
     Context "When not invoked via boxstarter" {
         $Boxstarter.ScriptToCall=$null
         Mock Invoke-Boxstarter
@@ -25,7 +25,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         }
         it "should not call chocolatey" {
             Assert-MockCalled chocolatey -times 0
-        }          
+        }
     }
 
     Context "When calling normally" {
@@ -78,7 +78,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         }
         it "should call chocolatey" {
             Assert-MockCalled chocolatey
-        }          
+        }
     }
 
     Context "When Setting a LocalRepo on $Boxstarter and not the commandLine" {
@@ -142,7 +142,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         }
         it "should use package as is" {
             Assert-MockCalled chocolatey -ParameterFilter {$packageNames -eq "TestDrive:\package"}
-        }        
+        }
     }
 
     Context "When specifying multiple packages" {

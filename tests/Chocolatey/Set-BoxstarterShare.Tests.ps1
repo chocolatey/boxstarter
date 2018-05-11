@@ -1,13 +1,13 @@
 ﻿$here = Split-Path -Parent $MyInvocation.MyCommand.Path
 if(get-module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
 
-Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 $Boxstarter.SuppressLogging=$true
 
@@ -77,7 +77,7 @@ Describe "Set-BoxstarterShare" {
         MkDir "$testRoot\boxstarter" | Out-Null
         $Boxstarter.BaseDir="$testRoot\Boxstarter"
         $expectedAccounts=@("Everyone","$($identity.Name)")
-        
+
         Set-BoxstarterShare -Accounts $expectedAccounts | Out-Null
 
         It "Should share with both accounts"{
@@ -88,7 +88,7 @@ Describe "Set-BoxstarterShare" {
                 }
                 if($line.StartsWith("Permission") -or ($Accounts.Length -gt 0)){
                     if($line.Trim().Length -gt 0){
-                        $accounts += $line.Replace("Permission","").Trim()                        
+                        $accounts += $line.Replace("Permission","").Trim()
                     }
                 }
             }

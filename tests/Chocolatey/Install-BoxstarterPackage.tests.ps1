@@ -3,13 +3,13 @@ if(get-module Boxstarter.chocolatey){Remove-Module boxstarter.chocolatey}
 $myIp = (Test-Connection -ComputerName $env:COMPUTERNAME -Count 1  | Select IPV4Address).IPV4Address.IPAddressToString
 $myIpv6 = (Test-Connection -ComputerName $env:COMPUTERNAME -Count 1  | Select IPV6Address).IPV6Address.IPAddressToString
 
-Resolve-Path $here\..\..\boxstarter.common\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.bootstrapper\*.ps1 |
     % { . $_.ProviderPath }
-Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 | 
+Resolve-Path $here\..\..\boxstarter.chocolatey\*.ps1 |
     % { . $_.ProviderPath }
 $Boxstarter.SuppressLogging=$true
 
@@ -40,7 +40,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\chocolatey\testpackage.txt" -Force -ErrorAction SilentlyContinue
 
         $result = Install-BoxstarterPackage -computerName $myIp -PackageName exception-package -DisableReboots 2> $null
-        
+
         It "will include exceptions"{
             $result.Errors.Count | should be 2
         }
@@ -93,7 +93,7 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will specify port"{
             Assert-MockCalled Test-WSMan -ParameterFilter {$Port -eq 5678}
-        }        
+        }
     }
 
     Context "When using a http ConnectionURI and testing CredSSP" {
@@ -109,7 +109,7 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will specify port"{
             Assert-MockCalled Test-WSMan -ParameterFilter {$Port -eq 5678}
-        }        
+        }
     }
 
     Context "When remoting and wmi are not enabled on remote computer" {
@@ -139,13 +139,13 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will disable CredSSP when done"{
             Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server | Out-Null`"*"} -Times 0
-        }        
+        }
     }
 
     Context "When remoting enabled on remote and local computer but CredSSP is not enabled on remote" {
         Mock Enable-RemotePSRemoting { return New-Object PSObject }
         Mock Test-WSMan -ParameterFilter { $Credential -ne $null }
-        Mock Invoke-Command 
+        Mock Invoke-Command
         Mock Invoke-RetriableScript #-ParameterFilter {$RetryScript -ne $null -and $RetryScript.ToString() -like "*WSManCredSSP*"}
         Mock Invoke-Command { return $false } -ParameterFilter {$ScriptBlock -ne $null -and $ScriptBlock.ToString() -like "*Test-PendingReboot"}
 
@@ -156,7 +156,7 @@ Describe "Install-BoxstarterPackage" {
         }
         It "will disable CredSSP when done on both computers"{
             Assert-MockCalled Invoke-Command -ParameterFilter {$ScriptBlock.ToString() -like "*Invoke-FromTask `"Disable-WSManCredSSP -Role Server*"} -Times 2
-        }        
+        }
     }
 
     Context "When calling locally" {
@@ -206,7 +206,7 @@ Describe "Install-BoxstarterPackage" {
 
         It "will disable CredSSP when done"{
             Assert-MockCalled Disable-WSManCredSSP -ParameterFilter {$Role -eq "client"}
-        }        
+        }
     }
 
     Context "When CredSSP is enabled but not for given computer" {
@@ -226,7 +226,7 @@ Describe "Install-BoxstarterPackage" {
         It "will disable/reset when done"{
             Assert-MockCalled Disable-WSManCredSSP -ParameterFilter {$Role -eq "client"}
         }
-    }    
+    }
 
     Context "When CredSSP is enabled for only one given computer" {
         Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blah2","")}
@@ -244,7 +244,7 @@ Describe "Install-BoxstarterPackage" {
         It "will disable/reset when done"{
             Assert-MockCalled Disable-WSManCredSSP -ParameterFilter {$Role -eq "client"}
         }
-    }    
+    }
 
     Context "When credential delegation is not set for given computer" {
         New-Item $regRoot -Force | out-null
@@ -257,7 +257,7 @@ Describe "Install-BoxstarterPackage" {
         It "will remove computer when done"{
             (Get-Item -Path "$regRoot\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly").Property.Length | should be 0
         }
-    }    
+    }
 
     Context "When no entries in trusted hosts" {
         $global:t_called=0
@@ -310,7 +310,7 @@ Describe "Install-BoxstarterPackage" {
         It "will not set hosts"{
             Assert-MockCalled Set-Item -Times 0
         }
-    }    
+    }
 
     Context "When entries in trusted hosts contain global wild card" {
         Mock Get-Item {@{Value="*"}} -ParameterFilter {$Path -eq "wsman:\localhost\client\trustedhosts"}
@@ -321,7 +321,7 @@ Describe "Install-BoxstarterPackage" {
         It "will not set hosts"{
             Assert-MockCalled Set-Item -Times 0
         }
-    }    
+    }
 
     Context "When remoting not enabled on remote computer but WMI is and the force switch is not set" {
         Mock Invoke-Command -ParameterFilter{$computerName -ne $myIp -and ($Session -eq $null -or $Session.ComputerName -ne $myIp)}
@@ -391,7 +391,7 @@ Describe "Install-BoxstarterPackage" {
         $session = New-PSSession $myIp
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         $currentRepo=$Boxstarter.LocalRepo
-    
+
         Install-BoxstarterPackage -session $session -PackageName test-package3 -DisableReboots -LocalRepo $repo | Out-Null
 
         It "will copy boxstarter build packages"{
@@ -410,7 +410,7 @@ Describe "Install-BoxstarterPackage" {
         $currentConfig=Get-Content "$($Boxstarter.BaseDir)\Boxstarter.Config"
         $currentRepo=$Boxstarter.LocalRepo
         Set-BoxStarterConfig -LocalRepo $repo
-    
+
         Install-BoxstarterPackage -session $session -PackageName test-package3 -DisableReboots -LocalRepo $repo | Out-Null
 
         It "will Remove LocalRepo node in Boxstarter.Config on Remote"{
