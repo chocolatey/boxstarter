@@ -199,10 +199,10 @@ Task Push-Github {
         body=$releaseNotes.DocumentElement.'#text'
     } -Compress
 
-    $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/mwrock/boxstarter/releases/latest" -Method GET -Headers $headers
+    $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/chocolatey/boxstarter/releases/latest" -Method GET -Headers $headers
     if($latest.tag_name -ne "v$version"){
         write-host "Creating release"
-        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/mwrock/boxstarter/releases" -Method POST -Body $postParams -Headers $headers
+        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/chocolatey/boxstarter/releases" -Method POST -Body $postParams -Headers $headers
         $uploadUrl = $response.upload_url.replace("{?name,label}","?name=boxstarter.$version.zip")
     }
     else {

@@ -9,7 +9,7 @@
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <id>Boxstarter.WinConfig</id>
     <title>Boxstarter WinConfig Module</title>
-    <iconUrl>https://cdn.rawgit.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
+    <iconUrl>https://cdn.rawgit.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Functions that Boxstarter uses to customize the windows environment.</description>
     <tags>devops bootstraper setup windows customizations</tags>

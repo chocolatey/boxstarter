@@ -8,7 +8,7 @@
     <projectUrl>https://Boxstarter.org</projectUrl>
     <id>Boxstarter.Common</id>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-    <iconUrl>https://raw.githubusercontent.com/mwrock/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <title>Boxstarter Common Module</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
