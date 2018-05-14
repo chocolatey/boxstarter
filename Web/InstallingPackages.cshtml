@@ -149,7 +149,7 @@ $result = (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList machine
 </pre>
 <h3>Troubleshooting Remote Installations</h3>
 <h4>Establishing remote connections with servers not on the local subnet</h4>
-<p>By default,  server versions of Windows have a firewall rule restricting traffic that is not on the local subnet. There may be circumstances where you might want to connect over the public Internet to another machine. This can be done by manually enabling the "WINRM-HTTP-In-TCP-PUBLIC" firewall rule using the Powershell 3.0 <code>Set-NetFirewallRule</code> or the command line <code>netsh advfirewall</code> command.</p>
+<p>By default,  server versions of Windows have a firewall rule restricting traffic that is not on the local subnet. There may be circumstances where you might want to connect over the public Internet to another machine. This can be done by manually enabling the "WINRM-HTTP-In-TCP-PUBLIC" firewall rule using the PowerShell 3.0 <code>Set-NetFirewallRule</code> or the command line <code>netsh advfirewall</code> command.</p>
 <p>Client versions of Windows will only allow PSRemoting on Private and Domain networks. Clients on PowerShell 3.0 and higher can provide the <code>-SkipNetorkProfileCheck</code> to Enable-PSRemoting to allow connections to public computers on the local subnet. Boxstarter uses this parameter when enabling Remoting on clients. Like with Server versions, you can enable a firewall rule to work around the local subnet restriction. </p>
 <p>Windows 7 OSs running PowerShell 2.0 can not enable PSRemoting when on a public network connection. You will need to change your connection type to a private or Domain based connection.</p>
 

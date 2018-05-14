@@ -20,7 +20,7 @@ Now Build the artifacts from the root of the repository:
 ./build quick-deploy
 ```
 
-If this is the first time you are running this command, it may take extra time to run as it ensures all prerequisites are installed (VS build tools, Azure Powershell module, etc.).
+If this is the first time you are running this command, it may take extra time to run as it ensures all prerequisites are installed (VS build tools, Azure PowerShell module, etc.).
 
 This will compile the Boxstarter website and ClickOnce application and also sign the ClickOnce app. It will bump the version where the build version will be the number of commits since the minor version was tagged. It will update the Boxstarter homepage HTML to reflect this version and create new Chocolatey packages for all Boxstarter packages.
 

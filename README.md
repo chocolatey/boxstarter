@@ -11,7 +11,7 @@ Repeatable, reboot resilient windows environment installations made easy using C
 * Integrates with Hyper-V and Windows Azure VMs supporting checkpoint restore and creation
 * Installation packages build on top of [Chocolatey](https://chocolatey.org) package management
 * Easily install with just a [Gist and the Boxstarter Web Launcher](https://boxstarter.org/WebLauncher) or [create a private repository on a thumb drive or network share](https://boxstarter.org/InstallingPackages#InstallFromShare)
-* Works on Window 7/2008 R2 and up with Powershell 2.0 and higher
+* Works on Window 7/2008 R2 and up with PowerShell 2.0 and higher
 * Lots of Windows configuration utilities including installing critical updates, changing windows explorer options, and more.
 
 ## Quickly install your favorite applications and settings, on any machine, with a gist! No pre-installed software needed.
@@ -46,7 +46,7 @@ Install-BoxstarterPackage -ComputerName win7 `
 
 ![Remote Install](Web/Images/result.png)
 
-**NOTE:** PowerShell Remoting must be enabled on the remote machine. Launch a Powershell Console as administrator:
+**NOTE:** PowerShell Remoting must be enabled on the remote machine. Launch a PowerShell Console as administrator:
 
 ```powershell
 Enable-PSRemoting -Force
