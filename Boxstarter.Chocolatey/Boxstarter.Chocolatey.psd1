@@ -1,5 +1,5 @@
 @{
-Description = 'Provides a robust environment capable of automatic reboots and several windows customization functions ideal for installing chocolatey packages on a new machine'
+Description = 'Provides a robust environment capable of automatic reboots and several windows customization functions ideal for installing Chocolatey packages on a new machine'
 # Script module or binary module file associated with this manifest.
 ModuleToProcess = './boxstarter.chocolatey.psm1'
 

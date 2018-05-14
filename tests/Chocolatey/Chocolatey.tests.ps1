@@ -62,7 +62,7 @@ Describe "Getting-Chocolatey" {
         }
     }
 
-    Context "When chocolatry strips the machine module path" {
+    Context "When Chocolatey strips the machine module path" {
         Mock Call-Chocolatey {
             $env:PSModulePath = "C:\Program Files\WindowsPowerShell\Modules"
             $global:LASTEXITCODE=0
@@ -80,15 +80,15 @@ Describe "Getting-Chocolatey" {
 
         Chocolatey Install $packages
 
-        it "will get chocolatey for package1" {
+        it "will get Chocolatey for package1" {
             Assert-MockCalled Call-Chocolatey -ParameterFilter {$packageNames -eq "package1"} -times 1
         }
-        it "will get chocolatey for package2" {
+        it "will get Chocolatey for package2" {
             Assert-MockCalled Call-Chocolatey -ParameterFilter {$packageNames -eq "package2"} -times 1
         }
     }
 
-    Context "When chocolatey throws a reboot error and reboots are OK" {
+    Context "When Chocolatey throws a reboot error and reboots are OK" {
         $boxstarter.RebootOk=$true
         Mock Remove-Item
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'."}
@@ -103,7 +103,7 @@ Describe "Getting-Chocolatey" {
         }
     }
 
-    Context "When chocolatey writes a reboot error and reboots are OK" {
+    Context "When Chocolatey writes a reboot error and reboots are OK" {
         $boxstarter.RebootOk=$true
         Mock Remove-Item
         Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '-654'."}
@@ -133,7 +133,7 @@ Describe "Getting-Chocolatey" {
         }
     }
 
-    Context "When chocolatey writes a error that is not a reboot error" {
+    Context "When Chocolatey writes a error that is not a reboot error" {
         $boxstarter.RebootOk=$true
         Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '3020'." 2>&1 | out-null}
 
@@ -174,7 +174,7 @@ Describe "Getting-Chocolatey" {
         }
     }
 
-    Context "When chocolatey returns an erroneous exit code" {
+    Context "When Chocolatey returns an erroneous exit code" {
         Mock Call-Chocolatey {[System.Environment]::ExitCode=1}
         $Boxstarter.IsRebooting=$false
 

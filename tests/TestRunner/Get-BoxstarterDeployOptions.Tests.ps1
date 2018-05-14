@@ -19,7 +19,7 @@ Describe "Get-BoxstarterDeployOptions" {
     Context "When Getting options that have not been set" {
         $result = Get-BoxstarterDeployOptions
 
-        it "should return the chocolatey feed as the default nuget feed" {
+        it "should return the Chocolatey feed as the default nuget feed" {
             $result.DefaultNugetFeed | should be "https://chocolatey.org/api/v2"
         }
         it "should return localhost as the default deployment target" {

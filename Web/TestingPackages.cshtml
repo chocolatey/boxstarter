@@ -12,14 +12,14 @@
     on one or more deployment targets and evaluate whether the installation
     was successful. The TestRunner module can also be used to automate
     the publishing of Chocolatey packages to a <a href="https://nuget.org">Nuget</a> feed. That may be
-    the public chocolatey feed or a private feed.
+    the public Chocolatey feed or a private feed.
 </p>
-<p>The TestRunner module can be downloaded and installed via chocolatey by running:</p>
+<p>The TestRunner module can be downloaded and installed via Chocolatey by running:</p>
 <pre>cinst Boxstarter.TestRunner</pre>
 
 <h3>Configuring the Local Boxstarter Repository</h3>
 <p>
-    Boxstarter needs to know where your repository of chocolatey packages
+    Boxstarter needs to know where your repository of Chocolatey packages
     is located. The Boxstarter repository is a single directory on disk
     that contains one subdirectory per package. By default, Boxstarter
     maintains this directory in a directory called <code>BuildPackages</code> inside
@@ -77,7 +77,7 @@ Set-BoxstarterDeployOptions -DeploymentTargetCredentials $cred `
     use of Boxstarter VM providers are necessary in order to take advantage of checkpoints.
 </p>
 <p>
-    The default deployment options deploy locally using the credentials of the current user and publish to the public chocolatey feed.
+    The default deployment options deploy locally using the credentials of the current user and publish to the public Chocolatey feed.
 </p>
 <p>
     Individual packages in a Boxstarter repository

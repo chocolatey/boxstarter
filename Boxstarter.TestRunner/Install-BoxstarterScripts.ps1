@@ -3,7 +3,7 @@ function Install-BoxstarterScripts {
 .SYNOPSIS
 Installs scripts in a Chocolatey package repository that can be used to
 integrate with Build servers and can bootstrap Boxstarter dependencies
-and test chocolatey package installs upon a commit to the repository.
+and test Chocolatey package installs upon a commit to the repository.
 
 .DESCRIPTION
 Install-BoxstarterScripts adds a directory to a Chocolatey package

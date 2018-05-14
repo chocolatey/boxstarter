@@ -1,17 +1,17 @@
 function Invoke-BoxstarterFromTask($Command) {
 <#
 .SYNOPSIS
-Runs the normal chocolatey command as a scheduled task.
+Runs the normal Chocolatey command as a scheduled task.
 
 .DESCRIPTION
 Creates the script necessary for a scheduled task to run the given command. The scheduled
 task will run immediately.
 
 .PARAMETER Command
-A chocolatey command to execute within a scheduled task. For example "cinst fiddler".
+A Chocolatey command to execute within a scheduled task. For example "cinst fiddler".
 
 .EXAMPLE
-A chocolatey command
+A Chocolatey command
 
 Invoke-BoxstarterFromTask "cinst rsat"
 

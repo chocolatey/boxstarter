@@ -23,8 +23,8 @@ Describe "Invoke-ChocolateyBoxstarter" {
         it "should Call Boxstarter" {
             Assert-MockCalled Invoke-Boxstarter
         }
-        it "should not call chocolatey" {
-            Assert-MockCalled chocolatey -times 0
+        it "should not call Chocolatey" {
+            Assert-MockCalled Chocolatey -times 0
         }
     }
 
@@ -36,7 +36,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
 
         Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | out-null
 
-        it "should concatenate local repo and nuget sources for source param to chocolatey" {
+        it "should concatenate local repo and nuget sources for source param to Chocolatey" {
             $script:passedSource | Should Be "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
         }
     }
@@ -76,8 +76,8 @@ Describe "Invoke-ChocolateyBoxstarter" {
         it "should not Call Boxstarter" {
             Assert-MockCalled Invoke-Boxstarter -times 0
         }
-        it "should call chocolatey" {
-            Assert-MockCalled chocolatey
+        it "should call Chocolatey" {
+            Assert-MockCalled Chocolatey
         }
     }
 
@@ -115,7 +115,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | out-null
 
         it "should use package returned from ScriptFromPackage" {
-            Assert-MockCalled chocolatey -ParameterFilter {$packageNames -eq "somePackage"}
+            Assert-MockCalled Chocolatey -ParameterFilter {$packageNames -eq "somePackage"}
         }
     }
 
@@ -126,7 +126,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         Invoke-ChocolateyBoxstarter http://someurl -NoPassword | out-null
 
         it "should use package returned from ScriptFromPackage" {
-            Assert-MockCalled chocolatey -ParameterFilter {$packageNames -eq "somePackage"}
+            Assert-MockCalled Chocolatey -ParameterFilter {$packageNames -eq "somePackage"}
         }
     }
 
@@ -141,7 +141,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
             Assert-MockCalled New-PackageFromScript -times 0
         }
         it "should use package as is" {
-            Assert-MockCalled chocolatey -ParameterFilter {$packageNames -eq "TestDrive:\package"}
+            Assert-MockCalled Chocolatey -ParameterFilter {$packageNames -eq "TestDrive:\package"}
         }
     }
 
@@ -151,8 +151,8 @@ Describe "Invoke-ChocolateyBoxstarter" {
 
         Invoke-ChocolateyBoxstarter $packages -NoPassword | out-null
 
-        it "should pass both packages to chocolatey" {
-            Assert-MockCalled chocolatey -ParameterFilter { (Compare-Object $packageNames $packages) -eq $null }
+        it "should pass both packages to Chocolatey" {
+            Assert-MockCalled Chocolatey -ParameterFilter { (Compare-Object $packageNames $packages) -eq $null }
         }
     }
 

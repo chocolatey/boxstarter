@@ -5,8 +5,8 @@ Invokes the installation of a Boxstarter package
 
 .DESCRIPTION
 This essentially wraps Chocolatey Install and provides these additional features
- - Installs chocolatey if it is not already installed
- - Installs the .net 4.5 framework if it is not installed which is a chocolatey requirement
+ - Installs Chocolatey if it is not already installed
+ - Installs the .net 4.5 framework if it is not installed which is a Chocolatey requirement
  - Disables windows update service during installation to prevent installation conflicts and minimize the need for reboots
  - Imports the Boxstarter.WinConfig module that provides functions for customizing windows
  - Detects pending reboots and restarts the machine when necessary to avoid installation failures
@@ -19,12 +19,12 @@ This essentially wraps Chocolatey Install and provides these additional features
  This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
 
  If the package name provided is a URL or resolves to a file. Then
- it is assumed that this contains the chocolatey install script and
+ it is assumed that this contains the Chocolatey install script and
  a .nupkg file will be created using the script.
 
  .PARAMETER BootstrapPackage
  The names of one or more Nuget Packages to be installed or URIs or
- file paths pointing to a chocolatey script. If using package names,
+ file paths pointing to a Chocolatey script. If using package names,
  the .nupkg file for the provided package names are searched in the
  following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
@@ -54,7 +54,7 @@ When set, Boxstarter will never prompt for logon. Use this if using
 an account without password validation.
 
 .NOTES
-If specifying only one package, Boxstarter calls chocolatey with the
+If specifying only one package, Boxstarter calls Chocolatey with the
 -force argument and deletes the previously installed package directory.
 This means that regardless of whether or not the package had been
 installed previously, Boxstarter will attempt to download and reinstall it.

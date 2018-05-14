@@ -5,7 +5,7 @@ Sets the execution policy for the current account
 
 .DESCRIPTION
 The execution policy is set in a separate elevated
-PowerShell process. If running in the chocolatey runner,
+PowerShell process. If running in the Chocolatey runner,
 the current window cannot be used because its execution
 policy has been explicitly set.
 

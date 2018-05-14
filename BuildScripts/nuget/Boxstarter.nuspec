@@ -20,7 +20,7 @@
       <dependency id="Boxstarter.HyperV" version="[$version$]" />
     </dependencies>
     <releaseNotes>
-- Revert vendored chocolatey to stable 0.10.5
+- Revert vendored Chocolatey to stable 0.10.5
 - Fix HRESULT code for WU_E_INSTALL_NOT_ALLOWED
 - Handle the case where the Windows Update Agent is updating itself
 - Install boxstarter to macine instead of user

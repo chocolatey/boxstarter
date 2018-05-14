@@ -31,7 +31,7 @@ BOXSTARTER VARIABLE SETTINGS
 
 	NugetSources
 		The Nuget feeds that Boxstarter checks for the Boxstarter
-		Bootstrap package. By default this is the chocolatey community feed.
+		Bootstrap package. By default this is the Chocolatey community feed.
 		This can be changed by using the Set-BoxstarterConfig function with
 		the -NugetSources argument.
 

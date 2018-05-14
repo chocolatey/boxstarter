@@ -118,7 +118,7 @@ Intercepts Chocolatey call to check for reboots
             $ec = [System.Environment]::ExitCode
             # suppress errors from enabled features that need a reboot
             if((Test-WindowsFeatureInstall $args) -and $ec -eq 3010) { $ec=0 }
-            # chocolatey reassembles environment variables after an install
+            # Chocolatey reassembles environment variables after an install
             # but does not add the machine PSModule value to the user Online
             $machineModPath = [System.Environment]::GetEnvironmentVariable("PSModulePath","Machine")
             if(!$env:PSModulePath.EndsWith($machineModPath)) {
@@ -133,7 +133,7 @@ Intercepts Chocolatey call to check for reboots
         }
         catch {
             #Only write the error to the error stream if it was not previously
-            #written by chocolatey
+            #written by Chocolatey
             $chocoErrors = $global:error.Count - $currentErrorCount
             if($chocoErrors -gt 0){
                 $idx = 0
@@ -151,10 +151,10 @@ Intercepts Chocolatey call to check for reboots
         }
         $chocoErrors = $global:error.Count - $currentErrorCount
         if($chocoErrors -gt 0){
-            Write-BoxstarterMessage "There was an error calling chocolatey" -Verbose
+            Write-BoxstarterMessage "There was an error calling Chocolatey" -Verbose
             $idx = 0
             while($idx -lt $chocoErrors){
-                Write-BoxstarterMessage "Error from chocolatey: $($global:error[$idx].Exception | fl * -Force | Out-String)"
+                Write-BoxstarterMessage "Error from Chocolatey: $($global:error[$idx].Exception | fl * -Force | Out-String)"
                 if($global:error[$idx] -match "code was '(-?\d+)'") {
                     $errorCode=$matches[1]
                     if($RebootCodes -contains $errorCode) {
@@ -211,7 +211,7 @@ function Call-Chocolatey {
     )
     $chocoArgs = @($command, $packageNames)
     $chocoArgs += Format-ExeArgs $command @args
-    Write-BoxstarterMessage "Passing the following args to chocolatey: $chocoArgs" -Verbose
+    Write-BoxstarterMessage "Passing the following args to Chocolatey: $chocoArgs" -Verbose
 
     $currentLogging=$Boxstarter.Suppresslogging
     try {

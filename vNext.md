@@ -2,14 +2,14 @@
 
 ## Goals
 
-### A more precise separation between boxstarter and provisioner(chocolatey)
-Boxstarter began with the intention of abstracting reboot resiliancy and being capable of running ANY script (chocolatey or not) in an unattended rebootable manner. Shortcuts have been taken it spots that hard wire Boxstarter and chocolatey especially with remote execution. All remote execution code is in the chocolatey module.
+### A more precise separation between boxstarter and provisioner(Chocolatey)
+Boxstarter began with the intention of abstracting reboot resiliancy and being capable of running ANY script (Chocolatey or not) in an unattended rebootable manner. Shortcuts have been taken it spots that hard wire Boxstarter and Chocolatey especially with remote execution. All remote execution code is in the Chocolatey module.
 
 ### Work with other Provisioners
-Currently chocolatey is the only provisioner. We also want to work with chef, puppet, DSC, etc.
+Currently Chocolatey is the only provisioner. We also want to work with chef, puppet, DSC, etc.
 
 ### Ability to compose multiple provisioners in a single install.
-This is up for debate. The thought being maybe you have a bunch of install automation that leverages chocolatey but there is a chef cookbook, DSC resource or puppet module that does something you want to include. I question the value here since many of these provisioners already allow you to nest one another. For example, you can use the Chocolatey or Boxtarter cookbook in chef and use chef to consume DSC  resources. It still makes sense to explore this.
+This is up for debate. The thought being maybe you have a bunch of install automation that leverages Chocolatey but there is a chef cookbook, DSC resource or puppet module that does something you want to include. I question the value here since many of these provisioners already allow you to nest one another. For example, you can use the Chocolatey or Boxtarter cookbook in chef and use chef to consume DSC  resources. It still makes sense to explore this.
 
 ### Clean up the execution workflow of a boxstarter run. Its current recursive pattern makes it overly complicated
 

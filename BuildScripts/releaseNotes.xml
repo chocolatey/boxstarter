@@ -1,5 +1,5 @@
 <releaseNotes>
-- Revert vendored chocolatey to stable 0.10.5
+- Revert vendored Chocolatey to stable 0.10.5
 - Add a ShowRibbon for Windows Explorer
 - Use System.IO.Compression.FileSystem for boxstarter module expansion on modern Powershell versions
 - Add file64 param to fix 64 bit binary installs

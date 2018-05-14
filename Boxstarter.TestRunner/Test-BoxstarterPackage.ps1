@@ -38,7 +38,7 @@ Set-BoxstarterDeployOptions -DeploymentTargetCredentials $cred `
   -DefaultNugetFeed https://www.myget.org/F/myfeed/api/v2 `
 Test-BoxstarterPackage
 
-All chocolatey packages in c:\dev\boxstarterRepo are built and their
+All Chocolatey packages in c:\dev\boxstarterRepo are built and their
 versions are evaluated against the versions published on the myFeed feed
 at MyGet.org. Those with a local version higher than the one published will
 be installed on testVM1 and testVM2.
