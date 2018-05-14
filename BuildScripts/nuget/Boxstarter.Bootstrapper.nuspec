@@ -10,7 +10,7 @@
     <iconUrl>https://cdn.rawgit.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <projectUrl>https://Boxstarter.org</projectUrl>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-    <description>Boxstarter's Bootstrapper module provides a powershell wrapper that supports reboots and automatic logons and exposes commands that can detect pending reboots, perform logging and messaging, and several commands that can configure various windows settings.</description>
+    <description>Boxstarter's Bootstrapper module provides a PowerShell wrapper that supports reboots and automatic logons and exposes commands that can detect pending reboots, perform logging and messaging, and several commands that can configure various windows settings.</description>
     <tags>Boxstarter bootstrapper environment setup</tags>
     <dependencies>
       <dependency id="Boxstarter.Common" version="[$version$]" />

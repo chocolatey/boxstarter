@@ -11,14 +11,14 @@ function Get-Boxstarter {
             Start-Process powershell -verb runas -argumentlist $command
         }
         else {
-            Write-Host "User is not running with administrative rights.`nPlease open a powershell console as administrator and try again."
+            Write-Host "User is not running with administrative rights.`nPlease open a PowerShell console as administrator and try again."
         }
         return
     }
 
     $badPolicy = $false
     @("Restricted", "AllSigned") | ? { $_ -eq (Get-ExecutionPolicy).ToString() } | % {
-        Write-Host "Your current Powershell Execution Policy is set to '$(Get-ExecutionPolicy)' and will prohibit boxstarter from operating propperly."
+        Write-Host "Your current PowerShell Execution Policy is set to '$(Get-ExecutionPolicy)' and will prohibit boxstarter from operating propperly."
         Write-Host "Please use Set-ExecutionPolicy to change the policy to RemoteSigned or Unrestricted."
         $badPolicy = $true
     }

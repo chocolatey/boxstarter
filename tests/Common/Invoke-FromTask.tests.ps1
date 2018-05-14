@@ -90,7 +90,7 @@ Describe "Invoke-FromTask" {
             schtasks /query /TN 'Ad-Hoc Task' 2>&1 | out-null
             $LastExitCode | should be 1
         }
-        It "Should kill the original powershell task"{
+        It "Should kill the original PowerShell task"{
             ($proc -eq $null -or $proc.HasExited) | should be $true
         }
     }
@@ -107,7 +107,7 @@ Describe "Invoke-FromTask" {
             schtasks /query /TN 'Ad-Hoc Task' 2>&1 | out-null
             $LastExitCode | should be 1
         }
-        It "Should kill the original powershell task"{
+        It "Should kill the original PowerShell task"{
             ($proc -eq $null -or $proc.HasExited) | should be $true
         }
     }

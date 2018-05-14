@@ -50,15 +50,15 @@ cinst IIS-WebServerRole -source windowsfeatures
 
 <h3>Step 3</h3>
 <h4><span class="text-primary">Install the Boxstarter Modules</span></h4>
-<p>You can download the Boxstarter module installer from this web site or you can use Chocolatey to install the Boxstarter. Alternatively, you may invoke the module installer over the web using powershell.</p>
+<p>You can download the Boxstarter module installer from this web site or you can use Chocolatey to install the Boxstarter. Alternatively, you may invoke the module installer over the web using PowerShell.</p>
 
-<p>If you are running powershell v3 or higher:</p>
+<p>If you are running PowerShell v3 or higher:</p>
 <pre>
 . { iwr -useb https://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
 </pre>
 
 <p/><p/>
-<p>If you are running powershell v2:</p>
+<p>If you are running PowerShell v2:</p>
 <pre>
 iex ((New-Object System.Net.WebClient).DownloadString('https://boxstarter.org/bootstrapper.ps1')); get-boxstarter -Force
 </pre>

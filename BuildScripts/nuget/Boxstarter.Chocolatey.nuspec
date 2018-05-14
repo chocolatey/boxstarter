@@ -10,7 +10,7 @@
     <title>Boxstarter Chocolatey Module</title>
     <projectUrl>https://Boxstarter.org</projectUrl>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-    <description>Creates a fresh developer (or non developer) environment from a bare OS utilizing powershell and Chocolatey. Installs Chocolatey, cutomizes windows settings, installs windows updates, handles reboots, installs windows features and your favorite applications.</description>
+    <description>Creates a fresh developer (or non developer) environment from a bare OS utilizing PowerShell and Chocolatey. Installs Chocolatey, cutomizes windows settings, installs windows updates, handles reboots, installs windows features and your favorite applications.</description>
     <tags>Boxstarter environment setup</tags>
     <dependencies>
       <dependency id="Boxstarter.Common" version="[$version$]" />

@@ -2,13 +2,13 @@ TOPIC
 	About_Boxstarter_Bootstrapper
 
 SYNOPSIS
-	Describes how to use Boxstarter to wrap powershell scripts.
+	Describes how to use Boxstarter to wrap PowerShell scripts.
 
 DESCRIPTION
 	The Boxstarter.Bootstrapper module provides an execution
 	environment for running scripts that may require one or more
 	reboots throughout its exeution process. This can be any
-	powershell script and is ideally suited for scripts that involve
+	PowerShell script and is ideally suited for scripts that involve
 	the installation of software and system configuration.
 
 ENABLING REBOOTS
@@ -87,7 +87,7 @@ LOGGING
 	ability to log both to the screen and the Boxstarter Log as well as
 	the ability to log to both simultaneously. Boxstarter also enables
 	you t ocapture the standard output and error streams of standard
-	command line executables and utilities and not just the powershell
+	command line executables and utilities and not just the PowerShell
 	pipeline. See About_Boxstarter_Logging for more details.
 
 WINDOWS CONFIGURATION UTILITIES

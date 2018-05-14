@@ -8,9 +8,9 @@ This function will ensure that the .net 4 runtime is installed on the
 machine. If it is not, it will be downloaded and installed. If running
 remotely, the .net 4 installation will run from a scheduled task.
 
-If the CLRVersion of the hosting powershell process is less than 4,
-such as is the case in powershell 2, the given script will be run
-from a new a new powershell process tht will be configured to host the
+If the CLRVersion of the hosting PowerShell process is less than 4,
+such as is the case in PowerShell 2, the given script will be run
+from a new a new PowerShell process tht will be configured to host the
 CLRVersion 4.0.30319.
 
 .Parameter ScriptBlock
@@ -29,12 +29,12 @@ https://boxstarter.org
     )
     Enable-Net40
     if($PSVersionTable.CLRVersion.Major -lt 4) {
-        Write-BoxstarterMessage "Relaunching powershell under .net fx v4" -verbose
+        Write-BoxstarterMessage "Relaunching PowerShell under .net fx v4" -verbose
         $env:COMPLUS_version="v4.0.30319"
         & powershell -OutputFormat Text -NoProfile -ExecutionPolicy bypass -command $ScriptBlock -args $ArgumentList
     }
     else {
-        Write-BoxstarterMessage "Using current powershell..." -verbose
+        Write-BoxstarterMessage "Using current PowerShell..." -verbose
         Invoke-Command -ScriptBlock $ScriptBlock -argumentlist $ArgumentList
     }
 }

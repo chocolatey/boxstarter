@@ -43,7 +43,7 @@ I'm considering rewriting the core of boxstarter in GO for these reasons.
 * Is not c++
 * I want to learn it. Yeah I said it.
 
-Once some design decisions have been ironed out, it may make more sense to remain in pure powershell and then port to GO later after the basic structure is stable or maybe not. Regardless, there will be a powershell module to wrap the core so users can still call boxstarter via powershell commands.
+Once some design decisions have been ironed out, it may make more sense to remain in pure PowerShell and then port to GO later after the basic structure is stable or maybe not. Regardless, there will be a PowerShell module to wrap the core so users can still call boxstarter via PowerShell commands.
 
 ## Thoughts on revised execution flow
 ### Boxstarter core as entry point

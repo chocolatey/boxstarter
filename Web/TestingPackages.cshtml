@@ -37,7 +37,7 @@
     boxstarter repository with <code>Set-BoxstarterConfig</code> all future
     interactions with the Boxstarter repository will act on this location.
     To temporarily change the repository location just for the current
-    powershell session, one can change the value of <code>$Boxstarter.LocalRepo</code>
+    PowerShell session, one can change the value of <code>$Boxstarter.LocalRepo</code>
     directly.
 </p>
 <pre>$Boxstarter.LocalRepo = "c:\dev\Chocolatey-Packages"</pre>
@@ -197,7 +197,7 @@ Mode                LastWriteTime     Length Name
         If you administer your own build server, there is some one time setup that
         you need to perform to integrate Boxstarter TestRunner tests and
         automatic package publishing. This must be performed on the build machine
-        that will run the builds (a remote powershell session is acceptable). In
+        that will run the builds (a remote PowerShell session is acceptable). In
         many build systems, this may be a different machine from the central server,
         in TFS it would be the build "controller" or in TeamCity the build "agent."
         Also, these steps must be performed using the credentials of the SAME USER

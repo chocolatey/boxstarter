@@ -125,7 +125,7 @@ Configuring a Dedicated Build Server
     If you administer your own build server, there is some one time setup that
     you need to perform to integrate Boxstarter TestRunner tests and
     automatic package publishing. This must be performed on the build machine
-    that will run the builds (a remote powershell session is acceptable). In
+    that will run the builds (a remote PowerShell session is acceptable). In
     many build systems, this may be a different machine from the central server,
     in TFS it would be the build "controller" or in TeamCity the build "agent."
     Also, these steps must be performed using the credentials of the SAME USER
