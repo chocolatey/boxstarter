@@ -11,7 +11,7 @@ can be used to set the feed assigned to a package and the API key assigned
 to a feed. If no feed is explicitly assigned to a package, then the
 Default Nuget Feed of the BoxstarterDeployOptions is used. This can be set
 using Set-BoxstarterDeployOptions and if no default feed is set, the public
-Chocolatey feed is used. A package feed can be cleared by using
+Chocolatey community feed is used. A package feed can be cleared by using
 Remove-BoxstarterPackageNugetFeed. It will then use the default nuget feed.
 If you want to ensure that a package is never associated with a feed
 including the default feed, use Set-BoxstarterPackageNugetFeed and set

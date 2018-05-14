@@ -16,7 +16,7 @@ This function wraps a Chocolatey Install and provides these additional features
 
  The .nupkg file for the provided package name is searched in the following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
- - The Chocolatey feed
+ - The Chocolatey community feed
  This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
 
  If the package name provided is a URL or resolves to a file, then
@@ -69,7 +69,7 @@ This function wraps a Chocolatey Install and provides these additional features
  the .nupkg file for the provided package names are searched in the
  following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
- - The Chocolatey feed
+ - The Chocolatey community feed
 
 .PARAMETER DisableReboots
 If set, reboots are suppressed.

@@ -34,7 +34,7 @@ This wraps three tasks:
 
 ### Push-Chocolatey
 
-Iterates all Chocolatey packages created in the above build and pushes them to the community Chocolatey feed.
+Iterates all Chocolatey packages created in the above build and pushes them to the community Chocolatey community feed.
 
 ### Push-Github
 

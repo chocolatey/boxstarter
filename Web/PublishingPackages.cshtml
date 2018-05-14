@@ -21,7 +21,7 @@
     <li>The Boxstarter Local Repository <code>$Boxstarter.LocalRepo</code> where packages are saved using <code>New-BoxstarterPackage</code></li>
     <li>The <a href="https://chocolatey.org/packages">Chocolatey.org</a> public feed</li>
 </ul>
-<p>The first location that contains a package name that Boxstarter is looking for will be the last location Boxstarter probes. So, for example, if the local repository and the Chocolatey feed have a package with the same name, the package in the local repository will be chosen.</p>
+<p>The first location that contains a package name that Boxstarter is looking for will be the last location Boxstarter probes. So, for example, if the local repository and the Chocolatey community feed have a package with the same name, the package in the local repository will be chosen.</p>
 <h3>Configuring where Boxstarter looks for packages</h3>
 <p>You can change the directory that Boxstarter considers the local repository or change the feeds that Boxstarter searches using the <code>Set-BoxstarterConfig</code> command.</p>
 <pre>
@@ -42,7 +42,7 @@ Set-BoxstarterConfig -NugetSources "https://www.myget.org/F/MyNugetFeed/api/v2;h
 <pre>
 nuget" push MyPackage.1.0.0.nupkg &lt;Your MyGet API Key&gt; -Source https://www.myget.org/F/MyFeed/api/v2/package
 </pre>
-<p>If you want to publish to the Chocolatey feed, Chocolatey has a command, <a href="https://github.com/chocolatey/choco/wiki/CommandsPush">choco push</a>, which will publish your package to Chocolatey without needing to specify the feed URL.</p>
+<p>If you want to publish to the Chocolatey community feed, Chocolatey has a command, <a href="https://github.com/chocolatey/choco/wiki/CommandsPush">choco push</a>, which will publish your package to Chocolatey without needing to specify the feed URL.</p>
 <pre>
 cpush MyPackage.1.0.0.nupkg &lt;Your Chocolatey API Key&gt;
 </pre>

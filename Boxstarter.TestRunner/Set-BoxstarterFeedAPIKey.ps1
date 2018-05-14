@@ -24,7 +24,7 @@ These keys are persisted to a file in encrypted format.
 Set-BoxstarterFeedAPIKey -NugetFeed "https://chocolatey.org/api/v2" `
   -APIKey 5cbc38d9-1a94-430d-8361-685a9080a6b8
 
-Sets the API Key used with the public Chocolatey feed to
+Sets the API Key used with the public Chocolatey community feed to
 5cbc38d9-1a94-430d-8361-685a9080a6b8.
 
 .LINK
