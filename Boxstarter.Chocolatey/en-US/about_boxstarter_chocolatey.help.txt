@@ -60,7 +60,7 @@ Consuming Boxstarter Packages
 
 Package Sources
 	Install-BoxstarterPackage (or Boxstarter) expects just the name of the
-	bootstrapping package - just like CINST or Nuget. Boxstarter will search
+	bootstrapping package - just like CINST or NuGet. Boxstarter will search
 	the following locations in this order:
 
 	- $Boxstarter.LocalRepo: This is the local repository that by default is

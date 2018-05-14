@@ -1,11 +1,11 @@
 function Get-BoxstarterPackageNugetFeed {
 <#
 .SYNOPSIS
-Gets the Nuget feed associated with an individual package.
+Gets the NuGet feed associated with an individual package.
 
 .DESCRIPTION
 A Chocolatey package repository may publish different packages to
-different feeds. Get-BoxstarterPackageNugetFeed retrieves the Nuget
+different feeds. Get-BoxstarterPackageNugetFeed retrieves the NuGet
 feed associated with a specified package name.
 Set-BoxstarterPackageNugetFeed can be used to specify a feed to be
 associated with a package. One may also use Set-BoxstarterDeployOptions
@@ -21,7 +21,7 @@ feed should be retrieved.
 .Example
 Get-BoxstarterPackageNugetFeed MyPackageName
 
-Retrieves the Nuget feed associated with MyPackageName
+Retrieves the NuGet feed associated with MyPackageName
 
 .LINK
 https://boxstarter.org

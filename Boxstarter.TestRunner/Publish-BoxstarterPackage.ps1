@@ -1,15 +1,15 @@
 function Publish-BoxstarterPackage {
 <#
 .SYNOPSIS
-Publishes a package to a Nuget feed
+Publishes a package to a NuGet feed
 
 .DESCRIPTION
-Publishes a package in the Boxstarter local repository to the Nuget feed
+Publishes a package in the Boxstarter local repository to the NuGet feed
 it is associated with and using the API key that the feed has been
 assigned to. Set-BoxstarterPackageNugetFeed and Set-BoxstarterFeedAPIKey
 can be used to set the feed assigned to a package and the API key assigned
 to a feed. If no feed is explicitly assigned to a package, then the
-Default Nuget Feed of the BoxstarterDeployOptions is used. This can be set
+Default NuGet Feed of the BoxstarterDeployOptions is used. This can be set
 using Set-BoxstarterDeployOptions and if no default feed is set, the public
 Chocolatey community feed is used. A package feed can be cleared by using
 Remove-BoxstarterPackageNugetFeed. It will then use the default nuget feed.
@@ -95,6 +95,6 @@ Set-BoxstarterFeedAPIKey
 }
 
 function Invoke-NugetPush ($pkg,$nupkg) {
-    $nuget="$env:ChocolateyInstall\chocolateyinstall\Nuget.exe"
+    $nuget="$env:ChocolateyInstall\chocolateyinstall\NuGet.exe"
     .$nuget push $nupkg (Get-BoxstarterFeedAPIKey $pkg.Feed) -Source "$($pkg.Feed)/package" -NonInteractive
 }

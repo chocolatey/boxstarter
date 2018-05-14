@@ -1,11 +1,11 @@
 function Remove-BoxstarterPackageNugetFeed {
 <#
 .SYNOPSIS
-Removes the Nuget feed associated with an individual package.
+Removes the NuGet feed associated with an individual package.
 
 .DESCRIPTION
 A Chocolatey package repository may publish different packages to
-different feeds. Remove-BoxstarterPackageNugetFeed removes the Nuget
+different feeds. Remove-BoxstarterPackageNugetFeed removes the NuGet
 feed associated with a specified package name. After doing so, the
 package will be associated with the DefaultNugetFeed that can be set
 with Set-BoxstarterDeployOptions and is set to the public Chocolatey
@@ -20,7 +20,7 @@ feed should be removed.
 .Example
 Remove-BoxstarterPackageNugetFeed MyPackageName
 
-Removes the Nuget feed associated with MyPackageName
+Removes the NuGet feed associated with MyPackageName
 
 .LINK
 https://boxstarter.org

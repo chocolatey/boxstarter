@@ -9,7 +9,7 @@ DESCRIPTION
 	The Boxstarter TestRunner module can test Chocolatey package installs
     on one or more deployment targets and evaluate whether the installation
     was successful. The TestRunner module can also be used to automate
-    the publishing of Chocolatey packages to a Nuget feed. That may be
+    the publishing of Chocolatey packages to a NuGet feed. That may be
     the public Chocolatey community feed or a private feed.
 
 Configuring the Local Boxstarter Repository

@@ -8,7 +8,7 @@ or an individual package.
 Get-BoxstarterPackage retrieves information about either a single package
 or all packages in the Local Boxstarter repository if no PackageName
 parameter is provided. This information includes package ID, version, the
-latest version published to the packages Nuget feed and the feed URI.
+latest version published to the packages NuGet feed and the feed URI.
 
 .PARAMETER PackageName
 The name of a Chocolatey package in the local repository for which to

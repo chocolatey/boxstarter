@@ -1,7 +1,7 @@
 function Set-BoxstarterFeedAPIKey {
 <#
 .SYNOPSIS
-Sets the API key for the specified Nuget feed
+Sets the API key for the specified NuGet feed
 
 .DESCRIPTION
 Boxstarter can automatically publish a succesfully tested Chocolatey
@@ -12,7 +12,7 @@ given nuget feed url. Use Get-BoxstarterFeedAPIKey to retrieve
 a key associated with a feed.
 
 .PARAMETER NugetFeed
-The URI of a Nuget feed for which the API key is being associated.
+The URI of a NuGet feed for which the API key is being associated.
 
 .PARAMETER APIKey
 The GUID API Key to assiciate with the feed.

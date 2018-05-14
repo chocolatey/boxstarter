@@ -27,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		NOTICE.txt = NOTICE.txt
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{87B9154F-EDBF-47CE-AAF2-7ECF4B6C9A93}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{87B9154F-EDBF-47CE-AAF2-7ECF4B6C9A93}"
 	ProjectSection(SolutionItems) = preProject
 		BuildScripts\nuget\Boxstarter.Azure.nuspec = BuildScripts\nuget\Boxstarter.Azure.nuspec
 		BuildScripts\nuget\boxstarter.bootstrapper.nuspec = BuildScripts\nuget\boxstarter.bootstrapper.nuspec

@@ -31,7 +31,7 @@ Describe "Get-BoxstarterConfig" {
 
     Context "When Setting NugetSorces to a new value" {
         Copy-Item "$currentBase\Boxstarter.Config" $testRoot
-        $expected = "Some Nuget Source"
+        $expected = "Some NuGet Source"
 
         Set-BoxstarterConfig -NugetSources $expected
 

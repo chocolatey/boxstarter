@@ -25,7 +25,7 @@ properties {
 Task default -depends Build
 Task Build -depends Build-Clickonce, Build-Web, Install-ChocoLib, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
-Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
+Task Package -depends Clean-Artifacts, Version-Module, Pack-NuGet, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Chocolatey, Push-Github, Publish-Web
 Task All-Tests -depends Test, Integration-Test
 Task Quick-Deploy -depends Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage
@@ -75,7 +75,7 @@ task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:BOXSTARTER_PUBLISH_PASSWORD }
 }
 
-Task Test -depends Install-ChocoLib, Pack-Nuget, Create-ModuleZipForRemoting {
+Task Test -depends Install-ChocoLib, Pack-NuGet, Create-ModuleZipForRemoting {
     pushd "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     $pesterTestResultsFile = "$baseDir\buildArtifacts\TestResults.xml"
@@ -100,7 +100,7 @@ Task Test -depends Install-ChocoLib, Pack-Nuget, Create-ModuleZipForRemoting {
     popd
 }
 
-Task Integration-Test -depends Pack-Nuget, Create-ModuleZipForRemoting {
+Task Integration-Test -depends Pack-NuGet, Create-ModuleZipForRemoting {
     pushd "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     if($testName){
@@ -141,7 +141,7 @@ Task Clean-Artifacts {
     mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.WinConfig"
 }
 
-Task Pack-Nuget -depends Sign-PowerShellFiles -description 'Packs the modules and example packages' {
+Task Pack-NuGet -depends Sign-PowerShellFiles -description 'Packs the modules and example packages' {
     if (Test-Path "$baseDir\buildPackages\*.nupkg") {
       Remove-Item "$baseDir\buildPackages\*.nupkg" -Force
     }

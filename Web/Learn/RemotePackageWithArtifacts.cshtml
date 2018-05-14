@@ -7,11 +7,11 @@
     <p class="lead">Sometimes a package may contain more than just a nuspec file and an install script. You may also want to install the package onto a remote machine.</p>
     <p class="lead"><span class="text-primary">Boxstarter can create a template package targeting an existing directory and install the package on any machine open to WINRM or WMI remoting.</span></p>
 }
-<p>This walk through will create a Nuget ODATA feed application and deploy it to a remote server after enabling web services on the server.</p>
+<p>This walk through will create a NuGet ODATA feed application and deploy it to a remote server after enabling web services on the server.</p>
 
 <h3>Step 1</h3>
-<h4><span class="text-primary">Create and Build the Nuget server</span></h4>
-<p>Create an empty Web Application in Visual Studio and add a Nuget reference to Nuget.Server. After the package install completes, build the solution. NOTE: This can be performed with the free Visual Studio Express for Web which can be installed via Chocolatey - <code>cinst VisualStudio2013ExpressWeb</code>.</p>
+<h4><span class="text-primary">Create and Build the NuGet server</span></h4>
+<p>Create an empty Web Application in Visual Studio and add a NuGet reference to NuGet.Server. After the package install completes, build the solution. NOTE: This can be performed with the free Visual Studio Express for Web which can be installed via Chocolatey - <code>cinst VisualStudio2013ExpressWeb</code>.</p>
 <img src="~/Images/NugetServer.png">
 
 <h3>Step 2</h3>
@@ -94,5 +94,5 @@ Install-BoxstarterPackage -ComputerName MyMachine -PackageName NugetServer -Cred
 
 <h3>Step 9</h3>
 <h4><span class="text-primary">Run the application</span></h4>
-<p>Now we should be able to browse to our Nuget server application at http://MyServer</p>
+<p>Now we should be able to browse to our NuGet server application at http://MyServer</p>
 <img src="~/Images/NugetServerWeb.png">

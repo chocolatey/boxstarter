@@ -1,11 +1,11 @@
 function Set-BoxstarterPackageNugetFeed {
 <#
 .SYNOPSIS
-Sets the Nuget feed associated with an individual package.
+Sets the NuGet feed associated with an individual package.
 
 .DESCRIPTION
 A Chocolatey package repository may publish different packages to
-different feeds. Set-BoxstarterPackageNugetFeed sets the Nuget
+different feeds. Set-BoxstarterPackageNugetFeed sets the NuGet
 feed associated with a specified package name.
 Get-BoxstarterPackageNugetFeed can be used to retrieve the feed
 associated with a package. One may also use Set-BoxstarterDeployOptions
@@ -19,7 +19,7 @@ The name of a Chocolatey package in the local repository for which a
 feed should be associated.
 
 .PARAMETER NugetFeed
-The Nuget feed to associate with the Chocolatey package.
+The NuGet feed to associate with the Chocolatey package.
 
 .NOTES
 These feed associations are persisted to a file so thet they can be

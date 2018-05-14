@@ -1,7 +1,7 @@
 function New-PackageFromScript {
 <#
 .SYNOPSIS
-Creates a Nuget package from a Chocolatey script
+Creates a NuGet package from a Chocolatey script
 
 .DESCRIPTION
 This creates a .nupkg file from a script file. It adds a dummy nuspec

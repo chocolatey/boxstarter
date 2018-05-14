@@ -23,7 +23,7 @@ This essentially wraps Chocolatey Install and provides these additional features
  a .nupkg file will be created using the script.
 
  .PARAMETER BootstrapPackage
- The names of one or more Nuget Packages to be installed or URIs or
+ The names of one or more NuGet Packages to be installed or URIs or
  file paths pointing to a Chocolatey script. If using package names,
  the .nupkg file for the provided package names are searched in the
  following locations and order:

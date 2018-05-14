@@ -2,7 +2,7 @@ function Set-BoxstarterDeployOptions {
 <#
 .SYNOPSIS
 Configures settings related to boxstarter package deployment to test
-machines and Nuget packages.
+machines and NuGet packages.
 
 .DESCRIPTION
 Boxstarter tests Chocolatey packages by deploying and installing the
@@ -72,7 +72,7 @@ This configures package deployments for Azure VMs testVM1 and testVM2
 hosted in the ServiceName service using the Admin credential. Prior to
 testing a package install, the VM will be restored to the clean
 checkpoint. If packages are published and are not associated with a
-Nuget feed, they will publish to the mywackyfeed on myget.org using API
+NuGet feed, they will publish to the mywackyfeed on myget.org using API
 Key 5cbc38d9-1a94-430d-8361-685a9080a6b8
 
 .LINK

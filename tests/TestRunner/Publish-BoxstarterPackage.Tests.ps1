@@ -119,8 +119,8 @@ Describe "Publish-BoxstarterPackage" {
                 Feed=$feed
             }
         }
-        $nugetError = & "$env:ChocolateyInstall\bin\Nuget.exe" push "yadayadayada" 2>&1
-        Mock Invoke-NugetPush { & "$env:ChocolateyInstall\bin\Nuget.exe" push "yadayadayada"  }
+        $nugetError = & "$env:ChocolateyInstall\bin\NuGet.exe" push "yadayadayada" 2>&1
+        Mock Invoke-NugetPush { & "$env:ChocolateyInstall\bin\NuGet.exe" push "yadayadayada"  }
         Mock Get-BoxstarterPackagePublishedVersion { [Version]"2.0.0.0" }
 
         $result = Publish-BoxstarterPackage $pkgName 2>$err
