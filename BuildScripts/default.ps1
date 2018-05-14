@@ -24,7 +24,7 @@ properties {
 
 Task default -depends Build
 Task Build -depends Build-Clickonce, Build-Web, Install-ChocoLib, Test, Package
-Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
+Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage -description 'Versions, and packages'
 Task Package -depends Clean-Artifacts, Version-Module, Pack-Nuget, Create-ModuleZipForRemoting, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Chocolatey, Push-Github, Publish-Web
 Task All-Tests -depends Test, Integration-Test
@@ -173,11 +173,6 @@ Task Deploy-Bootstrapper {
     Copy-Item "$basedir\buildscripts\bootstrapper.ps1" "$basedir\web\bootstrapper.ps1"
 }
 
-Task Push-Nuget -description 'Pushes the module to MyGet feed' {
-    PushDirectory $baseDir\buildPackages
-    PushDirectory $baseDir\buildArtifacts
-}
-
 Task Push-Chocolatey -description 'Pushes the module to Chocolatey feed' {
     exec {
         Get-ChildItem "$baseDir\buildArtifacts\*.nupkg" |
@@ -323,13 +318,6 @@ function PackDirectory($path, [switch]$AddReleaseNotes){
 
 function Get-ReleaseNotes {
     [xml](Get-Content "$baseDir\BuildScripts\releaseNotes.xml")
-}
-
-function PushDirectory($path){
-    exec {
-        Get-ChildItem "$path\*.nupkg" |
-            % { cpush $_ -source "https://www.myget.org/F/boxstarter/api/v2/package" }
-    }
 }
 
 # Borrowed from Luis Rocha's Blog (http://www.luisrocha.net/2009/11/setting-assembly-version-with-windows.html)

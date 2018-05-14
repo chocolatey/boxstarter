@@ -16,7 +16,6 @@ This essentially wraps Chocolatey Install and provides these additional features
  The .nupkg file for the provided package name is searched in the following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
  - The Chocolatey feed
- - The Boxstarter feed on MyGet
  This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
 
  If the package name provided is a URL or resolves to a file. Then
@@ -30,7 +29,6 @@ This essentially wraps Chocolatey Install and provides these additional features
  following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
  - The Chocolatey feed
- - The Boxstarter feed on MyGet
 
 .Parameter LocalRepo
 This is the path to the local boxstarter repository where boxstarter
