@@ -105,7 +105,7 @@ Describe "Publish-BoxstarterPackage" {
         }
     }
 
-    Context "When nuget throws an error" {
+    Context "When NuGet throws an error" {
         $global:Error.Clear()
         $pkgName="package1"
         [Uri]$feed="http://myfeed"
@@ -125,7 +125,7 @@ Describe "Publish-BoxstarterPackage" {
 
         $result = Publish-BoxstarterPackage $pkgName 2>$err
 
-        it "should write nuget error" {
+        it "should write NuGet error" {
             $global:Error[0].Exception.Message | should be ($nugetError -Join ", ")
         }
         it "Should include error in Publish errors" {
@@ -152,7 +152,7 @@ Describe "Publish-BoxstarterPackage" {
 
         $result = Publish-BoxstarterPackage $pkgName 2>$err
 
-        it "should write nuget error" {
+        it "should write NuGet error" {
             $global:Error[0].Exception.Message | should be $restException.Message
         }
         it "Should include error in Publish errors" {

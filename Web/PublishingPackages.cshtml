@@ -38,9 +38,9 @@ Set-BoxstarterConfig -NugetSources "https://www.myget.org/F/MyNugetFeed/api/v2;h
 <p>This will cause Boxstarter to search for packages in the local repository and then in your MyNugetFeed followed by the Chocolatey.org feed.</p>
 
 <h3>Pushing packages to a feed</h3>
-<p>Boxstarter does not provide any functionality for publishing packages to a NuGet feed. However, you can use nuget.exe which does provide this capability. You can obtain the nuget.exe command line interface by installing the nuget.commandline package. Calling the NuGet command line with the <a href="https://docs.nuget.org/docs/reference/command-line-reference#Push_Command">Push</a> command and the feed URL will publish your package to that feed.</p>
+<p>Boxstarter does not provide any functionality for publishing packages to a NuGet feed. However, you can use NuGet.exe which does provide this capability. You can obtain the NuGet.exe command line interface by installing the nuget.commandline package. Calling the NuGet command line with the <a href="https://docs.nuget.org/docs/reference/command-line-reference#Push_Command">Push</a> command and the feed URL will publish your package to that feed.</p>
 <pre>
-nuget" push MyPackage.1.0.0.nupkg &lt;Your MyGet API Key&gt; -Source https://www.myget.org/F/MyFeed/api/v2/package
+nuget push MyPackage.1.0.0.nupkg &lt;Your MyGet API Key&gt; -Source https://www.myget.org/F/MyFeed/api/v2/package
 </pre>
 <p>If you want to publish to the Chocolatey community feed, Chocolatey has a command, <a href="https://github.com/chocolatey/choco/wiki/CommandsPush">choco push</a>, which will publish your package to Chocolatey without needing to specify the feed URL.</p>
 <pre>

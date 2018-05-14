@@ -2,7 +2,7 @@ function Select-BoxstarterResultsToPublish {
 <#
 .SYNOPSIS
 Returns successful Boxstarter packages from provided test results
-eligible to be published to a nuget feed.
+eligible to be published to a NuGet feed.
 
 .DESCRIPTION
 Test-BoxstarterPackage will return a set of test results given an
@@ -28,7 +28,7 @@ choose the packages which passed on all test machines.
 Set-BoxstarterDeployOptions can be used to designate the machines to
 be used for testing. The successful packages are then piped to
 Publish-BoxstarterPackage which publishes the packages to their
-associated nuget feed.
+associated NuGet feed.
 
 .LINK
 https://boxstarter.org

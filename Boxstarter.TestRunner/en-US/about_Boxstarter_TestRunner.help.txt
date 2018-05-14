@@ -35,7 +35,7 @@ Configuring Boxstarter Testing Options
     Boxstarter tests Chocolatey packages by deploying and installing the
     package to one or more deployment targets. The deployment options include
     settings that control what computers to use to test the packages, the
-    credentials to use, VM checkpoints to restore as well as nuget feed and
+    credentials to use, VM checkpoints to restore as well as NuGet feed and
     API key for publishing successful packages.
 
     To read the current settings for these options, use
@@ -50,12 +50,12 @@ Configuring Boxstarter Testing Options
     subsequent runs.
 
     In addition to configuring settings regarding the deployment targets where
-    packages will be tested, a default nuget feed URL and an API Key can be
+    packages will be tested, a default NuGet feed URL and an API Key can be
     configured. When testing an entire repository, calling Test-BoxstarterPackage
-    with no parameters, the nuget feed is queried for the latest published
+    with no parameters, the NuGet feed is queried for the latest published
     version. If the local package version is greater than the version published,
     the package install is tested. Individual packages in a Boxstarter repository
-    can be published to different feeds. The nuget feed and API Key configured
+    can be published to different feeds. The NuGet feed and API Key configured
     using Set-BoxstarterDeploymentOptions are default settings used if a package
     has not been individually assigned to its own feed.
 

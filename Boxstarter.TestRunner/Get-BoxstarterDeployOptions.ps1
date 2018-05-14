@@ -7,7 +7,7 @@ Lists all Boxstarter deployment options currently set
 Boxstarter tests Chocolatey packages by deploying and installing the
 package to a remote machine. The deployment options include settings
 that control what computers to use to test the packages, the credentials
-to use, VM checkpoints to snap as well as nuget feed and API key for
+to use, VM checkpoints to snap as well as NuGet feed and API key for
 publishing successful packages. To change these options, use
 Set-BoxstarterDeploymentOptions.
 

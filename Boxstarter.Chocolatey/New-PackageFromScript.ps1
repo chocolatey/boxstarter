@@ -5,7 +5,7 @@ Creates a NuGet package from a Chocolatey script
 
 .DESCRIPTION
 This creates a .nupkg file from a script file. It adds a dummy nuspec
-and packs the nuspec and script to a nuget package saved to
+and packs the nuspec and script to a NuGet package saved to
 $Boxstarter.LocalRepo. The function returns a string that is the
 Package Name of the package.
 

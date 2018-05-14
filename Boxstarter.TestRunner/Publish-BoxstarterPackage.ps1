@@ -12,7 +12,7 @@ to a feed. If no feed is explicitly assigned to a package, then the
 Default NuGet Feed of the BoxstarterDeployOptions is used. This can be set
 using Set-BoxstarterDeployOptions and if no default feed is set, the public
 Chocolatey community feed is used. A package feed can be cleared by using
-Remove-BoxstarterPackageNugetFeed. It will then use the default nuget feed.
+Remove-BoxstarterPackageNugetFeed. It will then use the default NuGet feed.
 If you want to ensure that a package is never associated with a feed
 including the default feed, use Set-BoxstarterPackageNugetFeed and set
 the feed to $null.
@@ -64,7 +64,7 @@ Set-BoxstarterFeedAPIKey
             else {
                 $err = @()
                 $nupkg = join-path $Boxstarter.LocalRepo "$_.$($pkg.Version).nupkg"
-                Write-BoxstarterMessage "Calling nuget: push $nupkg $(Get-BoxstarterFeedAPIKey $pkg.Feed) -Source $($pkg.Feed)/package -NonInteractive" -Verbose
+                Write-BoxstarterMessage "Calling NuGet: push $nupkg $(Get-BoxstarterFeedAPIKey $pkg.Feed) -Source $($pkg.Feed)/package -NonInteractive" -Verbose
                 $err += Invoke-NugetPush $pkg $nupkg 2>&1
                 try {
                     for($count = 1; $count -le 5; $count++) {

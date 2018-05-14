@@ -36,7 +36,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
 
         Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | out-null
 
-        it "should concatenate local repo and nuget sources for source param to Chocolatey" {
+        it "should concatenate local repo and NuGet sources for source param to Chocolatey" {
             $script:passedSource | Should Be "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
         }
     }

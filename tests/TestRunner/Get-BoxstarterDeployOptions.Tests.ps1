@@ -19,7 +19,7 @@ Describe "Get-BoxstarterDeployOptions" {
     Context "When Getting options that have not been set" {
         $result = Get-BoxstarterDeployOptions
 
-        it "should return the Chocolatey community feed as the default nuget feed" {
+        it "should return the Chocolatey community feed as the default NuGet feed" {
             $result.DefaultNugetFeed | should be "https://chocolatey.org/api/v2"
         }
         it "should return localhost as the default deployment target" {
@@ -74,10 +74,10 @@ Describe "Get-BoxstarterDeployOptions" {
         it "should put secrets options file in the right place" {
             "$($Boxstarter.LocalRepo)\BoxstarterScripts\$env:computername-$env:USERNAME-options.xml" | should exist
         }
-        it "should get default nuget feed" {
+        it "should get default NuGet feed" {
             $result.DefaultNugetFeed | should be "https://www.myget.org/F/boxstarter/api/v2"
         }
-        it "should get default nuget feed API key" {
+        it "should get default NuGet feed API key" {
             $result.DefaultFeedAPIKey | should be $key
         }
     }
