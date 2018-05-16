@@ -1,6 +1,6 @@
 function Get-Boxstarter {
     Param(
-        [string] $Version = "2.10.3",
+        [string] $Version = "2.11.0",
         [switch] $Force
     )
     if(!(Test-Admin)) {

@@ -18,9 +18,9 @@
     </dependencies>
     <releaseNotes xmlns="">
 - Revert vendored Chocolatey to stable 0.10.5
-- Fix HRESULT code for WU_E_INSTALL_NOT_ALLOWED
-- Handle the case where the Windows Update Agent is updating itself
-- Install boxstarter to macine instead of user
+- Add a ShowRibbon for Windows Explorer
+- Use System.IO.Compression.FileSystem for boxstarter module expansion on modern PowerShell versions
+- Add file64 param to fix 64 bit binary installs
 </releaseNotes>
   </metadata>
   <files>
