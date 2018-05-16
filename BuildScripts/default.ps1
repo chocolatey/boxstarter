@@ -181,6 +181,7 @@ Task Push-Chocolatey -description 'Pushes the module to Chocolatey community sfe
 }
 
 Task Push-Github {
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12;
     $headers = @{
         Authorization = 'Basic ' + [Convert]::ToBase64String(
             [Text.Encoding]::ASCII.GetBytes("$($env:BOXSTARTER_GITHUB_USERNAME):$($env:BOXSTARTER_GITHUB_TOKEN)"));
