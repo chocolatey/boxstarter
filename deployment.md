@@ -2,6 +2,7 @@
 
 ## Prerequisites
 
+* Run `.\build.bat Install-ChocoLib` - this will place the required version of the Chocolatey Lib into the Boxstarter.Chocolatey folder
 * You will need a code signing certificate installed in your personal certificate store
 * The thumbprint of that certificate needs to be specified in the `ManifestCertificateThumbprint` property inside the `Boxstarter.ClickOnce` `.csproj` file.
 * You should set `$env:BOXSTARTER_GITHUB_USERNAME` to your GitHub username
