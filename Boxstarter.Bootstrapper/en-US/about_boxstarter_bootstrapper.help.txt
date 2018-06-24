@@ -20,7 +20,7 @@ ENABLING REBOOTS
 	If Reoots are enabled, calling INVOKE-REBOOT will prepare the
 	Boxstarter environment for reboot and force a restart of the
 	local machine. DO NOT CALL RESTART-COMPUTER. This will not allow
-	Boxstarter to propperly prepare for reboot and will disable
+	Boxstarter to properly prepare for reboot and will disable
 	automatic logon and not allow the Boxstarter script to continue
 	upon reboot.
 
