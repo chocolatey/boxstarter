@@ -18,7 +18,7 @@ function Get-Boxstarter {
 
     $badPolicy = $false
     @("Restricted", "AllSigned") | ? { $_ -eq (Get-ExecutionPolicy).ToString() } | % {
-        Write-Host "Your current PowerShell Execution Policy is set to '$(Get-ExecutionPolicy)' and will prohibit boxstarter from operating propperly."
+        Write-Host "Your current PowerShell Execution Policy is set to '$(Get-ExecutionPolicy)' and will prohibit boxstarter from operating properly."
         Write-Host "Please use Set-ExecutionPolicy to change the policy to RemoteSigned or Unrestricted."
         $badPolicy = $true
     }
