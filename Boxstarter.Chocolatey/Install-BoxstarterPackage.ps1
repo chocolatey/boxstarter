@@ -16,7 +16,7 @@ This function wraps a Chocolatey Install and provides these additional features
 
  The .nupkg file for the provided package name is searched in the following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
- - The Chocolatey community feed
+ - The Chocolatey community feed / OR NugetSources in Boxstarter.config when the 'DelegateChocoSources' switch is used
  This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
 
  If the package name provided is a URL or resolves to a file, then
@@ -90,6 +90,10 @@ This is the path to the local boxstarter repository where boxstarter
 should look for .nupkg files to install. By default this is located
 in the BuildPackages directory just under the root Boxstarter
 directory but can be changed with Set-BoxstarterConfig.
+
+.PARAMETER DelegateChocoSources
+This enables remote chocolatey installs to use the same NugetSources
+as the local boxstarter install.
 
 .NOTES
 If specifying only one package, Boxstarter calls Chocolatey with the
@@ -276,7 +280,8 @@ about_boxstarter_chocolatey
         [parameter(ParameterSetName="Package")]
         [switch]$KeepWindowOpen,
         [string]$LocalRepo,
-        [switch]$DisableRestart
+        [switch]$DisableRestart,
+        [switch]$DelegateChocoSources
     )
     $CurrentVerbosity=$global:VerbosePreference
     try {
@@ -305,10 +310,12 @@ about_boxstarter_chocolatey
             $sessionArgs.Credential=$Credential
         }
 
+				$delegateSources = if ($DelegateChocoSources) { $true} else { $false }
+
         #If $sessions are being provided we assume remoting is setup on both ends
         #and don't need to test, configure and tear down
         if($Session -ne $null){
-            Process-Sessions $Session $sessionArgs
+            Process-Sessions $Session $sessionArgs $delegateSources
             return
         }
 
@@ -336,7 +343,7 @@ about_boxstarter_chocolatey
                 $ConnectionUri | %{
                     $sessionArgs.ConnectionURI = $_
                     Write-BoxstarterMessage "Installing $packageName on $($_.ToString())"
-                    Install-BoxstarterPackageOnComputer $_.Host $sessionArgs $PackageName $DisableReboots $CredSSPStatus
+                    Install-BoxstarterPackageOnComputer $_.Host $sessionArgs $PackageName $DisableReboots $CredSSPStatus $delegateSources
                 }
             }
             elseif($BoxstarterConnectionConfig) {
@@ -348,13 +355,13 @@ about_boxstarter_chocolatey
                     if($_.PSSessionOption){
                         $sessionArgs.SessionOption = $_.PSSessionOption
                     }
-                    Install-BoxstarterPackageOnComputer $_.ConnectionURI.Host $sessionArgs $PackageName $DisableReboots $CredSSPStatus
+                    Install-BoxstarterPackageOnComputer $_.ConnectionURI.Host $sessionArgs $PackageName $DisableReboots $CredSSPStatus $delegateSources
                 }
             }
             else {
                 $ComputerName | %{
                     $sessionArgs.ComputerName = $_
-                    Install-BoxstarterPackageOnComputer $_ $sessionArgs $PackageName $DisableReboots $CredSSPStatus
+                    Install-BoxstarterPackageOnComputer $_ $sessionArgs $PackageName $DisableReboots $CredSSPStatus $delegateSources
                 }
             }
         }
@@ -384,13 +391,13 @@ function Get-ComputerNames([URI[]]$ConnectionUris) {
     return $computerNames
 }
 
-function Process-Sessions($sessions, $sessionArgs){
+function Process-Sessions($sessions, $sessionArgs, $delegateSources){
     $Sessions | %{
         Write-BoxstarterMessage "Processing Session..." -Verbose
         Set-SessionArgs $_ $sessionArgs
         $record = Start-Record $_.ComputerName
         try {
-            if(-not (Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs)){
+            if(-not (Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs $delegateSources)){
                 $record.Completed=$false
             }
         }
@@ -431,7 +438,7 @@ function Finish-Record($obj) {
     Write-BoxstarterMessage "object written..." -Verbose
 }
 
-function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots, $CredSSPStatus){
+function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots, $CredSSPStatus, $delegateSources){
     $record = Start-Record $ComputerName
     try {
         if(!(Enable-RemotingOnRemote $sessionArgs $ComputerName)){
@@ -447,7 +454,7 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
         write-BoxstarterMessage "Creating a new session with $computerName..." -Verbose
         $session = New-PSSession @sessionArgs -Name Boxstarter
 
-        if(-not (Install-BoxstarterPackageForSession $session $PackageName $DisableReboots $sessionArgs $enableCredSSP)){
+        if(-not (Install-BoxstarterPackageForSession $session $PackageName $DisableReboots $sessionArgs $enableCredSSP $delegateSources)){
             $record.Completed=$false
         }
     }
@@ -460,7 +467,7 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
     }
 }
 
-function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReboots, $sessionArgs, $enableCredSSP) {
+function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReboots, $sessionArgs, $enableCredSSP, $delegateSources) {
     try{
         if($session.Availability -ne "Available"){
             write-Error (New-Object -TypeName ArgumentException -ArgumentList "The Session is not Available")
@@ -470,7 +477,7 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
         for($count = 1; $count -le 5; $count++) {
             try {
                 Write-BoxstarterMessage "Attempt #$count to copy Boxstarter modules to $($session.ComputerName)" -Verbose
-                Setup-BoxstarterModuleAndLocalRepo $session
+                Setup-BoxstarterModuleAndLocalRepo $session $delegateSources
                 break
             }
             catch {
@@ -584,7 +591,7 @@ function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
     return $True
 }
 
-function Setup-BoxstarterModuleAndLocalRepo($session){
+function Setup-BoxstarterModuleAndLocalRepo($session, $delegateSources){
     if($LocalRepo){$Boxstarter.LocalRepo=$LocalRepo}
     Write-BoxstarterMessage "Copying Boxstarter Modules and LocalRepo packages at $($Boxstarter.BaseDir) to $env:temp on $($Session.ComputerName)..."
     Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | out-Null }
@@ -635,8 +642,23 @@ function Setup-BoxstarterModuleAndLocalRepo($session){
         if($configXml.config.LocalRepo -ne $null) {
             $configXml.config.RemoveChild(($configXml.config.ChildNodes | ? { $_.Name -eq "LocalRepo"}))
             $configXml.Save((Join-Path $env:temp\Boxstarter BoxStarter.config))
-        }
+				}
     }
+		if ($delegateSources) {
+			Write-BoxstarterMessage "Delegating Boxstarter NugetSources to remote host..."
+			$localCfg = (Join-Path $($Boxstarter.BaseDir) BoxStarter.config)
+			[xml]$configXml = Get-Content $localCfg
+			[string]$theSources = $($configXml.config.NugetSources)
+			Write-BoxstarterMessage "$localCfg - NugetSources: '$theSources'" -Verbose
+			Invoke-Command -Session $Session {
+				param([string]$theSources)
+				Set-ExecutionPolicy Bypass -Force
+				$cfgPath = (Join-Path $env:temp\Boxstarter BoxStarter.config)
+				[xml]$configXml = Get-Content $cfgPath
+				$configXml.config.NugetSources = $theSources
+				$configXml.Save($cfgPath)
+    	} -ArgumentList $theSources
+		}
 }
 
 function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $session) {
