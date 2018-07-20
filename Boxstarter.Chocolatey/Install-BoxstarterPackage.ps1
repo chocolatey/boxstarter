@@ -92,8 +92,8 @@ in the BuildPackages directory just under the root Boxstarter
 directory but can be changed with Set-BoxstarterConfig.
 
 .PARAMETER DelegateChocoSources
-This enables remote chocolatey installs to use the same NugetSources
-as the local boxstarter install.
+This enables remote Chocolatey installs to use the same NugetSources
+as the local Boxstarter install.
 
 .NOTES
 If specifying only one package, Boxstarter calls Chocolatey with the
@@ -642,23 +642,23 @@ function Setup-BoxstarterModuleAndLocalRepo($session, $delegateSources){
         if($configXml.config.LocalRepo -ne $null) {
             $configXml.config.RemoveChild(($configXml.config.ChildNodes | ? { $_.Name -eq "LocalRepo"}))
             $configXml.Save((Join-Path $env:temp\Boxstarter BoxStarter.config))
-				}
-    }
-		if ($delegateSources) {
-			Write-BoxstarterMessage "Delegating Boxstarter NugetSources to remote host..."
-			$localCfg = (Join-Path $($Boxstarter.BaseDir) BoxStarter.config)
-			[xml]$configXml = Get-Content $localCfg
-			[string]$theSources = $($configXml.config.NugetSources)
-			Write-BoxstarterMessage "$localCfg - NugetSources: '$theSources'" -Verbose
-			Invoke-Command -Session $Session {
-				param([string]$theSources)
-				Set-ExecutionPolicy Bypass -Force
-				$cfgPath = (Join-Path $env:temp\Boxstarter BoxStarter.config)
-				[xml]$configXml = Get-Content $cfgPath
-				$configXml.config.NugetSources = $theSources
-				$configXml.Save($cfgPath)
-    	} -ArgumentList $theSources
 		}
+    }
+    if ($delegateSources) {
+        Write-BoxstarterMessage "Delegating Boxstarter NugetSources to remote host..."
+        $localCfg = (Join-Path $($Boxstarter.BaseDir) BoxStarter.config)
+        [xml]$configXml = Get-Content $localCfg
+        [string]$theSources = $($configXml.config.NugetSources)
+        Write-BoxstarterMessage "$localCfg - NugetSources: '$theSources'" -Verbose
+        Invoke-Command -Session $Session {
+            param([string]$theSources)
+            Set-ExecutionPolicy Bypass -Force
+            $cfgPath = (Join-Path $env:temp\Boxstarter BoxStarter.config)
+            [xml]$configXml = Get-Content $cfgPath
+            $configXml.config.NugetSources = $theSources
+            $configXml.Save($cfgPath)
+        } -ArgumentList $theSources
+    }
 }
 
 function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $session) {
