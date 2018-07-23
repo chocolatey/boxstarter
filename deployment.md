@@ -1,5 +1,13 @@
 # Deploying Boxstarter
 
+## Visual Studio Requirements
+
+* At least Visual Studio 2013;
+* PowerShell Tools for Visual Studio which you can install from [Chocolatey](https://chocolatey.org):
+    * [Visual Studio 2013](https://www.chocolatey.org/packages/poshtools-visualstudio2013): `choco install poshtools-visualstudio2013 -y`
+    * [Visual Studio 2015](https://chocolatey.org/packages/visualstudio2015-powershelltools): `choco install visualstudio2015-powershelltools -y`
+    * [Visual Studio 2017](https://chocolatey.org/packages/visualstudio2017-powershelltools): `choco install visualstudio2017-powershelltools -y`
+
 ## Prerequisites
 
 * Run `.\build.bat Install-ChocoLib` - this will place the required version of the Chocolatey Lib into the Boxstarter.Chocolatey folder
