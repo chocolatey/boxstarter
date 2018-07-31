@@ -1,0 +1,8 @@
+VERIFICATION
+Verification is intended to assist the Chocolatey moderators and community in verifying that this package's contents are trustworthy.
+
+To verify the files using the project source:
+
+1. Please go to the project source location (https://github.com/chocolatey/boxstarter);
+2. Download the source files for the module you want to verify. Make sure the version of the file you download is the same version as the files from the package you want to verify;
+2. For each source file use Get-FileHash -Path <FILE TO VERIFY> to get the file hash value from both the downloaded file (from step 1 above) and the file from the package and compare them;
