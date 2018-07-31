@@ -258,15 +258,15 @@ task Install-ChocoLib {
     exec { .$nugetExe install chocolatey.lib -Version 0.10.5 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
     exec { .$nugetExe install log4net -Version 2.0.3 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
     MkDir $basedir\Boxstarter.Chocolatey\chocolatey -ErrorAction SilentlyContinue
-    Copy-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3\lib\net40-full\* $basedir\Boxstarter.Chocolatey\chocolatey
-    Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.5\lib\* $basedir\Boxstarter.Chocolatey\chocolatey
+    Copy-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3\lib\net40-full\* $basedir\Boxstarter.Chocolatey\chocolatey -Exclude *.xml
+    Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.5\lib\* $basedir\Boxstarter.Chocolatey\chocolatey -Exclude *.xml
     Remove-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3 -Recurse -Force
     Remove-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.5 -Recurse -Force
 }
 
 task Copy-PowerShellFiles -depends Clean-Artifacts {
     $tempNuGetDirectory = "$basedir\buildArtifacts\tempNuGetFolders"
-    $exclude = @("bin", "obj")
+    $exclude = @("bin", "obj", "*.pssproj")
 
     Copy-Item -Path $basedir\BuildScripts\chocolateyinstall.ps1 -Destination $tempNuGetDirectory
     Copy-Item -Path $basedir\BuildScripts\setup.ps1 -Destination $tempNuGetDirectory
