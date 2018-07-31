@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildScripts", "BuildScript
 		BuildScripts\releaseNotes.xml = BuildScripts\releaseNotes.xml
 		BuildScripts\setup.bat = BuildScripts\setup.bat
 		BuildScripts\setup.ps1 = BuildScripts\setup.ps1
+		BuildScripts\VERIFICATION.txt = BuildScripts\VERIFICATION.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9934F8F4-B4E6-4C70-8BEA-30CCF926284A}"

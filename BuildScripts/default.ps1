@@ -273,6 +273,7 @@ task Copy-PowerShellFiles -depends Clean-Artifacts {
     Copy-Item -Path $basedir\BuildScripts\nuget\Boxstarter.Azure.PreInstall.ps1 -Destination $tempNuGetDirectory
     Copy-Item -Path $basedir\BuildScripts\BoxstarterChocolateyInstall.ps1 -Destination $tempNuGetDirectory
     Copy-Item -Path $basedir\BoxstarterShell.ps1 -Destination $tempNuGetDirectory
+    Copy-Item -Path $basedir\BuildScripts\VERIFICATION.txt -Destination $tempNuGetDirectory
 
     Copy-Item -Path $basedir\Boxstarter.Azure\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.Azure -Exclude $exclude
     Copy-Item -Path $basedir\Boxstarter.Bootstrapper\* -Recurse -Destination $tempNuGetDirectory\Boxstarter.Bootstrapper -Exclude $exclude
