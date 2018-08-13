@@ -29,7 +29,7 @@ The Chocolatey team has very explicit information here regarding the process for
 
 ## Reporting an Issue/Bug?
 
-Submitting an Issue (or a Bug)? See the **[Submitting Issues](https://github.com/chocolatey/boxstarter#submitting-issues) section** in the [README](https://github.com/chocolatey/boxstarter/blob/master/README.md#submitting-issues).
+Submitting an Issue (or a Bug)? See the [Submitting Issues](https://github.com/chocolatey/boxstarter#submitting-issues) section in the [README](https://github.com/chocolatey/boxstarter/blob/master/README.md#submitting-issues).
 
 ## Submitting an Enhancement
 Log a GitHub issue. There are less constraints on this versus reporting issues. The process for contributions is roughly as follows:
@@ -69,7 +69,7 @@ Start with [Prerequisites](#prerequisites).
     1. Open a command line and navigate to that directory.
     1. Add the upstream fork - `git remote add upstream git@github.com:chocolatey/boxstarter.git`
     1. Run `git fetch upstream`
-    1. Ensure you have user name and email set appropriately to attribute your contributions - see [Name](https://help.github.com/articles/setting-your-username-in-git/) / [Email](https://help.github.com/articles/setting-your-email-in-git/).
+    1. Ensure you have user name and email set appropriately to attribute your contributions - see [Name](https://help.github.com/articles/setting-your-username-in-git/) / [Email](https://help.github.com/articles/setting-your-commit-email-address-in-git/).
     1. Ensure that the local repository has the following settings (without `--global`, these only apply to the *current* repository):
       * `git config core.autocrlf false`
       * `git config core.symlinks false`
