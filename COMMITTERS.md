@@ -17,7 +17,7 @@ Committers
 
 ## Branch Targeting
 
-Please target the master branch. It makes it much easier to push the shiny green button on a pull request. If you are not sure where to target, ask.
+Please target the master branch. It makes it much easier to push the shiny green button on a pull request.
 
 ## Summary
 We like to see folks contributing to Boxstarter. If you are a committer, we'd like to see you help from time to time with triage and the pull request process.
@@ -58,4 +58,4 @@ Unless there is something wrong with the code, we don't ask contributors to reba
 ## Merging
 Once you have reviewed the change set and determined it is ready for merge, the next steps are to bring it local and evaluate the code further by actually working with it, running the tests locally and adding any additional commits or fix-ups that are necessary in a local branch.
 
-When merging the user's contribution, it should be done with `git merge --log --no-ff` to create a merge commit so that in case there is an issue it becomes easier to revert later, and so that we can see where the code came from should we ever need to go find it later (more information on this can be found [here](https://www.kernel.org/pub/software/scm/git/docs/git-merge.html) and also a discussion on why this is a good idea [here](http://differential.io/blog/best-way-to-merge-a-github-pull-request)).
+When merging the user's contribution, it should be done with `git merge --log --no-ff` to create a merge commit so that in case there is an issue it becomes easier to revert later, and so that we can see where the code came from should we ever need to go find it later (more information on this can be found [here](https://www.kernel.org/pub/software/scm/git/docs/git-merge.html) and also a discussion on why this is a good idea [here](https://differential.com/insights/best-way-to-merge-a-github-pull-request/)).
