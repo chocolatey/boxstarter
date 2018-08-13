@@ -107,4 +107,4 @@ Submitting a ticket:
 If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [CONTRIBUTING](https://github.com/chocolatey/boxstarter/blob/master/CONTRIBUTING.md).
 
 ## Committers
-Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey/choco/blob/master/COMMITTERS.md).
+Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey/boxstarter/blob/master/COMMITTERS.md).
