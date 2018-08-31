@@ -82,7 +82,7 @@ Invoke-Reboot
             $encryptedPass = convertfrom-securestring -securestring $password
             $passwordArg = "-encryptedPassword $encryptedPass"
         }
-        $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($unNormalized.FullName)`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'}) $passwordArg"
+        $command = "-ExecutionPolicy bypass -command Import-Module `"$($unNormalized.FullName)`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'}) $passwordArg;Read-Host 'Type ENTER to exit'"
         Start-Process powershell -verb runas -argumentlist $command
         return
     }
