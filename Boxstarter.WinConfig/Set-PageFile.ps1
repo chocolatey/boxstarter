@@ -1,3 +1,4 @@
+#Andrea Dalle Vacche
 #Requires -Version 3.0
  
 Function Set-PageFile {
@@ -21,16 +22,16 @@ Function Set-PageFile {
     .PARAMETER  <AutoConfigure>
         Automatically configure the initial size and maximumsize.
     .EXAMPLE
-        C:\PS> Set-PageFile -InitialSize 1024 -MaximumSize 2048 -DriveLetter "C:","D:"
+        C:\PS> Set-PageFile -InitialSize 1024 -MaximumSize 4096 -DriveLetter "C","D"
  
-        Execution Results: Set page file size on "C:" successful.
+        Execution Results: Set page file size on "C" successful.
         Execution Results: Set page file size on "D:" successful.
  
         Name            InitialSize(MB) MaximumSize(MB)
         ----            --------------- ---------------
-        C:\pagefile.sys            1024            2048
-        D:\pagefile.sys            1024            2048
-        E:\pagefile.sys            2048            2048
+        C:\pagefile.sys            1024            4096
+        D:\pagefile.sys            1024            4096
+        E:\pagefile.sys            2048            4096
     .LINK
         Get-WmiObject
         http://technet.microsoft.com/library/hh849824.aspx
