@@ -3,7 +3,7 @@ properties {
     $baseDir = (Split-Path -parent $psake.build_script_dir)
     if(Get-Command Git -ErrorAction SilentlyContinue) {
         $list = [System.Collections.ArrayList]::new()
-        git tag | ? { $_ -match '^[0-9\.]*$' } | % { $list.Add([Version]::new($_)) } | Out-Null
+        git tag | Where-Object { $_ -match '^[0-9\.]*$' } | ForEach-Object { $list.Add([Version]::new($_)) } | Out-Null
         $list.Sort()
         $versionTag = $list[$list.Count-1].ToString()
         $version = $versionTag + "."
@@ -76,7 +76,7 @@ task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
 }
 
 Task Test -depends Install-ChocoLib, Pack-NuGet, Create-ModuleZipForRemoting {
-    pushd "$baseDir"
+    Push-Location "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     $pesterTestResultsFile = "$baseDir\buildArtifacts\TestResults.xml"
     $pesterTestResultsHtmlFile = "$baseDir\buildArtifacts\TestResults.html"
@@ -97,11 +97,11 @@ Task Test -depends Install-ChocoLib, Pack-NuGet, Create-ModuleZipForRemoting {
         throw 'There were failed unit tests.'
     }
 
-    popd
+    Pop-Location
 }
 
 Task Integration-Test -depends Pack-NuGet, Create-ModuleZipForRemoting {
-    pushd "$baseDir"
+    Push-Location "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     if($testName){
         exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/IntegrationTests -testName $testName}
@@ -109,19 +109,19 @@ Task Integration-Test -depends Pack-NuGet, Create-ModuleZipForRemoting {
     else{
         exec {."$pesterDir\tools\bin\Pester.bat" $baseDir/IntegrationTests }
     }
-    popd
+    Pop-Location
 }
 
 Task Version-Module -description 'Stamps the psd1 with the version and last changeset SHA' {
-    Get-ChildItem "$baseDir\**\*.psd1" | % {
+    Get-ChildItem "$baseDir\**\*.psd1" | ForEach-Object {
        $path = $_
         (Get-Content $path) |
-            % {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$version'" } |
-                % {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } |
+            ForEach-Object {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$version'" } |
+                ForEach-Object {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } |
                     Set-Content $path
     }
     (Get-Content "$baseDir\BuildScripts\bootstrapper.ps1") |
-        % {$_ -replace "Version = .*`$", "Version = `"$version`"," } |
+        ForEach-Object {$_ -replace "Version = .*`$", "Version = `"$version`"," } |
             Set-Content "$baseDir\BuildScripts\bootstrapper.ps1"
 }
 
@@ -176,7 +176,7 @@ Task Deploy-Bootstrapper {
 Task Push-Chocolatey -description 'Pushes the module to Chocolatey community sfeed' {
     exec {
         Get-ChildItem "$baseDir\buildArtifacts\*.nupkg" |
-            % { cpush $_  }
+            ForEach-Object { cpush $_  }
     }
 }
 
@@ -210,20 +210,20 @@ Task Push-Github {
         Invoke-RestMethod -Uri $uploadUrl -Method POST -ContentType "application/zip" -InFile "$basedir\BuildArtifacts\Boxstarter.$version.zip" -Headers $headers
     }
     catch{
-        Write-Host $_ | fl * -force
+        write-host $_ | Format-List * -force
     }
 }
 
 task Update-Homepage {
      $versionPattern="[0-9]+(\.([0-9]+|\*)){1,3}"
      $filename = "$baseDir\web\App_Code\Helper.cshtml"
-     (Get-Content $filename) | % {$_ -replace $versionPattern, ($version) } | Set-Content $filename
+     (Get-Content $filename) | ForEach-Object {$_ -replace $versionPattern, ($version) } | Set-Content $filename
 }
 
 task Get-ClickOnceStats {
     $creds = Get-Credential
     mkdir "$basedir\sitelogs" -ErrorAction silentlycontinue
-    pushd "$basedir\sitelogs"
+    Push-Location "$basedir\sitelogs"
     $ftpScript = @"
 user $($creds.UserName) $($creds.GetNetworkCredential().Password)
 cd LogFiles/http/RawLogs
@@ -234,8 +234,8 @@ bye
     if(!(Test-Path $env:ChocolateyInstall\lib\logparser*)) { cinst logparser -y --no-progress }
     $logParser = "${env:programFiles(x86)}\Log Parser 2.2\LogParser.exe"
     .$logparser -i:w3c "SELECT Date, EXTRACT_VALUE(cs-uri-query,'package') as package, COUNT(*) as count FROM * where cs-uri-stem = '/launch/Boxstarter.WebLaunch.Application' Group by Date, package Order by Date, package" -rtp:-1
-    popd
-    del "$basedir\sitelogs" -Recurse -Force
+    Pop-Location
+    Remove-Item "$basedir\sitelogs" -Recurse -Force
 }
 
 task Install-MSBuild {
@@ -309,10 +309,10 @@ function PackDirectory($path, [switch]$AddReleaseNotes){
     exec {
         $releaseNotes = Get-ReleaseNotes
         Get-ChildItem $path -Recurse -include *.nuspec |
-            % {
+            ForEach-Object {
                  if($AddReleaseNotes) {
                    [xml]$nuspec = Get-Content $_
-                   $oldReleaseNotes = $nuspec.package.metadata.ChildNodes| ? { $_.Name -eq 'releaseNotes' }
+                   $oldReleaseNotes = $nuspec.package.metadata.ChildNodes| Where-Object { $_.Name -eq 'releaseNotes' }
                    $newReleaseNotes = $nuspec.ImportNode($releaseNotes.DocumentElement, $true)
                    $nuspec.package.metadata.ReplaceChild($newReleaseNotes, $oldReleaseNotes) | Out-Null
                    $nuspec.Save($_)
@@ -345,9 +345,9 @@ function Update-AssemblyInfoFiles ([string] $version, [string] $commit) {
         # tf checkout $filename
 
         (Get-Content $filename) | ForEach-Object {
-            % {$_ -replace $assemblyVersionPattern, $assemblyVersion } |
-            % {$_ -replace $fileVersionPattern, $fileVersion } |
-            % {$_ -replace $fileCommitPattern, $commitVersion }
+            ForEach-Object {$_ -replace $assemblyVersionPattern, $assemblyVersion } |
+            ForEach-Object {$_ -replace $fileVersionPattern, $fileVersion } |
+            ForEach-Object {$_ -replace $fileCommitPattern, $commitVersion }
         } | Set-Content $filename
     }
 }

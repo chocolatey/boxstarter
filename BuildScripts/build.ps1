@@ -7,7 +7,7 @@ param (
 )
 $here = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
-    iex ((new-object net.webclient).DownloadString("https://bit.ly/psChocInstall"))
+    Invoke-Expression ((new-object net.webclient).DownloadString("https://bit.ly/psChocInstall"))
 }
 
 if(!(Test-Path $env:ChocolateyInstall\lib\Psake*)) { cinst psake -y --no-progress }
@@ -26,8 +26,8 @@ if($Help){
   return
 }
 
-$psakeDir = (dir $env:ChocolateyInstall\lib\Psake*)
-if($psakeDir.length -gt 0) {$psakerDir = $psakeDir[-1]}
+$psakeDir = (Get-ChildItem $env:ChocolateyInstall\lib\Psake*)
+if($psakeDir.length -gt 0) {$psakeDir = $psakeDir[-1]}
 ."$psakeDir\tools\psake\psake.ps1" "$here/default.ps1" $Action -ScriptPath $psakeDir\tools\psake -parameters $PSBoundParameters
 
 if($psake.build_success -eq $false) {
