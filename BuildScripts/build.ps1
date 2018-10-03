@@ -10,13 +10,13 @@ if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
     iex ((new-object net.webclient).DownloadString("https://bit.ly/psChocInstall"))
 }
 
-if(!(Test-Path $env:ChocolateyInstall\lib\Psake*)) { cinst psake -y }
-if(!(Test-Path $env:ChocolateyInstall\lib\7zip.CommandLine*)) { cinst 7zip.CommandLine -y }
-if(!(Test-Path $env:ChocolateyInstall\lib\pester*)) { cinst pester -v 3.4.0 -y }
-if(!(Test-Path $env:ChocolateyInstall\lib\AzurePowershell*)) { cinst AzurePowershell -y }
-if(!(Test-Path $env:ChocolateyInstall\lib\WindowsAzureLibsForNet*)) { cinst WindowsAzureLibsForNet --version 2.5 -y }
-if(!(Test-Path $env:ChocolateyInstall\bin\nuget.exe)) { cinst nuget.commandline -y }
-if(!(Test-Path $env:ChocolateyInstall\bin\ReportUnit.exe)) { choco install reportunit -y --source https://nuget.org/api/v2 }
+if(!(Test-Path $env:ChocolateyInstall\lib\Psake*)) { cinst psake -y --no-progress }
+if(!(Test-Path $env:ChocolateyInstall\lib\7zip.CommandLine*)) { cinst 7zip.CommandLine -y --no-progress }
+if(!(Test-Path $env:ChocolateyInstall\lib\pester*)) { cinst pester -v 3.4.0 -y --no-progress }
+if(!(Test-Path $env:ChocolateyInstall\lib\AzurePowershell*)) { cinst AzurePowershell -y --no-progress }
+if(!(Test-Path $env:ChocolateyInstall\lib\WindowsAzureLibsForNet*)) { cinst WindowsAzureLibsForNet --version 2.5 -y --no-progress }
+if(!(Test-Path $env:ChocolateyInstall\bin\nuget.exe)) { cinst nuget.commandline -y --no-progress }
+if(!(Test-Path $env:ChocolateyInstall\bin\ReportUnit.exe)) { choco install reportunit -y --source https://nuget.org/api/v2 --no-progress }
 
 if($Help){
   try {
