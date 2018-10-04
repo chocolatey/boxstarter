@@ -148,4 +148,8 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <!-- This is set to true by default if targetting .NET 2.0, 3.0 OR SignManifest == true. Override that for non-official builds. -->
+    <_DeploymentSignClickOnceManifests Condition="'$(CHOCOLATEY_OFFICIAL_CERT)' == ''">false</_DeploymentSignClickOnceManifests>
+  </PropertyGroup>
 </Project>

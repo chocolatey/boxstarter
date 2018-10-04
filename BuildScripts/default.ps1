@@ -231,7 +231,7 @@ mget *
 bye
 "@
     $ftpScript | ftp -i -n $ftpHost
-    if(!(Test-Path $env:ChocolateyInstall\lib\logparser*)) { cinst logparser -y }
+    if(!(Test-Path $env:ChocolateyInstall\lib\logparser*)) { cinst logparser -y --no-progress }
     $logParser = "${env:programFiles(x86)}\Log Parser 2.2\LogParser.exe"
     .$logparser -i:w3c "SELECT Date, EXTRACT_VALUE(cs-uri-query,'package') as package, COUNT(*) as count FROM * where cs-uri-stem = '/launch/Boxstarter.WebLaunch.Application' Group by Date, package Order by Date, package" -rtp:-1
     popd
@@ -239,15 +239,15 @@ bye
 }
 
 task Install-MSBuild {
-    if(!(Test-Path "$env:ProgramFiles\MSBuild\14.0\Bin\msbuild.exe")) { cinst microsoft-build-tools --version 14.0.23107.10 -y }
+    if(!(Test-Path "$env:ProgramFiles\MSBuild\14.0\Bin\msbuild.exe")) { cinst microsoft-build-tools --version 14.0.23107.10 -y --no-progress }
 }
 
 task Install-Win8SDK {
-    if(!(Test-Path "$env:ProgramFiles\Windows Kits\8.1\bin\x64\signtool.exe")) { cinst windows-sdk-8.1 -y }
+    if(!(Test-Path "$env:ProgramFiles\Windows Kits\8.1\bin\x64\signtool.exe")) { cinst windows-sdk-8.1 -y --no-progress }
 }
 
 task Install-WebDeploy {
-    if(!(Test-Path "$env:ProgramW6432\IIS\Microsoft Web Deploy V3")) { cinst webdeploy -y }
+    if(!(Test-Path "$env:ProgramW6432\IIS\Microsoft Web Deploy V3")) { cinst webdeploy -y --no-progress }
 }
 
 Task Restore-NuGetPackages {
