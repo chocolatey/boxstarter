@@ -139,12 +139,12 @@ StartTime    : 11/30/2013 1:56:36 AM
 </pre>
 
 <h3>Using BoxstarterConnectionConfig objects</h3>
-<p>If you have multiple machines you want to install but they require different credentials, use a BoxstarterConnectionConfig. This class contains a ComputerName and a PSCredential property that you can set and pipe to <code>Install-BoxstarterPackage</code>.</p>
+<p>If you have multiple machines you want to install but they require different credentials, use a BoxstarterConnectionConfig. This class contains a ConnectionURI, a PSCredential and an optional <a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/new-pssessionoption">PSSessionOption</a> property that you can set and pipe to <code>Install-BoxstarterPackage</code>.</p>
 <pre>
 $cred1=Get-Credential 'MyTargetMachine\myusername'
 $cred2=Get-Credential 'Domain\myDomainUser'
-$result = (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList machine1,$cred1),`
-    (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList machine2,$cred2) |
+$result = (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList 'http://machine1:5985/wsman',$cred1,$null),`
+    (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList 'http://machine2:5985/wsman',$cred2,$null) |
     Install-BoxstarterPackage -PackageName MyPackage
 </pre>
 <h3>Troubleshooting Remote Installations</h3>
