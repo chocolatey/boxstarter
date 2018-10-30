@@ -18,7 +18,7 @@ properties {
     }
     $nugetExe = "$env:ChocolateyInstall\bin\nuget.exe"
     $ftpHost="waws-prod-bay-001.ftp.azurewebsites.windows.net"
-    $msbuildExe="${env:ProgramFiles(x86)}\MSBuild\14.0\Bin\msbuild.exe"
+    $msbuildExe="${env:programFiles(x86)}\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\msbuild.exe"
     $reportUnitExe = "$env:ChocolateyInstall\bin\ReportUnit.exe"
 }
 
@@ -239,7 +239,10 @@ bye
 }
 
 task Install-MSBuild {
-    if(!(Test-Path "$env:ProgramFiles\MSBuild\14.0\Bin\msbuild.exe")) { cinst microsoft-build-tools --version 14.0.23107.10 -y --no-progress }
+    if(!(Test-Path "${env:programFiles(x86)}\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\msbuild.exe")) {
+        choco install visualstudio2017buildtools -params '--add Microsoft.VisualStudio.Workload.WebBuildTools' --version 15.8.7.0 --no-progress -y
+        choco install microsoft-build-tools --version 15.0.26320.2 --no-progress -y
+    }
 }
 
 task Install-Win8SDK {

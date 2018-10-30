@@ -28,4 +28,4 @@ PublishProfiles
 .vagrant
 .vs
 Backup/
-UpgradeLog.htm
+UpgradeLog*.htm
