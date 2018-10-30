@@ -1,6 +1,19 @@
 <releaseNotes>
-- Revert vendored Chocolatey to stable 0.10.5
-- Add a ShowRibbon for Windows Explorer
-- Use System.IO.Compression.FileSystem for boxstarter module expansion on modern PowerShell versions
-- Add file64 param to fix 64 bit binary installs
+As part of this release we had [7 issues](https://github.com/chocolatey/boxstarter/issues?milestone=1&state=closed) closed.
+
+__bug__
+
+- [__#324__](https://github.com/chocolatey/boxstarter/issues/324) 2.11.0 packages missing chocolatey dlls for remote installs
+
+__enhancements__
+
+- [__#323__](https://github.com/chocolatey/boxstarter/issues/323) Build script install deprecated package WindowsAzurePowershell
+- [__#320__](https://github.com/chocolatey/boxstarter/pull/320) implement DelegateChocoSources switch to enable source feed passing
+- [__#312__](https://github.com/chocolatey/boxstarter/issues/312) Chocolatey Package - include verification/license files
+- [__#311__](https://github.com/chocolatey/boxstarter/issues/311) Chocolatey Packages - Don't include XML files
+- [__#227__](https://github.com/chocolatey/boxstarter/issues/227) SignTool error when running build.bat
+
+__Documentation__
+
+- [__#321__](https://github.com/chocolatey/boxstarter/issues/321) No Visual Studio Prereqs Specified In Docs
 </releaseNotes>
