@@ -14,10 +14,13 @@
     <description>Provides common functions used by multiple Boxstarter Modules.</description>
     <tags>boxstarter</tags>
     <releaseNotes xmlns="">
-- Revert vendored Chocolatey to stable 0.10.5
-- Add a ShowRibbon for Windows Explorer
-- Use System.IO.Compression.FileSystem for boxstarter module expansion on modern PowerShell versions
-- Add file64 param to fix 64 bit binary installs
+- 2.11.0 packages missing chocolatey dlls for remote installs
+- Build script install deprecated package WindowsAzurePowershell
+- implement DelegateChocoSources switch to enable source feed passing
+- Chocolatey Package - include verification/license files
+- Chocolatey Packages - Don't include XML files
+- SignTool error when running build.bat
+- No Visual Studio Prereqs Specified In Docs
 </releaseNotes>
   </metadata>
   <files>
