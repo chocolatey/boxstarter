@@ -1,0 +1,12 @@
+issue-labels-include:
+- breaking change
+- feature
+- bug
+- enhancement
+- Documentation
+issue-labels-exclude:
+- Build
+issue-labels-alias:
+    - name:    Documentation
+      header:  Documentation
+      plural:  Documentation
