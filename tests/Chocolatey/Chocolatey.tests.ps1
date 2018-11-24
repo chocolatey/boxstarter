@@ -434,7 +434,7 @@ Describe "Export-BoxstarterVars" {
     $global:Boxstarter.Var2 = $true
     $global:Boxstarter.Val3 = $null
     $script:out = ""
-    Mock write-host {
+    Mock Write-Host {
         $script:out += $object
     }
 

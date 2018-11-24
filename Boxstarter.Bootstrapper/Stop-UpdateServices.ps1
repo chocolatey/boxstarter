@@ -1,5 +1,5 @@
 function Stop-UpdateServices {
-    write-boxstartermessage "Disabling Automatic Updates from Windows Update"
+    Write-BoxstarterMessage "Disabling Automatic Updates from Windows Update"
     $winUpdateKey = "HKLM:SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\au"
     if(!(Test-Path $winUpdateKey) ) { New-Item $winUpdateKey -Type Folder -Force | Out-Null }
 

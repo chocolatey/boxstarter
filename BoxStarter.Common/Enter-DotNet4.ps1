@@ -1,7 +1,7 @@
 function Enter-Dotnet4 {
 <#
 .SYNOPSIS
-Runs a script from a process hosting the .net 4 runtile
+Runs a script from a process hosting the .net 4 runtime
 
 .DESCRIPTION
 This function will ensure that the .net 4 runtime is installed on the

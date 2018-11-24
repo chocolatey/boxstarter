@@ -1,5 +1,5 @@
 function Start-UpdateServices {
-    write-boxstartermessage "Restore Automatic Updates from Windows Update"
+    Write-BoxstarterMessage "Restore Automatic Updates from Windows Update"
     $winUpdateKey = "HKLM:SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\au"
 
     Remove-BoxstarterError {
