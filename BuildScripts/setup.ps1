@@ -71,6 +71,12 @@ function Uninstall-Boxstarter ($here, $ModuleName, $installArgs = "") {
             Write-Verbose "Removing '$startMenu' menu folder"
             Remove-Item -Path $startMenu -Recurse -Force
         }
+
+        $desktopShortcut = Join-Path -Path ([Environment]::GetFolderPath('CommonDesktop')) -ChildPath "Boxstarter Shell.lnk"
+        if (Test-Path $desktopShortcut) {
+            Write-Verbose "Removing '$desktopShortcut'"
+            Remove-Item -Path $desktopShortcut -Force
+        }
     }
 }
 
