@@ -29,6 +29,7 @@
   </metadata>
   <files>
     <file src="..\..\buildArtifacts\tempNuGetFolders\chocolateyinstall.ps1" target="tools" />
+    <file src="..\..\buildArtifacts\tempNuGetFolders\chocolateyUninstall.ps1" target="tools" />
     <file src="..\..\buildArtifacts\tempNuGetFolders\Setup.ps1" target="tools" />
     <file src="..\..\boxstarter.bat" target="tools" />
     <file src="..\..\boxstarter.config" target="tools" />
