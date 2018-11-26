@@ -78,7 +78,7 @@ Set-BoxstarterFeedAPIKey
                     $err += $_
                 }
                 if($publishedVersion -eq $null -or $publishedVersion -ne $pkg.Version) {
-                    write-Error ($err -join ", " )
+                    Write-Error ($err -join ", " )
                 }
                 else {
                     $err = $null

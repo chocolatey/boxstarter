@@ -8,7 +8,7 @@ console and Boxstarter log.
 Boxstarter runs the provided script and redirects the
 standard output and standard error streams to the host
 console and to the Boxstarter log. This will include both
-PowerShell write-output and errors as well as the output
+PowerShell Write-Output and errors as well as the output
 from any standard command line executables that use
 standard output and error streams.
 
@@ -67,7 +67,7 @@ about_boxstarter_logging
     )
 
     process {
-        if(!$Quiet -and !$Boxstarter.SuppressLogging){write-host $object}
+        if(!$Quiet -and !$Boxstarter.SuppressLogging){Write-Host $object}
         if($object){
             Log-BoxstarterMessage $object
         }

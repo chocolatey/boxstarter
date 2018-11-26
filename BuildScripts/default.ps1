@@ -197,7 +197,7 @@ Task Push-Github {
 
     $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/chocolatey/boxstarter/releases/latest" -Method GET -Headers $headers
     if($latest.tag_name -ne "v$version"){
-        write-host "Creating release"
+        Write-Host "Creating release"
         $response = Invoke-RestMethod -Uri "https://api.github.com/repos/chocolatey/boxstarter/releases" -Method POST -Body $postParams -Headers $headers
         $uploadUrl = $response.upload_url.replace("{?name,label}","?name=boxstarter.$version.zip")
     }
@@ -205,12 +205,12 @@ Task Push-Github {
         $uploadUrl = $latest.upload_url.replace("{?name,label}","?name=boxstarter.$version.zip")
     }
 
-    write-host "Uploading $basedir\BuildArtifacts\Boxstarter.$version.zip to $uploadUrl"
+    Write-Host "Uploading $basedir\BuildArtifacts\Boxstarter.$version.zip to $uploadUrl"
     try {
         Invoke-RestMethod -Uri $uploadUrl -Method POST -ContentType "application/zip" -InFile "$basedir\BuildArtifacts\Boxstarter.$version.zip" -Headers $headers
     }
     catch{
-        write-host $_ | fl * -force
+        Write-Host $_ | fl * -force
     }
 }
 

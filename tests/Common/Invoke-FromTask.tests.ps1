@@ -29,7 +29,7 @@ Describe "Invoke-FromTask" {
 
     Context "When Invoking a task with output"{
         Remove-Item $env:temp\test.txt -ErrorAction SilentlyContinue
-        Mock write-host {
+        Mock Write-Host {
             $script:out += $object
         }
 
@@ -42,7 +42,7 @@ Describe "Invoke-FromTask" {
     Context "When Invoking a task with verbose output"{
         Remove-Item $env:temp\test.txt -ErrorAction SilentlyContinue
         $script:out = ""
-        Mock write-host {
+        Mock Write-Host {
             $script:out += $object
         }
 

@@ -136,7 +136,7 @@ Install-BoxstarterPackage
             if(!$remotingTest) {
                 Log-BoxstarterMessage "PowerShell remoting connection failed:"
                 if($global:Error.Count -gt 0) { Log-BoxstarterMessage $global:Error[0] }
-                write-BoxstarterMessage "Testing WSMAN..."
+                Write-BoxstarterMessage "Testing WSMAN..."
                 $WSManResponse = Test-WSMan $ComputerName -ErrorAction SilentlyContinue
                 if($WSManResponse) {
                     Write-BoxstarterMessage "WSMAN responded. Will not enable WMI." -verbose
@@ -145,7 +145,7 @@ Install-BoxstarterPackage
                 else {
                     Log-BoxstarterMessage "WSMan connection failed:"
                     if($global:Error.Count -gt 0) { Log-BoxstarterMessage $global:Error[0] }
-                    write-BoxstarterMessage "Testing WMI..."
+                    Write-BoxstarterMessage "Testing WMI..."
                     $wmiTest=try { Invoke-WmiMethod -ComputerName $ComputerName -Credential $Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue } catch {$ex=$_}
                     if($wmiTest -or ($ex -ne $null -and $ex.CategoryInfo.Reason -eq "UnauthorizedAccessException")) {
                         Write-BoxstarterMessage "WMI responded. Will not enable WMI." -verbose

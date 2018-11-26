@@ -451,7 +451,7 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
             $enableCredSSP = Should-EnableCredSSP $sessionArgs $computerName
         }
 
-        write-BoxstarterMessage "Creating a new session with $computerName..." -Verbose
+        Write-BoxstarterMessage "Creating a new session with $computerName..." -Verbose
         $session = New-PSSession @sessionArgs -Name Boxstarter
 
         if(-not (Install-BoxstarterPackageForSession $session $PackageName $DisableReboots $sessionArgs $enableCredSSP $delegateSources)){
@@ -470,7 +470,7 @@ function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $Pack
 function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReboots, $sessionArgs, $enableCredSSP, $delegateSources) {
     try{
         if($session.Availability -ne "Available"){
-            write-Error (New-Object -TypeName ArgumentException -ArgumentList "The Session is not Available")
+            Write-Error (New-Object -TypeName ArgumentException -ArgumentList "The Session is not Available")
             return $false
         }
 

@@ -205,7 +205,7 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
             $byte=$reader.ReadByte()
         }
         if($text -ne $null){
-            $text | write-host -NoNewline
+            $text | Write-Host -NoNewline
         }
     }
     finally{

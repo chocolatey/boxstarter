@@ -6,6 +6,6 @@ try {
     if(Test-Path $preInstall) { .$preInstall }
     Install-Boxstarter $tools $ModuleName $env:chocolateyPackageParameters
 } catch {
-    write-output $_ | fl * -force
+    Write-Output $_ | fl * -force
     throw $_.Exception
 }

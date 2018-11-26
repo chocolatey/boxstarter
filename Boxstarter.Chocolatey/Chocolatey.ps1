@@ -30,7 +30,7 @@ param(
     if($Boxstarter.ScriptToCall -ne $null) { Log-BoxStarterMessage $object }
     if($Boxstarter.SuppressLogging){
         $caller = (Get-Variable MyInvocation -Scope 1).Value.MyCommand.Name
-        if("Describe","Context","write-PesterResult" -contains $caller) {
+        if("Describe","Context","Write-PesterResult" -contains $caller) {
             Microsoft.PowerShell.Utility\Write-Host @PSBoundParameters
         }
         return;

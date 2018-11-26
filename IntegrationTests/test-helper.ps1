@@ -87,7 +87,7 @@ function start-task($session, $credential, $packageName) {
     Invoke-Command -Session $session {
         param($Credential, $packageName)
         Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
-        # write-host "$(get-command -module boxstarter.chocolatey | fl | out-string)"
+        # Write-Host "$(get-command -module boxstarter.chocolatey | fl | out-string)"
         Create-BoxstarterTask $Credential
         $taskAction = @"
             `$secpasswd = ConvertTo-SecureString "$($Credential.GetNetworkCredential().Password)" -AsPlainText -Force
@@ -125,7 +125,7 @@ function Setup-BoxstarterModuleAndLocalRepo($BaseDir, $session){
 function wait-task([ref]$session, $ConnectionURI, $credential) {
     if(!(Test-Session $session.value)) {
         if($session.value -ne $null) {
-            write-host "session failed $($session.value.Availability)"
+            Write-Host "session failed $($session.value.Availability)"
             try {
                     Remove-PSSession $session.value -ErrorAction SilentlyContinue
                     Write-Host "removed session after test failure"

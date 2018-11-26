@@ -128,10 +128,10 @@ Set-BoxstarterConfig
         }
         if($Boxstarter.ScriptToCall -eq $null){
             if($bootstrapPackage -ne $null -and $bootstrapPackage.length -gt 0){
-                write-BoxstarterMessage "Installing package $($bootstrapPackage -join ', ')" -Color Cyan
+                Write-BoxstarterMessage "Installing package $($bootstrapPackage -join ', ')" -Color Cyan
             }
             else{
-                write-BoxstarterMessage "Installing Chocolatey" -Color Cyan
+                Write-BoxstarterMessage "Installing Chocolatey" -Color Cyan
             }
             $scriptArgs=@{}
             if($bootstrapPackage){$scriptArgs.bootstrapPackage=$bootstrapPackage}
@@ -160,7 +160,7 @@ function Resolve-LocalRepo([string]$localRepo) {
     if($localRepo){
         $localRepo = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($localRepo)
     } else {$Localrepo = $Boxstarter.Localrepo}
-    write-BoxstarterMessage "LocalRepo is at $localRepo" -Verbose
+    Write-BoxstarterMessage "LocalRepo is at $localRepo" -Verbose
     return $localRepo
 }
 
@@ -195,6 +195,6 @@ function Download-Package([string[]]$bootstrapPackage) {
         $force=$true
     }
     $source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
-    write-BoxstarterMessage "Installing $($bootstrapPackage.Count) packages from $source" -Verbose
+    Write-BoxstarterMessage "Installing $($bootstrapPackage.Count) packages from $source" -Verbose
     Chocolatey install $bootstrapPackage -source $source -force:$force -execution-timeout 86400
 }

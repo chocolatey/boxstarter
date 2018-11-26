@@ -133,12 +133,12 @@ function Read-AuthenticatedPassword {
             $currentUser=Get-CurrentUser
             $creds = New-Object System.Management.Automation.PsCredential("$($currentUser.Domain)\$($currentUser.Name)", $password)
             Start-Process "Cmd.exe" -argumentlist "/c","echo" -Credential $creds
-            write-BoxstarterMessage "Successfully authenticated password."
+            Write-BoxstarterMessage "Successfully authenticated password."
             return $password
         }
         catch { }
     }
-    write-BoxstarterMessage "Unable to authenticate password for $($currentUser.Domain)\$($currentUser.Name). Proceeding with autologon disabled"
+    Write-BoxstarterMessage "Unable to authenticate password for $($currentUser.Domain)\$($currentUser.Name). Proceeding with autologon disabled"
     return $null
 }
 
@@ -157,7 +157,7 @@ function InitAutologon([System.Security.SecureString]$password){
     Write-BoxstarterMessage "AutoLogin status is $($Boxstarter.AutologedOn)" -verbose
     if($Boxstarter.RebootOk -and !$Password -and !$Boxstarter.AutologedOn) {
         Write-BoxstarterMessage "Please type CTRL+C or close this window to exit Boxstarter if you do not want to risk a reboot during this Boxstarter install.`r`n" -nologo -Color Yellow
-        write-BoxstarterMessage @"
+        Write-BoxstarterMessage @"
 Boxstarter may need to reboot your system.
 Please provide your password so that Boxstarter may automatically log you on.
 Your password will be securely stored and encrypted.
