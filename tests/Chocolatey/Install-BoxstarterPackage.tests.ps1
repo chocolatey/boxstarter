@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-if(get-module Boxstarter.chocolatey){Remove-Module boxstarter.chocolatey}
+if(Get-Module Boxstarter.chocolatey){Remove-Module boxstarter.chocolatey}
 $myIp = (Test-Connection -ComputerName $env:COMPUTERNAME -Count 1  | Select IPV4Address).IPV4Address.IPAddressToString
 $myIpv6 = (Test-Connection -ComputerName $env:COMPUTERNAME -Count 1  | Select IPV6Address).IPV6Address.IPAddressToString
 
@@ -247,7 +247,7 @@ Describe "Install-BoxstarterPackage" {
     }
 
     Context "When credential delegation is not set for given computer" {
-        New-Item $regRoot -Force | out-null
+        New-Item $regRoot -Force | Out-null
         Mock Get-WSManCredSSP {return @("The machine is enabled: wsman/blahblah","")}
         Mock Confirm-Choice {return $False}
         Mock Invoke-Command { New-Object System.Object }

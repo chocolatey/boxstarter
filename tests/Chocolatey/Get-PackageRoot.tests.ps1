@@ -1,6 +1,6 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-if(get-module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
-import-module "$here\..\..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1" -Force
+if(Get-Module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
+Import-Module "$here\..\..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1" -Force
 
 Describe "Get-PackageRoot" {
     $testRoot=(Get-PSDrive TestDrive).Root

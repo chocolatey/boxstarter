@@ -33,11 +33,11 @@ CINST Boxstarter
 <h3>Installing from the web</h3>
 <p>If you are running PowerShell v3 or higher:</p>
 <pre>
-. { iwr -useb https://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
+. { iwr -useb https://boxstarter.org/bootstrapper.ps1 } | iex; Get-Boxstarter -Force
 </pre>
 
 <p/><p/>
 <p>If you are running PowerShell v2:</p>
 <pre>
-iex ((New-Object System.Net.WebClient).DownloadString('https://boxstarter.org/bootstrapper.ps1')); get-boxstarter -Force
+iex ((New-Object System.Net.WebClient).DownloadString('https://boxstarter.org/bootstrapper.ps1')); Get-Boxstarter -Force
 </pre>

@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-if(get-module Boxstarter.bootstrapper){Remove-Module boxstarter.bootstrapper}
+if(Get-Module Boxstarter.bootstrapper){Remove-Module boxstarter.bootstrapper}
 Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 |

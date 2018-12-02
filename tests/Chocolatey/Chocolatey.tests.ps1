@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-if(get-module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
+if(Get-Module Boxstarter.Chocolatey){Remove-Module boxstarter.Chocolatey}
 Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
@@ -93,7 +93,7 @@ Describe "Getting-Chocolatey" {
         Mock Remove-Item
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'."}
 
-        Chocolatey Install pkg -RebootCodes @(56,3010,654) 2>&1 | out-null
+        Chocolatey Install pkg -RebootCodes @(56,3010,654) 2>&1 | Out-Null
 
         it "will Invoke-Reboot" {
             Assert-MockCalled Invoke-Reboot -times 1
@@ -108,7 +108,7 @@ Describe "Getting-Chocolatey" {
         Mock Remove-Item
         Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '-654'."}
 
-        Chocolatey Install pkg -RebootCodes @(56,3010,-654) 2>&1 | out-null
+        Chocolatey Install pkg -RebootCodes @(56,3010,-654) 2>&1 | Out-Null
 
         it "will Invoke-Reboot" {
             Assert-MockCalled Invoke-Reboot -times 1
@@ -123,7 +123,7 @@ Describe "Getting-Chocolatey" {
         Mock Remove-Item
         Mock Call-Chocolatey {throw "[ERROR] Exit code was '3010'." }
 
-        Chocolatey Install pkg -RebootCodes @(56,-654) 2>&1 | out-null
+        Chocolatey Install pkg -RebootCodes @(56,-654) 2>&1 | Out-Null
 
         it "will Invoke-Reboot when a default code is called too" {
             Assert-MockCalled Invoke-Reboot -times 1
@@ -135,9 +135,9 @@ Describe "Getting-Chocolatey" {
 
     Context "When Chocolatey writes a error that is not a reboot error" {
         $boxstarter.RebootOk=$true
-        Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '3020'." 2>&1 | out-null}
+        Mock Call-Chocolatey {Write-Error "[ERROR] Exit code was '3020'." 2>&1 | Out-Null}
 
-        Chocolatey Install pkg -RebootCodes @(56,3010,654) | out-null
+        Chocolatey Install pkg -RebootCodes @(56,3010,654) | Out-Null
 
         it "will not Invoke-Reboot" {
             Assert-MockCalled Invoke-Reboot -times 0
@@ -147,7 +147,7 @@ Describe "Getting-Chocolatey" {
     Context "When WindowsFeature is already installed" {
         Mock DISM {"State : Enabled"}
 
-        Chocolatey Install "somefeature" -source "WindowsFeatures" | out-null
+        Chocolatey Install "somefeature" -source "WindowsFeatures" | Out-Null
 
         it "will not Call Chocolatey" {
             Assert-MockCalled Call-Chocolatey -times 0
@@ -155,7 +155,7 @@ Describe "Getting-Chocolatey" {
     }
 
     Context "When WindowsFeature is not already installed" {
-        Chocolatey Install "somefeature" -source "WindowsFeatures" | out-null
+        Chocolatey Install "somefeature" -source "WindowsFeatures" | Out-Null
 
         it "will Call Chocolatey" {
             Assert-MockCalled Call-Chocolatey
@@ -167,7 +167,7 @@ Describe "Getting-Chocolatey" {
         $boxstarter.RebootOk=$true
         Mock Remove-Item
 
-        Chocolatey Install pkg | out-null
+        Chocolatey Install pkg | Out-Null
 
         it "will delete package folder" {
             Assert-MockCalled Remove-Item -parameterFilter {$path -eq $pkgDir}

@@ -87,7 +87,7 @@ function start-task($session, $credential, $packageName) {
     Invoke-Command -Session $session {
         param($Credential, $packageName)
         Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
-        # Write-Host "$(get-command -module boxstarter.chocolatey | fl | out-string)"
+        # Write-Host "$(Get-Command -module boxstarter.chocolatey | fl | Out-String)"
         Create-BoxstarterTask $Credential
         $taskAction = @"
             `$secpasswd = ConvertTo-SecureString "$($Credential.GetNetworkCredential().Password)" -AsPlainText -Force
@@ -101,7 +101,7 @@ function start-task($session, $credential, $packageName) {
 }
 
 function Setup-BoxstarterModuleAndLocalRepo($BaseDir, $session){
-    Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | out-Null }
+    Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | Out-Null }
     Send-File "$BaseDir\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
     Get-ChildItem "$BaseDir\BuildPackages\*.nupkg" | % {
         Write-host "Copying $($_.Name) to $($Session.ComputerName)"
@@ -171,7 +171,7 @@ function Remove-PreviousState($session) {
     Invoke-Command -session $session {
         param($boxDir)
         DISM /online /Disable-Feature /FeatureName:TelnetClient 2>&1 | Out-Null
-        Remove-Item -Path "$boxDir\test_marker" -ErrorAction SilentlyContinue | out-Null
+        Remove-Item -Path "$boxDir\test_marker" -ErrorAction SilentlyContinue | Out-Null
         Remove-Item -Path "$boxDir\test_error.txt" -ErrorAction SilentlyContinue | Out-Null
         Remove-Item -Path "$boxDir\reboot-test.txt" -ErrorAction SilentlyContinue | Out-Null
         Remove-Item -Path "$boxDir\..\..\boxstarter\boxstarter.log" -ErrorAction SilentlyContinue | Out-Null

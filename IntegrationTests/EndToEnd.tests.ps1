@@ -36,7 +36,7 @@ Describe "GistPackage" {
 
             it "enabled telnet" {
                 $result.InvokeOnTarget($result.Session, {
-                    (get-command telnet -ErrorAction SilentlyContinue) -ne $null
+                    (Get-Command telnet -ErrorAction SilentlyContinue) -ne $null
                 }) | should be $true
             }
 
@@ -78,7 +78,7 @@ if($vmName -eq "win2012r2") {
 
             it "enabled telnet" {
                 $result.InvokeOnTarget($result.Session, {
-                    (get-command telnet -ErrorAction SilentlyContinue) -ne $null
+                    (Get-Command telnet -ErrorAction SilentlyContinue) -ne $null
                 }) | should be $true
             }
 

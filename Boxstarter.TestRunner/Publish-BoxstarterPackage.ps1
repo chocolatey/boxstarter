@@ -63,7 +63,7 @@ Set-BoxstarterFeedAPIKey
             }
             else {
                 $err = @()
-                $nupkg = join-path $Boxstarter.LocalRepo "$_.$($pkg.Version).nupkg"
+                $nupkg = Join-Path $Boxstarter.LocalRepo "$_.$($pkg.Version).nupkg"
                 Write-BoxstarterMessage "Calling NuGet: push $nupkg $(Get-BoxstarterFeedAPIKey $pkg.Feed) -Source $($pkg.Feed)/package -NonInteractive" -Verbose
                 $err += Invoke-NugetPush $pkg $nupkg 2>&1
                 try {

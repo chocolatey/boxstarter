@@ -6,6 +6,6 @@ function Get-BoxstarterTempDir {
         $dir = $env:ProgramData
     }
 
-if(!(Test-Path "$dir\Boxstarter")){mkdir "$dir\Boxstarter" | out-null}
+if(!(Test-Path "$dir\Boxstarter")){mkdir "$dir\Boxstarter" | Out-Null}
     return "$dir\Boxstarter"
 }

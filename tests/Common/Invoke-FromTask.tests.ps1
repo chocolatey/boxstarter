@@ -22,7 +22,7 @@ Describe "Invoke-FromTask" {
             Get-Content $env:temp\test.txt | should be "this is a test from $PWD"
         }
         It "Should delete the task"{
-            schtasks /query /TN 'Ad-Hoc Task' 2>&1 | out-null
+            schtasks /query /TN 'Ad-Hoc Task' 2>&1 | Out-Null
             $LastExitCode | should be 1
         }
     }
@@ -62,7 +62,7 @@ Describe "Invoke-FromTask" {
             $err.Exception | should match "This is an error"
         }
         It "Should delete the task"{
-            schtasks /query /TN 'Ad-Hoc Task' 2>&1 | out-null
+            schtasks /query /TN 'Ad-Hoc Task' 2>&1 | Out-Null
             $LastExitCode | should be 1
         }
     }
@@ -87,7 +87,7 @@ Describe "Invoke-FromTask" {
             $err.Exception | should match "likely in a hung state"
         }
         It "Should delete the task"{
-            schtasks /query /TN 'Ad-Hoc Task' 2>&1 | out-null
+            schtasks /query /TN 'Ad-Hoc Task' 2>&1 | Out-Null
             $LastExitCode | should be 1
         }
         It "Should kill the original PowerShell task"{
@@ -104,7 +104,7 @@ Describe "Invoke-FromTask" {
             $err.Exception | should match "likely in a hung state"
         }
         It "Should delete the task"{
-            schtasks /query /TN 'Ad-Hoc Task' 2>&1 | out-null
+            schtasks /query /TN 'Ad-Hoc Task' 2>&1 | Out-Null
             $LastExitCode | should be 1
         }
         It "Should kill the original PowerShell task"{
@@ -113,4 +113,4 @@ Describe "Invoke-FromTask" {
     }
 }
 
-schtasks /DELETE /TN 'Boxstarter Task' /F 2>&1 | Out-null
+schtasks /DELETE /TN 'Boxstarter Task' /F 2>&1 | Out-Null

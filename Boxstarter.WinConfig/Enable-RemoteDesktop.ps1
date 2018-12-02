@@ -23,7 +23,7 @@ https://boxstarter.org
         return
     }
     try {
-        $obj.SetAllowTsConnections(1,1) | out-null
+        $obj.SetAllowTsConnections(1,1) | Out-Null
     }
     catch {
         throw "There was a problem enabling remote desktop. Make sure your operating system supports remote desktop and there is no group policy preventing you from enabling it."
@@ -37,11 +37,11 @@ https://boxstarter.org
     }
     try {
         if($DoNotRequireUserLevelAuthentication) {
-            $obj2.SetUserAuthenticationRequired(0) | out-null
+            $obj2.SetUserAuthenticationRequired(0) | Out-Null
             Write-BoxstarterMessage "Disabling Remote Desktop NLA ..."
         }
         else {
-			$obj2.SetUserAuthenticationRequired(1) | out-null
+			$obj2.SetUserAuthenticationRequired(1) | Out-Null
             Write-BoxstarterMessage "Enabling Remote Desktop NLA ..."
         }
     }

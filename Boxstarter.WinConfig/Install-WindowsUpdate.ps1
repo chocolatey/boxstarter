@@ -139,8 +139,8 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
 
 function Download-Update($update) {
     $downloadSession = Start-TimedSection "Download of $($update.Title)"
-    $updates = new-Object -com "Microsoft.Update.UpdateColl"
-    $updates.Add($update) | out-null
+    $updates = New-Object -com "Microsoft.Update.UpdateColl"
+    $updates.Add($update) | Out-Null
     $Downloader.Updates = $updates
 
     $retry = $true
@@ -180,11 +180,11 @@ function Download-Update($update) {
 
 function Install-Update($update, $currentCount, $totalUpdates) {
     $installSession=Start-TimedSection "Install $currentCount of $totalUpdates updates: $($update.Title)"
-    $updates= new-Object -com "Microsoft.Update.UpdateColl"
-    $updates.Add($update) | out-null
+    $updates= New-Object -com "Microsoft.Update.UpdateColl"
+    $updates.Add($update) | Out-Null
     $Installer.updates = $Updates
     try { $result = $Installer.Install() } catch {
-        if(!($SuppressReboots) -and (test-path function:\Invoke-Reboot)){
+        if(!($SuppressReboots) -and (Test-Path function:\Invoke-Reboot)){
             if(Test-PendingReboot){
                 $global:error.RemoveAt(0)
                 Invoke-Reboot

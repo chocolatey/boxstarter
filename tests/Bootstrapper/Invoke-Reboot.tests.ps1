@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-if(get-module Boxstarter.bootstrapper){Remove-Module boxstarter.bootstrapper}
+if(Get-Module Boxstarter.bootstrapper){Remove-Module boxstarter.bootstrapper}
 Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 |
@@ -15,7 +15,7 @@ Describe "Invoke-Reboot" {
     Mock New-Item -ParameterFilter { $Path -like "*boxstarter*" }
     Mock Restart
     $Boxstarter.SourcePID=500
-    if(get-module Bitlocker -ListAvailable){Mock Suspend-Bitlocker}
+    if(Get-Module Bitlocker -ListAvailable){Mock Suspend-Bitlocker}
 
     Context "When reboots are suppressed" {
         $Boxstarter.RebootOk=$false
@@ -40,7 +40,7 @@ Describe "Invoke-Reboot" {
     Context "When reboots are not suppressed" {
         $Boxstarter.RebootOk=$true
         $Boxstarter.IsRebooting=$false
-        $bitlockerCommand = Get-Command -Name 'get-bitlockervolume' -ErrorAction SilentlyContinue
+        $bitlockerCommand = Get-Command -Name 'Get-BitLockerVolume' -ErrorAction SilentlyContinue
         if($bitlockerCommand){
             Mock Get-BitlockerVolume {@{ProtectionStatus="On";VolumeType="operatingSystem"}}
         }
@@ -57,7 +57,7 @@ Describe "Invoke-Reboot" {
             $Boxstarter.IsRebooting | should be $true
         }
         it "will suspend bitlocker" {
-            if(get-module bitlocker -ListAvailable){Assert-MockCalled Suspend-Bitlocker}
+            if(Get-Module bitlocker -ListAvailable){Assert-MockCalled Suspend-Bitlocker}
         }
         it "will create Restart marker file" {
             Assert-MockCalled New-Item -ParameterFilter { $Path -Like "*boxstarter.500.restart" }
@@ -68,7 +68,7 @@ Describe "Invoke-Reboot" {
         $Boxstarter.RebootOk=$true
         $Boxstarter.IsRebooting=$false
         $Boxstarter.SourcePID=$null
-        $bitlockerCommand = Get-Command -Name 'get-bitlockervolume' -ErrorAction SilentlyContinue
+        $bitlockerCommand = Get-Command -Name 'Get-BitLockerVolume' -ErrorAction SilentlyContinue
         if($bitlockerCommand){
             Mock Get-BitlockerVolume {@{ProtectionStatus="On";VolumeType="operatingSystem"}}
         }
@@ -85,7 +85,7 @@ Describe "Invoke-Reboot" {
             $Boxstarter.IsRebooting | should be $true
         }
         it "will suspend bitlocker" {
-            if(get-module bitlocker -ListAvailable){Assert-MockCalled Suspend-Bitlocker}
+            if(Get-Module bitlocker -ListAvailable){Assert-MockCalled Suspend-Bitlocker}
         }
         it "will not create Restart marker file" {
             Assert-MockCalled New-Item -ParameterFilter { $Path -Like "*.restart" } -times 0
@@ -96,7 +96,7 @@ Describe "Invoke-Reboot" {
         $Boxstarter.RebootOk=$true
         $Boxstarter.IsRebooting=$false
         $Boxstarter.SourcePID=500
-        $bitlockerCommand = Get-Command -Name 'get-bitlockervolume' -ErrorAction SilentlyContinue
+        $bitlockerCommand = Get-Command -Name 'Get-BitLockerVolume' -ErrorAction SilentlyContinue
         if($bitlockerCommand){
             Mock Get-BitlockerVolume { throw "some crazy error." }
         }

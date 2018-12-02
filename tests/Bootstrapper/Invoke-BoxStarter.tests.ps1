@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-if(get-module Boxstarter.bootstrapper){Remove-Module boxstarter.bootstrapper}
+if(Get-Module Boxstarter.bootstrapper){Remove-Module boxstarter.bootstrapper}
 Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\boxstarter.winconfig\*.ps1 |
@@ -130,7 +130,7 @@ Describe "Invoke-Boxstarter" {
         Mock Restart
         Mock RestartNow
         Mock Read-AuthenticatedPassword
-        Mock get-UAC
+        Mock Get-UAC
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoLogonCount" -Value 1
 
@@ -210,7 +210,7 @@ Describe "Invoke-Boxstarter" {
         $currentUser=Get-CurrentUser
         Create-BoxstarterTask (New-Object Management.Automation.PsCredential ("$($currentUser.Domain)\$($currentUser.Name)", (New-Object System.Security.SecureString)))
         Invoke-Boxstarter { Invoke-FromTask "add-content $env:temp\test.txt -value '`$pid'" } -NoPassword | Out-Null
-        $boxProc=get-Content $env:temp\test.txt
+        $boxProc=Get-Content $env:temp\test.txt
         Remove-item $env:temp\test.txt
 
         it "will run in a different process" {
@@ -270,7 +270,7 @@ Describe "Invoke-Boxstarter" {
         Mock Restart
         Mock RestartNow
         Mock Read-AuthenticatedPassword
-        Mock get-UAC
+        Mock Get-UAC
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -Value 1
         New-Item "$(Get-BoxstarterTempDir)\Boxstarter.script" -type file -value ([ScriptBlock]::Create("`$env:testkey='val'")) -force | Out-Null
 

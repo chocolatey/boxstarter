@@ -35,12 +35,12 @@ New-BoxstarterPackage
     pushd $Boxstarter.LocalRepo
     try{
         if($name){
-            $searchPath = join-path $name "$name.nuspec"
+            $searchPath = Join-Path $name "$name.nuspec"
             Write-BoxstarterMessage "Searching for $searchPath" -Verbose
             if(!(Test-Path $searchPath)){
                 throw "Cannot find $($Boxstarter.LocalRepo)\$searchPath"
             }
-            Call-Chocolatey Pack (join-path $name "$name.nuspec") | out-null
+            Call-Chocolatey Pack (Join-Path $name "$name.nuspec") | Out-Null
             if(!$quiet){
                 Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $name or Install-BoxstarterPackage $name will run this package." -nologo
             }
@@ -50,8 +50,8 @@ New-BoxstarterPackage
                 Get-ChildItem . | ? { $_.PSIsContainer } | % {
                     $directoriesExist=$true
                     Write-BoxstarterMessage "Found directory $($_.name). Looking for $($_.name).nuspec"
-                    if(Test-Path (join-path $_.name "$($_.name).nuspec")){
-                        Call-Chocolatey Pack (join-path . "$($_.Name)\$($_.Name).nuspec") | out-null
+                    if(Test-Path (Join-Path $_.name "$($_.name).nuspec")){
+                        Call-Chocolatey Pack (Join-Path . "$($_.Name)\$($_.Name).nuspec") | Out-Null
                         if(!$quiet){
                             Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Install-BoxstarterPackage $($_.Name) will run this package." -nologo
                         }

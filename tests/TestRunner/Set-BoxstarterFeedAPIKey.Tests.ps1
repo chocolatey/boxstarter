@@ -1,6 +1,6 @@
 
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-if(get-module Boxstarter.TestRunner){Remove-Module Boxstarter.TestRunner}
+if(Get-Module Boxstarter.TestRunner){Remove-Module Boxstarter.TestRunner}
 Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
