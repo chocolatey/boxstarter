@@ -14,10 +14,10 @@ function Start-UpdateServices {
 }
 
 function Start-CCMEXEC {
-    $ccm = get-service -include CCMEXEC
+    $ccm = Get-Service -include CCMEXEC
     if($ccm -and $ccm.Status -ne "Running") {
         Write-BoxstarterMessage "Starting Configuration Manager Service"
-        set-service CCMEXEC -startuptype automatic
+        Set-Service CCMEXEC -startuptype automatic
         Enter-BoxstarterLogable { Start-Service CCMEXEC -ErrorAction SilentlyContinue }
     }
 }

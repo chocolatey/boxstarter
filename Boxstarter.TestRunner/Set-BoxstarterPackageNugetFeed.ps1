@@ -26,7 +26,7 @@ These feed associations are persisted to a file so thet they can be
 reused in all subsequent sessions.
 
 .Example
-set-BoxstarterPackageNugetFeed -PackageName MyPackage `
+Set-BoxstarterPackageNugetFeed -PackageName MyPackage `
   -NugetFeed https://www.myget.org/F/mywackyfeed/api/v2
 
 Sets the package MyPackage to the MyGet.org mywackyfeed

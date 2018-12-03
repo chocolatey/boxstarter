@@ -14,9 +14,9 @@ function Stop-UpdateServices {
 }
 
 function Stop-CCMEXEC {
-    $ccm = (get-service -include CCMEXEC)
+    $ccm = (Get-Service -include CCMEXEC)
     if($ccm) {
-        set-service CCMEXEC -startuptype disabled
+        Set-Service CCMEXEC -startuptype disabled
         do {
             if($ccm.CanStop) {
                 Write-boxstartermessage "Stopping Configuration Manager"

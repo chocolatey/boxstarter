@@ -19,7 +19,7 @@ Describe "Enable-BoxstarterVM.Azure" {
     $vmName="VMName"
     $vmServiceName="service"
     [Uri]$vmConnectionURI="http://localhost:5985/wsman"
-    $vm = new-Object Microsoft.WindowsAzure.Commands.ServiceManagement.Model.PersistentVMRoleContext
+    $vm = New-Object Microsoft.WindowsAzure.Commands.ServiceManagement.Model.PersistentVMRoleContext
     $vm.Name=$vmName
     $vm.ServiceName=$vmServiceName
     $vm.InstanceStatus="ReadyRole"
@@ -30,7 +30,7 @@ Describe "Enable-BoxstarterVM.Azure" {
     Mock Enable-BoxstarterClientRemoting
     Mock Set-AzureVMCheckpoint
     Mock Restore-AzureVMCheckpoint
-    Mock get-AzureSubscription { return @{CurrentStorageAccountName="sa"} }
+    Mock Get-AzureSubscription { return @{CurrentStorageAccountName="sa"} }
     Mock Invoke-RetriableScript -ParameterFilter {$RetryScript -ne $null -and $RetryScript.ToString() -like "*Get-WMIObject*"}
     Mock Set-AzureSubscription
     Mock Restart-computer

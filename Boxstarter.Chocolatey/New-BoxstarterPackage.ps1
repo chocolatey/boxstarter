@@ -50,7 +50,7 @@ Get-PackageRoot
     if(test-path $pkgDir) {
         throw "A LocalRepo already exists at $($boxstarter.LocalRepo)\$name. Delete the directory before calling New-BoxstarterPackage"
     }
-    MkDir $pkgDir | out-null
+    MkDir $pkgDir | Out-Null
     Pushd $pkgDir
     if($path){
         if(!(test-path $Path)){
@@ -92,7 +92,7 @@ Get-PackageRoot
         } $pkgFile $nuspec $Name $description
     }
     if(!(test-path "tools")){
-        Mkdir "tools" | out-null
+        Mkdir "tools" | Out-Null
     }
     $installScript=@"
 try {
@@ -104,7 +104,7 @@ try {
 }
 "@
     if(!(test-path "tools\ChocolateyInstall.ps1")){
-        new-Item "tools\ChocolateyInstall.ps1" -type file -value $installScript| out-null
+        new-Item "tools\ChocolateyInstall.ps1" -type file -value $installScript| Out-Null
     }
     Popd
 

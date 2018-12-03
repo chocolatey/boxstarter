@@ -53,7 +53,7 @@ Remove-BoxstarterTask
     if($taskProc -ne $null){
         Write-BoxstarterMessage "Command launched in process $taskProc" -Verbose
         try {
-            $waitProc=get-process -id $taskProc -ErrorAction Stop
+            $waitProc=Get-Process -id $taskProc -ErrorAction Stop
             Write-BoxstarterMessage "Waiting on $($waitProc.Id)" -Verbose
         } catch { $global:error.RemoveAt(0) }
     }
@@ -63,7 +63,7 @@ Remove-BoxstarterTask
     }
     catch {
         Write-BoxstarterMessage "error thrown managing task" -verbose
-        Write-BoxstarterMessage "$($_ | fl * -force | out-string)" -verbose
+        Write-BoxstarterMessage "$($_ | fl * -force | Out-String)" -verbose
         throw $_
     }
     Write-BoxstarterMessage "Task has completed" -Verbose
@@ -83,7 +83,7 @@ Remove-BoxstarterTask
 function Get-ErrorFileName { "$env:temp\BoxstarterError.stream" }
 
 function Get-CliXmlStream($cliXmlFile, $stream) {
-    $content = get-content $cliXmlFile
+    $content = Get-Content $cliXmlFile
     if($content.count -lt 2) { return $null }
 
     # Strip the first line containing '#< CLIXML'
@@ -93,7 +93,7 @@ function Get-CliXmlStream($cliXmlFile, $stream) {
     $xml.DocumentElement.ChildNodes |
       ? { $_.S -eq $stream } |
       % { $_.'#text'.Replace('_x000D_','').Replace('_x000A_','') } |
-      out-string
+      Out-String
 }
 
 function Get-ChildProcessMemoryUsage {
@@ -122,8 +122,8 @@ Start-Process powershell -NoNewWindow -Wait -RedirectStandardError $(Get-ErrorFi
 Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
 "@
     Set-Content $env:temp\BoxstarterTask.ps1 -value $fileContent -force
-    new-Item $env:temp\BoxstarterOutput.stream -Type File -Force | out-null
-    new-Item (Get-ErrorFileName) -Type File -Force | out-null
+    New-Item $env:temp\BoxstarterOutput.stream -Type File -Force | Out-Null
+    New-Item (Get-ErrorFileName) -Type File -Force | Out-Null
     $encoded
 }
 

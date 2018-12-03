@@ -530,16 +530,16 @@ function Invoke-Locally {
         if($Credential -ne $null) {
             $PSBoundParameters.Add("Password",$PSBoundParameters["Credential"].Password)
         }
-        $PSBoundParameters.Remove("Credential") | out-Null
+        $PSBoundParameters.Remove("Credential") | Out-Null
     }
     else {
         $PSBoundParameters.Add("NoPassword",$True)
     }
     if($PSBoundParameters.ContainsKey("Force")){
-        $PSBoundParameters.Remove("Force") | out-Null
+        $PSBoundParameters.Remove("Force") | Out-Null
     }
     $PSBoundParameters.Add("BootstrapPackage", $PSBoundParameters.PackageName)
-    $PSBoundParameters.Remove("PackageName") | out-Null
+    $PSBoundParameters.Remove("PackageName") | Out-Null
 
     $record = Start-Record 'localhost'
     try {
@@ -594,7 +594,7 @@ function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
 function Setup-BoxstarterModuleAndLocalRepo($session, $delegateSources){
     if($LocalRepo){$Boxstarter.LocalRepo=$LocalRepo}
     Write-BoxstarterMessage "Copying Boxstarter Modules and LocalRepo packages at $($Boxstarter.BaseDir) to $env:temp on $($Session.ComputerName)..."
-    Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | out-Null }
+    Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | Out-Null }
     Send-File "$($Boxstarter.BaseDir)\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
     Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % {
         Write-BoxstarterMessage "Copying $($_.Name) to $($Session.ComputerName)" -Verbose
@@ -914,7 +914,7 @@ function Enable-RemoteCredSSP($sessionArgs) {
             $VerbosePreference = $verbosity
             Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
             Create-BoxstarterTask $Credential
-            Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | out-Null"
+            Invoke-FromTask "Enable-WSManCredSSP -Role Server -Force | Out-Null"
             Remove-BoxstarterTask
         } -ArgumentList @($args[0].Credential, $VerbosePreference)
     } $sessionArgs

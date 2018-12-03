@@ -75,7 +75,7 @@ Invoke-Reboot
     $BoxStarter.IsRebooting = $false
     $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
     if(!(Test-Admin)) {
-        New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | out-null
+        New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | Out-Null
         Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate..."
         $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psd1")
         if($password){

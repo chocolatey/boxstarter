@@ -8,8 +8,8 @@ function Mount-TestVHD {
     $after = (Get-Volume).DriveLetter | ? { $_ -ne $null }
     $winVolume = compare $before $after -Passthru
     Get-PSDrive | Out-Null
-    reg load HKLM\VHDSYS "$($winVolume):\windows\system32\config\system" 2>&1 | out-null
-    reg load HKLM\VHDSOFTWARE "$($winVolume):\windows\system32\config\software" 2>&1 | out-null
+    reg load HKLM\VHDSYS "$($winVolume):\windows\system32\config\system" 2>&1 | Out-Null
+    reg load HKLM\VHDSOFTWARE "$($winVolume):\windows\system32\config\software" 2>&1 | Out-Null
 }
 
 function Clean-VHD {
@@ -56,8 +56,8 @@ Describe "Enable-BoxstarterVHD" {
             Remove-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy -ErrorAction SilentlyContinue
             Set-ItemProperty -path "HKLM:\VHDSYS\ControlSet00$current\Control\ComputerName\ComputerName" -Name ComputerName -value "$computerName"
             [GC]::Collect()
-            reg unload HKLM\VHDSYS | out-null
-            reg unload HKLM\VHDSOFTWARE | out-null
+            reg unload HKLM\VHDSYS | Out-Null
+            reg unload HKLM\VHDSOFTWARE | Out-Null
             Dismount-VHD $testRoot\test.vhdx
             Get-PSDrive | Out-Null
             $result = Enable-BoxstarterVHD $testRoot\test.vhdx
@@ -89,8 +89,8 @@ Describe "Enable-BoxstarterVHD" {
             Remove-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy -ErrorAction SilentlyContinue
             Set-ItemProperty -path "HKLM:\VHDSYS\ControlSet00$current\Control\ComputerName\ComputerName" -Name ComputerName -value "$computerName"
             [GC]::Collect()
-            reg unload HKLM\VHDSYS | out-null
-            reg unload HKLM\VHDSOFTWARE | out-null
+            reg unload HKLM\VHDSYS | Out-Null
+            reg unload HKLM\VHDSOFTWARE | Out-Null
             Dismount-VHD $testRoot\test.vhdx
             Get-PSDrive | Out-Null
 
@@ -123,8 +123,8 @@ Describe "Enable-BoxstarterVHD" {
             Remove-ItemProperty -path "HKLM:\VHDSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -name LocalAccountTokenFilterPolicy -ErrorAction SilentlyContinue
             Set-ItemProperty -path "HKLM:\VHDSYS\ControlSet00$current\Control\ComputerName\ComputerName" -Name ComputerName -value "$computerName"
             [GC]::Collect()
-            reg unload HKLM\VHDSYS | out-null
-            reg unload HKLM\VHDSOFTWARE | out-null
+            reg unload HKLM\VHDSYS | Out-Null
+            reg unload HKLM\VHDSOFTWARE | Out-Null
             Dismount-VHD $testRoot\test.vhdx
             Get-PSDrive | Out-Null
 

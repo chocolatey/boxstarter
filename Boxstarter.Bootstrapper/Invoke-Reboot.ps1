@@ -44,7 +44,7 @@ about_boxstarter_variable_in_bootstrapper
     }
     try {
         if(Get-Module Bitlocker -ListAvailable -ErrorAction Stop){
-            Get-BitlockerVolume -ErrorAction Stop | ? {$_.ProtectionStatus -eq "On"  -and $_.VolumeType -eq "operatingSystem"} | Suspend-Bitlocker -RebootCount 1 | out-null
+            Get-BitlockerVolume -ErrorAction Stop | ? {$_.ProtectionStatus -eq "On"  -and $_.VolumeType -eq "operatingSystem"} | Suspend-Bitlocker -RebootCount 1 | Out-Null
         }
     }
     catch {

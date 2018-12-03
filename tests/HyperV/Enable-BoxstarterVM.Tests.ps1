@@ -11,7 +11,7 @@ Describe "Enable-BoxstarterVM" {
     Remove-Item alias:\Enable-BoxstarterVM
 
     $Boxstarter.SuppressLogging=$true
-    New-Item $env:temp\boxstarter.vhd -ItemType File -Force | out-Null
+    New-Item $env:temp\boxstarter.vhd -ItemType File -Force | Out-Null
 
     Mock Get-VM { return @{State="Running";Notes="--Boxstarter Remoting Enabled--";Name="me"} }
     Mock Get-VMSnapShot

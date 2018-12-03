@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-if(get-module Boxstarter.TestRunner){Remove-Module Boxstarter.TestRunner}
+if(Get-Module Boxstarter.TestRunner){Remove-Module Boxstarter.TestRunner}
 Resolve-Path $here\..\..\Boxstarter.Common\*.ps1 |
     % { . $_.ProviderPath }
 Resolve-Path $here\..\..\Boxstarter.Bootstrapper\*.ps1 |
@@ -47,7 +47,7 @@ Describe "Test-BoxstarterPackage" {
         }
         Set-BoxstarterDeployOptions -DeploymentTargetUserName "user" -DeploymentTargetPassword "pass" -DeploymentTargetNames "target1"
 
-        Test-BoxstarterPackage 2>&1 | out-Null
+        Test-BoxstarterPackage 2>&1 | Out-Null
 
         it "Will write InvalidOperation" {
             $global:Error[0].CategoryInfo.Category | should be "InvalidOperation"

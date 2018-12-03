@@ -1,5 +1,5 @@
 function Get-SecretOptionsPath {
-    $boxstarterScriptPath = join-Path $Boxstarter.LocalRepo "BoxstarterScripts"
+    $boxstarterScriptPath = Join-Path $Boxstarter.LocalRepo "BoxstarterScripts"
     if(!(Test-Path $boxstarterScriptPath)) {
         mkdir $boxstarterScriptPath | Out-Null
     }

@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-if(get-module Boxstarter.chocolatey){Remove-Module boxstarter.chocolatey}
+if(Get-Module Boxstarter.chocolatey){Remove-Module boxstarter.chocolatey}
 
 Resolve-Path $here\..\..\boxstarter.common\*.ps1 |
     % { . $_.ProviderPath }
@@ -34,7 +34,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         Mock Chocolatey { $script:passedSource = $args[5] }
         New-Item TestDrive:\package.txt -type file | Out-Null
 
-        Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | out-null
+        Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | Out-Null
 
         it "should concatenate local repo and NuGet sources for source param to Chocolatey" {
             $script:passedSource | Should Be "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
@@ -112,7 +112,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         Mock Chocolatey
         New-Item TestDrive:\package.txt -type file | Out-Null
 
-        Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | out-null
+        Invoke-ChocolateyBoxstarter TestDrive:\package.txt -NoPassword | Out-Null
 
         it "should use package returned from ScriptFromPackage" {
             Assert-MockCalled Chocolatey -ParameterFilter {$packageNames -eq "somePackage"}
@@ -123,7 +123,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         Mock New-PackageFromScript {return "somePackage"} -ParameterFilter {$source -eq "http://someurl"}
         Mock Chocolatey
 
-        Invoke-ChocolateyBoxstarter http://someurl -NoPassword | out-null
+        Invoke-ChocolateyBoxstarter http://someurl -NoPassword | Out-Null
 
         it "should use package returned from ScriptFromPackage" {
             Assert-MockCalled Chocolatey -ParameterFilter {$packageNames -eq "somePackage"}
@@ -135,7 +135,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         Mock Chocolatey
         New-Item TestDrive:\package -type directory | Out-Null
 
-        Invoke-ChocolateyBoxstarter "TestDrive:\package" -NoPassword | out-null
+        Invoke-ChocolateyBoxstarter "TestDrive:\package" -NoPassword | Out-Null
 
         it "should not use package from ScriptFromPackage" {
             Assert-MockCalled New-PackageFromScript -times 0
@@ -149,7 +149,7 @@ Describe "Invoke-ChocolateyBoxstarter" {
         Mock Chocolatey
         $packages=@("package1","package2")
 
-        Invoke-ChocolateyBoxstarter $packages -NoPassword | out-null
+        Invoke-ChocolateyBoxstarter $packages -NoPassword | Out-Null
 
         it "should pass both packages to Chocolatey" {
             Assert-MockCalled Chocolatey -ParameterFilter { (Compare-Object $packageNames $packages) -eq $null }
