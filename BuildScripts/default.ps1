@@ -272,6 +272,7 @@ task Copy-PowerShellFiles -depends Clean-Artifacts {
     $exclude = @("bin", "obj", "*.pssproj")
 
     Copy-Item -Path $basedir\BuildScripts\chocolateyinstall.ps1 -Destination $tempNuGetDirectory
+    Copy-Item -Path $basedir\BuildScripts\chocolateyUninstall.ps1 -Destination $tempNuGetDirectory    
     Copy-Item -Path $basedir\BuildScripts\setup.ps1 -Destination $tempNuGetDirectory
     Copy-Item -Path $basedir\BuildScripts\nuget\Boxstarter.Azure.PreInstall.ps1 -Destination $tempNuGetDirectory
     Copy-Item -Path $basedir\BuildScripts\BoxstarterChocolateyInstall.ps1 -Destination $tempNuGetDirectory

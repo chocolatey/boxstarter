@@ -62,6 +62,24 @@ PS:>Get-Help Boxstarter
     }
 }
 
+function Uninstall-Boxstarter ($here, $ModuleName, $installArgs = "") {
+
+    if ($ModuleName -eq "Boxstarter.Chocolatey" -and !$env:appdata.StartsWith($env:windir)) {
+        $startMenu = Join-Path -Path ([Environment]::GetFolderPath('CommonPrograms')) -ChildPath "Boxstarter"
+
+        if (Test-Path $startMenu) {
+            Write-Verbose "Removing '$startMenu' menu folder"
+            Remove-Item -Path $startMenu -Recurse -Force
+        }
+
+        $desktopShortcut = Join-Path -Path ([Environment]::GetFolderPath('CommonDesktop')) -ChildPath "Boxstarter Shell.lnk"
+        if (Test-Path $desktopShortcut) {
+            Write-Verbose "Removing '$desktopShortcut'"
+            Remove-Item -Path $desktopShortcut -Force
+        }
+    }
+}
+
 function Create-Shortcut($location, $target, $targetArgs, $boxstarterPath) {
     $wshshell = New-Object -ComObject WScript.Shell
     $lnk = $wshshell.CreateShortcut($location)
