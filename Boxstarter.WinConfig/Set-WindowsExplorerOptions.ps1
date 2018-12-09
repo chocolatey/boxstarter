@@ -57,6 +57,12 @@ Setting this switch will cause Windows Explorer to show the Ribbon menu so that 
 .PARAMETER DisableShowRibbon
 Disables the showing of the Ribbon menu in Windows Explorer so that it shows only the tab names, see EnableShowRibbon
 
+.PARAMETER EnableSnapAssist
+Enables Windows snap feature (side by side application selection tool). 
+
+.PARAMETER DisableSnapAssist
+Disables Windows snap feature (side by side application selection tool).
+
 .LINK
 https://boxstarter.org
 
@@ -81,7 +87,9 @@ https://boxstarter.org
         [switch]$EnableShowFrequentFoldersInQuickAccess,
         [switch]$DisableShowFrequentFoldersInQuickAccess,
         [switch]$EnableShowRibbon,
-        [switch]$DisableShowRibbon
+        [switch]$DisableShowRibbon,
+        [switch]$EnableSnapAssist,
+        [switch]$DisableSnapAssist
     )
 
     $PSBoundParameters.Keys | % {
@@ -122,6 +130,9 @@ https://boxstarter.org
 
         if($EnableOpenFileExplorerToQuickAccess) {Set-ItemProperty $advancedKey LaunchTo 2}
         if($DisableOpenFileExplorerToQuickAccess) {Set-ItemProperty $advancedKey LaunchTo 1}
+
+        if($EnableSnapAssist) {Set-ItemProperty $advancedKey SnapAssist 1}
+        if($DisableSnapAssist) {Set-ItemProperty $advancedKey SnapAssist 0}
     }
 
     if(Test-Path -Path $cabinetStateKey) {
