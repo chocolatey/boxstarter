@@ -7,7 +7,7 @@ function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
     if(!(test-Path $packagePath)){
         mkdir $packagePath
     }
-    foreach($ModulePath in (Get-ChildItem $here | ?{ $_.PSIsContainer })){
+    foreach($ModulePath in (Get-ChildItem $here | Where-Object { $_.PSIsContainer })){
         $target=Join-Path $boxstarterPath $modulePath.BaseName
         if(test-Path $target){
             Remove-Item $target -Recurse -Force
@@ -113,7 +113,7 @@ function PersistBoxStarterPathToEnvironmentVariable($variableName, $boxstarterPa
     # Remove user scoped vars from previous releases
     $userValue = [Environment]::GetEnvironmentVariable($variableName, 'User')
     if($userValue){
-        $userValues=($userValue -split ';' | ?{ !($_.ToLower() -match "\\boxstarter$")}) -join ';'
+        $userValues=($userValue -split ';' | Where-Object { !($_.ToLower() -match "\\boxstarter$")}) -join ';'
     }
     elseif($variableName -eq "PSModulePath") {
         $userValues = [environment]::getfolderpath("mydocuments")
@@ -123,7 +123,7 @@ function PersistBoxStarterPathToEnvironmentVariable($variableName, $boxstarterPa
 
     $value = [Environment]::GetEnvironmentVariable($variableName, 'Machine')
     if($value){
-        $values=($value -split ';' | ?{ !($_.ToLower() -match "\\boxstarter$")}) -join ';'
+        $values=($value -split ';' | Where-Object { !($_.ToLower() -match "\\boxstarter$")}) -join ';'
         $values="$boxstarterPath;$values"
     }
     elseif($variableName -eq "PSModulePath") {
