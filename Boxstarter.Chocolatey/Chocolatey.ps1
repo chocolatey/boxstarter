@@ -95,7 +95,25 @@ Intercepts Chocolatey call to check for reboots
         [string[]]$packageNames=@('')
     )
     $RebootCodes = Get-PassedArg RebootCodes $args
+    if ($RebootCodes) {
+        $argsWithoutRebootCodes = @()
+        $skipNextArg = $false
+        foreach ($a in $args) {
+            if ($skipNextArg) {
+                $skipNextArg = $false;
+                continue;
+            }
+            if ($a -eq "-RebootCodes" -or $a -eq "--RebootCodes") {
+                $skipNextArg = $true
+                continue;
+            }
+            $argsWithoutRebootCodes += $a
+        }
+        $args = $argsWithoutRebootCodes
+    }
     $RebootCodes=Add-DefaultRebootCodes $RebootCodes
+    Write-BoxstarterMessage "RebootCodes: '$RebootCodes'" -Verbose
+
     $packageNames=-split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
 
@@ -155,11 +173,17 @@ Intercepts Chocolatey call to check for reboots
             $idx = 0
             while($idx -lt $chocoErrors){
                 Write-BoxstarterMessage "Error from Chocolatey: $($global:error[$idx].Exception | fl * -Force | Out-String)"
-                if($global:error[$idx] -match "code was '(-?\d+)'") {
-                    $errorCode=$matches[1]
+                if($global:error[$idx] -match "code (was '(?'ecwas'-?\d+)'|of (?'ecof'-?\d+)\.)") {
+                    if ($matches["ecwas"]) {
+                        $errorCode=$matches["ecwas"]
+                    } else {
+                        $errorCode=$matches["ecof"]
+                    }
                     if($RebootCodes -contains $errorCode) {
-                       Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code" -verbose
+                       Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code" -Verbose
                        $rebootable = $true
+                    } else {
+                       Write-BoxstarterMessage "Exit Code '$errorCode' is no reason to reboot" -Verbose 
                     }
                 }
                 $idx += 1
@@ -298,8 +322,12 @@ function Format-ExeArgs($command) {
 
 function Add-DefaultRebootCodes($codes) {
     if($codes -eq $null){$codes=@()}
-    $codes += 3010 #common MSI reboot needed code
-    $codes += -2067919934 #returned by SQL Server when it needs a reboot
+    if ($codes -notcontains 3010) {
+        $codes += 3010 #common MSI reboot needed code
+    }
+    if ($codes -notcontains -2067919934) {
+        $codes += -2067919934 #returned by SQL Server when it needs a reboot
+    }
     return $codes
 }
 
