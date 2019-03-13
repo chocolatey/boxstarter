@@ -103,7 +103,7 @@ Intercepts Chocolatey call to check for reboots
                 $skipNextArg = $false;
                 continue;
             }
-            if ($a -eq "-RebootCodes" -or $a -eq "--RebootCodes") {
+            if (@("-RebootCodes", "--RebootCodes") -contains $a) {
                 $skipNextArg = $true
                 continue;
             }
@@ -128,7 +128,7 @@ Intercepts Chocolatey call to check for reboots
         }
         if(((Test-PendingReboot) -or $Boxstarter.IsRebooting) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
         $session=Start-TimedSection "Calling Chocolatey to install $packageName. This may take several minutes to complete..."
-        $currentErrorCount = $global:error.Count
+        $currentErrorCount = 0
         $rebootable = $false
         try {
             [System.Environment]::ExitCode = 0
@@ -167,7 +167,7 @@ Intercepts Chocolatey call to check for reboots
                 }
             }
         }
-        $chocoErrors = $global:error.Count - $currentErrorCount
+        $chocoErrors = $currentErrorCount
         if($chocoErrors -gt 0){
             Write-BoxstarterMessage "There was an error calling Chocolatey" -Verbose
             $idx = 0
