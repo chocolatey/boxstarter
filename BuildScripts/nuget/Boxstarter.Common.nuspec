@@ -11,7 +11,12 @@
     <iconUrl>https://raw.githubusercontent.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <title>Boxstarter Common Module</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Provides common functions used by multiple Boxstarter Modules.</description>
+    <description>Provides common functions used by multiple Boxstarter Modules.
+
+## Package parameters
+
+* No desktop icon: `/nodesktopicon`
+    </description>
     <tags>boxstarter</tags>
     <releaseNotes xmlns="">
 - 2.11.0 packages missing chocolatey dlls for remote installs

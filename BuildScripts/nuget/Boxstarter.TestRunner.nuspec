@@ -10,7 +10,11 @@
     <iconUrl>https://cdn.rawgit.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <projectUrl>https://Boxstarter.org</projectUrl>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-    <description>Boxstarter's Test Runner module makes it easy to automate the testing and publishing of Chocolatey packages.</description>
+    <description>Boxstarter's Test Runner module makes it easy to automate the testing and publishing of Chocolatey packages.
+## Package parameters
+
+* No desktop icon: `/nodesktopicon`
+</description>
     <tags>Boxstarter testing environment setup</tags>
     <dependencies>
       <dependency id="Boxstarter" version="[$version$]" />
