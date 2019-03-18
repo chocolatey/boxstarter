@@ -10,7 +10,12 @@
     <iconUrl>https://cdn.rawgit.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <projectUrl>https://Boxstarter.org</projectUrl>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-    <description>Boxstarter's HyperV module includes functionality for targeting Hyper-V guest VMs with the ability to automatically configure them for remote installation and to create or restore snapshots at installation time.</description>
+    <description>Boxstarter's HyperV module includes functionality for targeting Hyper-V guest VMs with the ability to automatically configure them for remote installation and to create or restore snapshots at installation time.
+
+## Package parameters
+
+* No desktop icon: `/nodesktopicon`
+    </description>
     <tags>Boxstarter bootstrapper environment setup VM virtualization HyperV</tags>
     <dependencies>
       <dependency id="Boxstarter.Common" version="[$version$]" />

@@ -11,7 +11,12 @@
     <title>Boxstarter WinConfig Module</title>
     <iconUrl>https://cdn.rawgit.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Functions that Boxstarter uses to customize the windows environment.</description>
+    <description>Functions that Boxstarter uses to customize the windows environment.
+
+## Package parameters
+
+* No desktop icon: `/nodesktopicon`
+    </description>
     <tags>devops bootstraper setup windows customizations</tags>
     <dependencies>
       <dependency id="Boxstarter.Common" version="[$version$]" />

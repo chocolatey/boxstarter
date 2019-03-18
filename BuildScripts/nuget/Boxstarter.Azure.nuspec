@@ -10,7 +10,12 @@
     <iconUrl>https://cdn.rawgit.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <projectUrl>https://Boxstarter.org</projectUrl>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-    <description>Boxstarter's Azure module includes functionality for targeting Azure VMs with the ability to save and restore checkpoints leveraging blob snapshots.</description>
+    <description>Boxstarter's Azure module includes functionality for targeting Azure VMs with the ability to save and restore checkpoints leveraging blob snapshots.
+
+## Package parameters
+
+* No desktop icon: `/nodesktopicon`
+    </description>
     <tags>Boxstarter bootstrapper environment setup VM virtualization Azure</tags>
     <dependencies>
       <dependency id="Boxstarter" version="[$version$]" />
