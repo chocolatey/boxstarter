@@ -59,9 +59,9 @@ This function wraps a Chocolatey Install and provides these additional features
 
  .PARAMETER BoxstarterConnectionConfig
  If provided, Boxstarter will install the specified package name on all computers
- included in the BoxstarterConnectionConfig. This object contains a ComputerName
- and a PSCredential. Use this object if you need to pass different computers
- requiring different credentials.
+ included in the BoxstarterConnectionConfig. This object contains a ConnectionURI
+ a PSCredential, and an optional PSSessionOption. Use this object if you need to
+ pass different computers requiring different credentials.
 
  .PARAMETER PackageName
  The names of one or more NuGet Packages to be installed or URIs or
@@ -224,8 +224,8 @@ proceeding to the other computers.
 .EXAMPLE
 $cred1=Get-Credential mwrock
 $cred2=Get-Credential domain\mwrock
-(New-Object -TypeName BoxstarterConnectionConfig -ArgumentList "computer1",$cred1), `
-(New-Object -TypeName BoxstarterConnectionConfig -ArgumentList "computer2",$cred2) |
+(New-Object -TypeName BoxstarterConnectionConfig -ArgumentList "http://computer1:5985/wsman",$cred1,$null), `
+(New-Object -TypeName BoxstarterConnectionConfig -ArgumentList "http://computer2:5985/wsman",$cred2,$null) |
 Install-BoxstarterPackage -Package MyPackage
 
 This installs the MyPackage package on computer1 and computer2 and uses
