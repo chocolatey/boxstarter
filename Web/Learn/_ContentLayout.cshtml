@@ -13,17 +13,25 @@
 
 
 <div class="row">
-    <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
-        <div class="list-group">
-            <a href="WebLauncher" class="list-group-item @PageData["weblauncherStyle"]">Run with a Gist</a>
-            <a href="SimplePackage" class="list-group-item @PageData["simplepackageStyle"]">Simple package creation</a>
-            <a href="RemotePackageWithArtifacts" class="list-group-item @PageData["remotepackageWithartifactsStyle"]">Deploying a web application remotely</a>
-        </div>
+    <div class="col-sm-3" id="sidebar">
+        <div class="navbar" role="navigation">
+            <button type="button" class="btn btn-secondary center-block visible-xs" data-toggle="collapse" data-target=".navbar-left">
+                Table of Contents
+                <span class="caret"></span>
+            </button>
+            <div class="navbar-collapse navbar-left px-0 collapse">
+                <div class="list-group">
+                    <a href="WebLauncher" class="list-group-item @PageData["weblauncherStyle"]">Run with a Gist</a>
+                    <a href="SimplePackage" class="list-group-item @PageData["simplepackageStyle"]">Simple package creation</a>
+                    <a href="RemotePackageWithArtifacts" class="list-group-item @PageData["remotepackageWithartifactsStyle"]">Deploying a web application remotely</a>
+                </div>
+            </div><!-- /.nav-collapse -->
+        </div><!-- /.navbar -->
     </div>
-    <div class="col-md-9" role="main">
+    <div class="col-sm-9" role="main">
         <div class="media">
             <a class="pull-right" href="#">
-                <img class="media-object" src="~/images/boxlogo_sm.png"/>
+                <img class="media-object" src="~/images/boxlogo_sm.png" />
             </a>
             <div class="col-xs-12 col-md-8 media-body">
                 @RenderSection("headerBody")
