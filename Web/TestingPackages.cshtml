@@ -29,7 +29,7 @@
     directory. The repository location can be found using the <code>$boxstarter</code>
     settings variable in <code>$Boxstarter.LocalRepo</code>.
 </p>
-<img src="Images/repoDir.png" />
+<img class="img-responsive" src="Images/repoDir.png" />
 <p>This location can be changed using the <code>Set-BoxstarterConfig</code> command.</p>
 <pre>Set-BoxStarterConfig -LocalRepo "c:\dev\Chocolatey-Packages"</pre>
 <p>
@@ -121,7 +121,7 @@ Test-BoxstarterPackage -PackageName "MyPackage1","MyPackage2"
     is greater than the published version, Boxstarter will initiate a test on
     the deployment targets otherwise the package test will be skipped.
 </p>
-<img src="Images/CI.png" />
+<img class="img-responsive" src="Images/CI.png" />
 <h3>Publishing Successful Packages</h3>
 <p>
     <code>Test-BoxstarterPackage</code> will return a set of test results. One can then use
@@ -271,7 +271,7 @@ Set-BoxstarterDeployOptions -DeploymentTargetCredentials $cred `
                     <code>AzureSubscriptionCertificate</code> - The Azure subscription certificate to use when using Azure VMs as deployment targets. This is the Base64 encoded content of the certificate and can be found in the ManagementCertificate attribute of your Azure publish settings file.
                 </li>
             </ul>
-            <img src="Images/tfs.png"/>
+            <img class="img-responsive" src="Images/tfs.png"/>
             <p>
                 NOTE: All of these MSBuild script parameters are optional for dedicated
                 builds as long as the values were provided in steps 2 and 3 above which
