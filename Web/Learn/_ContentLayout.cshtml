@@ -30,11 +30,11 @@
     </div>
     <div class="col-sm-9" role="main">
         <div class="media">
-            <a class="pull-right" href="#">
-                <img class="media-object" src="~/images/boxlogo_sm.png" />
-            </a>
-            <div class="col-xs-12 col-md-8 media-body">
+            <div class="media-body">
                 @RenderSection("headerBody")
+            </div>
+            <div class="media-right">
+                <img class="media-object" src="~/images/boxlogo_sm.png" />
             </div>
         </div>
         @RenderBody()
