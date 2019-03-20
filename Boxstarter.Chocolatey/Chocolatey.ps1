@@ -152,7 +152,7 @@ Intercepts Chocolatey call to check for reboots
         catch {
             #Only write the error to the error stream if it was not previously
             #written by Chocolatey
-            $chocoErrors = $global:error.Count - $currentErrorCount
+            $chocoErrors = $currentErrorCount
             if($chocoErrors -gt 0){
                 $idx = 0
                 $errorWritten = $false
