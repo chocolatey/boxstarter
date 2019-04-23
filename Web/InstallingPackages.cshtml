@@ -89,7 +89,7 @@ E:\BoxstarterDir\Boxstarter example
     <li>Invoke a Boxstarter installation of the example package</li>
     <li>Will prompt the user for their password to use during reboots</li>
 </ul>
-<img src="Images/console.png"/>
+<img class="img-responsive" src="Images/console.png"/>
 
 <h3>Creating a Boxstarter Share</h3>
 <p>As stated already, Boxstarter and its local repository can exist on a network share. Boxstarter provides a command that will share the directory where Boxstarter exists.</p>
@@ -118,7 +118,7 @@ Install-BoxstarterPackage -ComputerName MyTargetMachine -PackageName MyPackage -
 </pre>
 <p>Boxstarter will use the credential to connect to MyTargetMachine and will copy the Boxstarter modules and your Local Repository packages to its local storage. It will then run the package on that machine. Boxstarter will configure your local machine to be able to connect to the remote machine and it may prompt you for permission to change settings. You can always provide the -Force parameter to silence the prompts and allow boxstarter to freely enable remoting if it is not already enabled.</p>
 <p>Here is a screen shot of Boxstarter installing a Minecraft Server (bukkit) on a AWS EC2 instance:</p>
-<img src="Images/amazon.png"/>
+<img class="img-responsive" src="Images/amazon.png"/>
 <p>You can pipe several computer names, URIs or Windows PowerShell sessions to <code>Install-BoxstarterPackage</code>. Boxstarter will attempt to install the package on each machine and return a PSObject result for each machine.</p>
 <pre>
 $cred=Get-Credential 'MyTargetMachine\myusername'

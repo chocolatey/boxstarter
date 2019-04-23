@@ -83,7 +83,7 @@ Install-WindowsFeature -name hyper-v -IncludeManagementTools
 <p>Before Windows Azure PowerShell can begin to manage your VMs, it needs your account information as well as authentication verification. This is incredibly easy, <b>only needs to be performed once</b> and involves just three commands:</p>
 <pre>Get-AzurePublishSettingsFile</pre>
 <p>This command will launch your default browser and initiate a Publisher Settings download. First you will land on the Windows Azure sign in page and as soon as you successfully authenticate, the download will begin.</p>
-<img src="images\publishAzure.png" />
+<img class="img-responsive" src="images\publishAzure.png" />
 <p>Now simply import the file just downloaded:</p>
 <pre>Import-AzurePublishSettingsFile -PublishSettingsFile C:\Users\Matt\Downloads\Subscription-1-1-19-2014-credentials.publishsettings</pre>
 <p>Finally, specify the name of the storage account you want to use. You can run <code>Get-AzureStorageAccount</code> for a list of all of your storage accounts.</p>
