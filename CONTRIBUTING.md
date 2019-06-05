@@ -106,6 +106,10 @@ Start with [Prerequisites](#prerequisites).
  * The last parameter in every function must be `[parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments`. This allows for future expansion and compatibility - as new parameters are introduced and used, it doesn't break older versions of Boxstarter.
  * Do not add new positional elements to functions. We want to promote using named parameters in calling functions.
  * Do not remove any existing positional elements from functions. We need to maintain compatibility with older versions of Boxstarter.
+ * There is a `.editorconfig` file that ensures basic settings such as file encoding, tab width and line endings. In Visual Studio 2017 it should be used by default, in prior versions you need to install the "[editorconfig plugin](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)".
+ * When using vscode, be sure to install the PowerShell and editorconfig plugins:
+   * `code --install-extension ms-vscode.powershell`
+   * `code --install-extension editorconfig.editorconfig`
 
 ### Prepare Commits
 This section serves to help you understand what makes a good commit.
