@@ -180,7 +180,7 @@ Intercepts Chocolatey call to check for reboots
                         $errorCode=$matches["ecof"]
                     }
                     if($RebootCodes -contains $errorCode) {
-                       Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code" -Verbose
+                       Write-BoxstarterMessage "Chocolatey install returned a rebootable exit code ($errorCode)" -Verbose
                        $rebootable = $true
                     } else {
                        Write-BoxstarterMessage "Exit Code '$errorCode' is no reason to reboot" -Verbose 
