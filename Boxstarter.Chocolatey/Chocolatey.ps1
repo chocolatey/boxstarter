@@ -95,7 +95,7 @@ Intercepts Chocolatey call to check for reboots
         [string[]]$packageNames=@('')
     )
     $RebootCodes = Get-PassedArg RebootCodes $args
-    if ($RebootCodes) {
+    if ($null -ne $RebootCodes) {
         $argsWithoutRebootCodes = @()
         $skipNextArg = $false
         foreach ($a in $args) {
@@ -111,23 +111,23 @@ Intercepts Chocolatey call to check for reboots
         }
         $args = $argsWithoutRebootCodes
     }
-    $RebootCodes=Add-DefaultRebootCodes $RebootCodes
+    $RebootCodes = Add-DefaultRebootCodes $RebootCodes
     Write-BoxstarterMessage "RebootCodes: '$RebootCodes'" -Verbose
 
-    $packageNames=-split $packageNames
+    $packageNames = -split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
 
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
         if((Get-PassedArg @("source", "s") $args) -eq "WindowsFeatures"){
-            $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
+            $dismInfo = (DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
             if($dismInfo -contains "State : Enabled" -or $dismInfo -contains "State : Enable Pending") {
                 Write-BoxstarterMessage "$packageName is already installed"
                 return
             }
         }
         if(((Test-PendingReboot) -or $Boxstarter.IsRebooting) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
-        $session=Start-TimedSection "Calling Chocolatey to install $packageName. This may take several minutes to complete..."
+        $session = Start-TimedSection "Calling Chocolatey to install $packageName. This may take several minutes to complete..."
         $currentErrorCount = 0
         $rebootable = $false
         try {
