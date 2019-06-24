@@ -30,6 +30,18 @@ Turn on always show all icons in the notification area
 .PARAMETER AlwaysShowIconsOff
 Turn off always show all icons in the notification area
 
+.PARAMETER MultiMonitorOn
+Turn on Show tasbkar on all displays.
+
+.PARAMETER MultiMonitorOff
+Turn off Show taskbar on all displays.
+
+.PARAMETER MultiMonitorMode
+Changes the behavior of the Taskbar when using multiple displays.  Valid inputs are All, MainAndOpen, and Open.
+
+.PARAMETER MultiMonitorCombine
+Changes the Taskbar Icon combination style for non-primary displays.  Valid inputs are Always, Full, and Never.
+
 #>
 	[CmdletBinding(DefaultParameterSetName='unlock')]
 	param(
@@ -55,8 +67,16 @@ Turn off always show all icons in the notification area
 				[ValidateSet('Top','Left','Bottom','Right')]
 				$Dock,
 				[ValidateSet('Always','Full','Never')]
-				$Combine
-	)
+				$Combine,
+        [Parameter(ParameterSetName='MultiMonitorOn')]
+        [switch]$MultiMonitorOn,
+        [Parameter(ParameterSetName='MultiMonitorOff')]
+        [switch]$MultiMonitorOff,
+        [ValidateSet('All', 'MainAndOpen', 'Open')]
+        $MultiMonitorMode,
+        [ValidateSet('Always','Full','Never')]
+        $MultiMonitorCombine
+    )
 
 	$explorerKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer'
 	$key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
@@ -85,7 +105,29 @@ Turn off always show all icons in the notification area
 			"Full" { Set-ItemProperty $key TaskbarGlomLevel 1 }
 			"Never" { Set-ItemProperty $key TaskbarGlomLevel 2 }
 		}
-	}
+
+        if($MultiMonitorOn)
+        {
+            Set-ItemProperty $key MMTaskbarEnabled 1
+        }
+
+        if($MultiMonitorOff)
+        {
+            Set-ItemProperty $key MMTaskbarEnabled 0
+        }
+
+        switch($MultiMonitorMode) {
+        "All" { Set-ItemProperty $key MMTaskbarMode 0 }
+        "MainAndOpen" { Set-ItemProperty $key MMTaskbarMode 1 }
+        "Open" {Set-ItemProperty $key MMTaskbarMode 2 }
+        }
+        
+        switch($MultiMonitorCombine) {
+            "Always" { Set-ItemProperty $key MMTaskbarGlomLevel 0 }
+            "Full" { Set-ItemProperty $key MMTaskbarGlomLevel 1 }
+            "Never" { Set-ItemProperty $key MMTaskbarGlomLevel 2 }
+        }
+    }
 
 	if(Test-Path -Path $settingKey) {
 		$settings = (Get-ItemProperty -Path $settingKey -Name Settings).Settings
