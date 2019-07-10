@@ -1,7 +1,7 @@
 #Andrea Dalle Vacche
 #Requires -Version 3.0
  
-Function Set-PageFile {
+Function Set-BoxstarterPageFile {
 <#
     .SYNOPSIS
         Set-PageFile is an advanced function which can be used to adjust virtual memory page file size.
