@@ -4,23 +4,23 @@
 Function Set-BoxstarterPageFile {
 <#
     .SYNOPSIS
-        Set-PageFile is an advanced function which can be used to adjust virtual memory page file size.
+        This can be used to manage the Windows page file.
     .DESCRIPTION
-        Set-PageFile is an advanced function which can be used to adjust virtual memory page file size.
-    .PARAMETER  <InitialSize>
-        Setting the paging file's initial size.
-    .PARAMETER  <MaximumSize>
-        Setting the paging file's maximum size.
-    .PARAMETER  <DriveLetter>
-        Specifies the drive letter you want to configure.
-    .PARAMETER  <SystemManagedSize>
-        Allow Windows to manage page files on this computer.
-    .PARAMETER  <None>        
-        Disable page files setting.
-    .PARAMETER  <Reboot>      
+        This can be used to manage the Windows page file.
+    .PARAMETER InitialSize
+        Initial size of the page file.
+    .PARAMETER MaximumSize
+        Maximum size of the page file.
+    .PARAMETER DriveLetter
+        The drive used for the holding the page file.
+    .PARAMETER SystemManagedSize
+        Allow Windows to manage the page files.
+    .PARAMETER None        
+        Disable the use of the page file.
+    .PARAMETER Reboot      
         Reboot the computer so that configuration changes take effect.
-    .PARAMETER  <AutoConfigure>
-        Automatically configure the initial size and maximumsize.
+    .PARAMETER AutoConfigure
+        Automatically configure the initial size and maximum size.
     .EXAMPLE
         C:\PS> Set-PageFile -InitialSize 1024 -MaximumSize 4096 -DriveLetter "C","D"
  
@@ -32,9 +32,6 @@ Function Set-BoxstarterPageFile {
         C:\pagefile.sys            1024            4096
         D:\pagefile.sys            1024            4096
         E:\pagefile.sys            2048            4096
-    .LINK
-        Get-WmiObject
-        http://technet.microsoft.com/library/hh849824.aspx
 #>
     [cmdletbinding(SupportsShouldProcess,DefaultParameterSetName="SetPageFileSize")]
     Param
