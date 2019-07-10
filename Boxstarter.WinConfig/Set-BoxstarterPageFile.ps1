@@ -1,6 +1,3 @@
-#Andrea Dalle Vacche
-#Requires -Version 3.0
- 
 Function Set-BoxstarterPageFile {
 <#
     .SYNOPSIS
@@ -19,8 +16,6 @@ Function Set-BoxstarterPageFile {
         Disable the use of the page file.
     .PARAMETER Reboot      
         Reboot the computer so that configuration changes take effect.
-    .PARAMETER AutoConfigure
-        Automatically configure the initial size and maximum size.
     .EXAMPLE
         C:\PS> Set-PageFile -InitialSize 1024 -MaximumSize 4096 -DriveLetter "C","D"
  
@@ -56,11 +51,7 @@ Function Set-BoxstarterPageFile {
         [Switch]$SystemManagedSize,
  
         [Parameter()]
-        [Switch]$Reboot,
- 
-        [Parameter(Mandatory,ParameterSetName="AutoConfigure")]
-        [Alias('auto')]
-        [Switch]$AutoConfigure
+        [Switch]$Reboot
     )
 Begin {}
 Process {
@@ -69,7 +60,7 @@ Process {
             $DL = $_
             $PageFile = $Vol = $null
             try {
-                $Vol = Get-CimInstance -ClassName CIM_StorageVolume -Filter "Name='$($DL):\\'" -ErrorAction Stop
+                $Vol = Get-WmiObject -Class CIM_StorageVolume -Filter "Name='$($DL):\\'" -ErrorAction Stop
             } catch {
                 Write-Warning -Message "Failed to find the DriveLetter $DL specified"
                 return
@@ -81,13 +72,13 @@ Process {
             Switch ($PsCmdlet.ParameterSetName) {
                 None {
                     try {
-                        $PageFile = Get-CimInstance -Query "Select * From Win32_PageFileSetting Where Name='$($DL):\\pagefile.sys'" -ErrorAction Stop
+                        $PageFile = Get-WmiObject -Query "Select * From Win32_PageFileSetting Where Name='$($DL):\\pagefile.sys'" -ErrorAction Stop
                     } catch {
                         Write-Warning -Message "Failed to query the Win32_PageFileSetting class because $($_.Exception.Message)"
                     }
                     If($PageFile) {
                         try {
-                            $PageFile | Remove-CimInstance -ErrorAction Stop 
+                            $PageFile | Remove-WmiObject -ErrorAction Stop 
                         } catch {
                             Write-Warning -Message "Failed to delete pagefile the Win32_PageFileSetting class because $($_.Exception.Message)"
                         }
@@ -99,44 +90,6 @@ Process {
                 SystemManagedSize {
                     Set-PageFileSize -DL $DL -InitialSize 0 -MaximumSize 0
                     break
-                }
-                AutoConfigure {         
-                    $TotalPhysicalMemorySize = @()
-                    #Getting total physical memory size
-                    try {
-                        Get-CimInstance Win32_PhysicalMemory  -ErrorAction Stop | ? DeviceLocator -ne "SYSTEM ROM" | ForEach-Object {
-                            $TotalPhysicalMemorySize += [Double]($_.Capacity)/1GB
-                        }
-                    } catch {
-                        Write-Warning -Message "Failed to query the Win32_PhysicalMemory class because $($_.Exception.Message)"
-                    }       
-                    <#
-                    By default, the minimum size on a 32-bit (x86) system is 1.5 times the amount of physical RAM if physical RAM is less than 1 GB, 
-                    and equal to the amount of physical RAM plus 300 MB if 1 GB or more is installed. The default maximum size is three times the amount of RAM, 
-                    regardless of how much physical RAM is installed. 
-                    If($TotalPhysicalMemorySize -lt 1) {
-                        $InitialSize = 1.5*1024
-                        $MaximumSize = 1024*3
-                        Set-PageFileSize -DL $DL -InitialSize $InitialSize -MaximumSize $MaximumSize
-                    } Else {
-                        $InitialSize = 1024+300
-                        $MaximumSize = 1024*3
-                        Set-PageFileSize -DL $DL -InitialSize $InitialSize -MaximumSize $MaximumSize
-                    }
-                    #>
- 
- 
-                    $InitialSize = (Get-CimInstance -ClassName Win32_PageFileUsage).AllocatedBaseSize
-                    $sum = $null
-                    (Get-Counter '\Process(*)\Page File Bytes Peak' -SampleInterval 15 -ErrorAction SilentlyContinue).CounterSamples.CookedValue | % {$sum += $_}
-                    $MaximumSize = ($sum*70/100)/1MB
-                    if ($Vol.FreeSpace -gt $MaximumSize) {
-                        Set-PageFileSize -DL $DL -InitialSize $InitialSize -MaximumSize $MaximumSize
-                    } else {
-                        Write-Warning -Message "Maximum size of page file being set exceeds the freespace available on the drive"
-                    }
-                    break
-                                 
                 }
                 Default {
                     if ($Vol.FreeSpace -gt $MaximumSize) {
@@ -150,7 +103,7 @@ Process {
  
         # Get current page file size information
         try {
-            Get-CimInstance -ClassName Win32_PageFileSetting -ErrorAction Stop |Select-Object Name,
+            Get-WmiObject -Class Win32_PageFileSetting -ErrorAction Stop |Select-Object Name,
         @{Name="InitialSize(MB)";Expression={if($_.InitialSize -eq 0){"System Managed"}else{$_.InitialSize}}}, 
         @{Name="MaximumSize(MB)";Expression={if($_.MaximumSize -eq 0){"System Managed"}else{$_.MaximumSize}}}| 
         Format-Table -AutoSize
@@ -187,14 +140,14 @@ Process {
     #This capability is not available on windows server 2003,XP and lower versions.
     #Only if it is NOT managed by the system and will also allow you to change these.
     try {
-        $Sys = Get-CimInstance -ClassName Win32_ComputerSystem -ErrorAction Stop 
+        $Sys = Get-WmiObject -Class Win32_ComputerSystem -ErrorAction Stop 
     } catch {
          
     }
  
     If($Sys.AutomaticManagedPagefile) {
         try {
-            $Sys | Set-CimInstance -Property @{ AutomaticManagedPageFile = $false } -ErrorAction Stop
+            $Sys | Set-WmiObject -Property @{ AutomaticManagedPageFile = $false } -ErrorAction Stop
             Write-Verbose -Message "Set the AutomaticManagedPageFile to false"
         } catch {
             Write-Warning -Message "Failed to set the AutomaticManagedPageFile property to false in  Win32_ComputerSystem class because $($_.Exception.Message)"
@@ -203,23 +156,23 @@ Process {
      
     # Configuring the page file size
     try {
-        $PageFile = Get-CimInstance -ClassName Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($DriveLetter):'" -ErrorAction Stop
+        $PageFile = Get-WmiObject -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($DriveLetter):'" -ErrorAction Stop
     } catch {
         Write-Warning -Message "Failed to query Win32_PageFileSetting class because $($_.Exception.Message)"
     }
  
     If($PageFile){
         try {
-            $PageFile | Remove-CimInstance -ErrorAction Stop
+            $PageFile | Remove-WmiObject -ErrorAction Stop
         } catch {
             Write-Warning -Message "Failed to delete pagefile the Win32_PageFileSetting class because $($_.Exception.Message)"
         }
     }
     try {
-        New-CimInstance -ClassName Win32_PageFileSetting -Property  @{Name= "$($DriveLetter):\pagefile.sys"} -ErrorAction Stop | Out-Null
+        New-WmiObject -Class Win32_PageFileSetting -Property  @{Name= "$($DriveLetter):\pagefile.sys"} -ErrorAction Stop | Out-Null
       
         # http://msdn.microsoft.com/en-us/library/windows/desktop/aa394245%28v=vs.85%29.aspx            
-        Get-CimInstance -ClassName Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($DriveLetter):'" -ErrorAction Stop | Set-CimInstance -Property @{
+        Get-WmiObject -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($DriveLetter):'" -ErrorAction Stop | Set-CimInstance -Property @{
             InitialSize = $InitialSize ;
             MaximumSize = $MaximumSize ; 
         } -ErrorAction Stop
