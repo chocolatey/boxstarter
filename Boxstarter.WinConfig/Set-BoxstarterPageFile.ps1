@@ -53,8 +53,7 @@ Function Set-BoxstarterPageFile {
         [Parameter()]
         [Switch]$Reboot
     )
-Begin {}
-Process {
+
     If($PSCmdlet.ShouldProcess("Setting the virtual memory page file size")) {
         $DriveLetter | ForEach-Object -Process {
             $DL = $_
@@ -115,8 +114,6 @@ Process {
         }
     }
 }
-End {}
-}
  
 Function Set-PageFileSize {
 [CmdletBinding()]
@@ -134,8 +131,6 @@ Param(
         [ValidateRange(0,[int32]::MaxValue)]
         [Int32]$MaximumSize
 )
-Begin {}
-Process {
     #The AutomaticManagedPagefile property determines whether the system managed pagefile is enabled. 
     #This capability is not available on windows server 2003,XP and lower versions.
     #Only if it is NOT managed by the system and will also allow you to change these.
@@ -182,6 +177,4 @@ Process {
     } catch {
         Write-Warning "Pagefile configuration changed on computer '$Env:COMPUTERNAME'. The computer must be restarted for the changes to take effect."
     }
-}
-End {}
 }
