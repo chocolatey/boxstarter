@@ -95,22 +95,40 @@ Intercepts Chocolatey call to check for reboots
         [string[]]$packageNames=@('')
     )
     $RebootCodes = Get-PassedArg RebootCodes $args
-    $RebootCodes=Add-DefaultRebootCodes $RebootCodes
-    $packageNames=-split $packageNames
+    if ($null -ne $RebootCodes) {
+        $argsWithoutRebootCodes = @()
+        $skipNextArg = $false
+        foreach ($a in $args) {
+            if ($skipNextArg) {
+                $skipNextArg = $false;
+                continue;
+            }
+            if (@("-RebootCodes", "--RebootCodes") -contains $a) {
+                $skipNextArg = $true
+                continue;
+            }
+            $argsWithoutRebootCodes += $a
+        }
+        $args = $argsWithoutRebootCodes
+    }
+    $RebootCodes = Add-DefaultRebootCodes $RebootCodes
+    Write-BoxstarterMessage "RebootCodes: '$RebootCodes'" -Verbose
+
+    $packageNames = -split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
 
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
         if((Get-PassedArg @("source", "s") $args) -eq "WindowsFeatures"){
-            $dismInfo=(DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
+            $dismInfo = (DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
             if($dismInfo -contains "State : Enabled" -or $dismInfo -contains "State : Enable Pending") {
                 Write-BoxstarterMessage "$packageName is already installed"
                 return
             }
         }
         if(((Test-PendingReboot) -or $Boxstarter.IsRebooting) -and $Boxstarter.RebootOk) {return Invoke-Reboot}
-        $session=Start-TimedSection "Calling Chocolatey to install $packageName. This may take several minutes to complete..."
-        $currentErrorCount = $global:error.Count
+        $session = Start-TimedSection "Calling Chocolatey to install $packageName. This may take several minutes to complete..."
+        $currentErrorCount = 0
         $rebootable = $false
         try {
             [System.Environment]::ExitCode = 0
@@ -134,7 +152,7 @@ Intercepts Chocolatey call to check for reboots
         catch {
             #Only write the error to the error stream if it was not previously
             #written by Chocolatey
-            $chocoErrors = $global:error.Count - $currentErrorCount
+            $chocoErrors = $currentErrorCount
             if($chocoErrors -gt 0){
                 $idx = 0
                 $errorWritten = $false
@@ -149,17 +167,23 @@ Intercepts Chocolatey call to check for reboots
                 }
             }
         }
-        $chocoErrors = $global:error.Count - $currentErrorCount
+        $chocoErrors = $currentErrorCount
         if($chocoErrors -gt 0){
             Write-BoxstarterMessage "There was an error calling Chocolatey" -Verbose
             $idx = 0
             while($idx -lt $chocoErrors){
                 Write-BoxstarterMessage "Error from Chocolatey: $($global:error[$idx].Exception | fl * -Force | Out-String)"
-                if($global:error[$idx] -match "code was '(-?\d+)'") {
-                    $errorCode=$matches[1]
+                if($global:error[$idx] -match "code (was '(?'ecwas'-?\d+)'|of (?'ecof'-?\d+)\.)") {
+                    if ($matches["ecwas"]) {
+                        $errorCode=$matches["ecwas"]
+                    } else {
+                        $errorCode=$matches["ecof"]
+                    }
                     if($RebootCodes -contains $errorCode) {
-                       Write-BoxstarterMessage "Chocolatey Install returned a rebootable exit code" -verbose
+                       Write-BoxstarterMessage "Chocolatey install returned a rebootable exit code ($errorCode)" -Verbose
                        $rebootable = $true
+                    } else {
+                       Write-BoxstarterMessage "Exit Code '$errorCode' is no reason to reboot" -Verbose 
                     }
                 }
                 $idx += 1
@@ -298,8 +322,12 @@ function Format-ExeArgs($command) {
 
 function Add-DefaultRebootCodes($codes) {
     if($codes -eq $null){$codes=@()}
-    $codes += 3010 #common MSI reboot needed code
-    $codes += -2067919934 #returned by SQL Server when it needs a reboot
+    if ($codes -notcontains 3010) {
+        $codes += 3010 #common MSI reboot needed code
+    }
+    if ($codes -notcontains -2067919934) {
+        $codes += -2067919934 #returned by SQL Server when it needs a reboot
+    }
     return $codes
 }
 
