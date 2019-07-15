@@ -90,16 +90,12 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
                 }
 
                 $Result= $null
-                if ($update.isDownloaded -eq "true" -and ($update.InstallationBehavior.CanRequestUserInput -eq $false )) {
-                    Out-BoxstarterLog " * $($update.title) already downloaded"
+                if ($update.InstallationBehavior.CanRequestUserInput -eq $false ) {
+                    Download-Update $update
                     $result = install-Update $update $currentCount $totalUpdates
                 }
-                elseif($update.InstallationBehavior.CanRequestUserInput -eq $true) {
-                    Out-BoxstarterLog " * $($update.title) Requires user input and will not be downloaded"
-                }
                 else {
-                    Download-Update $update
-                    $result = Install-Update $update $currentCount $totalUpdates
+                    Out-BoxstarterLog " * $($update.title) Requires user input and will not be downloaded"
                 }
             }
 
