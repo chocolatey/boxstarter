@@ -57,17 +57,17 @@ Changes the Taskbar Icon combination style for non-primary displays.  Valid inpu
         [switch]$AutoHide,
         [Parameter(ParameterSetName='locknohide')]
         [Parameter(ParameterSetName='unlocknohide')]
-				[switch]$NoAutoHide,
-				[Parameter(ParameterSetName='AlwaysShowIconsOn')]
-				[switch]$AlwaysShowIconsOn,
-				[Parameter(ParameterSetName='AlwaysShowIconsOff')]
-				[switch]$AlwaysShowIconsOff,
-				[ValidateSet('Small','Large')]
-				$Size,
-				[ValidateSet('Top','Left','Bottom','Right')]
-				$Dock,
-				[ValidateSet('Always','Full','Never')]
-				$Combine,
+        [switch]$NoAutoHide,
+        [Parameter(ParameterSetName='AlwaysShowIconsOn')]
+        [switch]$AlwaysShowIconsOn,
+        [Parameter(ParameterSetName='AlwaysShowIconsOff')]
+        [switch]$AlwaysShowIconsOff,
+        [ValidateSet('Small','Large')]
+        $Size,
+        [ValidateSet('Top','Left','Bottom','Right')]
+        $Dock,
+        [ValidateSet('Always','Full','Never')]
+        $Combine,
         [Parameter(ParameterSetName='MultiMonitorOff')]
         [switch]$MultiMonitorOff,
         [Parameter(ParameterSetName='MultiMonitorOn')]
@@ -91,43 +91,43 @@ Changes the Taskbar Icon combination style for non-primary displays.  Valid inpu
 	if(Test-Path -Path $key) {
 		if($Lock)
 		{
-			Set-ItemProperty $key TaskbarSizeMove 0
+			Set-ItemProperty -Path $key -Name TaskbarSizeMove -Value 0
         }
         if($UnLock){
-			Set-ItemProperty $key TaskbarSizeMove 1
+			Set-ItemProperty -Path $key -Name TaskbarSizeMove -Value 1
 		}
 
 		switch ($Size) {
-			"Small" { Set-ItemProperty $key TaskbarSmallIcons 1 }
-			"Large" { Set-ItemProperty $key TaskbarSmallIcons 0 }
+			"Small" { Set-ItemProperty -Path $key -Name TaskbarSmallIcons -Value 1 }
+			"Large" { Set-ItemProperty -Path $key -Name TaskbarSmallIcons -Value 0 }
 		}
 
 		switch($Combine) {
-			"Always" { Set-ItemProperty $key TaskbarGlomLevel 0 }
-			"Full" { Set-ItemProperty $key TaskbarGlomLevel 1 }
-			"Never" { Set-ItemProperty $key TaskbarGlomLevel 2 }
+			"Always" { Set-ItemProperty -Path $key -Name TaskbarGlomLevel -Value 0 }
+			"Full" { Set-ItemProperty -Path $key -Name TaskbarGlomLevel -Value 1 }
+			"Never" { Set-ItemProperty -Path $key -Name TaskbarGlomLevel -Value 2 }
 		}
 
         if($MultiMonitorOn)
         {
-            Set-ItemProperty $key MMTaskbarEnabled 1
+            Set-ItemProperty -Path $key -Name MMTaskbarEnabled -Value 1
             
             switch($MultiMonitorMode) {
-                "All" { Set-ItemProperty $key MMTaskbarMode 0 }
-                "MainAndOpen" { Set-ItemProperty $key MMTaskbarMode 1 }
-                "Open" {Set-ItemProperty $key MMTaskbarMode 2 }
+                "All" { Set-ItemProperty -Path $key -Name MMTaskbarMode -Value 0 }
+                "MainAndOpen" { Set-ItemProperty -Path $key -Name MMTaskbarMode -Value 1 }
+                "Open" {Set-ItemProperty -Path $key -Name MMTaskbarMode -Value 2 }
             }
             
             switch($MultiMonitorCombine) {
-                "Always" { Set-ItemProperty $key MMTaskbarGlomLevel 0 }
-                "Full" { Set-ItemProperty $key MMTaskbarGlomLevel 1 }
-                "Never" { Set-ItemProperty $key MMTaskbarGlomLevel 2 }
+                "Always" { Set-ItemProperty -Path $key -Name MMTaskbarGlomLevel -Value 0 }
+                "Full" { Set-ItemProperty -Path $key -Name MMTaskbarGlomLevel -Value 1 }
+                "Never" { Set-ItemProperty -Path $key -Name MMTaskbarGlomLevel -Value 2 }
             }
         }
 
         if($MultiMonitorOff)
         {
-            Set-ItemProperty $key MMTaskbarEnabled 0
+            Set-ItemProperty -Path $key -Name MMTaskbarEnabled -Value 0
         }
     }
 
