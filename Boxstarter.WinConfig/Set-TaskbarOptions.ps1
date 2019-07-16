@@ -68,12 +68,14 @@ Changes the Taskbar Icon combination style for non-primary displays.  Valid inpu
 				$Dock,
 				[ValidateSet('Always','Full','Never')]
 				$Combine,
-        [Parameter(ParameterSetName='MultiMonitorOn')]
-        [switch]$MultiMonitorOn,
         [Parameter(ParameterSetName='MultiMonitorOff')]
         [switch]$MultiMonitorOff,
+        [Parameter(ParameterSetName='MultiMonitorOn')]
+        [switch]$MultiMonitorOn,
+        [Parameter(ParameterSetName='MultiMonitorOn')]
         [ValidateSet('All', 'MainAndOpen', 'Open')]
         $MultiMonitorMode,
+        [Parameter(ParameterSetName='MultiMonitorOn')]
         [ValidateSet('Always','Full','Never')]
         $MultiMonitorCombine
     )
@@ -109,23 +111,23 @@ Changes the Taskbar Icon combination style for non-primary displays.  Valid inpu
         if($MultiMonitorOn)
         {
             Set-ItemProperty $key MMTaskbarEnabled 1
+            
+            switch($MultiMonitorMode) {
+                "All" { Set-ItemProperty $key MMTaskbarMode 0 }
+                "MainAndOpen" { Set-ItemProperty $key MMTaskbarMode 1 }
+                "Open" {Set-ItemProperty $key MMTaskbarMode 2 }
+            }
+            
+            switch($MultiMonitorCombine) {
+                "Always" { Set-ItemProperty $key MMTaskbarGlomLevel 0 }
+                "Full" { Set-ItemProperty $key MMTaskbarGlomLevel 1 }
+                "Never" { Set-ItemProperty $key MMTaskbarGlomLevel 2 }
+            }
         }
 
         if($MultiMonitorOff)
         {
             Set-ItemProperty $key MMTaskbarEnabled 0
-        }
-
-        switch($MultiMonitorMode) {
-        "All" { Set-ItemProperty $key MMTaskbarMode 0 }
-        "MainAndOpen" { Set-ItemProperty $key MMTaskbarMode 1 }
-        "Open" {Set-ItemProperty $key MMTaskbarMode 2 }
-        }
-        
-        switch($MultiMonitorCombine) {
-            "Always" { Set-ItemProperty $key MMTaskbarGlomLevel 0 }
-            "Full" { Set-ItemProperty $key MMTaskbarGlomLevel 1 }
-            "Never" { Set-ItemProperty $key MMTaskbarGlomLevel 2 }
         }
     }
 
