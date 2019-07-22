@@ -70,7 +70,9 @@ Invoke-Reboot
       [Parameter(Position=5,Mandatory=0)]
       [switch]$NoPassword,
       [Parameter(Position=6,Mandatory=0)]
-      [switch]$DisableRestart
+      [switch]$DisableRestart,
+      [Parameter(Position=7,Mandatory=0)]
+      [switch]$ExitOnFirstError
     )
     $BoxStarter.IsRebooting = $false
     $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
@@ -92,6 +94,7 @@ Invoke-Reboot
         $session=Start-TimedSection "Installation session." -Verbose
         if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
         if($DisableRestart){$Boxstarter.DisableRestart=$DisableRestart}
+        if($ExitOnFirstError){$Boxstarter.ExitOnFirstError=$ExitOnFirstError}
         if($encryptedPassword){$password = ConvertTo-SecureString -string $encryptedPassword}
         if(!$NoPassword){
             Write-BoxstarterMessage "NoPassword is false checking autologin" -verbose
@@ -101,7 +104,7 @@ Invoke-Reboot
         if($script:BoxstarterPassword -eq $null) {
             $boxstarter.NoPassword=$True
         }
-        Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and RebootOk is set to $($Boxstarter.RebootOk) and the NoPassword parameter passed was $NoPassword" -verbose
+        Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and RebootOk is set to $($Boxstarter.RebootOk) and the NoPassword parameter passed was $NoPassword, ExitOnFirstError is set to $($Boxstarter.ExitOnFirstError)" -verbose
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))

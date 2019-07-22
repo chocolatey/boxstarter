@@ -281,7 +281,8 @@ about_boxstarter_chocolatey
         [switch]$KeepWindowOpen,
         [string]$LocalRepo,
         [switch]$DisableRestart,
-        [switch]$DelegateChocoSources
+        [switch]$DelegateChocoSources,
+        [switch]$ExitOnFirstError
     )
     $CurrentVerbosity=$global:VerbosePreference
     try {
@@ -524,7 +525,8 @@ function Invoke-Locally {
         [switch]$DisableReboots,
         [switch]$KeepWindowOpen,
         [switch]$DisableRestart,
-        [string]$LocalRepo
+        [string]$LocalRepo,
+        [switch]$ExitOnFirstError
     )
     if($PSBoundParameters.ContainsKey("Credential")){
         if($Credential -ne $null) {

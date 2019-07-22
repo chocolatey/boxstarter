@@ -117,7 +117,7 @@ Intercepts Chocolatey call to check for reboots
     $packageNames = -split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
 
-    $exitOnFirstError = (Get-PassedSwitch ExitOnFirstError $args)
+    $exitOnFirstError = (Get-PassedSwitch ExitOnFirstError $args) -Or $Boxstarter.ExitOnFirstError
     Write-BoxstarterMessage "Will exit on first package error: $exitOnFirstError" -Verbose
 
     foreach($packageName in $packageNames){

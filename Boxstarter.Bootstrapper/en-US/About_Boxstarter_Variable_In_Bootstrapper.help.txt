@@ -24,6 +24,9 @@ BOXSTARTER VARIABLE SETTINGS
 	IsRebooting
 		Indicates if Boxstarter has intiated a reboot.
 
+	ExitOnFirstError
+		Indicates if Boxstarter will stop any further execution after a Chocolatey package failed to install
+
 	Log
 		This points to the path of the Boxstarter log file. By default
 		this is $env:LocalAppData\Boxstarter\boxstarter.log. You may
