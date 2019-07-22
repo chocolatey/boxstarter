@@ -117,7 +117,7 @@ Intercepts Chocolatey call to check for reboots
     $packageNames = -split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
 
-    $exitOnFirstError = $null -eq (Get-PassedArg ExitOnFirstError $args)
+    $exitOnFirstError = (Get-PassedSwitch ExitOnFirstError $args)
     Write-BoxstarterMessage "Will exit on first package error: $exitOnFirstError" -Verbose
 
     foreach($packageName in $packageNames){
@@ -191,8 +191,7 @@ Intercepts Chocolatey call to check for reboots
                             Write-BoxstarterMessage "Exiting because 'ExitOnFirstError' is set."
                             Stop-Timedsection $session
                             Remove-ChocolateyPackageInProgress $packageName
-                            [System.Environment]::ExitCode = 1
-                            return #break outer foreach(packages) - do not continue with any other package installation
+                            exit 1
                        }
                     }
                 }
@@ -205,6 +204,21 @@ Intercepts Chocolatey call to check for reboots
             Invoke-Reboot
         }
     }
+}
+
+function Get-PassedSwitch($switchName, $origArgs) {
+    $candidateKeys = @()
+    $switchName | % {
+        $candidateKeys += "-$_"
+        $candidateKeys += "--$_"
+    }
+    $switchPresent = $false
+    $origArgs | % {
+        if ($candidateKeys -contains $_) {
+            $switchPresent = $true
+        }
+    }
+    return $switchPresent
 }
 
 function Get-PassedArg($argName, $origArgs) {
