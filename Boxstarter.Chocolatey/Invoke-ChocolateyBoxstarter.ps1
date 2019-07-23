@@ -126,7 +126,7 @@ Set-BoxstarterConfig
       [switch]$NoPassword,
 
       [switch]$DisableRestart,
-      
+
       [switch]$StopOnFirstError
     )
     try{
@@ -141,15 +141,48 @@ Set-BoxstarterConfig
             else{
                 Write-BoxstarterMessage "Installing Chocolatey" -Color Cyan
             }
-            $scriptArgs=@{}
-            if($bootstrapPackage){$scriptArgs.bootstrapPackage=$bootstrapPackage}
-            if($LocalRepo){$scriptArgs.Localrepo=$localRepo}
-            if($DisableReboots){$scriptArgs.DisableReboots = $DisableReboots}
-            $script=@"
-Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
-Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage '$($bootstrapPackage -join ''',''')'"}) $(if($LocalRepo){"-LocalRepo $localRepo"})  $(if($DisableReboots){"-DisableReboots"} ) $(if($StopOnFirstError){"-StopOnFirstError"} ) 
+            $scriptStringArgs = ""
+
+            # parameters for Invoke-ChocolateyBoxstarter
+            if ($bootstrapPackage) {
+                $scriptStringArgs += "-bootstrapPackage '$($bootstrapPackage -join ''',''')' "
+            }
+            if ($DisableReboots){
+                $scriptStringArgs += "-DisableReboots "
+            }
+            if ($LocalRepo) {
+                $scriptStringArgs += "-LocalRepo $localRepo "
+            }
+
+            $invokeBoxstarterArgs=@{}
+            # parameters for Invoke-ChocolateyBoxstarter AND Invoke-Boxstarter
+            if ($password) {
+                $invokeBoxstarterArgs.password = $password
+            }
+            if ($Boxstarter.RebootOk) {
+                $invokeBoxstarterArgs.RebootOk = $Boxstarter.RebootOk
+            }
+            # (skipping encryptedPassword)
+            if ($KeepWindowOpen) {
+                $invokeBoxstarterArgs.KeepWindowOpen = $KeepWindowOpen
+            }
+            if ($NoPassword) {
+                $invokeBoxstarterArgs.NoPassword = $NoPassword
+            }
+            if ($DisableRestart){
+                $invokeBoxstarterArgs.DisableRestart = $DisableRestart
+                $scriptStringArgs += "-DisableRestart "
+            }
+            if ($StopOnFirstError){
+                $invokeBoxstarterArgs.StopOnFirstError = $StopOnFirstError
+                $scriptStringArgs += "-StopOnFirstError "
+            }
+
+            $script = @"
+Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking; Invoke-ChocolateyBoxstarter $scriptStringArgs
 "@
-            Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password -KeepWindowOpen:$KeepWindowOpen -NoPassword:$NoPassword -DisableRestart:$DisableRestart -StopOnFirstError:$StopOnFirstError
+
+            Invoke-Boxstarter ([ScriptBlock]::Create($script)) @invokeBoxstarterArgs
             return
         }
         if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
