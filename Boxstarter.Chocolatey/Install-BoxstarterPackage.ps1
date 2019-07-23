@@ -95,6 +95,10 @@ directory but can be changed with Set-BoxstarterConfig.
 This enables remote Chocolatey installs to use the same NugetSources
 as the local Boxstarter install.
 
+.PARAMETER StopOnPackageFailure
+This will stop execution immediately after a Chocolatey package fails to
+install.
+
 .NOTES
 If specifying only one package, Boxstarter calls Chocolatey with the
 -force argument and deletes the previously installed package directory.
@@ -294,7 +298,7 @@ about_boxstarter_chocolatey
 
         [switch]$DelegateChocoSources,
 
-        [switch]$StopOnFirstError
+        [switch]$StopOnPackageFailure
     )
     $CurrentVerbosity=$global:VerbosePreference
     try {
@@ -545,7 +549,7 @@ function Invoke-Locally {
 
         [string]$LocalRepo,
 
-        [switch]$StopOnFirstError
+        [switch]$StopOnPackageFailure
     )
     if($PSBoundParameters.ContainsKey("Credential")){
         if($Credential -ne $null) {

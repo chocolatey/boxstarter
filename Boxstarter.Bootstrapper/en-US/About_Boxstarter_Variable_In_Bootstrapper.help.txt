@@ -24,7 +24,7 @@ BOXSTARTER VARIABLE SETTINGS
 	IsRebooting
 		Indicates if Boxstarter has intiated a reboot.
 
-	StopOnFirstError
+	StopOnPackageFailure
 		Indicates if Boxstarter will stop any further execution after a Chocolatey package failed to install
 
 	Log

@@ -117,7 +117,7 @@ Intercepts Chocolatey call to check for reboots
     $packageNames = -split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
 
-    $stopOnFirstError = (Get-PassedSwitch StopOnFirstError $args) -Or $Boxstarter.StopOnFirstError
+    $stopOnFirstError = (Get-PassedSwitch StopOnPackageFailure $args) -Or $Boxstarter.StopOnPackageFailure
     Write-BoxstarterMessage "Will stop on first package error: $stopOnFirstError" -Verbose
 
     foreach($packageName in $packageNames){
@@ -188,7 +188,7 @@ Intercepts Chocolatey call to check for reboots
                     } else {
                        Write-BoxstarterMessage "Exit Code '$errorCode' is no reason to reboot" -Verbose 
                        if ($stopOnFirstError) {
-                            Write-BoxstarterMessage "Exiting because 'StopOnFirstError' is set."
+                            Write-BoxstarterMessage "Exiting because 'StopOnPackageFailure' is set."
                             Stop-Timedsection $session
                             Remove-ChocolateyPackageInProgress $packageName
                             exit 1

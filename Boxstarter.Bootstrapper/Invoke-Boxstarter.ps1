@@ -79,7 +79,7 @@ Invoke-Reboot
       [switch]$DisableRestart,
 
       [Parameter(Position=7,Mandatory=0)]
-      [switch]$StopOnFirstError
+      [switch]$StopOnPackageFailure
     )
     $BoxStarter.IsRebooting = $false
     $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
@@ -107,8 +107,8 @@ Invoke-Reboot
         if ($DisableRestart) {
             $Boxstarter.DisableRestart = $DisableRestart
         }
-        if ($StopOnFirstError) {
-            $Boxstarter.StopOnFirstError = $StopOnFirstError
+        if ($StopOnPackageFailure) {
+            $Boxstarter.StopOnPackageFailure = $StopOnPackageFailure
         }
         if ($encryptedPassword) {
             $password = ConvertTo-SecureString -string $encryptedPassword
@@ -121,7 +121,7 @@ Invoke-Reboot
         if ($script:BoxstarterPassword -eq $null) {
             $boxstarter.NoPassword = $True
         }
-        Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and RebootOk is set to $($Boxstarter.RebootOk) and the NoPassword parameter passed was $NoPassword and StopOnFirstError is set to $($Boxstarter.StopOnFirstError)" -verbose
+        Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and RebootOk is set to $($Boxstarter.RebootOk) and the NoPassword parameter passed was $NoPassword and StopOnPackageFailure is set to $($Boxstarter.StopOnPackageFailure)" -verbose
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))

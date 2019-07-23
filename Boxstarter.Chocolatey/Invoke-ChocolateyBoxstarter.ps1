@@ -127,7 +127,7 @@ Set-BoxstarterConfig
 
       [switch]$DisableRestart,
 
-      [switch]$StopOnFirstError
+      [switch]$StopOnPackageFailure
     )
     try{
         if($DisableReboots){
@@ -173,9 +173,9 @@ Set-BoxstarterConfig
                 $invokeBoxstarterArgs.DisableRestart = $DisableRestart
                 $scriptStringArgs += "-DisableRestart "
             }
-            if ($StopOnFirstError){
-                $invokeBoxstarterArgs.StopOnFirstError = $StopOnFirstError
-                $scriptStringArgs += "-StopOnFirstError "
+            if ($StopOnPackageFailure){
+                $invokeBoxstarterArgs.StopOnPackageFailure = $StopOnPackageFailure
+                $scriptStringArgs += "-StopOnPackageFailure "
             }
 
             $script = @"
