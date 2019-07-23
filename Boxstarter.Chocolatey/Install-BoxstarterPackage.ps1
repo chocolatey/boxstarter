@@ -262,26 +262,38 @@ about_boxstarter_chocolatey
 	param(
         [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="BoxstarterConnectionConfig")]
         [BoxstarterConnectionConfig[]]$BoxstarterConnectionConfig,
+
         [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="ComputerName")]
         [string[]]$ComputerName,
+
         [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="ConnectionUri")]
         [Uri[]]$ConnectionUri,
+
         [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="Session")]
         [System.Management.Automation.Runspaces.PSSession[]]$Session,
+
         [parameter(Mandatory=$true, Position=0, ParameterSetName="Package")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="ComputerName")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="ConnectionUri")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="Session")]
         [parameter(Mandatory=$true, Position=1, ParameterSetName="BoxstarterConnectionConfig")]
         [string[]]$PackageName,
+
         [Management.Automation.PsCredential]$Credential,
+
         [switch]$Force,
+
         [switch]$DisableReboots,
+
         [parameter(ParameterSetName="Package")]
         [switch]$KeepWindowOpen,
+
         [string]$LocalRepo,
+
         [switch]$DisableRestart,
+
         [switch]$DelegateChocoSources,
+
         [switch]$StopOnFirstError
     )
     $CurrentVerbosity=$global:VerbosePreference
@@ -520,12 +532,19 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
 function Invoke-Locally {
     param(
         [string[]]$PackageName,
+
         [Management.Automation.PsCredential]$Credential,
+
         [switch]$Force,
+
         [switch]$DisableReboots,
+
         [switch]$KeepWindowOpen,
+
         [switch]$DisableRestart,
+
         [string]$LocalRepo,
+
         [switch]$StopOnFirstError
     )
     if($PSBoundParameters.ContainsKey("Credential")){
