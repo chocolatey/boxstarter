@@ -83,7 +83,7 @@ Invoke-Reboot
     )
     $BoxStarter.IsRebooting = $false
     $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
-    if(!(Test-Admin)) {
+    if (!(Test-Admin)) {
         New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | Out-Null
         Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate..."
         $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psd1")
@@ -97,19 +97,29 @@ Invoke-Reboot
     }
     $session=$null
     try{
-        if(!(Get-IsRemote)){ Write-BoxstarterLogo }
-        $session=Start-TimedSection "Installation session." -Verbose
-        if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
-        if($DisableRestart){$Boxstarter.DisableRestart=$DisableRestart}
-        if($StopOnFirstError){$Boxstarter.StopOnFirstError=$StopOnFirstError}
-        if($encryptedPassword){$password = ConvertTo-SecureString -string $encryptedPassword}
-        if(!$NoPassword){
-            Write-BoxstarterMessage "NoPassword is false checking autologin" -verbose
-            $boxstarter.NoPassword=$False
-            $script:BoxstarterPassword=InitAutologon $password
+        if (!(Get-IsRemote)) { 
+            Write-BoxstarterLogo 
         }
-        if($script:BoxstarterPassword -eq $null) {
-            $boxstarter.NoPassword=$True
+        $session = Start-TimedSection "Installation session." -Verbose
+        if($RebootOk){
+            $Boxstarter.RebootOk = $RebootOk
+        }
+        if ($DisableRestart) {
+            $Boxstarter.DisableRestart = $DisableRestart
+        }
+        if ($StopOnFirstError) {
+            $Boxstarter.StopOnFirstError = $StopOnFirstError
+        }
+        if ($encryptedPassword) {
+            $password = ConvertTo-SecureString -string $encryptedPassword
+        }
+        if (!$NoPassword) {
+            Write-BoxstarterMessage "NoPassword is false checking autologin" -verbose
+            $boxstarter.NoPassword = $False
+            $script:BoxstarterPassword = InitAutologon $password
+        }
+        if ($script:BoxstarterPassword -eq $null) {
+            $boxstarter.NoPassword = $True
         }
         Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and RebootOk is set to $($Boxstarter.RebootOk) and the NoPassword parameter passed was $NoPassword and StopOnFirstError is set to $($Boxstarter.StopOnFirstError)" -verbose
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
