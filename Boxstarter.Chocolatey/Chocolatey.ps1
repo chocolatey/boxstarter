@@ -207,18 +207,7 @@ Intercepts Chocolatey call to check for reboots
 }
 
 function Get-PassedSwitch($switchName, $origArgs) {
-    $candidateKeys = @()
-    $switchName | % {
-        $candidateKeys += "-$_"
-        $candidateKeys += "--$_"
-    }
-    $switchPresent = $false
-    $origArgs | % {
-        if ($candidateKeys -contains $_) {
-            $switchPresent = $true
-        }
-    }
-    return $switchPresent
+    return [bool]($origArgs | Where-Object { $_ -match "^-+$switchName$" })
 }
 
 function Get-PassedArg($argName, $origArgs) {
