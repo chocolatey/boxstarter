@@ -4,4 +4,4 @@ if(!$Boxstarter.ContainsKey('Log')) {
 }
 if(!$Boxstarter.ContainsKey('RebootOk')) { $Boxstarter.RebootOk=$false }
 if(!$Boxstarter.ContainsKey('IsRebooting')) { $Boxstarter.IsRebooting=$false }
-if(!$Boxstarter.ContainsKey('ExitOnFirstError')) { $Boxstarter.ExitOnFirstError=$false }
+if(!$Boxstarter.ContainsKey('StopOnFirstError')) { $Boxstarter.StopOnFirstError=$false }
