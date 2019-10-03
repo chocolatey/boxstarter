@@ -3,27 +3,20 @@ The Chocolatey team has very explicit information here regarding the process for
 
 <!-- TOC -->
 
-- [Reporting an Issue/Bug?](#reporting-an-issuebug)
-- [Submitting an Enhancement / Feature Request?](#submitting-an-enhancement)
-    - [Submitting an Enhancement For Choco](#submitting-an-enhancement)
-- [Contributing](#contributing)
-  - [Prerequisites](#prerequisites)
-    - [Definition of Trivial Contributions](#definition-of-trivial-contributions)
-    - [Is the CLA Really Required?](#is-the-cla-really-required)
-- [Contributing Process](#contributing-process)
-  - [Get Buyoff Or Find Open Community Issues/Features](#get-buyoff-or-find-open-community-issuesfeatures)
-  - [Set Up Your Environment](#set-up-your-environment)
-  - [Code Format / Design](#code-format--design)
-    - [CSharp](#csharp)
-    - [PowerShell](#powershell)
-  - [Debugging / Testing](#debugging--testing)
-    - [Visual Studio](#visual-studio)
-      - [Automated Tests](#automated-tests)
-    - [Chocolatey Build](#chocolatey-build)
-  - [Prepare Commits](#prepare-commits)
-  - [Submit Pull Request (PR)](#submit-pull-request-pr)
-  - [Respond to Feedback on Pull Request](#respond-to-feedback-on-pull-request)
-- [Other General Information](#other-general-information)
+* [Reporting an Issue/Bug?](#reporting-an-issuebug)
+* [Submitting an Enhancement / Feature Request](#submitting-an-enhancement--feature-request)
+* [Definition of Trivial Contributions](#definition-of-trivial-contributions)
+* [Contributing Process](#contributing-process)
+  * [Get Buyoff Or Find Open Community Issues/Features](#get-buyoff-or-find-open-community-issuesfeatures)
+  * [Set Up Your Environment](#set-up-your-environment)
+  * [Code Format, Design, Standards and Style](#code-format-design-standards-and-style)
+    * [CSharp](#csharp)
+    * [PowerShell](#powershell)
+    * [Code Standards and Style](#code-standards-and-style)
+  * [Prepare Commits](#prepare-commits)
+  * [Submit Pull Request (PR)](#submit-pull-request-pr)
+  * [Respond to Feedback on Pull Request](#respond-to-feedback-on-pull-request)
+* [Other General Information](#other-general-information)
 
 <!-- /TOC -->
 
@@ -31,14 +24,13 @@ The Chocolatey team has very explicit information here regarding the process for
 
 Submitting an Issue (or a Bug)? See the [Submitting Issues](https://github.com/chocolatey/boxstarter#submitting-issues) section in the [README](https://github.com/chocolatey/boxstarter/blob/master/README.md#submitting-issues).
 
-## Submitting an Enhancement
+## Submitting an Enhancement / Feature Request
 Log a GitHub issue. There are less constraints on this versus reporting issues. The process for contributions is roughly as follows:
 
-### Prerequisites
- * Submit the Enhancement ticket. You will need the issue id for your commits.
- * You agree to follow the [etiquette regarding communication](https://github.com/chocolatey/boxstarter#etiquette-regarding-communication).
+* Submit the Enhancement ticket. You will need the issue id for your commits.
+* You agree to follow the [etiquette regarding communication](https://github.com/chocolatey/boxstarter#etiquette-regarding-communication).
 
-#### Definition of Trivial Contributions
+## Definition of Trivial Contributions
 It's hard to define what is a trivial contribution. Sometimes even a 1 character change can be considered significant. Unfortunately because it can be subjective, the decision on what is trivial comes from the committers of the project and not from folks contributing to the project.
 
 What is generally considered trivial:
@@ -88,7 +80,8 @@ Start with [Prerequisites](#prerequisites).
     * While not an absolute requirement, automated tests will help reviewers feel comfortable about your changes, which gets your contributions accepted faster.
  * Please do not update your branch from the master unless we ask you to. See the responding to feedback section below.
 
-### Code Format / Design
+### Code Format, Design, Standards and Style
+
 #### CSharp
  * If you are using ReSharper, all of this is already in the shared resharper settings.
  * Class names and Properties are `PascalCase` - this is nearly the only time you start with uppercase.
