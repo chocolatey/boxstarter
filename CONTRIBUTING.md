@@ -102,14 +102,27 @@ Start with [Prerequisites](#prerequisites).
  * PowerShell must be CRLF and UTF-8. Git attributes are not used, so Git will not ensure this for you.
  * The minimum version of PowerShell this must work with is v2. This makes things somewhat more limited but compatible across the board for all areas Boxstarter is deployed. It is getting harder to find a reference for PowerShell v2, but this is a good one: http://adamringenberg.com/powershell2/table-of-contents/.
  * If you add a new file, also ensure you add it to the Visual Studio project and ensure it becomes an embedded resource.
- * PowerShell function names should follow the `[Verb]-Boxstarter[Noun]` convention. If you are updating an existing function please rename it to this format and add an alias for the previous name to ensure backwards compatibility.
- * The last parameter in every function must be `[parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments`. This allows for future expansion and compatibility - as new parameters are introduced and used, it doesn't break older versions of Boxstarter.
  * Do not add new positional elements to functions. We want to promote using named parameters in calling functions.
  * Do not remove any existing positional elements from functions. We need to maintain compatibility with older versions of Boxstarter.
- * There is a `.editorconfig` file that ensures basic settings such as file encoding, tab width and line endings. In Visual Studio 2017 it should be used by default, in prior versions you need to install the "[editorconfig plugin](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)".
- * When using vscode, be sure to install the PowerShell and editorconfig plugins:
-   * `code --install-extension ms-vscode.powershell`
-   * `code --install-extension editorconfig.editorconfig`
+ * There is a `.editorconfig` file that ensures basic settings such as file encoding, tab width and line endings. 
+   * In Visual Studio 2017 it should be used by default, in prior versions you need to install the "[editorconfig plugin](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)".
+   * When using vscode, be sure to install the PowerShell and editorconfig plugins:
+     * `code --install-extension ms-vscode.powershell`
+     * `code --install-extension editorconfig.editorconfig`
+
+#### Code Standards and Style
+
+The existing code base does not strictly adhere to these guidelines but we are working our way towards that. Any new code added to the project must adhere to these guidelines _where practically possible_.
+
+* Code should be written with the focus on readability. Don't try to squeeze as much code into one line. If your code is easier to read over 5 lines than 1, then use 5.
+  * Make sure you have spaces around any operators as it makes it easier to read (i.e. do `$a = $b`, don't do `$a=$b`)
+  * Use formatted string where it would enhance readability (ie. do `"We have {0} things in path {1} on drive {2}:" -f @($a).count, $file.FullName.ToUpper(), $file.PsDrive`; don't do `"We have $(@(a).count) things in path $($file.FullName.ToUpper()) on drive $($file.PSDrive):"`)
+* Do. Not. Use. Any. PowerShell. Aliases. In. Your. Code. Use the full function or cmdlet name.
+* When calling other functions or cmdlets use the full parameter name. Don't rely on position based parameters.
+* When adding new functions ensure you use [Comment Based Help](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comment_based_help) and include examples and parameters.
+* Only create [Advanced Functions](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced). If you are updating an existing function please make sure you change it to be an advanced function.
+* PowerShell function names should follow the `[Verb]-Boxstarter[Noun]` convention. If you are updating an existing function please rename it to this format and add an alias for the previous name to ensure backwards compatibility.
+* When declaring function parameters ensure there is a blank line between each parameter declaration.
 
 ### Prepare Commits
 This section serves to help you understand what makes a good commit.
