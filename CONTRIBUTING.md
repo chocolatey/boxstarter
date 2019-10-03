@@ -48,8 +48,6 @@ What is generally not considered trivial:
 
 ## Contributing Process
 
-Start with [Prerequisites](#prerequisites).
-
 ### Get Buyoff Or Find Open Community Issues/Features
 
 * Through a Github issue (preferred), through the [mailing list](https://groups.google.com/forum/#!forum/boxstarter), or through [Gitter](https://gitter.im/chocolatey/boxstarter), talk about a feature you would like to see (or a bug fix), and why it should be in Boxstarter.
