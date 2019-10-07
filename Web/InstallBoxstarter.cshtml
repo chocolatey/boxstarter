@@ -41,3 +41,27 @@ CINST Boxstarter
 <pre>
 iex ((New-Object System.Net.WebClient).DownloadString('https://boxstarter.org/bootstrapper.ps1')); Get-Boxstarter -Force
 </pre>
+
+<h2>Uninstalling Boxstarter</h2>
+
+<p>If you need to remove Boxstarter from your system, run code below in a PowerShell console:</p>
+
+<pre>
+# Remove the Chocolatey packages in a specific order!
+'Boxstarter.Azure', 'Boxstarter.TestRunner', 'Boxstarter.WindowsUpdate', 'Boxstarter',
+    'Boxstarter.HyperV', 'Boxstarter.Chocolatey', 'Boxstarter.Bootstrapper', 'Boxstarter.WinConfig', 'BoxStarter.Common' |
+    ForEach-Object { choco uninstall $_ -y }
+
+# Remove the Boxstarter data folder
+Remove-Item -Path (Join-Path -Path $env:ProgramData -ChildPath 'Boxstarter') -Recurse -Force
+
+# Remove Boxstarter from the path in both the current session and the system
+$env:PATH = ($env:PATH -split ';' | Where-Object { $_ -notlike '*Boxstarter*' }) -join ';'
+[Environment]::SetEnvironmentVariable('PATH', $env:PATH, 'Machine')
+
+# Remove Boxstarter from the PSModulePath in both the current session and the system
+$env:PSModulePath = ($env:PSModulePath -split ';' | Where-Object { $_ -notlike '*Boxstarter*' }) -join ';'
+[Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath, 'Machine')
+</pre>
+
+Boxstarter installs [Chocolatey](https://chocolatey.org) and this needs to be [uninstalled](https://chocolatey.org/docs/uninstallation) separately.
