@@ -57,7 +57,7 @@ What is generally not considered trivial:
 
 ### Set Up Your Environment
 
-* Visual Studio 2010+ is recommended for code contributions.
+* If you are working with C# code then Visual Studio 2010+ is recommended for code contributions. Otherwise [Visual Studio Code](https://www.chocolatey.org/packages/vscode) with the [PowerShell extension](https://www.chocolatey.org/packages/vscode-powershell) is recommended.
 * For git specific information:
     1. Create a fork of chocolatey/boxstarter under your GitHub account. See [forks](https://help.github.com/articles/working-with-forks/) for more information.
     1. [Clone your fork](https://help.github.com/articles/cloning-a-repository/) locally.
