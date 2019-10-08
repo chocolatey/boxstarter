@@ -110,7 +110,7 @@ What is generally not considered trivial:
 
 #### Code Standards and Style
 
-The existing code base does not strictly adhere to these guidelines but we are working our way towards that. Any new code added to the project must adhere to these guidelines _where practically possible_.
+The existing code base does not strictly adhere to these guidelines but we are working our way towards that. Any new code added to the project must adhere to these guidelines _where practically possible_. The list is not exhaustive so there may be guidelines missing that we will adhere to or, ask you to adhere to. Please bear with us while this list evolves!
 
 * Code should be written with the focus on readability. Don't try to squeeze as much code into one line. If your code is easier to read over 5 lines than 1, then use 5.
     * Make sure you have spaces around any operators as it makes it easier to read (i.e. do `$a = $b`, don't do `$a=$b`)
@@ -121,6 +121,8 @@ The existing code base does not strictly adhere to these guidelines but we are w
 * Only create [Advanced Functions](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced). If you are updating an existing function please make sure you change it to be an advanced function.
 * PowerShell function names should follow the `[Verb]-Boxstarter[Noun]` convention. If you are updating an existing function please rename it to this format and add an alias for the previous name to ensure backwards compatibility.
 * When declaring function parameters ensure there is a blank line between each parameter declaration.
+
+You can find general PowerShell Coding Guidelines in the [The Unofficial PowerShell Best Practices and Style Guide](https://poshcode.gitbooks.io/powershell-practice-and-style/).
 
 ### Prepare Commits
 
