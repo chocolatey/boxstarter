@@ -46,7 +46,7 @@ When including the log information, please ensure you have run the command with 
 <p>
 
 ~~~sh
-PLACE LOG CONTENT HERE IF LESS THAN FIFTY LINES between the `=====`, OR POST A LINK TO A GIST IF MORE THAN 50 LINES
+PLACE LOG CONTENT HERE IF LESS THAN FIFTY LINES between the `=====`, OR POST A LINK TO A GIST IF MORE THAN 50 LINES using https://gist.github.com/
 ~~~
 
 </p>
