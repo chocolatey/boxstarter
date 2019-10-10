@@ -65,15 +65,20 @@ function Check-Chocolatey {
                 Write-Warning ".net install returned $exitCode. You likely need to reboot your computer before proceeding with the install."
                 return $false
             }
-            $env:ChocolateyInstall = "$env:programdata\chocolatey"
-            New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
-            $url="https://chocolatey.org/api/v2/package/chocolatey/"
-            $wc=new-object net.webclient
-            $wp=[system.net.WebProxy]::GetDefaultProxy()
-            $wp.UseDefaultCredentials=$true
-            $wc.Proxy=$wp
-            iex ($wc.DownloadString("https://chocolatey.org/install.ps1"))
-            $env:path="$env:path;$env:ChocolateyInstall\bin"
+            try {
+                $env:ChocolateyInstall = "$env:programdata\chocolatey"
+                New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
+                $url="https://chocolatey.org/api/v2/package/chocolatey/"
+                $wc=new-object net.webclient
+                $wp=[system.net.WebProxy]::GetDefaultProxy()
+                $wp.UseDefaultCredentials=$true
+                $wc.Proxy=$wp
+                iex ($wc.DownloadString("https://chocolatey.org/install.ps1"))
+                $env:path="$env:path;$env:ChocolateyInstall\bin"
+            }
+            catch {
+                return $false
+            }
         }
         else{
             return $false
