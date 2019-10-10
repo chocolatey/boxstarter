@@ -95,7 +95,8 @@ Intercepts Chocolatey call to check for reboots
         [string[]]$packageNames=@('')
     )
 
-    if ($command -ne "install" -and $command -ne "update") {
+    $rebootProtectedCommands = @("install", "uninstall", "upgrade", "update")
+    if ($rebootProtectedCommands -notcontains $command) {
         Call-Chocolatey @PSBoundParameters @args
         return
     }
