@@ -222,9 +222,7 @@ check if a parameter/switch is present in a list of arguments
         [Parameter(Mandatory = $True)]
         $origArgs
     )
-    Process {
-       return [bool]($origArgs | Where-Object { $_ -match "^-+$switchName$" })
-    }
+    return [bool]($origArgs | Where-Object { $_ -match "^-+$switchName$" })
 }
 
 function Get-PassedArg($argName, $origArgs) {
