@@ -81,10 +81,10 @@ Describe "Getting-Chocolatey" {
         Chocolatey Install $packages
 
         it "will get Chocolatey for package1" {
-            Assert-MockCalled Call-Chocolatey -ParameterFilter {$packageNames -eq "package1"} -times 1
+            Assert-MockCalled Call-Chocolatey -ParameterFilter {$PackageNames -eq "package1"} -times 1
         }
         it "will get Chocolatey for package2" {
-            Assert-MockCalled Call-Chocolatey -ParameterFilter {$packageNames -eq "package2"} -times 1
+            Assert-MockCalled Call-Chocolatey -ParameterFilter {$PackageNames -eq "package2"} -times 1
         }
     }
 
@@ -248,7 +248,10 @@ Describe "Call-Chocolatey" {
         Mock Get-BoxstarterConfig { @{NugetSources="blah"} }
         Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
 
-        choco Install pkg
+        it "executes with success" {
+            choco Install pkg 
+            $LASTEXITCODE | Should Be 0
+        }
 
         it "passes expected params" {
             $passedArgs.count | Should Be 5
@@ -293,7 +296,7 @@ Describe "Call-Chocolatey" {
         $script:passedArgs = ""
         Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
 
-        choco Install pkg --source blah --bing boom
+        choco Install pkg --source blah --bing=boom
 
         it "passes expected params" {
             $passedArgs.count | Should Be 7
@@ -302,7 +305,7 @@ Describe "Call-Chocolatey" {
             $passedArgs[2] | Should Be "--source"
             $passedArgs[3] | Should Be "blah"
         }
-        it "passes other args" {
+        it "passes other args with assignment operator" {
             $passedArgs[4] | Should Be "--bing"
             $passedArgs[5] | Should Be "boom"
         }
@@ -394,6 +397,20 @@ Describe "Call-Chocolatey" {
             $passedArgs[2] | Should Be "-f"
         }
     }
+    
+    context "when passing force as -force" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Install pkg -force
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 6
+        }
+        it "passes source" {
+            $passedArgs[2] | Should Be "-force"
+        }
+    }
 
     context "when verbose" {
         $script:passedArgs = ""
@@ -404,9 +421,35 @@ Describe "Call-Chocolatey" {
 
         it "passes expected params" {
             $passedArgs.count | Should Be 6
-        }
-        it "passes source" {
+            $passedArgs[0] | Should Be "Install"
+            $passedArgs[1] | Should Be "pkg"
+            $passedArgs[2] | Should Be "-Source"
+            # $passedArgs[3] -> feeds, may differ from system to system
             $passedArgs[4] | Should Be "-Verbose"
+            $passedArgs[5] | Should Be "-y"
+        }
+    }
+
+    context "package parameters / -Verbose" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Install -y pkg --source blah --installargs "ADD_CMAKE_TO_PATH=System" -Verbose
+
+        $passedArgs | Should Not BeNullOrEmpty
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 8 # actually 7 + 1 "-Verbose" is appended
+        }
+        it "passes all parameters in correct order" {
+            $passedArgs[0] | Should Be "Install"
+            $passedArgs[1] | Should Be "pkg" # package will always be first argument (reordering happens!)
+            $passedArgs[2] | Should Be "-y" # passed -y is after package because of the reordering
+            $passedArgs[3] | Should Be "--source"
+            $passedArgs[4] | Should Be "blah"
+            $passedArgs[5] | Should Be "--installargs"
+            $passedArgs[6] | Should Be "ADD_CMAKE_TO_PATH=System"
+            $passedArgs[7] | Should Be "-Verbose"
         }
     }
 }
