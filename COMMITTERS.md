@@ -3,7 +3,7 @@ Committers
 
 <!-- TOC -->
 
-- [Branch Targetting](#branch-targetting)
+- [Branch Targeting](#branch-targeting)
 - [Summary](#summary)
 - [Terminology](#terminology)
 - [Review Process](#review-process)
