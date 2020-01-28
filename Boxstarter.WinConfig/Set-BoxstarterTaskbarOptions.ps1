@@ -43,12 +43,12 @@ Changes the behavior of the taskbar when using multiple displays. Valid inputs a
 Changes the taskbar icon combination style for non-primary displays. Valid inputs are Always, Full, and Never.
 
 .EXAMPLE
-Set-TaskbarOptions -Lock -AutoHide -AlwaysShowIconsOff -MultiMonitorOff
+Set-BoxstarterTaskbarOptions -Lock -AutoHide -AlwaysShowIconsOff -MultiMonitorOff
 
 Locks the taskbar, enabled auto-hiding of the taskbar, turns off showing icons
 in the notification area and turns off showing the taskbar on multiple monitors.
 .EXAMPLE
-Set-TaskbarOptions -Unlock -AlwaysShowIconsOn -Size Large -MultiMonitorOn -MultiMonitorCombine Always
+Set-BoxstarterTaskbarOptions -Unlock -AlwaysShowIconsOn -Size Large -MultiMonitorOn -MultiMonitorCombine Always
 
 Unlocks the taskbar and always shows large notification icons. Sets
 multi-monitor support and always combine icons on non-primary monitors.
