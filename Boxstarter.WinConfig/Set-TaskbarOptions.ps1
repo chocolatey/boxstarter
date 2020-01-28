@@ -1,34 +1,34 @@
 function Set-TaskbarOptions {
 <#
 .SYNOPSIS
-Sets options for the Windows Task Bar
+Sets options for the Windows Task Bar.
 
 .PARAMETER Lock
-Locks the taskbar
+Locks the taskbar.
 
 .PARAMETER UnLock
-Unlocks the taskbar
+Unlocks the taskbar.
 
 .PARAMETER AutoHide
-Autohides the taskbar
+Autohides the taskbar.
 
 .PARAMETER NoAutoHide
-No autohiding on the taskbar
+No autohiding on the taskbar.
 
 .PARAMETER Size
-Changes the size of the Taskbar Icons.  Valid inputs are Small and Large.
+Changes the size of the taskbar icons.  Valid inputs are Small and Large.
 
 .PARAMETER Dock
-Changes the location in which the Taskbar is docked.  Valid inputs are Top, Left, Bottom and Right.
+Changes the location in which the taskbar is docked. Valid inputs are Top, Left, Bottom and Right.
 
 .PARAMETER Combine
-Changes the Taskbar Icon combination style. Valid inputs are Always, Full, and Never.
+Changes the taskbar icon combination style. Valid inputs are Always, Full, and Never.
 
 .PARAMETER AlwaysShowIconsOn
-Turn on always show all icons in the notification area
+Turn on always show all icons in the notification area.
 
 .PARAMETER AlwaysShowIconsOff
-Turn off always show all icons in the notification area
+Turn off always show all icons in the notification area.
 
 .PARAMETER MultiMonitorOn
 Turn on Show tasbkar on all displays.
@@ -37,11 +37,21 @@ Turn on Show tasbkar on all displays.
 Turn off Show taskbar on all displays.
 
 .PARAMETER MultiMonitorMode
-Changes the behavior of the Taskbar when using multiple displays.  Valid inputs are All, MainAndOpen, and Open.
+Changes the behavior of the taskbar when using multiple displays. Valid inputs are All, MainAndOpen, and Open.
 
 .PARAMETER MultiMonitorCombine
-Changes the Taskbar Icon combination style for non-primary displays.  Valid inputs are Always, Full, and Never.
+Changes the taskbar icon combination style for non-primary displays. Valid inputs are Always, Full, and Never.
 
+.EXAMPLE
+Set-TaskbarOptions -Lock -AutoHide -AlwaysShowIconsOff -MultiMonitorOff
+
+Locks the taskbar, enabled auto-hiding of the taskbar, turns off showing icons
+in the notification area and turns off showing the taskbar on multiple monitors.
+.EXAMPLE
+Set-TaskbarOptions -Unlock -AlwaysShowIconsOn -Size Large -MultiMonitorOn -MultiMonitorCombine Always
+
+Unlocks the taskbar and always shows large notification icons. Sets
+multi-monitor support and always combine icons on non-primary monitors.
 #>
     [CmdletBinding(DefaultParameterSetName='unlock')]
     param(
