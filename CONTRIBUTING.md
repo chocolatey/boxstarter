@@ -110,17 +110,69 @@ What is generally not considered trivial:
 
 #### Code Standards and Style
 
-The existing code base does not strictly adhere to these guidelines but we are working our way towards that. Any new code added to the project must adhere to these guidelines _where practically possible_. The list is not exhaustive so there may be guidelines missing that we will adhere to or, ask you to adhere to. Please bear with us while this list evolves!
+The existing code base does not strictly adhere to these guidelines but we are working our way towards that. The list is not exhaustive so there may be guidelines missing that we will adhere to or, ask you to adhere to. Please bear with us while this list evolves!
+
+Note that any new code you add _or_ any functions you amend, should also adhere to these guidelines _where practically possible_. This allows the code base to be amended in manageable steps.
 
 * Code should be written with the focus on readability. Don't try to squeeze as much code into one line. If your code is easier to read over 5 lines than 1, then use 5.
+    * Bracing style is a religious war that we don't want to get into. The code base should follow a variant of Kerninghan and Ritchie (often called the One True Brace Style) with one exception, else statements go on a separate line. This aids readability.
+        ```
+        function Get-ForceLeader {
+            [CmdletBinding()]
+            param(
+                [string]
+                [ValidateSet( "dark", "light")]
+                $ForceSide
+            )
+
+            if ($ForceSide -eq "dark") {
+                $name = "Darth Vader"
+            }
+            else {
+                $name = "Luke Skywalker"
+            }
+
+            $name
+        }
+        ```
     * Make sure you have spaces around any operators as it makes it easier to read (i.e. do `$a = $b`, don't do `$a=$b`)
     * Use formatted string where it would enhance readability (ie. do `"We have {0} things in path {1} on drive {2}:" -f @($a).count, $file.FullName.ToUpper(), $file.PsDrive`; don't do `"We have $(@(a).count) things in path $($file.FullName.ToUpper()) on drive $($file.PSDrive):"`)
+    * Ensure logic statements (ie. if, foreach, do, while, switch etc.) are on separate lines:
+        ```
+        if ($name -eq "Luke Skywalker") {
+            Use-TheForce -Name $name
+        }
+
+        switch ($name) {
+            "Darth Vader" {
+                Join-TheDarkSide -Name $name
+                break
+            }
+
+            "Leia Organa" {
+                Use-TheForce -Name $name
+            }
+        }
+        ```
 * Do. Not. Use. Any. PowerShell. Aliases. In. Your. Code. Use the full function or cmdlet name.
 * When calling other functions or cmdlets use the full parameter name. Don't rely on position based parameters.
-* When adding new functions ensure you use [Comment Based Help](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comment_based_help) and include examples and parameters.
-* Only create [Advanced Functions](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced). If you are updating an existing function please make sure you change it to be an advanced function.
+* Ensure functions use [Comment Based Help](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comment_based_help) and include examples and parameters.
+* Functions should only be [Advanced Functions](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced). There may be practical reasons as to why your function cannot be an Advanced Function so please add comments in the function Comment Based Help if that is the case.
 * PowerShell function names should follow the `[Verb]-Boxstarter[Noun]` convention. If you are updating an existing function please rename it to this format and add an alias for the previous name to ensure backwards compatibility.
-* When declaring function parameters ensure there is a blank line between each parameter declaration.
+* When declaring function parameters ensure each statement is on a separate line and there is a blank line between declarations, for example:
+
+    ```
+    [Parameter(Mandatory = $true,
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true)]
+    [ValidateNotNullOrEmpty()]
+    [String[]]
+    $aString,
+
+    [Parameter(Mandatory = $true)]
+    ...
+    ```
+
 
 You can find general PowerShell Coding Guidelines in the [The Unofficial PowerShell Best Practices and Style Guide](https://poshcode.gitbooks.io/powershell-practice-and-style/).
 
