@@ -75,12 +75,15 @@ Changes the Taskbar Icon combination style for non-primary displays.  Valid inpu
         $AlwaysShowIconsOff,
 
         [ValidateSet('Small','Large')]
+        [String]
         $Size,
 
         [ValidateSet('Top','Left','Bottom','Right')]
+        [String]
         $Dock,
 
         [ValidateSet('Always','Full','Never')]
+        [String]
         $Combine,
 
         [Parameter(ParameterSetName='MultiMonitorOff')]
@@ -93,10 +96,12 @@ Changes the Taskbar Icon combination style for non-primary displays.  Valid inpu
 
         [Parameter(ParameterSetName='MultiMonitorOn')]
         [ValidateSet('All', 'MainAndOpen', 'Open')]
+        [String]
         $MultiMonitorMode,
 
         [Parameter(ParameterSetName='MultiMonitorOn')]
         [ValidateSet('Always','Full','Never')]
+        [String]
         $MultiMonitorCombine
     )
 
