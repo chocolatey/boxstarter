@@ -1,4 +1,4 @@
-function Set-TaskbarOptions {
+function Set-BoxstarterTaskbarOptions {
 <#
 .SYNOPSIS
 Sets options for the Windows Task Bar.
@@ -238,3 +238,5 @@ multi-monitor support and always combine icons on non-primary monitors.
 
     Restart-Explorer
 }
+
+New-Alias -Name Set-TaskbarOptions -Value Set-BoxstarterTaskbarOptions
