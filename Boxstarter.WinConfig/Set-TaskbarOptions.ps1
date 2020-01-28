@@ -103,7 +103,7 @@ Changes the Taskbar Icon combination style for non-primary displays.  Valid inpu
     $explorerKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer'
     $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
     $settingKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects2'
-    
+
     if (-not (Test-Path -Path $settingKey)) {
         $settingKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects3'
     }
@@ -112,34 +112,64 @@ Changes the Taskbar Icon combination style for non-primary displays.  Valid inpu
         if ($Lock) {
             Set-ItemProperty -Path $key -Name TaskbarSizeMove -Value 0
         }
+
         if ($UnLock) {
             Set-ItemProperty -Path $key -Name TaskbarSizeMove -Value 1
         }
 
         switch ($Size) {
-            "Small" { Set-ItemProperty -Path $key -Name TaskbarSmallIcons -Value 1 }
-            "Large" { Set-ItemProperty -Path $key -Name TaskbarSmallIcons -Value 0 }
+            "Small" {
+                Set-ItemProperty -Path $key -Name TaskbarSmallIcons -Value 1
+            }
+
+            "Large" {
+                Set-ItemProperty -Path $key -Name TaskbarSmallIcons -Value 0
+            }
         }
 
         switch ($Combine) {
-            "Always" { Set-ItemProperty -Path $key -Name TaskbarGlomLevel -Value 0 }
-            "Full" { Set-ItemProperty -Path $key -Name TaskbarGlomLevel -Value 1 }
-            "Never" { Set-ItemProperty -Path $key -Name TaskbarGlomLevel -Value 2 }
+            "Always" {
+                Set-ItemProperty -Path $key -Name TaskbarGlomLevel -Value 0
+            }
+
+            "Full" {
+                Set-ItemProperty -Path $key -Name TaskbarGlomLevel -Value 1
+            }
+
+            "Never" {
+                Set-ItemProperty -Path $key -Name TaskbarGlomLevel -Value 2
+            }
         }
 
         if ($MultiMonitorOn) {
             Set-ItemProperty -Path $key -Name MMTaskbarEnabled -Value 1
-            
+
             switch ($MultiMonitorMode) {
-                "All" { Set-ItemProperty -Path $key -Name MMTaskbarMode -Value 0 }
-                "MainAndOpen" { Set-ItemProperty -Path $key -Name MMTaskbarMode -Value 1 }
-                "Open" { Set-ItemProperty -Path $key -Name MMTaskbarMode -Value 2 }
+                "All" {
+                    Set-ItemProperty -Path $key -Name MMTaskbarMode -Value 0
+                }
+
+                "MainAndOpen" {
+                    Set-ItemProperty -Path $key -Name MMTaskbarMode -Value 1
+                }
+
+                "Open" {
+                    Set-ItemProperty -Path $key -Name MMTaskbarMode -Value 2
+                }
             }
-            
+
             switch ($MultiMonitorCombine) {
-                "Always" { Set-ItemProperty -Path $key -Name MMTaskbarGlomLevel -Value 0 }
-                "Full" { Set-ItemProperty -Path $key -Name MMTaskbarGlomLevel -Value 1 }
-                "Never" { Set-ItemProperty -Path $key -Name MMTaskbarGlomLevel -Value 2 }
+                "Always" {
+                    Set-ItemProperty -Path $key -Name MMTaskbarGlomLevel -Value 0
+                }
+
+                "Full" {
+                    Set-ItemProperty -Path $key -Name MMTaskbarGlomLevel -Value 1
+                }
+
+                "Never" {
+                    Set-ItemProperty -Path $key -Name MMTaskbarGlomLevel -Value 2
+                }
             }
         }
 
@@ -152,27 +182,43 @@ Changes the Taskbar Icon combination style for non-primary displays.  Valid inpu
         $settings = (Get-ItemProperty -Path $settingKey -Name Settings).Settings
 
         switch ($Dock) {
-            "Top" { $settings[12] = 0x01 }
-            "Left" { $settings[12] = 0x00 }
-            "Bottom" { $settings[12] = 0x03 }
-            "Right" { $settings[12] = 0x02 }
+            "Top" {
+                $settings[12] = 0x01
+            }
+
+            "Left" {
+                $settings[12] = 0x00
+            }
+
+            "Bottom" {
+                $settings[12] = 0x03
+            }
+
+            "Right" {
+                $settings[12] = 0x02
+            }
         }
-        
+
         if ($AutoHide) {
-            $settings[8] = $settings[8] -bor 1			
+            $settings[8] = $settings[8] -bor 1
         }
 
         if ($NoAutoHide) {
             $settings[8] = $settings[8] -band 0
             Set-ItemProperty -Path $settingKey -Name Settings -Value $settings
         }
-        
+
         Set-ItemProperty -Path $settingKey -Name Settings -Value $settings
     }
 
     if (Test-Path -Path $explorerKey) {
-        if ($AlwaysShowIconsOn) { Set-ItemProperty -Path $explorerKey -Name 'EnableAutoTray' -Value 0 }
-        if ($alwaysShowIconsOff) { Set-ItemProperty -Path $explorerKey -Name 'EnableAutoTray' -Value 1 }
+        if ($AlwaysShowIconsOn) {
+            Set-ItemProperty -Path $explorerKey -Name 'EnableAutoTray' -Value 0
+        }
+
+        if ($alwaysShowIconsOff) {
+            Set-ItemProperty -Path $explorerKey -Name 'EnableAutoTray' -Value 1
+        }
     }
 
     Restart-Explorer
