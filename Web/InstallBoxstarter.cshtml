@@ -31,15 +31,9 @@ CINST Boxstarter
 <p>After Boxstarter is installed, a new PowerShell console must be opened before you can load the modules and run its commands. For convenience you can use the <a href="/UsingBoxstarter">Boxstarter Shell</a> for running Boxstarter commands which is the easiest way to ensure that all Boxstarter modules are properly loaded regardless of the version of Windows and PowerShell you are running.</p>
 
 <h3>Installing from the web</h3>
-<p>If you are running PowerShell v3 or higher:</p>
+<p>Run the following command from PowerShell:</p>
 <pre>
-. { iwr -useb https://boxstarter.org/bootstrapper.ps1 } | iex; Get-Boxstarter -Force
-</pre>
-
-<p/><p/>
-<p>If you are running PowerShell v2:</p>
-<pre>
-iex ((New-Object System.Net.WebClient).DownloadString('https://boxstarter.org/bootstrapper.ps1')); Get-Boxstarter -Force
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://boxstarter.org/bootstrapper.ps1')); Get-Boxstarter -Force
 </pre>
 
 <h2>Uninstalling Boxstarter</h2>
