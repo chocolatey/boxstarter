@@ -117,7 +117,7 @@ Intercepts Chocolatey call to check for reboots
     $packageNames = -split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
 
-    $stopOnFirstError = (Get-PassedSwitch -switchName "StopOnPackageFailure" -origArgs $args) -Or $Boxstarter.StopOnPackageFailure
+    $stopOnFirstError = (Get-PassedSwitch -SwitchName "StopOnPackageFailure" -OrigArgs $args) -Or $Boxstarter.StopOnPackageFailure
     Write-BoxstarterMessage "Will stop on first package error: $stopOnFirstError" -Verbose
 
     foreach($packageName in $packageNames){
@@ -217,12 +217,13 @@ check if a parameter/switch is present in a list of arguments
     param(
         # the name of the argument switch to look for in $origArgs
         [Parameter(Mandatory = $True)]
-        $switchName,
+        [string]$SwitchName,
+
         # the full list of original parameters (probably $args)
         [Parameter(Mandatory = $True)]
-        $origArgs
+        [string]$OrigArgs
     )
-    return [bool]($origArgs | Where-Object { $_ -match "^-+$switchName$" })
+    return [bool]($OrigArgs | Where-Object { $_ -match "^-+$SwitchName$" })
 }
 
 function Get-PassedArg($argName, $origArgs) {
