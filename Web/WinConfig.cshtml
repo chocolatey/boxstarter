@@ -74,15 +74,15 @@ Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowProtec
 Set-WindowsExplorerOptions -DisableShowHiddenFilesFoldersDrives -DisableShowProtectedOSFiles -DisableShowFileExtensions -DisableShowFullPathInTitleBar -DisableOpenFileExplorerToQuickAccess -DisableShowRecentFilesInQuickAccess -DisableShowFrequentFoldersInQuickAccess -DisableExpandToOpenFolder -DisableShowRibbon
 </pre>
 
-<h3>Set-TaskbarOptions</h3>
-<p>Sets options on the Windows Taskbar</p>
+<h3>Set-BoxstarterTaskbarOptions</h3>
+<p>Sets options on the Windows Taskbar (formerly called Set-TaskbarOptions)</p>
 <p>AlwaysShowIconsOn/AlwaysShowIconsOff allows turning on or off always show all icons in the notification area</p>
 <pre>
-Set-TaskbarOptions -Size Small -Lock -Dock Top -Combine Always -AlwaysShowIconsOn
+Set-BoxstarterTaskbarOptions -Size Small -Lock -Dock Top -Combine Always -AlwaysShowIconsOn -MultiMonitorOn -MultiMonitorMode All -MultiMonitorCombine Always
 </pre>
 <p>It is also possible to do the converse actions, if required.</p>
 <pre>
-    Set-TaskbarOptions -Size Large -UnLock -Dock Bottom -Combine Never -AlwaysShowIconsOff
+    Set-BoxstarterTaskbarOptions -Size Large -UnLock -Dock Bottom -Combine Never -AlwaysShowIconsOff -MultiMonitorOff
 </pre>
 
 <h3>Update-ExecutionPolicy</h3>
