@@ -59,22 +59,31 @@ Invoke-Reboot
     param(
       [Parameter(Position=0,Mandatory=0)]
       [ScriptBlock]$ScriptToCall,
+
       [Parameter(Position=1,Mandatory=0)]
       [System.Security.SecureString]$password,
+
       [Parameter(Position=2,Mandatory=0)]
       [switch]$RebootOk,
+
       [Parameter(Position=3,Mandatory=0)]
       [string]$encryptedPassword=$null,
+
       [Parameter(Position=4,Mandatory=0)]
       [switch]$KeepWindowOpen,
+
       [Parameter(Position=5,Mandatory=0)]
       [switch]$NoPassword,
+
       [Parameter(Position=6,Mandatory=0)]
-      [switch]$DisableRestart
+      [switch]$DisableRestart,
+
+      [Parameter(Position=7,Mandatory=0)]
+      [switch]$StopOnPackageFailure
     )
     $BoxStarter.IsRebooting = $false
     $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
-    if(!(Test-Admin)) {
+    if (!(Test-Admin)) {
         New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | Out-Null
         Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate..."
         $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psd1")
@@ -88,20 +97,31 @@ Invoke-Reboot
     }
     $session=$null
     try{
-        if(!(Get-IsRemote)){ Write-BoxstarterLogo }
-        $session=Start-TimedSection "Installation session." -Verbose
-        if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
-        if($DisableRestart){$Boxstarter.DisableRestart=$DisableRestart}
-        if($encryptedPassword){$password = ConvertTo-SecureString -string $encryptedPassword}
-        if(!$NoPassword){
+        if (!(Get-IsRemote)) { 
+            Write-BoxstarterLogo 
+        }
+        $session = Start-TimedSection "Installation session." -Verbose
+        if($RebootOk){
+            $Boxstarter.RebootOk = $RebootOk
+        }
+        if ($DisableRestart) {
+            $Boxstarter.DisableRestart = $DisableRestart
+        }
+        if ($StopOnPackageFailure) {
+            $Boxstarter.StopOnPackageFailure = $StopOnPackageFailure
+        }
+        if ($encryptedPassword) {
+            $password = ConvertTo-SecureString -string $encryptedPassword
+        }
+        if (!$NoPassword) {
             Write-BoxstarterMessage "NoPassword is false checking autologin" -verbose
-            $boxstarter.NoPassword=$False
-            $script:BoxstarterPassword=InitAutologon $password
+            $boxstarter.NoPassword = $False
+            $script:BoxstarterPassword = InitAutologon $password
         }
-        if($script:BoxstarterPassword -eq $null) {
-            $boxstarter.NoPassword=$True
+        if ($script:BoxstarterPassword -eq $null) {
+            $boxstarter.NoPassword = $True
         }
-        Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and RebootOk is set to $($Boxstarter.RebootOk) and the NoPassword parameter passed was $NoPassword" -verbose
+        Write-BoxstarterMessage "NoPassword is set to $($boxstarter.NoPassword) and RebootOk is set to $($Boxstarter.RebootOk) and the NoPassword parameter passed was $NoPassword and StopOnPackageFailure is set to $($Boxstarter.StopOnPackageFailure)" -verbose
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
         Stop-UpdateServices
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))

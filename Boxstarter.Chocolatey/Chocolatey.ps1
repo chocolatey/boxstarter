@@ -124,6 +124,9 @@ Intercepts Chocolatey call to check for reboots
     $packageNames = -split $packageNames
     Write-BoxstarterMessage "Installing $($packageNames.Count) packages" -Verbose
 
+    $stopOnFirstError = (Get-PassedSwitch -SwitchName "StopOnPackageFailure" -OrigArgs $args) -Or $Boxstarter.StopOnPackageFailure
+    Write-BoxstarterMessage "Will stop on first package error: $stopOnFirstError" -Verbose
+
     foreach($packageName in $packageNames){
         $PSBoundParameters.packageNames = $packageName
         if((Get-PassedArg @("source", "s") $args) -eq "WindowsFeatures"){
@@ -191,6 +194,12 @@ Intercepts Chocolatey call to check for reboots
                        $rebootable = $true
                     } else {
                        Write-BoxstarterMessage "Exit Code '$errorCode' is no reason to reboot" -Verbose 
+                       if ($stopOnFirstError) {
+                            Write-BoxstarterMessage "Exiting because 'StopOnPackageFailure' is set."
+                            Stop-Timedsection $session
+                            Remove-ChocolateyPackageInProgress $packageName
+                            exit 1
+                       }
                     }
                 }
                 $idx += 1
@@ -202,6 +211,26 @@ Intercepts Chocolatey call to check for reboots
             Invoke-Reboot
         }
     }
+}
+
+function Get-PassedSwitch {
+<#
+.SYNOPSIS
+check if a parameter/switch is present in a list of arguments
+(1-to many dashes followed by the parameter name)
+
+#>
+    [CmdletBinding()]
+    param(
+        # the name of the argument switch to look for in $origArgs
+        [Parameter(Mandatory = $True)]
+        [string]$SwitchName,
+
+        # the full list of original parameters (probably $args)
+        [Parameter(Mandatory = $True)]
+        [string]$OrigArgs
+    )
+    return [bool]($OrigArgs | Where-Object { $_ -match "^-+$SwitchName$" })
 }
 
 function Get-PassedArg($argName, $origArgs) {
