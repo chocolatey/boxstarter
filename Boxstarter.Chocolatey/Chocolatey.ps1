@@ -18,7 +18,7 @@ function Install-ChocolateyInstallPackageOverride {
         [string] 
         $file64,
 
-        [int[]]
+        [Int64[]]
         $validExitCodes = @(0)
     )
 
@@ -466,12 +466,21 @@ function Format-ExeArgs {
     )
 
     $newArgs = @()
+    $forceArg = $false
     $args | ForEach-Object {
         $p = [string]$_
-        if ($p -eq "-force: True") {
-            $p = "-f"
+        Write-BoxstarterMessage  "p: $p" -Verbose
+        if ($forceArg) {
+            $forceArg = $false
+            if ($p -eq "True") {
+                $p = "-f"
+            } 
+            else {
+                return
+            }
         }
-        elseif ($p -eq "-force: False") {
+        elseif ($p -eq "-force:") {
+            $forceArg = $true
             return
         }
         elseif ($p.StartsWith("-") -and $p.Contains("=")) {
