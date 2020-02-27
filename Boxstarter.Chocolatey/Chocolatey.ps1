@@ -173,7 +173,7 @@ function chocolatey {
         $args = $argsWithoutBoxstarterSpecials
     }
     $rebootCodes = Add-DefaultRebootCodes -Codes $rebootCodes
-    Write-BoxstarterMessage "RebootCodes: '$rebootCodes'" -Verbose
+    Write-BoxstarterMessage "RebootCodes: '$rebootCodes' ($($rebootCodes.Count) elements)" -Verbose
 
     $PackageNames = Get-PackageNamesFromInvocationLine -InvocationArguments $args
     $argsWithoutPackageNames = @()
@@ -225,8 +225,10 @@ function chocolatey {
             }
         }
         catch {
+            Write-BoxstarterMessage "Exception: $($_.Exception.Message)" -Verbose
             #Only write the error to the error stream if it was not previously
             #written by Chocolatey
+            $currentErrorCount += 1
             $chocoErrors = $currentErrorCount
             if ($chocoErrors -gt 0) {
                 $idx = 0
@@ -255,7 +257,7 @@ function chocolatey {
                     else {
                         $errorCode = $matches["ecof"]
                     }
-                    if ($RebootCodes -contains $errorCode) {
+                    if ($rebootCodes -contains $errorCode) {
                         Write-BoxstarterMessage "Chocolatey install returned a rebootable exit code ($errorCode)" -Verbose
                         $rebootable = $true
                     }
@@ -365,7 +367,7 @@ function Get-PassedArg {
         [string[]]
         $ArgumentName,
 
-        [string[]]
+        [PSObject[]]
         $OriginalArgs
     )
 
