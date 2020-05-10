@@ -1,6 +1,10 @@
 ---
 name: Report Issue With Boxstarter
 about: Did you find unexpected behavior?
+title: ''
+labels: 0 - _Triaging, Bug
+assignees: ''
+
 ---
 
 <!--
@@ -38,7 +42,6 @@ When including the log information, please ensure you have run the command with 
 - Make sure there is no sensitive data shared.
 - We need ALL output, not just what you may believe is relevant.
 - We need ALL OUTPUT (including the configuration information)
-
 
 <details>
 <summary>Full Log Output</summary>
