@@ -9,3 +9,6 @@ contact_links:
   - name: Report Chocolatey Package Issues
     url: https://chocolatey.org/docs/package-triage-process
     about: This is Boxstarter and not where you should report package issues.
+  - name: Security Disclosure / Report
+    url: https://chocolatey.org/security
+    about: Please do not raise Security issue in this repository. Use the link to report them responsibly. Thank you.
