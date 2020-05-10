@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Boxstarter Gitter Community Support
+    url: https://gitter.im/chocolatey/boxstarter/
+    about: Please ask and answer questions here.
+  - name: Boxstarter Google Groups Community Support
+    url: https://groups.google.com/forum/#!forum/boxstarter
+    about: Please ask and answer questions here (very low traffic).
+  - name: Report Package Issues
+    url: https://chocolatey.org/docs/package-triage-process
+    about: This is Boxstarter and not where you should report package issues.
