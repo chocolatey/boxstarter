@@ -6,6 +6,6 @@ contact_links:
   - name: Boxstarter Google Groups Community Support
     url: https://groups.google.com/forum/#!forum/boxstarter
     about: Please ask and answer questions here (very low traffic).
-  - name: Report Package Issues
+  - name: Report Chocolatey Package Issues
     url: https://chocolatey.org/docs/package-triage-process
     about: This is Boxstarter and not where you should report package issues.
