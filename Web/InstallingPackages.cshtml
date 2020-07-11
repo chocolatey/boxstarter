@@ -147,6 +147,34 @@ $result = (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList 'http:/
     (new-Object -TypeName BoxstarterConnectionConfig -ArgumentList 'http://machine2:5985/wsman',$cred2,$null) |
     Install-BoxstarterPackage -PackageName MyPackage
 </pre>
+
+<h3>Chocolatey Sources and Remote Installations</h3>
+<p>
+When using Boxstarter to install packages on a remote machine, the .nupkg file for the provided package name is searched in the following locations and order:
+<ul>
+    <li>.\BuildPackages relative to the parent directory of the module file</li>
+    <li>The Chocolatey community feed <b>OR</b> NugetSources in Boxstarter.config when the 'DelegateChocoSources' switch is used</li>
+</ul>
+ This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
+
+ If the package name provided is a URL or resolves to a file, then
+ it is assumed that this contains the Chocolatey install script and
+ a .nupkg file will be created using the script.
+ 
+<pre>
+$cred=Get-Credential 'MyTargetMachine\myusername'
+Install-BoxstarterPackage -ComputerName MyTargetMachine -PackageName MyPackage -Credential $cred -DelegateChocoSources
+
+Boxstarter: Configuring local PowerShell Remoting settings...
+Boxstarter: Configuring CredSSP settings...
+Boxstarter: Testing remoting access on MyTargetMachine...
+Boxstarter: Remoting is accessible on MyTargetMachine
+Boxstarter: Copying Boxstarter Modules and LocalRepo packages at C:\ProgramData\Boxstarter to C:\Users\ADMINI~1.TRI\AppData\Local\Temp\ on MyTargetMachine...
+Boxstarter: Delegating Boxstarter NugetSources to remote host...
+Boxstarter: Running remote install...
+</pre>
+</p>
+
 <h3>Troubleshooting Remote Installations</h3>
 <h4>Establishing remote connections with servers not on the local subnet</h4>
 <p>By default,  server versions of Windows have a firewall rule restricting traffic that is not on the local subnet. There may be circumstances where you might want to connect over the public Internet to another machine. This can be done by manually enabling the "WINRM-HTTP-In-TCP-PUBLIC" firewall rule using the PowerShell 3.0 <code>Set-NetFirewallRule</code> or the command line <code>netsh advfirewall</code> command.</p>

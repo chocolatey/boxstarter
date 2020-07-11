@@ -17,7 +17,7 @@ This function wraps a Chocolatey Install and provides these additional features
  The .nupkg file for the provided package name is searched in the following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
  - The Chocolatey community feed / OR NugetSources in Boxstarter.config when the 'DelegateChocoSources' switch is used
- This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
+ This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.config
 
  If the package name provided is a URL or resolves to a file, then
  it is assumed that this contains the Chocolatey install script and
@@ -70,6 +70,7 @@ This function wraps a Chocolatey Install and provides these additional features
  following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
  - The Chocolatey community feed
+ - NugetSources in Boxstarter.config when the 'DelegateChocoSources' switch is used
 
 .PARAMETER DisableReboots
 If set, reboots are suppressed.
@@ -180,6 +181,12 @@ $cred=Get-Credential mwrock
 Install-BoxstarterPackage -ComputerName MyOtherComputer.mydomain.com -Package MyPackage -Credential $cred
 
 This installs the MyPackage package on MyOtherComputer.mydomain.com.
+
+.EXAMPLE
+$cred=Get-Credential mwrock
+Install-BoxstarterPackage -ComputerName MyOtherComputer.mydomain.com -Package MyPackage -Credential $cred -DelegateChocoSources
+
+This installs the MyPackage package on MyOtherComputer.mydomain.com, using the Chocolatey feeds configured in Boxstarter.config
 
 .EXAMPLE
 $cred=Get-Credential mwrock
