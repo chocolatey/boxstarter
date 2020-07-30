@@ -328,13 +328,24 @@ function Get-PackageNamesFromInvocationLine {
     # we somehow need to know what parameters are named and can take a value
     # - if we don't know, the parameter's value will be treated as package name
     $namedParameters = @("force:", # -force:$bool is a zebra
-        "s", "source",  
-        "ia", "installargs", "installarguments", 
-        "params", "parameters", "pkgparameters", "packageparameters", 
-        "cp", 
+        "s", "source", 
+        "log-file",
+        "version",
+        "ia", "installargs", "installarguments", "install-arguments",
+        "override", "overrideargs", "overridearguments", "override-arguments",
+        "params", "parameters", "pkgparameters", "packageparameters", "package-parameters",
+        "user", "password", "cert", "cp", "certpassword",
         "checksum", "downloadchecksum", "checksum64", "checksumx64", "downloadchecksumx64",
-        "checksumtype", "checksum-type", "downloadchecksumtyp",
-        "checksumtype64", "checksumtypex64", "checksum-type-x64", "downloadchecksumtypex64")
+        "checksumtype", "checksum-type", "downloadchecksumtype",
+        "checksumtype64", "checksumtypex64", "checksum-type-x64", "downloadchecksumtypex64",
+        "timeout", "execution-timeout",
+        "cache", "cachelocation", "cache-location",
+        "proxy", "proxy-user", "proxy-password", "proxy-bypass-list",
+        "viruspositivesmin", "virus-positives-minimum",
+        "install-arguments-sensitive", "package-parameters-sensitive",
+        "dir", "directory", "installdir", "installdirectory", "install-dir", "install-directory",
+        "bps", "maxdownloadrate", "max-download-rate", "maxdownloadbitspersecond", "max-download-bits-per-second", 
+        "maximumdownloadbitspersecond", "maximum-download-bits-per-second")
 
     $skipNext = $false
     foreach ($a in $InvocationArguments) {
@@ -379,18 +390,18 @@ function Get-PassedArg {
     $nextIsValue = $false
     $val = $null
 
-    $OriginalArgs | Foreach-Object {
+    foreach ($a in $OriginalArgs) {
         if ($nextIsValue) {
             $nextIsValue = $false
-            $val = $_
-            return
+            $val = $a
+            break;
         }
 
-        if ($candidateKeys -contains $_) {
+        if ($candidateKeys -contains $a) {
             $nextIsValue = $true
         }
-        elseif ($_.ToString().Contains("=")) {
-            $parts = $_.split("=", 2)
+        elseif ($a.ToString().Contains("=")) {
+            $parts = $a.split("=", 2)
             $nextIsValue = $false
             $val = $parts[1]
         }
