@@ -2,7 +2,7 @@
          DefaultTargets="Go"
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-  	<OutputPath>BuilsArtifacts</OutputPath>
+  	<OutputPath>BuildArtifacts</OutputPath>
     <Configuration>Release</Configuration>
     <Platform>Any CPU</Platform>
   </PropertyGroup>
