@@ -231,7 +231,7 @@ mget *
 bye
 "@
     $ftpScript | ftp -i -n $ftpHost
-    if(!(Test-Path $env:ChocolateyInstall\lib\logparser*)) { cinst logparser -y --no-progress }
+    if(!(Test-Path $env:ChocolateyInstall\lib\logparser*)) { cinst logparser =2.2.0.1 -y --no-progress }
     $logParser = "${env:programFiles(x86)}\Log Parser 2.2\LogParser.exe"
     .$logparser -i:w3c "SELECT Date, EXTRACT_VALUE(cs-uri-query,'package') as package, COUNT(*) as count FROM * where cs-uri-stem = '/launch/Boxstarter.WebLaunch.Application' Group by Date, package Order by Date, package" -rtp:-1
     Pop-Location
@@ -240,17 +240,17 @@ bye
 
 task Install-MSBuild {
     if(!(Test-Path "${env:programFiles(x86)}\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\msbuild.exe")) {
-        choco install visualstudio2017buildtools -params '--add Microsoft.VisualStudio.Workload.WebBuildTools' --version 15.8.7.0 --no-progress -y
-        choco install microsoft-build-tools --version 15.0.26320.2 --no-progress -y
+        choco install visualstudio2017buildtools -params '--add Microsoft.VisualStudio.Workload.WebBuildTools' --version=15.8.7.0 --no-progress -y
+        choco install microsoft-build-tools --version=15.0.26320.2 --no-progress -y
     }
 }
 
 task Install-Win8SDK {
-    if(!(Test-Path "$env:ProgramFiles\Windows Kits\8.1\bin\x64\signtool.exe")) { cinst windows-sdk-8.1 -y --no-progress }
+    if(!(Test-Path "$env:ProgramFiles\Windows Kits\8.1\bin\x64\signtool.exe")) { cinst windows-sdk-8.1 --version=8.100.26654.0 -y --no-progress }
 }
 
 task Install-WebDeploy {
-    if(!(Test-Path "$env:ProgramW6432\IIS\Microsoft Web Deploy V3")) { cinst webdeploy -y --no-progress }
+    if(!(Test-Path "$env:ProgramW6432\IIS\Microsoft Web Deploy V3")) { cinst webdeploy --version=3.6.20170627 -y --no-progress }
 }
 
 Task Restore-NuGetPackages {
