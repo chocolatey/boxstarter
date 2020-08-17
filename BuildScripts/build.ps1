@@ -11,7 +11,7 @@ if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
 }
 
 if(!(Test-Path $env:ChocolateyInstall\lib\Psake*)) { cinst psake -y --no-progress }
-if(!(Test-Path $env:ChocolateyInstall\lib\7zip.CommandLine*)) { cinst 7zip.CommandLine -y --no-progress }
+if(!(Test-Path $env:ChocolateyInstall\lib\7zip.portable*)) { cinst 7zip.portable -y --no-progress }
 if(!(Test-Path $env:ChocolateyInstall\lib\pester*)) { cinst pester -y --no-progress }
 if(!(Test-Path $env:ChocolateyInstall\lib\AzurePowershell*)) { cinst AzurePowershell -y --no-progress }
 if(!(Test-Path $env:ChocolateyInstall\lib\WindowsAzureLibsForNet*)) { cinst WindowsAzureLibsForNet --version 2.5 -y --no-progress }
