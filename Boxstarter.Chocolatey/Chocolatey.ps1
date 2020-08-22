@@ -364,6 +364,9 @@ function Get-PackageNamesFromInvocationLine {
             if ($namedParameters -contains $param) {
                 $skipNext = $true
             }
+            elseif ($param -contains '=') {
+                $skipNext = $true
+            }
         }
         else {
             $packageNames += $a

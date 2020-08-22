@@ -454,6 +454,33 @@ Describe "Call-Chocolatey" {
     }
 }
 
+Describe "Get-PackageNamesFromInvocationLine" {
+    It "extracts single package name from default invocation style" {
+        $pkgNames = Get-PackageNamesFromInvocationLine @("-y", "-f", "packagename", "-s", "myfeed")
+        $pkgNames | Should Be "packagename"
+    }
+    It "extracts multipe package names from default invocation style" {
+        $pkgNames = Get-PackageNamesFromInvocationLine @("-y", "-f", "packagename1", "pkg2", "-s", "myfeed")
+        $pkgNames | Should Be @("packagename1", "pkg2")
+    }
+    It "extracts multipe package names from complex invocation" {
+        $pkgNames = Get-PackageNamesFromInvocationLine @("--execution-timeout", "600", "-y", "-cache-location", "d:/cache", "-f", "packagename1", "-maxdownloadrate=1200", "-ia", "/S /noreboot", "pkg2", "-s", "myfeed")
+        $pkgNames | Should Be @("packagename1", "pkg2")
+    }
+    It "keeps sort order of packages names" {
+        $pkgNames = Get-PackageNamesFromInvocationLine @("-y", "foobar", "-f", "packagename1", "pkg2", "-s", "myfeed")
+        $pkgNames | Should Be @("foobar", "packagename1", "pkg2")
+    }
+    It "ignores anything that starts with a dash" {
+        $pkgNames = Get-PackageNamesFromInvocationLine @("-foo=bar", "-pkg1", "-pkg2=???")
+        $pkgNames | Should BeNullOrEmpty
+    }
+    It "ignores any parameter that contains a '='" {
+        $pkgNames = Get-PackageNamesFromInvocationLine @("-foo=bar", "pkg1", "-pkg2=???")
+        $pkgNames | Should Be "pkg1"
+    }
+}
+
 Describe "Install-ChocolateyInstallPackageOverride" {
     Mock Get-IsRemote { return $true }
     $script:passedCommand = ""
