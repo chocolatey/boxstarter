@@ -479,6 +479,18 @@ Describe "Get-PackageNamesFromInvocationLine" {
         $pkgNames = Get-PackageNamesFromInvocationLine @("-foo=bar", "pkg1", "-pkg2=???")
         $pkgNames | Should Be "pkg1"
     }
+    It "ignores any parameter that contains a '=' (weird case)" {
+        $pkgNames = Get-PackageNamesFromInvocationLine @("-foo", "=", "bar", "pkg1", "-pkg2=???")
+        $pkgNames | Should Be "pkg1"
+    }
+    It "ignores any parameter that contains a '=' (paranoid case)" {
+        $pkgNames = Get-PackageNamesFromInvocationLine @("-a=", "paranoid", "-foo", "=", "bar", "pkg1", "-pkg2=???")
+        $pkgNames | Should Be @("pkg1")
+    }
+    It "ignores any parameter that contains a '=' (paranoid case x paranoid case)" {
+        $pkgNames = Get-PackageNamesFromInvocationLine @("-a=", "paranoid", "-foo", "=", "bar", @("-a=paranoid"), "pkg1", @("-a", "=", "paranoid"), "-pkg2=???")
+        $pkgNames | Should Be @("pkg1")
+    }
 }
 
 Describe "Install-ChocolateyInstallPackageOverride" {
