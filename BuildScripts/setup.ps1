@@ -1,19 +1,126 @@
+
+<#
+.SYNOPSIS
+    test if current session/identity is elevated 
+    (a.k.a. check if we've got admin privileges)
+#>
+function Test-Admin {
+    $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = New-Object System.Security.Principal.WindowsPrincipal( $identity )
+    return $principal.IsInRole( [System.Security.Principal.WindowsBuiltInRole]::Administrator )
+}
+
+<#
+.SYNOPSIS
+    get name of 'WellKnownSidType' in the current user's system locale
+#>
+function Get-LocalizedWellKnownPrincipalName {
+    param (
+        [Parameter(Mandatory = $true)]
+        [Security.Principal.WellKnownSidType] $WellKnownSidType
+    )
+    $sid = New-Object -TypeName 'System.Security.Principal.SecurityIdentifier' -ArgumentList @($WellKnownSidType, $null)
+    $account = $sid.Translate([Security.Principal.NTAccount])
+
+    return $account.Value
+}
+
+<#
+.SYNOPSIS
+    ensure a given folder is only writeable by administrative users
+
+.NOTES
+    we need to do this in order to mitigate privilege escalation attacks!
+    
+    Attack Vector 1: Boxstarter folders are added to PATH, therefore they must be protected in a way so 
+    that a random user may not put arbitrary files/dlls in these folders.
+    (files may be replaces with hijacked/malicious ones)
+    
+    Attack Vector 2: 'BuildPackages' contains Boxstarter Packages that may be installed after system reboots.
+    If a user would be able to modify those packages, it would be easy to run arbitrary PowerShell code with 
+    SYSTEM privileges.
+    
+    see Ensure-Permissions 
+    https://github.com/chocolatey/choco/blob/master/nuget/chocolatey/tools/chocolateysetup.psm1
+#>
+function Ensure-Permissions {
+    [CmdletBinding()]
+    param(
+        [string]$folder
+    )
+    Write-Debug "Ensure-Permissions"
+
+    $currentEA = $ErrorActionPreference
+    $ErrorActionPreference = 'Stop'
+    try {
+        # get current acl
+        $acl = (Get-Item $folder).GetAccessControl('Access,Owner')
+
+        Write-Debug "Removing existing permissions."
+        $acl.Access | ForEach-Object {
+            Write-Debug "Remove '$($_.FileSystemRights)' for user '$($_.IdentityReference)'"
+            $acl.RemoveAccessRuleAll($_) 
+        }
+
+        $inheritanceFlags = ([Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [Security.AccessControl.InheritanceFlags]::ObjectInherit)
+        $propagationFlags = [Security.AccessControl.PropagationFlags]::None
+
+        $rightsFullControl = [Security.AccessControl.FileSystemRights]::FullControl
+        $rightsReadExecute = [Security.AccessControl.FileSystemRights]::ReadAndExecute
+
+        Write-Output "Restricting write permissions of '$folder' to Administrators"
+        $builtinAdmins = Get-LocalizedWellKnownPrincipalName -WellKnownSidType ([Security.Principal.WellKnownSidType]::BuiltinAdministratorsSid)
+        $adminsAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($builtinAdmins, $rightsFullControl, $inheritanceFlags, $propagationFlags, "Allow")
+        $acl.SetAccessRule($adminsAccessRule)
+        $localSystem = Get-LocalizedWellKnownPrincipalName -WellKnownSidType ([Security.Principal.WellKnownSidType]::LocalSystemSid)
+        $localSystemAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($localSystem, $rightsFullControl, $inheritanceFlags, $propagationFlags, "Allow")
+        $acl.SetAccessRule($localSystemAccessRule)
+        $builtinUsers = Get-LocalizedWellKnownPrincipalName -WellKnownSidType ([Security.Principal.WellKnownSidType]::BuiltinUsersSid)
+        $usersAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($builtinUsers, $rightsReadExecute, $inheritanceFlags, $propagationFlags, "Allow")
+        $acl.SetAccessRule($usersAccessRule)
+
+        Write-Debug "Set Owner to Administrators"
+        $builtinAdminsSid = New-Object System.Security.Principal.SecurityIdentifier([Security.Principal.WellKnownSidType]::BuiltinAdministratorsSid, $null)
+        $acl.SetOwner($builtinAdminsSid)
+
+        Write-Debug "Removing inheritance with no copy"
+        $acl.SetAccessRuleProtection($true, $false)
+
+        # enact the changes against the actual
+        (Get-Item $folder).SetAccessControl($acl)
+
+    }
+    catch {
+        Write-Warning $_.Exception
+        Write-Warning "Not able to set permissions for $folder."
+    }
+    $ErrorActionPreference = $currentEA
+}
+
 function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
+
+    if (!(Test-Admin)) {
+        throw "Installation of Boxstarter requires Administrative permissions. Please run from elevated prompt."
+    }
+
     $boxstarterPath = Join-Path $env:ProgramData Boxstarter
-    if(!(test-Path $boxstarterPath)){
-        mkdir $boxstarterPath
+    if (!(test-Path $boxstarterPath)) {
+        New-Item -ItemType Directory $boxstarterPath | Out-Null
     }
-    $packagePath=Join-Path $boxstarterPath BuildPackages
-    if(!(test-Path $packagePath)){
-        mkdir $packagePath
+    $packagePath = Join-Path $boxstarterPath BuildPackages
+    if (!(test-Path $packagePath)) {
+        New-Item -ItemType Directory $packagePath | Out-Null
     }
-    foreach($ModulePath in (Get-ChildItem $here | Where-Object { $_.PSIsContainer })){
-        $target=Join-Path $boxstarterPath $modulePath.BaseName
-        if(test-Path $target){
+    foreach ($ModulePath in (Get-ChildItem $here | Where-Object { $_.PSIsContainer })) {
+        $target = Join-Path $boxstarterPath $modulePath.BaseName
+        if (test-Path $target) {
             Remove-Item $target -Recurse -Force
         }
     }
     Copy-Item "$here\*" $boxstarterPath -Recurse -Force -Exclude ChocolateyInstall.ps1, Setup.*
+
+    # set permissions to mitigate possible privilege escalation
+    Ensure-Permissions -folder $boxstarterPath
 
     PersistBoxStarterPathToEnvironmentVariable "PSModulePath" $boxstarterPath
     PersistBoxStarterPathToEnvironmentVariable "Path" $boxstarterPath
@@ -46,7 +153,7 @@ PS:>Get-Help Boxstarter
         $startMenu = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::CommonStartMenu)
         $startMenu += "\Programs\Boxstarter"
         if(!(Test-Path $startMenu)){
-            mkdir $startMenu
+            New-Item -ItemType Directory $startMenu | Out-Null
         }
         $target="powershell.exe"
         $targetArgs="-ExecutionPolicy bypass -NoExit -Command `"&'$boxstarterPath\BoxstarterShell.ps1'`""
