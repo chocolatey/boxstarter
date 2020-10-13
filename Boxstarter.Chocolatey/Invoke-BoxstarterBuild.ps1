@@ -32,7 +32,7 @@ New-BoxstarterPackage
     if(!$boxstarter -or !$boxstarter.LocalRepo){
         throw "No Local Repository has been set in `$Boxstarter.LocalRepo."
     }
-    pushd $Boxstarter.LocalRepo
+    Push-Location $Boxstarter.LocalRepo
     try{
         if($name){
             $searchPath = Join-Path $name "$name.nuspec"
@@ -40,18 +40,19 @@ New-BoxstarterPackage
             if(!(Test-Path $searchPath)){
                 throw "Cannot find $($Boxstarter.LocalRepo)\$searchPath"
             }
-            Call-Chocolatey Pack (Join-Path $name "$name.nuspec") | Out-Null
+            Call-Chocolatey -Command Pack -PackageNames (Join-Path -Path $name -ChildPath "$name.nuspec") | Out-Null
             if(!$quiet){
                 Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $name or Install-BoxstarterPackage $name will run this package." -nologo
             }
         } else {
              if($all){
                 Write-BoxstarterMessage "Scanning $($Boxstarter.LocalRepo) for package folders"
-                Get-ChildItem . | ? { $_.PSIsContainer } | % {
-                    $directoriesExist=$true
+                Get-ChildItem . | Where-Object { $_.PSIsContainer } | ForEach-Object {
+                    $directoriesExist = $true
                     Write-BoxstarterMessage "Found directory $($_.name). Looking for $($_.name).nuspec"
-                    if(Test-Path (Join-Path $_.name "$($_.name).nuspec")){
-                        Call-Chocolatey Pack (Join-Path . "$($_.Name)\$($_.Name).nuspec") | Out-Null
+                    $nuspecCandidate = Join-Path -Path $_.Name -ChildPath "$($_.Name).nuspec"
+                    if(Test-Path $nuspecCandidate){
+                        Call-Chocolatey -Command Pack -PackageNames (Join-Path -Path . -ChildPath $nuspecCandidate) | Out-Null
                         if(!$quiet){
                             Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Install-BoxstarterPackage $($_.Name) will run this package." -nologo
                         }
@@ -64,6 +65,6 @@ New-BoxstarterPackage
         }
     }
     finally {
-        popd
+        Pop-Location
     }
 }
