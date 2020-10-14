@@ -162,11 +162,11 @@ function chocolatey {
         # if a 'pure Boxstarter' parameter has been specified, 
         # we need to remove it from the command line arguments that 
         # will be passed to Chocolatey, as only Boxstarter is able to handle it
-        if ($a -match "^--?RebootCodes") {
+        if ($a -match "^--?RebootCodes$") {
             $skipNextArg = $true
             continue;
         }
-        if ($a -match "^--?StopOnPackageFailure") {
+        if ($a -match "^--?StopOnPackageFailure$") {
             continue;
         }
         $argsWithoutBoxstarterSpecials += $a
