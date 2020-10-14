@@ -165,7 +165,7 @@ function chocolatey {
                 $skipNextArg = $true
                 continue;
             }
-            if (@("-StopOnPackageFailure", "--StopOnPackageFailure" -contains $a)) {
+            if (@("-StopOnPackageFailure", "--StopOnPackageFailure") -contains $a) {
                 continue;
             }
             $argsWithoutBoxstarterSpecials += $a
