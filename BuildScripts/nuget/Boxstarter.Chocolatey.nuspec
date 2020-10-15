@@ -23,13 +23,7 @@
       <dependency id="Boxstarter.Bootstrapper" version="[$version$]" />
     </dependencies>
     <releaseNotes>
-- 2.11.0 packages missing chocolatey dlls for remote installs
-- Build script install deprecated package WindowsAzurePowershell
-- implement DelegateChocoSources switch to enable source feed passing
-- Chocolatey Package - include verification/license files
-- Chocolatey Packages - Don't include XML files
-- SignTool error when running build.bat
-- No Visual Studio Prereqs Specified In Docs
+See information here: https://github.com/chocolatey/boxstarter/releases
 </releaseNotes>
   </metadata>
   <files>
