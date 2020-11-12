@@ -63,6 +63,12 @@ Enables Windows snap feature (side by side application selection tool).
 .PARAMETER DisableSnapAssist
 Disables Windows snap feature (side by side application selection tool).
 
+.PARAMETER EnableItemCheckBox
+Enables the showing of check boxes next to items in Windows Explorer for item selection
+
+.PARAMETER DisableItemCheckBox
+Disables the showing of check boxes next to items in Windows Explorer for item selection.
+
 .LINK
 https://boxstarter.org
 
@@ -89,7 +95,9 @@ https://boxstarter.org
         [switch]$EnableShowRibbon,
         [switch]$DisableShowRibbon,
         [switch]$EnableSnapAssist,
-        [switch]$DisableSnapAssist
+        [switch]$DisableSnapAssist,
+        [switch]$EnableItemCheckBox,
+        [switch]$DisableItemCheckBox
     )
 
     $PSBoundParameters.Keys | % {
@@ -133,6 +141,9 @@ https://boxstarter.org
 
         if($EnableSnapAssist) {Set-ItemProperty $advancedKey SnapAssist 1}
         if($DisableSnapAssist) {Set-ItemProperty $advancedKey SnapAssist 0}
+
+        if($EnableItemCheckBox) {Set-ItemProperty $advancedKey AutoCheckSelect 1}
+        if($DisableItemCheckBox) {Set-ItemProperty $advancedKey AutoCheckSelect 0}
     }
 
     if(Test-Path -Path $cabinetStateKey) {
