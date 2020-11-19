@@ -62,15 +62,17 @@ What is generally not considered trivial:
     1. Create a fork of chocolatey/boxstarter under your GitHub account. See [forks](https://help.github.com/articles/working-with-forks/) for more information.
     1. [Clone your fork](https://help.github.com/articles/cloning-a-repository/) locally.
     1. Open a command line and navigate to that directory.
-    1. Add the upstream fork - `git remote add upstream git@github.com:chocolatey/boxstarter.git`
+    1. Add the upstream fork
+        - If [**Using SSH agent forwarding**](https://docs.github.com/en/free-pro-team@latest/developers/overview/using-ssh-agent-forwarding) - `git remote add upstream git@github.com:chocolatey/boxstarter.git`
+        - If using **HTTPS cloning** (if you are unsure, use this one) - `git remote add upstream https://github.com/chocolatey/boxstarter.git` 
     1. Run `git fetch upstream`
     1. Ensure you have user name and email set appropriately to attribute your contributions - see [Name](https://help.github.com/articles/setting-your-username-in-git/) / [Email](https://help.github.com/articles/setting-your-commit-email-address-in-git/).
     1. Ensure that the local repository has the following settings (without `--global`, these only apply to the *current* repository):
-      * `git config core.autocrlf false`
-      * `git config core.symlinks false`
-      * `git config merge.ff false`
-      * `git config merge.log true`
-      * `git config fetch.prune true`
+        - `git config core.autocrlf false`
+        - `git config core.symlinks false`
+        - `git config merge.ff false`
+        - `git config merge.log true`
+        - `git config fetch.prune true`
     1. From there you create a branch named specific to the feature.
     1. In the branch you do work specific to the feature.
     1. For committing the code, please see [Prepare Commits](#prepare-commits).
