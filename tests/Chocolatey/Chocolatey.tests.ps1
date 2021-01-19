@@ -472,6 +472,27 @@ Describe "Call-Chocolatey" {
             $passedArgs[4] | Should Be "blah"
         }
     }
+
+    context "package parameters - Boxstarter exclusive parameters are stripped (single param)" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+
+        choco Install -y pkg --source blah --StopOnPackageFailure
+
+        $passedArgs | Should Not BeNullOrEmpty
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 5
+        }
+        it "passes all parameters in correct order" {
+            $passedArgs[0] | Should Be "Install"
+            $passedArgs[1] | Should Be "pkg" # package will always be first argument (reordering happens!)
+            $passedArgs[2] | Should Be "-y" # passed -y is after package because of the reordering
+            $passedArgs[3] | Should Be "--source"
+            $passedArgs[4] | Should Be "blah"
+        }
+    }
+
 }
 
 Describe "Get-PackageNamesFromInvocationLine" {

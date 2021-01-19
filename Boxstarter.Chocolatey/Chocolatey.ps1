@@ -149,29 +149,30 @@ function chocolatey {
     Write-BoxstarterMessage "Will stop on first package error: $stopOnFirstError" -Verbose
 
     $rebootCodes = Get-PassedArg -ArgumentName 'RebootCodes' -OriginalArgs $args
-    # if a 'pure Boxstarter' parameter has been specified, 
-    # we need to remove it from the command line arguments that 
-    # will be passed to Chocolatey, as only Boxstarter is able to handle it
-    if ($null -ne $rebootCodes) {
-        $argsWithoutBoxstarterSpecials = @()
-        $skipNextArg = $false
-        foreach ($a in $args) {
-            if ($skipNextArg) {
-                $skipNextArg = $false;
-                continue;
-            }
+    
+    $argsWithoutBoxstarterSpecials = @()
+    $skipNextArg = $false
 
-            if (@("-RebootCodes", "--RebootCodes") -contains $a) {
-                $skipNextArg = $true
-                continue;
-            }
-            if (@("-StopOnPackageFailure", "--StopOnPackageFailure") -contains $a) {
-                continue;
-            }
-            $argsWithoutBoxstarterSpecials += $a
+    foreach ($a in $args) {
+        if ($skipNextArg) {
+            $skipNextArg = $false;
+            continue;
         }
-        $args = $argsWithoutBoxstarterSpecials
+
+        # if a 'pure Boxstarter' parameter has been specified, 
+        # we need to remove it from the command line arguments that 
+        # will be passed to Chocolatey, as only Boxstarter is able to handle it
+        if ($a -match "^--?RebootCodes$") {
+            $skipNextArg = $true
+            continue;
+        }
+        if ($a -match "^--?StopOnPackageFailure$") {
+            continue;
+        }
+        $argsWithoutBoxstarterSpecials += $a
     }
+
+    $args = $argsWithoutBoxstarterSpecials
     $rebootCodes = Add-DefaultRebootCodes -Codes $rebootCodes
     Write-BoxstarterMessage "RebootCodes: '$rebootCodes' ($($rebootCodes.Count) elements)" -Verbose
 
