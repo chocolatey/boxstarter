@@ -254,7 +254,7 @@ Describe "Call-Chocolatey" {
         }
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 5
+            $passedArgs.count | Should Be 7
         }
         it "passes thru command" {
             $passedArgs[0] | Should Be "Install"
@@ -262,12 +262,16 @@ Describe "Call-Chocolatey" {
         it "passes thru package" {
             $passedArgs[1] | Should Be "pkg"
         }
+        it "injects cacheLocation" {
+            $passedArgs[2] | Should Be "-cacheLocation"
+            $passedArgs[3] | Should Be $env:temp
+        }
         it "passes configed source" {
-            $passedArgs[2] | Should Be "-source"
-            $passedArgs[3] | Should Be "$($Boxstarter.LocalRepo);blah"
+            $passedArgs[4] | Should Be "-source"
+            $passedArgs[5] | Should Be "$($Boxstarter.LocalRepo);blah"
         }
         it "passes confirm" {
-            $passedArgs[4] | Should Be "-y"
+            $passedArgs[6] | Should Be "-y"
         }
     }
 
@@ -279,7 +283,7 @@ Describe "Call-Chocolatey" {
         choco Uninstall pkg
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 3
+            $passedArgs.count | Should Be 5
         }
         it "passes thru command" {
             $passedArgs[0] | Should Be "Uninstall"
@@ -287,8 +291,12 @@ Describe "Call-Chocolatey" {
         it "passes thru package" {
             $passedArgs[1] | Should Be "pkg"
         }
+        it "injects cacheLocation" {
+            $passedArgs[2] | Should Be "-cacheLocation"
+            $passedArgs[3] | Should Be $env:temp
+        }
         it "passes confirm" {
-            $passedArgs[2] | Should Be "-y"
+            $passedArgs[4] | Should Be "-y"
         }
     }
 
@@ -299,7 +307,7 @@ Describe "Call-Chocolatey" {
         choco Install pkg --source blah --bing=boom
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 7
+            $passedArgs.count | Should Be 9
         }
         it "passes source" {
             $passedArgs[2] | Should Be "--source"
@@ -308,6 +316,10 @@ Describe "Call-Chocolatey" {
         it "passes other args with assignment operator" {
             $passedArgs[4] | Should Be "--bing"
             $passedArgs[5] | Should Be "boom"
+        }
+        it "injects cacheLocation" {
+            $passedArgs[6] | Should Be "-cacheLocation"
+            $passedArgs[7] | Should Be $env:temp
         }
     }
 
@@ -318,11 +330,15 @@ Describe "Call-Chocolatey" {
         choco Install pkg --source=blah
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 5
+            $passedArgs.count | Should Be 7
         }
         it "passes source" {
             $passedArgs[2] | Should Be "--source"
             $passedArgs[3] | Should Be "blah"
+        }
+        it "injects cacheLocation" {
+            $passedArgs[4] | Should Be "-cacheLocation"
+            $passedArgs[5] | Should Be $env:temp
         }
     }
 
@@ -333,11 +349,15 @@ Describe "Call-Chocolatey" {
         choco Install pkg -source blah
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 5
+            $passedArgs.count | Should Be 7
         }
         it "passes source" {
             $passedArgs[2] | Should Be "-source"
             $passedArgs[3] | Should Be "blah"
+        }
+        it "injects cacheLocation" {
+            $passedArgs[4] | Should Be "-cacheLocation"
+            $passedArgs[5] | Should Be $env:temp
         }
     }
 
@@ -348,11 +368,15 @@ Describe "Call-Chocolatey" {
         choco Install pkg -s blah
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 5
+            $passedArgs.count | Should Be 7
         }
         it "passes source" {
             $passedArgs[2] | Should Be "-s"
             $passedArgs[3] | Should Be "blah"
+        }
+        it "injects cacheLocation" {
+            $passedArgs[4] | Should Be "-cacheLocation"
+            $passedArgs[5] | Should Be $env:temp
         }
     }
 
@@ -363,9 +387,9 @@ Describe "Call-Chocolatey" {
         choco Install pkg -force:$true
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 6
+            $passedArgs.count | Should Be 8
         }
-        it "passes source" {
+        it "passes force" {
             $passedArgs[2] | Should Be "-f"
         }
     }
@@ -377,9 +401,9 @@ Describe "Call-Chocolatey" {
         choco Install pkg -force:$false
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 5
+            $passedArgs.count | Should Be 7
         }
-        it "passes source" {
+        it "passes force (false)" {
             $passedArgs -contains "-f" | Should Be $false
         }
     }
@@ -391,7 +415,7 @@ Describe "Call-Chocolatey" {
         choco Install pkg -f
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 6
+            $passedArgs.count | Should Be 8
         }
         it "passes source" {
             $passedArgs[2] | Should Be "-f"
@@ -405,7 +429,7 @@ Describe "Call-Chocolatey" {
         choco Install pkg -force
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 6
+            $passedArgs.count | Should Be 8
         }
         it "passes source" {
             $passedArgs[2] | Should Be "-force"
@@ -420,13 +444,15 @@ Describe "Call-Chocolatey" {
         $global:VerbosePreference="SilentlyContinue"
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 6
+            $passedArgs.count | Should Be 8
             $passedArgs[0] | Should Be "Install"
             $passedArgs[1] | Should Be "pkg"
-            $passedArgs[2] | Should Be "-Source"
+            $passedArgs[2] | Should Be "-cacheLocation"
+            $passedArgs[3] | Should Be $env:temp
+            $passedArgs[4] | Should Be "-Source"
             # $passedArgs[3] -> feeds, may differ from system to system
-            $passedArgs[4] | Should Be "-Verbose"
-            $passedArgs[5] | Should Be "-y"
+            $passedArgs[6] | Should Be "-Verbose"
+            $passedArgs[7] | Should Be "-y"
         }
     }
 
@@ -439,7 +465,7 @@ Describe "Call-Chocolatey" {
         $passedArgs | Should Not BeNullOrEmpty
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 8 # actually 7 + 1 "-Verbose" is appended
+            $passedArgs.count | Should Be 10 # actually 9 + 1 "-Verbose" is appended
         }
         it "passes all parameters in correct order" {
             $passedArgs[0] | Should Be "Install"
@@ -462,7 +488,7 @@ Describe "Call-Chocolatey" {
         $passedArgs | Should Not BeNullOrEmpty
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 5
+            $passedArgs.count | Should Be 7
         }
         it "passes all parameters in correct order" {
             $passedArgs[0] | Should Be "Install"
@@ -470,6 +496,8 @@ Describe "Call-Chocolatey" {
             $passedArgs[2] | Should Be "-y" # passed -y is after package because of the reordering
             $passedArgs[3] | Should Be "--source"
             $passedArgs[4] | Should Be "blah"
+            $passedArgs[5] | Should Be "-cacheLocation"
+            $passedArgs[6] | Should Be $env:temp
         }
     }
 
@@ -482,7 +510,7 @@ Describe "Call-Chocolatey" {
         $passedArgs | Should Not BeNullOrEmpty
 
         it "passes expected params" {
-            $passedArgs.count | Should Be 5
+            $passedArgs.count | Should Be 7
         }
         it "passes all parameters in correct order" {
             $passedArgs[0] | Should Be "Install"
@@ -490,6 +518,8 @@ Describe "Call-Chocolatey" {
             $passedArgs[2] | Should Be "-y" # passed -y is after package because of the reordering
             $passedArgs[3] | Should Be "--source"
             $passedArgs[4] | Should Be "blah"
+            $passedArgs[5] | Should Be "-cacheLocation"
+            $passedArgs[6] | Should Be $env:temp
         }
     }
 

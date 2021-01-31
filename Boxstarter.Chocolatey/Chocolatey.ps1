@@ -152,11 +152,16 @@ function chocolatey {
     
     $argsWithoutBoxstarterSpecials = @()
     $skipNextArg = $false
+    $containsCacheLocation = $false
 
     foreach ($a in $args) {
         if ($skipNextArg) {
             $skipNextArg = $false;
             continue;
+        }
+
+        if ($a -match "^--?cache(Location|-location)?$") {
+            $containsCacheLocation = $true
         }
 
         # if a 'pure Boxstarter' parameter has been specified, 
@@ -170,6 +175,12 @@ function chocolatey {
             continue;
         }
         $argsWithoutBoxstarterSpecials += $a
+    }
+
+    if (-not $containsCacheLocation) {
+        Write-BoxstarterMessage "passing '-cacheLocation=$($env:temp)' to Chocolatey" -Verbose
+        $argsWithoutBoxstarterSpecials += "-cacheLocation"
+        $argsWithoutBoxstarterSpecials += $env:temp
     }
 
     $args = $argsWithoutBoxstarterSpecials
