@@ -167,6 +167,7 @@ Once that is done, please run Enable-BoxstarterVM again.
                 Enable-BoxstarterClientRemoting $ComputerName | Out-Null
                 Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
                 try {
+                    # TODO: use something else than Get-WmiObject here!
                     Invoke-RetriableScript { Invoke-Command $args[0] { Get-WmiObject Win32_ComputerSystem } -Credential $args[1] -ErrorAction Stop | Out-Null } $uri $Credential
                 }
                 catch {

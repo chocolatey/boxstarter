@@ -31,7 +31,7 @@ See information here: https://github.com/chocolatey/boxstarter/releases
     <file src="..\..\buildArtifacts\tempNuGetFolders\chocolateyUninstall.ps1" target="tools" />
     <file src="..\..\buildArtifacts\tempNuGetFolders\Setup.ps1" target="tools" />
     <file src="..\..\boxstarter.bat" target="tools" />
-    <file src="..\..\boxstarter.config" target="tools" />
+    <file src="..\..\Boxstarter.config" target="tools" />
     <file src="..\..\LICENSE.txt" target="tools" />
     <file src="..\..\NOTICE.txt" target="tools" />
     <file src="..\..\buildArtifacts\tempNuGetFolders\VERIFICATION.txt" target="tools" />

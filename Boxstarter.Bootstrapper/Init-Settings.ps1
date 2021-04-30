@@ -2,7 +2,7 @@ if (!$Global:Boxstarter) {
     $Global:Boxstarter = @{ } 
 }
 if (!$Boxstarter.ContainsKey('Log')) {
-    $Boxstarter.Log = "$(Get-BoxstarterTempDir)\boxstarter.log"
+    $Boxstarter.Log = "$(Get-BoxstarterTempDir)/boxstarter.log"
 }
 if (!$Boxstarter.ContainsKey('RebootOk')) { 
     $Boxstarter.RebootOk = $false 

@@ -31,6 +31,7 @@ Describe "Enable-BoxstarterVM.Azure" {
     Mock Set-AzureVMCheckpoint
     Mock Restore-AzureVMCheckpoint
     Mock Get-AzureSubscription { return @{CurrentStorageAccountName="sa"} }
+    # TODO: use cim/wmi compatibility wrapper here ???
     Mock Invoke-RetriableScript -ParameterFilter {$RetryScript -ne $null -and $RetryScript.ToString() -like "*Get-WMIObject*"}
     Mock Set-AzureSubscription
     Mock Restart-computer
@@ -56,7 +57,7 @@ Describe "Enable-BoxstarterVM.Azure" {
         Enable-BoxstarterVM -VMName $vmName -CloudServiceName $vmServiceName -Credential $mycreds -ErrorAction SilentlyContinue | Out-Null
 
         It "Should start vm"{
-            Assert-VerifiableMocks
+            Assert-VerifiableMock
         }
         $vm.InstanceStatus="ReadyRole"
     }

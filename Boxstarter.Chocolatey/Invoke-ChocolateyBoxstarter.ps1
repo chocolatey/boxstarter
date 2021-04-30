@@ -16,7 +16,7 @@ This essentially wraps Chocolatey Install and provides these additional features
  The .nupkg file for the provided package name is searched in the following locations and order:
  - .\BuildPackages relative to the parent directory of the module file
  - The Chocolatey community feed
- This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.Config
+ This can be configured by editing $($Boxstarter.BaseDir)\Boxstarter.config
 
  If the package name provided is a URL or resolves to a file. Then
  it is assumed that this contains the Chocolatey install script and
@@ -237,5 +237,6 @@ function Download-Package([string[]]$bootstrapPackage) {
     }
     $source = "$($Boxstarter.LocalRepo);$((Get-BoxstarterConfig).NugetSources)"
     Write-BoxstarterMessage "Installing $($bootstrapPackage.Count) packages from $source" -Verbose
+    # TODO: timeout for boxstarter toplevel packages should be configurable as well!
     Chocolatey install $bootstrapPackage -source $source -force:$force -execution-timeout 86400
 }

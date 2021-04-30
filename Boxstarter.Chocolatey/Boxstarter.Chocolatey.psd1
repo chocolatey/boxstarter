@@ -1,10 +1,10 @@
 @{
 Description = 'Provides a robust environment capable of automatic reboots and several windows customization functions ideal for installing Chocolatey packages on a new machine'
 # Script module or binary module file associated with this manifest.
-ModuleToProcess = './boxstarter.chocolatey.psm1'
+ModuleToProcess = './Boxstarter.Chocolatey.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.13.0'
+ModuleVersion = '3.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e51'
@@ -22,7 +22,7 @@ PowerShellVersion = '2.0'
 DotNetFrameworkVersion = '2.0'
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('..\Boxstarter.Common\Boxstarter.Common.psd1')
+NestedModules = @('../Boxstarter.Common/Boxstarter.Common.psd1')
 
 # Functions to export from this module
 FunctionsToExport = '*'
@@ -43,7 +43,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = '8459d49a8d5a049d8936519ccf045706c7b3eb23'
+PrivateData = '96008a8dabea02b6632cf19202c0529afeccf7a5'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

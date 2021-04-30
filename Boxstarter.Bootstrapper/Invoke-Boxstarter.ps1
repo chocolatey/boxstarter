@@ -88,7 +88,7 @@ Invoke-Reboot
         Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate..."
         $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psd1")
         if($password){
-            $encryptedPass = convertfrom-securestring -securestring $password
+            $encryptedPass = ConvertFrom-SecureString -securestring $password
             $passwordArg = "-encryptedPassword $encryptedPass"
         }
         $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($unNormalized.FullName)`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'}) $passwordArg"

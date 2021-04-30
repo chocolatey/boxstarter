@@ -2,16 +2,26 @@ $here = Split-Path -parent $MyInvocation.MyCommand.Definition
 
 # Import the Chocolatey module first so that $Boxstarter properties
 # are initialized correctly and then import everything else.
-Import-Module $here\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1 -DisableNameChecking -ErrorAction SilentlyContinue
-Resolve-Path $here\Boxstarter.*\*.psd1 |
-    % { Import-Module $_.ProviderPath -DisableNameChecking -ErrorAction SilentlyContinue }
-Import-Module $here\Boxstarter.Common\Boxstarter.Common.psd1 -Function Test-Admin
+$mpath = "$here/Boxstarter.Chocolatey/Boxstarter.Chocolatey.psd1"
+Write-Host "=> $mpath"
+Import-Module $mpath -DisableNameChecking -ErrorAction SilentlyContinue
+Resolve-Path $here/Boxstarter.*/*.psd1 |
+    ForEach-Object { 
+        Write-Host "=> $_"
+        Import-Module $_.ProviderPath -DisableNameChecking -ErrorAction SilentlyContinue 
+    }
+Import-Module $here/Boxstarter.Common/Boxstarter.Common.psd1 -Function Test-Admin
+
 
 if(!(Test-Admin)) {
     Write-BoxstarterMessage "Not running with administrative rights. Attempting to elevate..."
-    $command = "-ExecutionPolicy bypass -noexit -command &'$here\BoxstarterShell.ps1'"
-    Start-Process powershell -verb runas -argumentlist $command
-    Exit
+    if ($PSVersionTable.Platform -eq 'Unix') {
+        Write-BoxstarterMessage "nevermind, this is a Unix system, will use *sudo powers* when necessary"
+    } else {
+        $command = "-ExecutionPolicy bypass -noexit -command &'$here\BoxstarterShell.ps1'"
+        Start-Process powershell -verb runas -argumentlist $command
+        Exit
+    }
 }
 
 $Host.UI.RawUI.WindowTitle="Boxstarter Shell"

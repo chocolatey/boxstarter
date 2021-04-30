@@ -40,6 +40,7 @@ param(
     Remove-Item -Force `$log -ErrorAction SilentlyContinue
     Start-Transcript -Path `$log
 
+    # TODO use cim/wmi compatibility wrapper here!
     if(!(1,3,4,5 -contains (Get-WmiObject win32_computersystem).DomainRole)) {
         `$networkListManager = [Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]'{DCB00C01-570F-4A9B-8D69-199FDBA5723B}'))
         `$connections = `$networkListManager.GetNetworkConnections()
@@ -96,6 +97,7 @@ param(
     Write-BoxstarterMessage "Testing connection" -Verbose
     for($count = 1; $count -le 100; $count++) {
         $wmiResult = Invoke-Command $computername {
+            # TODO: use something different than Get-WmiObject here!
             Get-WmiObject Win32_ComputerSystem } -Credential $credential -ErrorAction SilentlyContinue
         if($wmiResult -ne $Null){
             Write-BoxstarterMessage "PowerShell Remoting enabled successfully"

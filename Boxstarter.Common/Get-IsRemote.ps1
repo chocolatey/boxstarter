@@ -21,8 +21,12 @@ https://boxstarter.org
 }
 
 function Test-ChildOfWinrs($ID = $PID) {
+    if ($PSVersionTable.Platform -eq 'Unix') {
+        Log-BoxstarterMessage "Test-ChildOfWinrs: detected Unix platform!"
+        return $false
+    }
    if(++$script:recursionLevel -gt 20) { return $false }
-   $parent = (Get-WmiObject -Class Win32_Process -Filter "ProcessID=$ID").ParentProcessID
+   $parent = (Get-CimInstance -Class Win32_Process -Filter "ProcessID=$ID").ParentProcessID
     if($parent -eq $null) {
         Log-BoxstarterMessage "No parent process found. Must be root."
         return $false

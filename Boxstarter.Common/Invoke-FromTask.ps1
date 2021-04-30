@@ -86,8 +86,10 @@ function Get-CliXmlStream($cliXmlFile, $stream) {
     $content = Get-Content $cliXmlFile
     if($content.count -lt 2) { return $null }
 
+    $i = 1
+    # $content | Foreach-Object {$i = 0} { if ($_ -notmatch [regex]::Escape('#< CLIXML')) { return; } $i++ }
     # Strip the first line containing '#< CLIXML'
-    [xml]$xml = $content[1..($content.count-1)]
+    [xml]$xml = $content[$i..($content.count-$i)]
 
     # return stream stripping carriage retuens and linefeeds
     $xml.DocumentElement.ChildNodes |
@@ -101,6 +103,7 @@ function Get-ChildProcessMemoryUsage {
         $ID=$PID,
         [int]$res=0
     )
+    # TODO use cim/wmi compatibility wrapper here!
     Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % {
         if($_.ProcessID -ne $null) {
             try {
@@ -217,6 +220,7 @@ function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
 }
 
 function KillTree($id){
+    # TODO use cim/wmi compatibility wrapper here!
     Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$ID" | % {
         if($_.ProcessID -ne $null) {
             Invoke-SilentKill $_.ProcessID

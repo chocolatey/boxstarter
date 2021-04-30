@@ -130,6 +130,7 @@ Install-BoxstarterPackage
             until ($ComputerName -ne $null)
             $clientRemoting = Enable-BoxstarterClientRemoting $ComputerName
             Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
+            # TODO: use something else from Get-WmiObject here!
             $remotingTest = Invoke-Command $ComputerName { Get-WmiObject Win32_ComputerSystem } -Credential $Credential -ErrorAction SilentlyContinue
 
             $params=@{}
@@ -194,6 +195,7 @@ Install-BoxstarterPackage
 }
 
 function Get-VMGuestComputerName($vmName) {
+    # TODO use cim/wmi compatibility wrapper here!
     $vm = Get-WmiObject -Namespace root\virtualization\v2 -Class Msvm_ComputerSystem -Filter "ElementName='$vmName'"
     $vm.GetRelated("Msvm_KvpExchangeComponent").GuestIntrinsicExchangeItems | % {
         if(([XML]$_) -ne $null){

@@ -4,7 +4,7 @@ param(
 if(!$Global:Boxstarter) { $Global:Boxstarter = @{} }
 if(!$Boxstarter.ContainsKey('RebootOk')) { $Boxstarter.RebootOk=$true }
 
-$unNormalized=(Get-Item "$PSScriptRoot\..\Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1")
+$unNormalized=(Get-Item "$PSScriptRoot/../Boxstarter.Bootstrapper/Boxstarter.Bootstrapper.psd1")
 Import-Module $unNormalized.FullName -global -DisableNameChecking
 Resolve-Path $PSScriptRoot\*.ps1 |
     % { . $_.ProviderPath }

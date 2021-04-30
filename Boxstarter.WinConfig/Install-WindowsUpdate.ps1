@@ -49,6 +49,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         if($getUpdatesFromMS) {
             $Searcher.ServerSelection = 2 #2 is the Const for the Windows Update server
         }
+        # TODO use cim/wmi compatibility wrapper here!
         $wus=Get-WmiObject -Class Win32_Service -Filter "Name='wuauserv'"
         $origStatus=$wus.State
         $origStartupType=$wus.StartMode

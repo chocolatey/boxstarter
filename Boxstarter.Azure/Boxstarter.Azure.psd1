@@ -1,10 +1,10 @@
 @{
 Description = 'Provides Cmdlets that will install a boxstarter package on a Windows Azure VM'
 # Script module or binary module file associated with this manifest.
-ModuleToProcess = './boxstarter.Azure.psm1'
+ModuleToProcess = './Boxstarter.Azure.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.13.0'
+ModuleVersion = '3.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'bbdb3e8b-9daf-4c00-a553-4f3f88fb6e59'
@@ -21,6 +21,7 @@ PowerShellVersion = '3.0'
 # Minimum version of the .NET Framework required by this module
 DotNetFrameworkVersion = '4.0'
 
+# TODO: figure out what to do on *NIX system
 RequiredAssemblies = @( "$env:ProgramW6432\Microsoft SDKs\Azure\.NET SDK\v2.5\bin\plugins\Caching\Microsoft.WindowsAzure.StorageClient.dll" )
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
@@ -45,7 +46,7 @@ AliasesToExport = '*'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-PrivateData = '8459d49a8d5a049d8936519ccf045706c7b3eb23'
+PrivateData = '96008a8dabea02b6632cf19202c0529afeccf7a5'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

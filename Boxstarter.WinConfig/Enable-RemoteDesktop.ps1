@@ -17,6 +17,7 @@ https://boxstarter.org
     )
 
     Write-BoxstarterMessage "Enabling Remote Desktop..."
+    # TODO use cim/wmi compatibility wrapper here!
     $obj = Get-WmiObject -Class "Win32_TerminalServiceSetting" -Namespace root\cimv2\terminalservices
     if($obj -eq $null) {
         Write-BoxstarterMessage "Unable to locate terminalservices namespace. Remote Desktop is not enabled"
@@ -29,6 +30,7 @@ https://boxstarter.org
         throw "There was a problem enabling remote desktop. Make sure your operating system supports remote desktop and there is no group policy preventing you from enabling it."
     }
 
+    # TODO use cim/wmi compatibility wrapper here!
     $obj2 = Get-WmiObject -class Win32_TSGeneralSetting -Namespace root\cimv2\terminalservices -ComputerName . -Filter "TerminalName='RDP-tcp'"
 
     if($obj2.UserAuthenticationRequired -eq $null) {

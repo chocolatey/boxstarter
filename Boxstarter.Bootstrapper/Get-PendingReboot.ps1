@@ -118,6 +118,7 @@ Process {
 	    $CBSRebootPend = $null
 
 	    ## Querying WMI for build version
+        # TODO use cim/wmi compatibility wrapper here!
 	    $WMI_OS = Get-WmiObject -Class Win32_OperatingSystem -Property BuildNumber, CSName -ComputerName $Computer -ErrorAction Stop
 
 	    ## Making registry connection to the local/remote computer

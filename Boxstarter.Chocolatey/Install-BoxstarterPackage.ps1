@@ -1,5 +1,5 @@
 function Install-BoxstarterPackage {
-<#
+    <#
 .SYNOPSIS
 Installs a Boxstarter package
 
@@ -269,25 +269,25 @@ directory.
 https://boxstarter.org
 about_boxstarter_chocolatey
 #>
-    [CmdletBinding(DefaultParameterSetName="Package")]
-	param(
-        [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="BoxstarterConnectionConfig")]
+    [CmdletBinding(DefaultParameterSetName = "Package")]
+    param(
+        [parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $True, ParameterSetName = "BoxstarterConnectionConfig")]
         [BoxstarterConnectionConfig[]]$BoxstarterConnectionConfig,
 
-        [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="ComputerName")]
+        [parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $True, ParameterSetName = "ComputerName")]
         [string[]]$ComputerName,
 
-        [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="ConnectionUri")]
+        [parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $True, ParameterSetName = "ConnectionUri")]
         [Uri[]]$ConnectionUri,
 
-        [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$True, ParameterSetName="Session")]
+        [parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $True, ParameterSetName = "Session")]
         [System.Management.Automation.Runspaces.PSSession[]]$Session,
 
-        [parameter(Mandatory=$true, Position=0, ParameterSetName="Package")]
-        [parameter(Mandatory=$true, Position=1, ParameterSetName="ComputerName")]
-        [parameter(Mandatory=$true, Position=1, ParameterSetName="ConnectionUri")]
-        [parameter(Mandatory=$true, Position=1, ParameterSetName="Session")]
-        [parameter(Mandatory=$true, Position=1, ParameterSetName="BoxstarterConnectionConfig")]
+        [parameter(Mandatory = $true, Position = 0, ParameterSetName = "Package")]
+        [parameter(Mandatory = $true, Position = 1, ParameterSetName = "ComputerName")]
+        [parameter(Mandatory = $true, Position = 1, ParameterSetName = "ConnectionUri")]
+        [parameter(Mandatory = $true, Position = 1, ParameterSetName = "Session")]
+        [parameter(Mandatory = $true, Position = 1, ParameterSetName = "BoxstarterConnectionConfig")]
         [string[]]$PackageName,
 
         [Management.Automation.PsCredential]$Credential,
@@ -296,7 +296,7 @@ about_boxstarter_chocolatey
 
         [switch]$DisableReboots,
 
-        [parameter(ParameterSetName="Package")]
+        [parameter(ParameterSetName = "Package")]
         [switch]$KeepWindowOpen,
 
         [string]$LocalRepo,
@@ -307,15 +307,15 @@ about_boxstarter_chocolatey
 
         [switch]$StopOnPackageFailure
     )
-    $CurrentVerbosity=$global:VerbosePreference
+    $CurrentVerbosity = $global:VerbosePreference
     try {
 
-        if($PSBoundParameters["Verbose"] -eq $true) {
-            $global:VerbosePreference="Continue"
+        if ($PSBoundParameters["Verbose"] -eq $true) {
+            $global:VerbosePreference = "Continue"
         }
 
         #If no PSRemoting based param's are present, we just run locally
-        if($PsCmdlet.ParameterSetName -eq "Package"){
+        if ($PsCmdlet.ParameterSetName -eq "Package") {
             Invoke-Locally @PSBoundParameters
             return
         }
@@ -324,78 +324,78 @@ about_boxstarter_chocolatey
         Write-BoxstarterLogo
 
         #Convert pipeline to array
-        $list=@($input)
-        if($list.Count){
+        $list = @($input)
+        if ($list.Count) {
             Set-Variable -Name $PsCmdlet.ParameterSetName -Value $list
         }
 
-        $sessionArgs=@{}
-        if($Credential){
-            $sessionArgs.Credential=$Credential
+        $sessionArgs = @{ }
+        if ($Credential) {
+            $sessionArgs.Credential = $Credential
         }
 
-				$delegateSources = if ($DelegateChocoSources) { $true} else { $false }
+        $delegateSources = if ($DelegateChocoSources) { $true } else { $false }
 
         #If $sessions are being provided we assume remoting is setup on both ends
         #and don't need to test, configure and tear down
-        if($Session -ne $null){
+        if ($Session -ne $null) {
             Process-Sessions $Session $sessionArgs $delegateSources
             return
         }
 
         #We need the computer names to configure remoting
-        if(!$ComputerName){
-            if($BoxstarterConnectionConfig){
-                $uris = $BoxstarterConnectionConfig | % { $_.ConnectionURI }
+        if (!$ComputerName) {
+            if ($BoxstarterConnectionConfig) {
+                $uris = $BoxstarterConnectionConfig | ForEach-Object { $_.ConnectionURI }
             }
-            else{
+            else {
                 $uris = $ConnectionUri
             }
             $ComputerName = Get-ComputerNames $uris
         }
 
-        try{
+        try {
             #Enable remoting settings if necessary on client
-            $ClientRemotingStatus=Enable-BoxstarterClientRemoting $ComputerName
+            $ClientRemotingStatus = Enable-BoxstarterClientRemoting $ComputerName
 
             #If unable to enable remoting on the client, abort
-            if(!$ClientRemotingStatus.Success){return}
+            if (!$ClientRemotingStatus.Success) { return }
 
-            $CredSSPStatus=Enable-BoxstarterCredSSP $ComputerName
+            $CredSSPStatus = Enable-BoxstarterCredSSP $ComputerName
 
-            if($ConnectionURI){
-                $ConnectionUri | %{
+            if ($ConnectionURI) {
+                $ConnectionUri | ForEach-Object {
                     $sessionArgs.ConnectionURI = $_
                     Write-BoxstarterMessage "Installing $packageName on $($_.ToString())"
                     Install-BoxstarterPackageOnComputer $_.Host $sessionArgs $PackageName $DisableReboots $CredSSPStatus $delegateSources
                 }
             }
-            elseif($BoxstarterConnectionConfig) {
-                $BoxstarterConnectionConfig | %{
+            elseif ($BoxstarterConnectionConfig) {
+                $BoxstarterConnectionConfig | ForEach-Object {
                     $sessionArgs.ConnectionURI = $_.ConnectionURI
-                    if($_.Credential){
+                    if ($_.Credential) {
                         $sessionArgs.Credential = $_.Credential
                     }
-                    if($_.PSSessionOption){
+                    if ($_.PSSessionOption) {
                         $sessionArgs.SessionOption = $_.PSSessionOption
                     }
                     Install-BoxstarterPackageOnComputer $_.ConnectionURI.Host $sessionArgs $PackageName $DisableReboots $CredSSPStatus $delegateSources
                 }
             }
             else {
-                $ComputerName | %{
+                $ComputerName | ForEach-Object {
                     $sessionArgs.ComputerName = $_
                     Install-BoxstarterPackageOnComputer $_ $sessionArgs $PackageName $DisableReboots $CredSSPStatus $delegateSources
                 }
             }
         }
-        finally{
+        finally {
             #Client settings should be as they were when we started
             Rollback-ClientRemoting $ClientRemotingStatus $CredSSPStatus
         }
     }
-    finally{
-        $global:VerbosePreference=$CurrentVerbosity
+    finally {
+        $global:VerbosePreference = $CurrentVerbosity
     }
 }
 
@@ -403,32 +403,32 @@ function Get-ComputerNames([URI[]]$ConnectionUris) {
     $computerNames = @()
 
     Write-BoxstarterMessage "resolving URIs to computer names..." -Verbose
-    $ConnectionUris | %{
-        if($_ -eq $null) {
+    $ConnectionUris | ForEach-Object {
+        if ($_ -eq $null) {
             Write-BoxstarterMessage "Tried to resolve Null URI" -Verbose
         }
         else {
             Write-BoxstarterMessage "$($_ -is [uri]) found $($_.Host) for $($_.ToString())" -Verbose
-            $computerNames+=$_.Host
+            $computerNames += $_.Host
         }
     }
     return $computerNames
 }
 
-function Process-Sessions($sessions, $sessionArgs, $delegateSources){
-    $Sessions | %{
+function Process-Sessions($Sessions, $SessionArgs, $DelegateSources) {
+    $Sessions | ForEach-Object {
         Write-BoxstarterMessage "Processing Session..." -Verbose
-        Set-SessionArgs $_ $sessionArgs
+        Set-SessionArgs $_ $SessionArgs
         $record = Start-Record $_.ComputerName
         try {
-            if(-not (Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $sessionArgs $delegateSources)){
-                $record.Completed=$false
+            if (-not (Install-BoxstarterPackageForSession $_ $PackageName $DisableReboots $SessionArgs $DelegateSources)) {
+                $record.Completed = $false
             }
         }
         catch {
-            $record.Completed=$false
+            $record.Completed = $false
         }
-        finally{
+        finally {
             Finish-Record $record
         }
     }
@@ -437,11 +437,11 @@ function Process-Sessions($sessions, $sessionArgs, $delegateSources){
 function Start-Record($computerName) {
     $global:error.Clear()
     $props = @{
-        StartTime = Get-Date
-        Completed = $true
+        StartTime    = Get-Date
+        Completed    = $true
         ComputerName = $computerName
-        Errors = @()
-        FinishTime = $null
+        Errors       = @()
+        FinishTime   = $null
     }
     return (New-Object PSObject -Prop $props)
 }
@@ -449,8 +449,8 @@ function Start-Record($computerName) {
 function Finish-Record($obj) {
     Write-BoxstarterMessage "Composing record for pipeline..." -Verbose
     $obj.FinishTime = Get-Date
-    $global:error | %{
-        if($_.CategoryInfo -ne $null -and $_.CategoryInfo.Category -eq "OperationStopped"){
+    $global:error | ForEach-Object {
+        if ($_.CategoryInfo -ne $null -and $_.CategoryInfo.Category -eq "OperationStopped") {
             Log-BoxstarterMessage $_
         }
         else {
@@ -462,60 +462,60 @@ function Finish-Record($obj) {
     Write-BoxstarterMessage "object written..." -Verbose
 }
 
-function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots, $CredSSPStatus, $delegateSources){
+function Install-BoxstarterPackageOnComputer ($ComputerName, $sessionArgs, $PackageName, $DisableReboots, $CredSSPStatus, $delegateSources) {
     $record = Start-Record $ComputerName
     try {
-        if(!(Enable-RemotingOnRemote $sessionArgs $ComputerName)){
+        if (!(Enable-RemotingOnRemote $sessionArgs $ComputerName)) {
             Write-Error "Unable to access remote computer via PowerShell Remoting or WMI. You can enable it by running: Enable-PSRemoting -Force from an Administrator PowerShell console on the remote computer."
-            $record.Completed=$false
+            $record.Completed = $false
             return
         }
 
-        if($CredSSPStatus.Success){
+        if ($CredSSPStatus.Success) {
             $enableCredSSP = Should-EnableCredSSP $sessionArgs $computerName
         }
 
         Write-BoxstarterMessage "Creating a new session with $computerName..." -Verbose
         $session = New-PSSession @sessionArgs -Name Boxstarter
 
-        if(-not (Install-BoxstarterPackageForSession $session $PackageName $DisableReboots $sessionArgs $enableCredSSP $delegateSources)){
-            $record.Completed=$false
+        if (-not (Install-BoxstarterPackageForSession $session $PackageName $DisableReboots $sessionArgs $enableCredSSP $delegateSources)) {
+            $record.Completed = $false
         }
     }
     catch {
-        $record.Completed=$false
+        $record.Completed = $false
         Write-Error $_
     }
-    finally{
+    finally {
         Finish-Record $record
     }
 }
 
 function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReboots, $sessionArgs, $enableCredSSP, $delegateSources) {
-    try{
-        if($session.Availability -ne "Available"){
+    try {
+        if ($session.Availability -ne "Available") {
             Write-Error (New-Object -TypeName ArgumentException -ArgumentList "The Session is not Available")
             return $false
         }
 
-        for($count = 1; $count -le 5; $count++) {
+        for ($count = 1; $count -le 5; $count++) {
             try {
                 Write-BoxstarterMessage "Attempt #$count to copy Boxstarter modules to $($session.ComputerName)" -Verbose
                 Setup-BoxstarterModuleAndLocalRepo $session $delegateSources
                 break
             }
             catch {
-                if($global:Error.Count -gt 0){$global:Error.RemoveAt(0)}
-                if($count -eq 5) { throw $_ }
+                if ($global:Error.Count -gt 0) { $global:Error.RemoveAt(0) }
+                if ($count -eq 5) { throw $_ }
             }
         }
 
-        if($enableCredSSP){
+        if ($enableCredSSP) {
             $credSSPSession = Enable-RemoteCredSSP $sessionArgs
-            if($session -ne $null -and $credSSPSession -ne $null){
+            if ($session -ne $null -and $credSSPSession -ne $null) {
                 Write-BoxstarterMessage "CredSSP session succeeded. Replacing sessions..."
                 Remove-PSSession $session -ErrorAction SilentlyContinue
-                $session=$credSSPSession
+                $session = $credSSPSession
             }
         }
 
@@ -524,17 +524,17 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
     }
     finally {
         Write-BoxstarterMessage "checking if session should be removed..." -Verbose
-        if($session -ne $null -and $session.Name -eq "Boxstarter") {
+        if ($session -ne $null -and $session.Name -eq "Boxstarter") {
             Write-BoxstarterMessage "Removing session $($session.id)..." -Verbose
             Remove-PSSession $Session
             Write-BoxstarterMessage "Session removed..." -Verbose
             $Session = $null
         }
 
-        if($sessionArgs.Authentication){
+        if ($sessionArgs.Authentication) {
             $sessionArgs.Remove("Authentication")
         }
-        if($enableCredSSP){
+        if ($enableCredSSP) {
             Disable-RemoteCredSSP $sessionArgs
         }
     }
@@ -558,16 +558,16 @@ function Invoke-Locally {
 
         [switch]$StopOnPackageFailure
     )
-    if($PSBoundParameters.ContainsKey("Credential")){
-        if($Credential -ne $null) {
-            $PSBoundParameters.Add("Password",$PSBoundParameters["Credential"].Password)
+    if ($PSBoundParameters.ContainsKey("Credential")) {
+        if ($Credential -ne $null) {
+            $PSBoundParameters.Add("Password", $PSBoundParameters["Credential"].Password)
         }
         $PSBoundParameters.Remove("Credential") | Out-Null
     }
     else {
-        $PSBoundParameters.Add("NoPassword",$True)
+        $PSBoundParameters.Add("NoPassword", $True)
     }
-    if($PSBoundParameters.ContainsKey("Force")){
+    if ($PSBoundParameters.ContainsKey("Force")) {
         $PSBoundParameters.Remove("Force") | Out-Null
     }
     $PSBoundParameters.Add("BootstrapPackage", $PSBoundParameters.PackageName)
@@ -578,37 +578,38 @@ function Invoke-Locally {
         Invoke-ChocolateyBoxstarter @PSBoundParameters
     }
     catch {
-        $record.Completed=$false
+        $record.Completed = $false
         throw
     }
-    finally{
+    finally {
         Finish-Record $record
     }
 }
 
-function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
+function Enable-RemotingOnRemote ($sessionArgs, $ComputerName) {
     Write-BoxstarterMessage "Testing remoting access on $ComputerName..."
     try {
+        # TODO: use something different than Get-WmiObject here!
         $remotingTest = Invoke-Command @sessionArgs { Get-WmiObject Win32_ComputerSystem } -ErrorAction Stop
     }
     catch {
         Write-BoxstarterMessage $_.ToString() -Verbose
-        $sessionArgs.Keys | % {
+        $sessionArgs.Keys | ForEach-Object {
             Write-BoxstarterMessage "session arg key: $_ has value $($sessionArgs[$_])" -Verbose
         }
         Write-BoxstarterMessage "using credential username $($sessionArgs.Credential.UserName)" -Verbose
         $global:error.RemoveAt(0)
     }
-    if($remotingTest -eq $null){
+    if ($remotingTest -eq $null) {
         Write-BoxstarterMessage "PowerShell Remoting is not enabled or accessible on $ComputerName" -Verbose
-        if(Test-Admin) {
-            $wmiTest=Invoke-WmiMethod -ComputerName $ComputerName -Credential $sessionArgs.Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
+        if (Test-Admin) {
+            $wmiTest = Invoke-WmiMethod -ComputerName $ComputerName -Credential $sessionArgs.Credential Win32_Process Create -Args "cmd.exe" -ErrorAction SilentlyContinue
         }
-        if($wmiTest -eq $null){
-            if($global:Error.Count -gt 0){ $global:Error.RemoveAt(0) }
+        if ($wmiTest -eq $null) {
+            if ($global:Error.Count -gt 0) { $global:Error.RemoveAt(0) }
             return $false
         }
-        if($Force -or (Confirm-Choice "PowerShell Remoting is not enabled on Remote computer. Should Boxstarter enable PowerShell remoting? This will also change the Network Location type on the remote machine to PRIVATE if it is currently PUBLIC.")){
+        if ($Force -or (Confirm-Choice "PowerShell Remoting is not enabled on Remote computer. Should Boxstarter enable PowerShell remoting? This will also change the Network Location type on the remote machine to PRIVATE if it is currently PUBLIC.")) {
             Write-BoxstarterMessage "Enabling PowerShell Remoting on $ComputerName"
             Enable-RemotePSRemoting $ComputerName $sessionArgs.Credential
         }
@@ -623,109 +624,123 @@ function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
     return $True
 }
 
-function Setup-BoxstarterModuleAndLocalRepo($session, $delegateSources){
-    if($LocalRepo){$Boxstarter.LocalRepo=$LocalRepo}
+function Expand-ZipFile($ZipFilePath, $DestinationFolder) {
+    if ($PSVersionTable.PSVersion.Major -ge 4) {
+        try {
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            $archive = [System.IO.Compression.ZipFile]::OpenRead($ZipFilePath)
+
+            foreach ($entry in $archive.Entries) {
+                $entryTargetFilePath = [System.IO.Path]::Combine($DestinationFolder, $entry.FullName)
+                $entryDir = [System.IO.Path]::GetDirectoryName($entryTargetFilePath)
+
+                if (!(Test-Path $entryDir)) {
+                    New-Item -ItemType Directory -Path $entryDir -Force | Out-Null
+                }
+
+                if (!$entryTargetFilePath.EndsWith("/")) {
+                    [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $entryTargetFilePath, $true);
+                }
+            }
+        }
+        catch {
+            throw $_
+        }
+    }
+    else {
+        #original method
+        $shellApplication = new-object -com shell.application
+        $zipPackage = $shellApplication.NameSpace($ZipFilePath)
+        $DestinationF = $shellApplication.NameSpace($DestinationFolder)
+        $DestinationF.CopyHere($zipPackage.Items(), 0x10)
+    }
+}
+
+function Setup-BoxstarterModuleAndLocalRepo($Session, $delegateSources) {
+    if ($LocalRepo) { $Boxstarter.LocalRepo = $LocalRepo }
+
     Write-BoxstarterMessage "Copying Boxstarter Modules and LocalRepo packages at $($Boxstarter.BaseDir) to $env:temp on $($Session.ComputerName)..."
-    Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | Out-Null }
-    Send-File "$($Boxstarter.BaseDir)\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
-    Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % {
+    Invoke-Command -Session $Session { mkdir $env:temp\Boxstarter\BuildPackages -Force | Out-Null }
+    Send-File "$($Boxstarter.BaseDir)\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\Boxstarter.zip" $Session
+    Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | ForEach-Object {
         Write-BoxstarterMessage "Copying $($_.Name) to $($Session.ComputerName)" -Verbose
-        Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $session
+        Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $Session
     }
     Write-BoxstarterMessage "Expanding modules on $($Session.ComputerName)" -Verbose
     Invoke-Command -Session $Session {
         Set-ExecutionPolicy Bypass -Force
-        if ($PSVersionTable.PSVersion.Major -ge 4) {
-            try
-            {
-                Add-Type -AssemblyName System.IO.Compression.FileSystem
-                $archive = [System.IO.Compression.ZipFile]::OpenRead("$env:temp\Boxstarter\Boxstarter.zip")
-
-                foreach ($entry in $archive.Entries)
-                {
-                    $entryTargetFilePath = [System.IO.Path]::Combine("$env:temp\boxstarter", $entry.FullName)
-                    $entryDir = [System.IO.Path]::GetDirectoryName($entryTargetFilePath)
-
-                    if(!(Test-Path $entryDir))
-                    {
-                        New-Item -ItemType Directory -Path $entryDir -Force | Out-Null
-                    }
-
-                    if(!$entryTargetFilePath.EndsWith("/"))
-                    {
-                        [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $entryTargetFilePath, $true);
-                    }
-                }
-            }
-            catch
-            {
-                throw $_
-            }
+        Expand-ZipFile -ZipFilePath "$env:temp\Boxstarter\Boxstarter.zip" -DestinationFolder $env:temp\Boxstarter
+        
+        [xml]$configXml = Get-Content (Join-Path $env:temp\Boxstarter Boxstarter.config)
+        if ($configXml.config.LocalRepo -ne $null) {
+            $configXml.config.RemoveChild(($configXml.config.ChildNodes | ? { $_.Name -eq "LocalRepo" }))
+            $configXml.Save((Join-Path $env:temp\Boxstarter Boxstarter.config))
         }
-        else {
-            #original method
-            $shellApplication = new-object -com shell.application
-            $zipPackage = $shellApplication.NameSpace("$env:temp\Boxstarter\Boxstarter.zip")
-            $destinationFolder = $shellApplication.NameSpace("$env:temp\boxstarter")
-            $destinationFolder.CopyHere($zipPackage.Items(),0x10)
-        }
-
-        [xml]$configXml = Get-Content (Join-Path $env:temp\Boxstarter BoxStarter.config)
-        if($configXml.config.LocalRepo -ne $null) {
-            $configXml.config.RemoveChild(($configXml.config.ChildNodes | ? { $_.Name -eq "LocalRepo"}))
-            $configXml.Save((Join-Path $env:temp\Boxstarter BoxStarter.config))
-		}
     }
     if ($delegateSources) {
         Write-BoxstarterMessage "Delegating Boxstarter NugetSources to remote host..."
-        $localCfg = (Join-Path $($Boxstarter.BaseDir) BoxStarter.config)
+        $localCfg = (Join-Path $($Boxstarter.BaseDir) Boxstarter.config)
         [xml]$configXml = Get-Content $localCfg
         [string]$theSources = $($configXml.config.NugetSources)
         Write-BoxstarterMessage "$localCfg - NugetSources: '$theSources'" -Verbose
         Invoke-Command -Session $Session {
             param([string]$theSources)
             Set-ExecutionPolicy Bypass -Force
-            $cfgPath = (Join-Path $env:temp\Boxstarter BoxStarter.config)
+            $cfgPath = (Join-Path $env:temp\Boxstarter Boxstarter.config)
             [xml]$configXml = Get-Content $cfgPath
             $configXml.config.NugetSources = $theSources
             $configXml.Save($cfgPath)
         } -ArgumentList $theSources
     }
+    # ensure Chocolatey is present on remote host ...
+    Invoke-Command -Session $Session {
+        Set-ExecutionPolicy Bypass -Force
+        if (Test-Path $env:ChocolateyInstall) {
+            Write-BoxstarterMessage "$env:ChocolateyInstall is already present on remote host!"
+            return
+        }
+        Write-BoxstarterMessage "installing Chocolatey on remote host..."
+        $chocoNupkg = Get-Item $env:temp\Boxstarter\Boxstarter.Chocolatey\chocolatey\*.nupkg | Select-Object -First 1
+        Expand-ZipFile -ZipFilePath $chocoNupkg.FullName -DestinationFolder $env:temp\boxstarter_chocolatey
+        Import-Module $env:temp\boxstarter_chocolatey\tools\chocolateysetup.psm1 -DisableNameChecking
+        Initialize-Chocolatey
+    }
+    
 }
 
-function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $session) {
+function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $Session) {
     Write-BoxstarterMessage "Running remote install..."
-    $remoteResult = Invoke-Command -session $session {
-        param($SuppressLogging,$pkg,$Credential,$DisableReboots, $verbosity, $ProgressArgs, $debug)
-        $global:VerbosePreference=$verbosity
-        $global:DebugPreference=$debug
+    $remoteResult = Invoke-Command -session $Session {
+        param($SuppressLogging, $pkg, $Credential, $DisableReboots, $verbosity, $ProgressArgs, $debug)
+        $global:VerbosePreference = $verbosity
+        $global:DebugPreference = $debug
         Import-Module $env:temp\Boxstarter\Boxstarter.Common\Boxstarter.Common.psd1 -DisableNameChecking
-        if($Credential -eq $null){
+        if ($Credential -eq $null) {
             $currentUser = Get-CurrentUser
-            $credential = (New-Object Management.Automation.PsCredential ("$($currentUser.Domain)\$($currentUser.Name)", (New-Object System.Security.SecureString)))
+            $Credential = (New-Object Management.Automation.PsCredential ("$($currentUser.Domain)\$($currentUser.Name)", (New-Object System.Security.SecureString)))
         }
         Create-BoxstarterTask $Credential
         Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
-        $Boxstarter.SuppressLogging=$SuppressLogging
-        $global:Boxstarter.ProgressArgs=$ProgressArgs
-        $result=$null
+        $Boxstarter.SuppressLogging = $SuppressLogging
+        $global:Boxstarter.ProgressArgs = $ProgressArgs
+        $result = $null
         try {
-            $resultToReturn = @{}
+            $resultToReturn = @{ }
             $result = Invoke-ChocolateyBoxstarter $pkg -Password $Credential.password -DisableReboots:$DisableReboots
-            if($Boxstarter.IsRebooting){
-                $resultToReturn.Result="Rebooting"
+            if ($Boxstarter.IsRebooting) {
+                $resultToReturn.Result = "Rebooting"
             }
-            elseif($result=$true){
-                $resultToReturn.Result="Completed"
+            elseif ($result = $true) {
+                $resultToReturn.Result = "Completed"
             }
             $resultToReturn.Errors = $Global:Error
             return $resultToReturn
         }
-        catch{
+        catch {
             throw $_
         }
     } -ArgumentList $Boxstarter.SuppressLogging, $Package, $Credential, $DisableReboots, $global:VerbosePreference, $global:Boxstarter.ProgressArgs, $global:DebugPreference
-    if($remoteResult.Errors -ne $null) {
+    if ($remoteResult.Errors -ne $null) {
         $global:Error.AddRange($remoteResult.Errors)
     }
     Write-BoxstarterMessage "Result from Remote Boxstarter: $($remoteResult.Result)" -Verbose
@@ -733,7 +748,7 @@ function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $sessio
 }
 
 function Test-RebootingOrDisconnected($RemoteResult) {
-    if($remoteResult -eq $null -or $remoteResult.Result -eq $null -or $remoteResult.Result -eq "Rebooting") {
+    if ($RemoteResult -eq $null -or $RemoteResult.Result -eq $null -or $RemoteResult.Result -eq "Rebooting") {
         return $true
     }
     else {
@@ -741,19 +756,19 @@ function Test-RebootingOrDisconnected($RemoteResult) {
     }
 }
 
-function Wait-ForSessionToClose($session) {
-    Write-BoxstarterMessage "Waiting for $($session.ComputerName) to sever remote session..."
-    $timeout=0
-    while($session.State -eq "Opened" -and $timeout -lt 120){
+function Wait-ForSessionToClose($Session) {
+    Write-BoxstarterMessage "Waiting for $($Session.ComputerName) to sever remote session..."
+    $timeout = 0
+    while ($Session.State -eq "Opened" -and $timeout -lt 120) {
         $timeout += 2
         start-sleep -seconds 2
     }
 }
 
 function Test-ShutDownInProgress($Session) {
-    $response=Invoke-Command -Session $Session {
+    $response = Invoke-Command -Session $Session {
         try {
-        $systemMetrics = Add-Type -TypeDefinition @"
+            $systemMetrics = Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
 public static class SystemMetrics
@@ -770,13 +785,14 @@ public static class SystemMetrics
 
 }
 "@ -PassThru
-        } catch {}
-        if ($systemMetrics){
+        }
+        catch { }
+        if ($systemMetrics) {
             return $systemMetrics::IsShuttingdown()
         }
     }
 
-    if($response -eq $false) {
+    if ($response -eq $false) {
         Write-BoxstarterMessage "System Shutdown not in progress" -Verbose
     }
     else {
@@ -786,92 +802,94 @@ public static class SystemMetrics
     return $response
 }
 
-function Test-Reconnection($Session, $sessionPID) {
+function Test-Reconnection($Session, $SessionPID) {
     $reconnected = $false
 
     #If there is a pending reboot then session is in the middle of a restart
-    try{
-        $response=Invoke-Command -Session $session {
+    try {
+        $response = Invoke-Command -Session $Session {
             Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
             return Test-PendingReboot
         } -ErrorAction Stop
-    } catch {
+    }
+    catch {
         Write-BoxstarterMessage "Failed to test pending reboot : $($global:Error[0])" -Verbose
         $global:Error.RemoveAt(0)
     }
     Write-BoxstarterMessage "Reboot check returned $response" -Verbose
 
 
-    if($response -ne $null -and $response -eq $false){
+    if ($response -ne $null -and $response -eq $false) {
         #Check for a system shutdown in progress
-        $response = Test-ShutDownInProgress $session
+        $response = Test-ShutDownInProgress $Session
 
-        if($response -eq $false) {
+        if ($response -eq $false) {
             $reconnected = $true #Session is connectible
-            try{
+            try {
                 #In case previous session's task is still alive kill it so it does not lock anything
-                Write-BoxstarterMessage "Killing $sessionPID" -Verbose
-                Invoke-Command -Session $session {
+                Write-BoxstarterMessage "Killing $SessionPID" -Verbose
+                Invoke-Command -Session $Session {
                     param($p)
-                    if(Get-Process -Id $p -ErrorAction SilentlyContinue){
+                    if (Get-Process -Id $p -ErrorAction SilentlyContinue) {
                         KILL $p -ErrorAction Stop -Force
                     }
                     else {
                         $global:Error.RemoveAt(0)
                     }
-                } -ArgumentList $sessionPID
-            } catch{
-                Write-BoxstarterMessage "Failed to kill $sessionPID : $($global:Error[0])" -Verbose
+                } -ArgumentList $SessionPID
+            }
+            catch {
+                Write-BoxstarterMessage "Failed to kill $SessionPID : $($global:Error[0])" -Verbose
                 $global:Error.RemoveAt(0)
             }
         }
     }
     #if the session is pending a reboot but not in the middle of a system shutdown,
     #try to invoke a reboot to prevent us from hanging while waiting
-    elseif($response -eq $true -and !(Test-ShutDownInProgress $session)){
-        Write-BoxstarterMessage "Attempting to restart $($session.ComputerName)" -Verbose
-        Invoke-Command -Session $session {
+    elseif ($response -eq $true -and !(Test-ShutDownInProgress $Session)) {
+        Write-BoxstarterMessage "Attempting to restart $($Session.ComputerName)" -Verbose
+        Invoke-Command -Session $Session {
             Import-Module $env:temp\Boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
-            $Boxstarter.RebootOK=$true
-            if(Test-PendingReboot){restart-Computer -Force }
+            $Boxstarter.RebootOK = $true
+            if (Test-PendingReboot) { restart-Computer -Force }
         } -ErrorAction SilentlyContinue
     }
 
     return $reconnected
 }
 
-function Invoke-Remotely([ref]$session,$Package,$DisableReboots,$sessionArgs){
+function Invoke-Remotely([ref]$session, $Package, $DisableReboots, $sessionArgs) {
     Write-BoxstarterMessage "Invoking remote install" -verbose
-    while($session.value.Availability -eq "Available") {
+    while ($session.value.Availability -eq "Available") {
         $sessionPID = try { Invoke-Command -Session $session.value { return $PID } } catch { $global:Error.RemoveAt(0) }
         Write-BoxstarterMessage "Session's process ID is $sessionPID" -verbose
-        if($sessionPID -ne $null) {
+        if ($sessionPID -ne $null) {
             $remoteResult = Invoke-RemoteBoxstarter $Package $sessionArgs.Credential $DisableReboots $session.value
         }
 
-        if(Test-RebootingOrDisconnected $remoteResult) {
+        if (Test-RebootingOrDisconnected $remoteResult) {
             Wait-ForSessionToClose $session.value
 
-            $reconnected=$false
+            $reconnected = $false
             Write-BoxstarterMessage "Waiting for $($session.value.ComputerName) to respond to remoting..."
-            Do{
-                if($session.value -ne $null){
+            Do {
+                if ($session.value -ne $null) {
                     Write-BoxstarterMessage "removing session..." -verbose
                     try { Remove-PSSession $session.value } catch { $global:Error.RemoveAt(0) }
                     $session.value = $null
                     Write-BoxstarterMessage "session removed..." -verbose
                 }
-                $response=$null
-                start-sleep -seconds 2
+                $response = $null
+                Start-Sleep -seconds 2
                 Write-BoxstarterMessage "attempting to recreate session..." -verbose
                 $session.value = New-PSSession @sessionArgs -Name Boxstarter -ErrorAction SilentlyContinue
-                if($session.value -eq $null) {
+                if ($session.value -eq $null) {
                     Write-BoxstarterMessage "New session is null..." -verbose
                     $global:Error.RemoveAt(0)
                 }
-                elseif($session.value -ne $null -and $Session.value.Availability -eq "Available"){
+                elseif ($session.value -ne $null -and $session.value.Availability -eq "Available") {
                     Write-BoxstarterMessage "testing new session..." -verbose
-                    if($remoteResult.Result -eq "Rebooting"){$sessionPID=-1}
+                    if ($remoteResult.Result -eq "Rebooting") { $sessionPID = -1 }
                     $reconnected = Test-Reconnection $session.value $sessionPID
                 }
                 else {
@@ -887,30 +905,30 @@ function Invoke-Remotely([ref]$session,$Package,$DisableReboots,$sessionArgs){
 }
 
 function Set-SessionArgs($session, $sessionArgs) {
-    $uri = try { Invoke-Command $session {return $PSSenderInfo.ConnectionString} -ErrorAction SilentlyContinue } catch{}
-    if($uri){
-        $sessionArgs.ConnectionURI=$uri
+    $uri = try { Invoke-Command $session { return $PSSenderInfo.ConnectionString } -ErrorAction SilentlyContinue } catch { }
+    if ($uri) {
+        $sessionArgs.ConnectionURI = $uri
     }
-    else{
-        $sessionArgs.ComputerName=$session.ComputerName
+    else {
+        $sessionArgs.ComputerName = $session.ComputerName
     }
 }
 
 function Should-EnableCredSSP($sessionArgs, $computerName) {
     Write-BoxstarterMessage "Testing remote CredSSP..." -Verbose
-    if($sessionArgs.Credential){
-        $uriArgs=@{}
-        if($sessionArgs.ConnectionURI){
+    if ($sessionArgs.Credential) {
+        $uriArgs = @{ }
+        if ($sessionArgs.ConnectionURI) {
             $uri = [URI]$sessionArgs.ConnectionURI
-            $uriArgs = @{Port=$uri.port;UseSSL=($uri.scheme -eq "https")}
+            $uriArgs = @{Port = $uri.port; UseSSL = ($uri.scheme -eq "https") }
         }
         try {
             $credsspEnabled = Test-WsMan -ComputerName $ComputerName @uriArgs -Credential $SessionArgs.Credential -Authentication CredSSP -ErrorAction SilentlyContinue
         }
         catch {
             Write-BoxstarterMessage "Exception from testing WSMan for CredSSP access" -Verbose
-            try { $xml=[xml]$_ } catch { $global:Error.RemoveAt(0) }
-            if($xml -ne $null) {
+            try { $xml = [xml]$_ } catch { $global:Error.RemoveAt(0) }
+            if ($xml -ne $null) {
                 Write-BoxstarterMessage "WSMan Fault Found" -Verbose
                 Write-BoxstarterMessage "$($xml.OuterXml)" -Verbose
             }
@@ -918,19 +936,19 @@ function Should-EnableCredSSP($sessionArgs, $computerName) {
                 Write-BoxstarterMessage $_ -Verbose
             }
         }
-        if($credsspEnabled -eq $null){
+        if ($credsspEnabled -eq $null) {
             Write-BoxstarterMessage "Need to enable CredSSP on server" -Verbose
-            if($global:Error.Count -gt 0){ $global:Error.RemoveAt(0) }
+            if ($global:Error.Count -gt 0) { $global:Error.RemoveAt(0) }
             return $True
         }
-        else{
+        else {
             Write-BoxstarterMessage "CredSSP test response:" -Verbose
-            [System.Xml.XmlElement]$xml=$credsspEnabled
-            if($xml -ne $null) {
+            [System.Xml.XmlElement]$xml = $credsspEnabled
+            if ($xml -ne $null) {
                 Write-BoxstarterMessage "WSMan XML Found..." -Verbose
                 Write-BoxstarterMessage "$($xml.OuterXml)" -Verbose
             }
-            $sessionArgs.Authentication="CredSSP"
+            $sessionArgs.Authentication = "CredSSP"
         }
     }
     Write-BoxstarterMessage "Do not need to enable CredSSP on server" -Verbose
@@ -939,8 +957,8 @@ function Should-EnableCredSSP($sessionArgs, $computerName) {
 
 function Enable-RemoteCredSSP($sessionArgs) {
     Write-BoxstarterMessage "Creating a scheduled task to enable CredSSP Authentication on $ComputerName..."
-    $n=Invoke-RetriableScript {
-        $splat=$args[0]
+    $n = Invoke-RetriableScript {
+        $splat = $args[0]
         Invoke-Command @splat {
             param($Credential, $verbosity)
             $VerbosePreference = $verbosity
@@ -950,25 +968,25 @@ function Enable-RemoteCredSSP($sessionArgs) {
             Remove-BoxstarterTask
         } -ArgumentList @($args[0].Credential, $VerbosePreference)
     } $sessionArgs
-    $sessionArgs.Authentication="CredSSP"
+    $sessionArgs.Authentication = "CredSSP"
     Write-BoxstarterMessage "Creating New session with CredSSP Authentication..." -Verbose
     try {
         $session = Invoke-RetriableScript {
-            $splat=$args[0]
+            $splat = $args[0]
             $s = New-PSSession @splat -Name Boxstarter -ErrorAction Stop
             return $s
         } $sessionArgs
     }
     catch {
         $sessionArgs.Remove("Authentication")
-        $session=$null
+        $session = $null
         Write-BoxstarterMessage "Unable to create CredSSP session. Error was: $($_.ToString())" -Verbose
         $global:error.RemoveAt(0)
     }
     return $session
 }
 
-function Disable-RemoteCredSSP ($sessionArgs){
+function Disable-RemoteCredSSP ($sessionArgs) {
     Write-BoxstarterMessage "Disabling CredSSP Authentication on $ComputerName" -Verbose
     Invoke-Command @sessionArgs {
         param($Credential, $verbosity)
@@ -984,34 +1002,34 @@ function Disable-RemoteCredSSP ($sessionArgs){
 
 function Rollback-ClientRemoting($ClientRemotingStatus, $CredSSPStatus) {
     Write-BoxstarterMessage "Rolling back remoting settings changed by Boxstarter..."
-    if($ClientRemotingStatus.PreviousTrustedHosts -ne $null){
-        $currentHosts=Get-Item "wsman:\localhost\client\trustedhosts"
-        if($currentHosts.Value -ne $ClientRemotingStatus.PreviousTrustedHosts) {
+    if ($ClientRemotingStatus.PreviousTrustedHosts -ne $null) {
+        $currentHosts = Get-Item "wsman:\localhost\client\trustedhosts"
+        if ($currentHosts.Value -ne $ClientRemotingStatus.PreviousTrustedHosts) {
             Write-BoxstarterMessage "Reseting wsman Trusted Hosts to $($ClientRemotingStatus.PreviousTrustedHosts)" -Verbose
             Set-Item "wsman:\localhost\client\trustedhosts" -Value "$($ClientRemotingStatus.PreviousTrustedHosts)" -Force
         }
     }
-    if($CredSSPStatus -ne $null -and $CredSSPStatus.Success){
-        try {Disable-WSManCredSSP -Role Client -ErrorAction SilentlyContinue } catch{ Write-BoxstarterMessage "Unable to disable CredSSP locally" }
-        if($CredSSPStatus.PreviousCSSPTrustedHosts -ne $null){
-            try{
+    if ($CredSSPStatus -ne $null -and $CredSSPStatus.Success) {
+        try { Disable-WSManCredSSP -Role Client -ErrorAction SilentlyContinue } catch { Write-BoxstarterMessage "Unable to disable CredSSP locally" }
+        if ($CredSSPStatus.PreviousCSSPTrustedHosts -ne $null) {
+            try {
                 Write-BoxstarterMessage "Reseting CredSSP Trusted Hosts to $($CredSSPStatus.PreviousCSSPTrustedHosts.Replace('wsman/',''))" -Verbose
-                Enable-WSManCredSSP -DelegateComputer ($CredSSPStatus.PreviousCSSPTrustedHosts.Replace("wsman/","").split(",") | Get-Unique) -Role Client -force | Out-Null
+                Enable-WSManCredSSP -DelegateComputer ($CredSSPStatus.PreviousCSSPTrustedHosts.Replace("wsman/", "").split(",") | Get-Unique) -Role Client -force | Out-Null
             }
-            catch{}
+            catch { }
         }
         Write-BoxstarterMessage "Reseting GroupPolicy for Credentials Delegation" -Verbose
-        if(Test-Path "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly") {
-            (Get-Item "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly").Property | % {
-                if([int]$_ -gt $CredSSPStatus["PreviousFreshNTLMCredDelegationHostCount"]) {
+        if (Test-Path "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly") {
+            (Get-Item "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly").Property | ForEach-Object {
+                if ([int]$_ -gt $CredSSPStatus["PreviousFreshNTLMCredDelegationHostCount"]) {
                     Remove-ItemProperty "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly" -Name $_
                 }
             }
         }
 
-        if(Test-Path "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentials") {
-            (Get-Item "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentials").Property | % {
-                if([int]$_ -gt $CredSSPStatus["PreviousFreshCredDelegationHostCount"]) {
+        if (Test-Path "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentials") {
+            (Get-Item "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentials").Property | ForEach-Object {
+                if ([int]$_ -gt $CredSSPStatus["PreviousFreshCredDelegationHostCount"]) {
                     Remove-ItemProperty "$(Get-CredentialDelegationKey)\CredentialsDelegation\AllowFreshCredentials" -Name $_
                 }
             }

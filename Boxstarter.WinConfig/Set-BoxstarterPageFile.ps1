@@ -68,6 +68,7 @@ Function Set-BoxstarterPageFile {
         # that it would throw an exception but actually make the change. The
         # EnableAllPrivileges switch for Get-WmiObject seems to stop this
         # exception being thrown.
+        # TODO: use cim/wmi compatibility wrapper here ? (NOTE: -EnableAllPrivileges)
         $pfStatus = Get-WmiObject -Class Win32_ComputerSystem -EnableAllPrivileges -ErrorAction Stop
         if ($pfStatus.AutomaticManagedPagefile -eq $true) {
             # disable automatic management of the pagefile
@@ -78,10 +79,12 @@ Function Set-BoxstarterPageFile {
 
             # when we disable the AutomaticManagedPagefile it starts to use the
             # $env:SystemDrive for the page file so lets remove that
+            # TODO: use cim/wmi compatibility wrapper here!
             Get-WmiObject -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($env:SystemDrive)'" -ErrorAction Stop | Remove-WmiObject -ErrorAction Stop
         }
 
         # if the pagefile exists on $DriveLetter then remove it
+        # TODO: use cim/wmi compatibility wrapper here ? (NOTE: -EnableAllPrivileges)
         Get-WmiObject -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($DriveLetter):'" -EnableAllPrivileges -ErrorAction Stop | Remove-WmiObject -ErrorAction Stop
 
         # create a new instance of a the Wwin32_PageFileSetting object
@@ -107,6 +110,7 @@ Function Set-BoxstarterPageFile {
 
     ForEach ($dl in $DriveLetter) {
         # adding DriveType to the WMI Filter doesn't appear to work :(
+        # TODO: use cim/wmi compatibility wrapper here!
         $vol = Get-WmiObject -Class CIM_StorageVolume -Filter "Name='$($dl):\\'" -ErrorAction Stop | Where-Object { $_.DriveType -eq 3 }
         if ($null -eq $vol) {
             Write-BoxstarterMessage "Could not find volume '$($dl):'. Either it does not exist or it is not a fixed local volume." -color red
@@ -116,6 +120,7 @@ Function Set-BoxstarterPageFile {
         Switch ($PsCmdlet.ParameterSetName) {
             Disable {
                 try {
+                    # TODO: use cim/wmi compatibility wrapper here!
                     Get-WmiObject -Class Win32_PageFileSetting -Filter "Name='$($dl):\\pagefile.sys'" -ErrorAction Stop | Remove-WmiObject -ErrorAction Stop
                 }
                 catch {
@@ -157,6 +162,7 @@ Function Set-BoxstarterPageFile {
     } #foreach
 
     Write-BoxstarterMessage "A reboot is required before the pagefile changes will take effect."
+    # TODO: use cim/wmi compatibility wrapper here!
     Get-WmiObject -Class Win32_PageFileSetting -ErrorAction Stop |Select-Object Name,
         @{Name = "InitialSize(MB)"; Expression={ if ($_.InitialSizeMB -eq 0) { "System Managed" } else { $_.InitialSizeMB }}},
         @{Name = "MaximumSize(MB)"; Expression={ if ($_.MaximumSizeMB -eq 0) { "System Managed" } else { $_.MaximumSizeMB }}} |

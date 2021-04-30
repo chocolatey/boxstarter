@@ -6,11 +6,11 @@ Describe "Get-BoxstarterConfig" {
     $currentBase = $Boxstarter.BaseDir
     $currentNugetSources = $Boxstarter.NugetSources
     $currentLocalRepo = $Boxstarter.LocalRepo
-    [xml]$configXml = Get-Content (Join-Path $Boxstarter.BaseDir BoxStarter.config)
+    [xml]$configXml = Get-Content (Join-Path $Boxstarter.BaseDir Boxstarter.config)
     $Boxstarter.BaseDir = $testRoot
 
     Context "When No LocalRepo is explicitly configured" {
-        Copy-Item "$currentBase\Boxstarter.Config" $testRoot
+        Copy-Item "$currentBase\Boxstarter.config" $testRoot
 
         $result = Get-BoxstarterConfig
 
@@ -20,7 +20,7 @@ Describe "Get-BoxstarterConfig" {
     }
 
     Context "When NugetSorces have not been changed" {
-        Copy-Item "$currentBase\Boxstarter.Config" $testRoot
+        Copy-Item "$currentBase\Boxstarter.config" $testRoot
 
         $result = Get-BoxstarterConfig
 
@@ -30,7 +30,7 @@ Describe "Get-BoxstarterConfig" {
     }
 
     Context "When Setting NugetSorces to a new value" {
-        Copy-Item "$currentBase\Boxstarter.Config" $testRoot
+        Copy-Item "$currentBase\Boxstarter.config" $testRoot
         $expected = "Some NuGet Source"
 
         Set-BoxstarterConfig -NugetSources $expected
@@ -44,7 +44,7 @@ Describe "Get-BoxstarterConfig" {
     }
 
     Context "When Setting LocalRepo to a new value" {
-        Copy-Item "$currentBase\Boxstarter.Config" $testRoot
+        Copy-Item "$currentBase\Boxstarter.config" $testRoot
         $expected = "$testRoot\CrazyRepo"
 
         Set-BoxstarterConfig -LocalRepo $expected
@@ -58,7 +58,7 @@ Describe "Get-BoxstarterConfig" {
     }
 
     Context "When Setting LocalRepo to a relative path" {
-        Copy-Item "$currentBase\Boxstarter.Config" $testRoot
+        Copy-Item "$currentBase\Boxstarter.config" $testRoot
         $expected = "$testRoot\CrazyRepo"
         Push-Location $testRoot
 

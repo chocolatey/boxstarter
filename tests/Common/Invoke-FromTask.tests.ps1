@@ -79,6 +79,7 @@ Describe "Invoke-FromTask" {
 
     Context "When Invoking Task that is idle longer than idle timeout"{
         try { Invoke-FromTask "Start-Process notepad.exe -Wait" -Credential $mycreds -IdleTimeout 2} catch {$err=$_}
+        # TODO: use cim/wmi compatibility wrapper here!
         $origId=Get-WmiObject -Class Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
         if($origId -ne $null) { $proc = Get-Process $origId -ErrorAction SilentlyContinue }
         start-sleep -seconds 2
@@ -97,6 +98,7 @@ Describe "Invoke-FromTask" {
 
     Context "When Invoking Task that is not idle but lasts longer than total timeout"{
         try { Invoke-FromTask "start-sleep -seconds 30" -Credential $mycreds -TotalTimeout 2} catch {$err=$_}
+        # TODO: use cim/wmi compatibility wrapper here!
         $origId=Get-WmiObject -Class Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%-EncodedCommand%'" | select ProcessId | % { $_.ProcessId }
     if($origId -ne $null) { $proc = Get-Process $origId -ErrorAction SilentlyContinue }
 

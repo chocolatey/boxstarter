@@ -112,8 +112,8 @@
     <Content Include="..\Boxstarter.WinConfig\*.*">
       <Link>Boxstarter.WinConfig\%(Filename)%(Extension)</Link>
     </Content>
-    <Content Include="..\boxstarter.config">
-      <Link>boxstarter.config</Link>
+    <Content Include="..\Boxstarter.config">
+      <Link>Boxstarter.config</Link>
     </Content>
     <Content Include="boxLogo_sm.ico" />
     <None Include="App.config" />

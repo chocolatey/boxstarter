@@ -421,6 +421,12 @@ function Test-WindowsFeatureInstall($passedArgs) {
     (Get-PassedArg -ArgumentName @("source", "s") -OriginalArgs $passedArgs) -eq "WindowsFeatures"
 }
 
+<#
+.SYNOPSIS
+    Calls Chocolatey with a given set of arguments
+.NOTES
+    Chocolatey will either be called directly or via scheduled task (remote environments and Windows Features)
+#>
 function Call-Chocolatey {
     param(
         [string]
@@ -432,7 +438,7 @@ function Call-Chocolatey {
 
     $chocoArgs = @($Command, $PackageNames)
     $chocoArgs += Format-ExeArgs -Command $Command @args
-    $chocoArgsExpanded = $chocoArgs | Foreach-Object { "$($_); " }
+    $chocoArgsExpanded = $chocoArgs | Foreach-Object { "$($_) " }
     Write-BoxstarterMessage "Passing the following args to Chocolatey: @($chocoArgsExpanded)" -Verbose
 
     $currentLogging = $Boxstarter.Suppresslogging
@@ -444,7 +450,7 @@ function Call-Chocolatey {
             Invoke-ChocolateyFromTask $chocoArgs
         }
         else {
-            Invoke-LocalChocolatey $chocoArgs
+            Invoke-LocalChocolatey $chocoArgsExpanded
         }
     }
     finally {
@@ -469,11 +475,14 @@ function Invoke-LocalChocolatey($chocoArgs) {
     }
     Export-BoxstarterVars
 
+    # TODO mw: as we're not using chocolatey.dll anymore we can probably rip out the whole 'Enter-DotNet4' machanism
+    # ... keep it for now, as we might use it for Chocolatey.nupg unzip/install anyway ...
     Enter-DotNet4 {
         if ($env:BoxstarterVerbose -eq 'true') {
             $global:VerbosePreference = "Continue"
         }
 
+        # we'll need to import this very module in order to be able to call Invoke-Chocolatey
         Import-Module "$($args[1].BaseDir)\Boxstarter.chocolatey\Boxstarter.chocolatey.psd1" -DisableNameChecking
         Invoke-Chocolatey $args[0]
     } $chocoArgs, $Boxstarter
@@ -581,6 +590,7 @@ function Wait-ForMSIEXEC {
     Do {
         Get-Process | Where-Object { $_.Name -eq "MSIEXEC" } | Foreach-Object {
             if (!($_.HasExited)) {
+                # TODO use cim/wmi compatibility wrapper here!
                 $proc = Get-WmiObject -Class Win32_Process -Filter "ProcessID=$($_.Id)"
                 if ($null -ne $proc.CommandLine -and $proc.CommandLine.EndsWith(" /V")) { 
                     break 

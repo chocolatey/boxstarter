@@ -71,7 +71,7 @@ Package Sources
 	- Chocolatey.org: The public Chocolatey community feed at https://chocolatey.org/api/v2
 
 	The last remote source can be configured by editing
-	$($Boxstarter.BaseDir)\Boxstarter.Config.
+	$($Boxstarter.BaseDir)\Boxstarter.config.
 
 Running Boxstarter Remotely
 	When using the Computername, ConnectionURI or Session parameters of
