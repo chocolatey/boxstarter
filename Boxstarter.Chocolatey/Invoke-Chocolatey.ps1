@@ -1,4 +1,37 @@
 
+function Expand-ZipFile($ZipFilePath, $DestinationFolder) {
+    if ($PSVersionTable.PSVersion.Major -ge 4) {
+        try {
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            $archive = [System.IO.Compression.ZipFile]::OpenRead($ZipFilePath)
+
+            foreach ($entry in $archive.Entries) {
+                $entryTargetFilePath = [System.IO.Path]::Combine($DestinationFolder, $entry.FullName)
+                $entryDir = [System.IO.Path]::GetDirectoryName($entryTargetFilePath)
+
+                if (!(Test-Path $entryDir)) {
+                    New-Item -ItemType Directory -Path $entryDir -Force | Out-Null
+                }
+
+                if (!$entryTargetFilePath.EndsWith("/")) {
+                    [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $entryTargetFilePath, $true);
+                }
+            }
+        }
+        catch {
+            throw $_
+        }
+    }
+    else {
+        #original method
+        $shellApplication = new-object -com shell.application
+        $zipPackage = $shellApplication.NameSpace($ZipFilePath)
+        $DestinationF = $shellApplication.NameSpace($DestinationFolder)
+        $DestinationF.CopyHere($zipPackage.Items(), 0x10)
+    }
+}
+
+
 function Invoke-Chocolatey($chocoArgs) {
     Write-BoxstarterMessage "Current runtime is $($PSVersionTable.CLRVersion)" -Verbose
 
