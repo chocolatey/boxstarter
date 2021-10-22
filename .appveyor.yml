@@ -17,3 +17,7 @@ branches:
     - master
     - /release/.*/
     - /hotfix/.*/
+
+artifacts:
+  - path: '.\BuildArtifacts\Boxstarter.*.zip'
+  - path: '.\BuildArtifacts\Boxstarter.*.nupkg'
