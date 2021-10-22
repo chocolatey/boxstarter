@@ -23,9 +23,9 @@ properties {
 }
 
 Task default -depends Build
-Task Build -depends Build-Clickonce, Build-Web, Install-ChocoLib, Test, Package
+Task Build -depends Build-Clickonce, Build-Web, Install-ChocoPkg, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
-Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoLib, Create-ModuleZipForRemoting, Pack-NuGet, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
+Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-NuGet, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Chocolatey, Push-Github, Publish-Web
 Task All-Tests -depends Test, Integration-Test
 Task Quick-Deploy -depends Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage
@@ -75,7 +75,7 @@ task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:BOXSTARTER_PUBLISH_PASSWORD }
 }
 
-Task Test -depends Install-ChocoLib, Pack-NuGet, Create-ModuleZipForRemoting {
+Task Test -depends Install-ChocoPkg, Pack-NuGet, Create-ModuleZipForRemoting {
     Push-Location "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     $pesterTestResultsFile = "$baseDir\buildArtifacts\TestResults.xml"
@@ -257,14 +257,19 @@ Task Restore-NuGetPackages {
     exec { .$nugetExe restore "$baseDir\Boxstarter.sln" }
 }
 
-task Install-ChocoLib {
-    exec { .$nugetExe install chocolatey.lib -Version 0.10.5 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
-    exec { .$nugetExe install log4net -Version 2.0.3 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
+task Install-ChocoPkg {
     MkDir $basedir\Boxstarter.Chocolatey\chocolatey -ErrorAction SilentlyContinue
-    Copy-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3\lib\net40-full\* $basedir\Boxstarter.Chocolatey\chocolatey -Exclude *.xml
-    Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.5\lib\* $basedir\Boxstarter.Chocolatey\chocolatey -Exclude *.xml
-    Remove-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3 -Recurse -Force
-    Remove-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.5 -Recurse -Force
+    $srcUrl = 'https://community.chocolatey.org/api/v2/package/chocolatey/0.11.2'
+    $targetFile = 'chocolatey.0.11.2.nupkg'
+    Push-Location $basedir\Boxstarter.Chocolatey\chocolatey
+    try {
+        if (-Not (Test-Path $targetFile)) {
+            Invoke-WebRequest -Uri $srcUrl -OutFile $targetFile
+        }
+    }
+    finally {
+        Pop-Location
+    }
 }
 
 task Copy-PowerShellFiles -depends Clean-Artifacts {
