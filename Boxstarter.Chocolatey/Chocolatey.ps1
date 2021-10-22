@@ -432,7 +432,7 @@ function Call-Chocolatey {
 
     $chocoArgs = @($Command, $PackageNames)
     $chocoArgs += Format-ExeArgs -Command $Command @args
-    $chocoArgsExpanded = $chocoArgs | Foreach-Object { "$($_); " }
+    $chocoArgsExpanded = $chocoArgs | Foreach-Object { "$($_)" }
     Write-BoxstarterMessage "Passing the following args to Chocolatey: @($chocoArgsExpanded)" -Verbose
 
     $currentLogging = $Boxstarter.Suppresslogging
@@ -441,10 +441,10 @@ function Call-Chocolatey {
             $Boxstarter.SuppressLogging = $true 
         }
         if (($PSVersionTable.CLRVersion.Major -lt 4 -or (Test-WindowsFeatureInstall $args)) -and (Get-IsRemote)) {
-            Invoke-ChocolateyFromTask $chocoArgs
+            Invoke-ChocolateyFromTask $chocoArgsExpanded
         }
         else {
-            Invoke-LocalChocolatey $chocoArgs
+            Invoke-LocalChocolatey $chocoArgsExpanded
         }
     }
     finally {
