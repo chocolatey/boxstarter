@@ -11,4 +11,5 @@ Export-ModuleMember Invoke-BoxStarter, `
                     Stop-TimedSection, `
                     Out-Boxstarter, `
                     Enter-BoxstarterLogable, `
-                    Get-BoxstarterTempDir
+                    Get-BoxstarterTempDir, `
+                    Setup-BoxstarterExtension
