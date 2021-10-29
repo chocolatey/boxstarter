@@ -7,6 +7,22 @@ function Cleanup-Boxstarter {
     }
     Start-UpdateServices
 
+    $extensionBaseDir = "$env:ChocolateyInstall\extensions\boxstarter-choco"
+    if (Test-Path $extensionBaseDir) {
+        Remove-Item $extensionBaseDir -Recurse -Force -ErrorAction SilentlyContinue
+
+        Import-Module "$env:ChocolateyInstall/helpers/chocolateyProfile.psm1" -DisableNameChecking:$true
+        . "$env:ChocolateyInstall/helpers/functions/Write-FunctionCallLogMessage.ps1"
+        . "$env:ChocolateyInstall/helpers/functions/Test-ProcessAdminRights.ps1"
+        . "$env:ChocolateyInstall/helpers/functions/Set-EnvironmentVariable.ps1"
+        . "$env:ChocolateyInstall/helpers/functions/Uninstall-ChocolateyEnvironmentVariable.ps1"
+        $uninstallEnvVarParam = @{
+            variableName = 'BoxstarterChocoExtension'
+            variableType = [System.EnvironmentVariableTarget]::Machine
+        }
+        Uninstall-ChocolateyEnvironmentVariable @uninstallEnvVarParam
+    }
+
     if(Test-Path "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC") {
         del "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC"
         Enable-UAC
