@@ -19,6 +19,7 @@ Export-ModuleMember Confirm-Choice,`
                     Stop-TimedSection,`
                     Test-Admin,`
                     Write-BoxstarterLogo,`
-                    Write-BoxstarterMessage
+                    Write-BoxstarterMessage,`
+                    Get-BoxstarterTaskContextTempDir
 
 Export-ModuleMember -Variable Boxstarter
