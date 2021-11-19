@@ -78,6 +78,9 @@ function Write-HostOverride {
     }
 }
 
+# TODO: check if this actually works the way I think it does!
+Import-Module $env:chocolateyinstall\helpers\chocolateyInstaller.psm1 -Global -DisableNameChecking
+
 new-alias Install-ChocolateyInstallPackage Install-ChocolateyInstallPackageOverride -force
 new-alias Write-Host Write-HostOverride -force
 
