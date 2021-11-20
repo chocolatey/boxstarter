@@ -55,7 +55,7 @@ function Invoke-Chocolatey($chocoArgs) {
         mkdir "$env:ChocolateyInstall\lib" | Out-Null
     }
     
-    Setup-BoxstarterExtension
+    Install-BoxstarterExtension
 
     Enter-BoxstarterLogable {
 

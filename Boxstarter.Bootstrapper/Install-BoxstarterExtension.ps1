@@ -1,5 +1,5 @@
 
-function Setup-BoxstarterExtension {
+function Install-BoxstarterExtension {
     $extensionBaseDir = "$env:ChocolateyInstall\extensions\boxstarter-choco"
     New-Item -ItemType Directory -Path $extensionBaseDir -Force | Out-Null
 
@@ -8,8 +8,9 @@ function Setup-BoxstarterExtension {
 
 if (-Not (Test-Path `$testfile)) {
   New-Item -Path `$testfile | Out-Null
-  Write-Host "Lets.GetBoxstarter() :-)"        
+  Write-Host " *** LOADING BOXSTARTER ***"        
   Import-Module '$($boxstarter.BaseDir)\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1' -Global -DisableNameChecking -ArgumentList `$true
+  Write-BoxstarterMessage "*** HELLO WORLD ***"
 }
 "@ | Out-File "$extensionBaseDir/boxstarter-choco.psm1" -Encoding utf8
 
