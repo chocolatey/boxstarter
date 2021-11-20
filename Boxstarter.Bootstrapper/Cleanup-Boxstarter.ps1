@@ -10,6 +10,7 @@ function Cleanup-Boxstarter {
     $extensionBaseDir = "$env:ChocolateyInstall\extensions\boxstarter-choco"
     if (Test-Path $extensionBaseDir) {
         Remove-Item $extensionBaseDir -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item "$(Join-Path $env:temp 'Boxstarter.ext.*')" -Force -ErrorAction SilentlyContinue
     }
 
     if(Test-Path "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC") {
