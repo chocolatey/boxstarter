@@ -12,4 +12,4 @@ Export-ModuleMember Invoke-BoxStarter, `
                     Out-Boxstarter, `
                     Enter-BoxstarterLogable, `
                     Get-BoxstarterTempDir, `
-                    Setup-BoxstarterExtension
+                    Install-BoxstarterExtension
