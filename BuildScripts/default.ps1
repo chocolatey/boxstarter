@@ -152,7 +152,7 @@ Task Pack-NuGet -depends Sign-PowerShellFiles -description 'Packs the modules an
     }
 
     PackDirectory "$baseDir\BuildPackages"
-    PackDirectory "$baseDir\BuildScripts\nuget" -AddReleaseNotes
+    PackDirectory "$baseDir\BuildScripts\nuget" -AddReleaseNotes -Version $chocoPkgVersion
     Move-Item "$baseDir\BuildScripts\nuget\*.nupkg" "$basedir\buildArtifacts"
 }
 
@@ -323,7 +323,7 @@ task Sign-PowerShellFiles -depends Copy-PowerShellFiles {
     }
 }
 
-function PackDirectory($path, [switch]$AddReleaseNotes){
+function PackDirectory($path, [switch]$AddReleaseNotes, $Version = $version){
     exec {
         $releaseNotes = Get-ReleaseNotes
         Get-ChildItem $path -Recurse -include *.nuspec |
@@ -335,7 +335,7 @@ function PackDirectory($path, [switch]$AddReleaseNotes){
                    $nuspec.package.metadata.ReplaceChild($newReleaseNotes, $oldReleaseNotes) | Out-Null
                    $nuspec.Save($_)
                  }
-                 .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $chocoPkgVersion
+                 .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $Version
               }
     }
 }
