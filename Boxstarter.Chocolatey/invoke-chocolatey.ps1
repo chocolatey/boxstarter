@@ -59,20 +59,27 @@ function Invoke-Chocolatey($chocoArgs) {
 
     Enter-BoxstarterLogable {
 
-        Write-BoxstarterMessage "calling actual choco.exe now with '$chocoArgs'" -Verbose
         $cd = [System.IO.Directory]::GetCurrentDirectory()
         try {
-            Write-BoxstarterMessage "setting current directory location to $((Get-Location).Path)" -Verbose
-            [System.IO.Directory]::SetCurrentDirectory("$(Convert-Path (Get-Location).Path)")
+            $targetWdir = $((Get-Location).Path)
+            Write-BoxstarterMessage "setting current directory location to $targetWdir" -Verbose
+            [System.IO.Directory]::SetCurrentDirectory("$(Convert-Path $targetWdir)")
             
             Write-BoxstarterMessage "BoxstarterWrapper::Run($chocoArgs)..." -Verbose
+            <#
+            $chocoArgs | ForEach-Object {
+              Write-BoxStarterMessage " -> $_" -Verbose
+            }
+            #>
+
             $pargs = @{
                 FilePath          = Join-Path $env:ChocolateyInstall 'choco.exe'
-                ArgumentList      = $chocoArgs.Split(" ")
+                ArgumentList      = $chocoArgs
                 NoNewWindow       = $true
                 PassThru          = $true
                 UseNewEnvironment = $false
                 Wait              = $true
+                WorkingDirectory  = $targetWdir
                 Verbose           = $VerbosePreference
             }
             
