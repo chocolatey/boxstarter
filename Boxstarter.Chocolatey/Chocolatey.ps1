@@ -78,11 +78,11 @@ function Write-HostOverride {
     }
 }
 
-# TODO: check if this actually works the way I think it does!
+# Need to import the module _BEFORE_ we use an alias to override the core func
 Import-Module $env:chocolateyinstall\helpers\chocolateyInstaller.psm1 -Global -DisableNameChecking
 
-new-alias Install-ChocolateyInstallPackage Install-ChocolateyInstallPackageOverride -force
-new-alias Write-Host Write-HostOverride -force
+New-Alias Install-ChocolateyInstallPackage Install-ChocolateyInstallPackageOverride -Force
+New-Alias Write-Host Write-HostOverride -Force
 
 <#
 .SYNOPSIS
@@ -145,8 +145,7 @@ function chocolatey {
         Call-Chocolatey @PSBoundParameters @args
         return
     }
-    $argsExpanded = $args | Foreach-Object { "$($_); " }
-    Write-BoxstarterMessage "Parameters to be passed to Chocolatey: Command='$Command', args='$argsExpanded'" -Verbose
+    Write-BoxstarterMessage "Parameters to be passed to Chocolatey: Command='$Command', args='$args'" -Verbose
 
     $stopOnFirstError = (Get-PassedSwitch -SwitchName "StopOnPackageFailure" -OriginalArgs $args) -Or $Boxstarter.StopOnPackageFailure
     Write-BoxstarterMessage "Will stop on first package error: $stopOnFirstError" -Verbose
@@ -435,8 +434,8 @@ function Call-Chocolatey {
 
     $chocoArgs = @($Command, $PackageNames)
     $chocoArgs += Format-ExeArgs -Command $Command @args
-    $chocoArgsExpanded = $chocoArgs | Foreach-Object { "$($_)" }
-    Write-BoxstarterMessage "Passing the following args to Chocolatey: @($chocoArgsExpanded)" -Verbose
+    $chocoArgs = $chocoArgs | ForEach-Object { "$($_)" }
+    Write-BoxstarterMessage "Passing the following args to Chocolatey: @($chocoArgs)" -Verbose
 
     $currentLogging = $Boxstarter.Suppresslogging
     try {
@@ -444,10 +443,10 @@ function Call-Chocolatey {
             $Boxstarter.SuppressLogging = $true 
         }
         if (($PSVersionTable.CLRVersion.Major -lt 4 -or (Test-WindowsFeatureInstall $args)) -and (Get-IsRemote)) {
-            Invoke-ChocolateyFromTask $chocoArgsExpanded
+            Invoke-ChocolateyFromTask $chocoArgs
         }
         else {
-            Invoke-LocalChocolatey $chocoArgsExpanded
+            Invoke-LocalChocolatey $chocoArgs
         }
     }
     finally {
@@ -512,7 +511,12 @@ function Format-ExeArgs {
             $p = $pts[1]
         }
 
-        $newArgs += $p
+        #$p = $p | ForEach-Object { "$($_)" }
+        if ($p.StartsWith("'")) {
+          $p = "`"$p`""
+        }
+        
+        $newArgs += $p 
     }
 
     if ($null -eq (Get-PassedArg -ArgumentName @("source", "s") -OriginalArgs $args)) {
