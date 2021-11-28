@@ -78,12 +78,15 @@ function Invoke-Chocolatey($chocoArgs) {
                 NoNewWindow       = $true
                 PassThru          = $true
                 UseNewEnvironment = $false
-                Wait              = $true
+                Wait              = $false
                 WorkingDirectory  = $targetWdir
                 Verbose           = $VerbosePreference
             }
             
             $p = Start-Process @pargs
+
+            Wait-Process -Id $p.Id
+            
             Write-BoxstarterMessage "BoxstarterWrapper::Run => $($p.ExitCode)" -Verbose
             [System.Environment]::ExitCode = $p.ExitCode
 
