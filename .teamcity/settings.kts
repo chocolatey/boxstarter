@@ -28,9 +28,6 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 version = "2021.2"
 
 project {
-
-    vcsRoot(HttpsGithubComChocolateyBoxstarterGitRefsHeadsMaster)
-
     buildType(Build)
 }
 
@@ -40,7 +37,7 @@ object Build : BuildType({
     artifactRules = "buildArtifacts => buildArtifacts"
 
     vcs {
-        root(HttpsGithubComChocolateyBoxstarterGitRefsHeadsMaster)
+        root(DslContext.settingsRoot)
     }
 
     steps {
@@ -52,6 +49,14 @@ object Build : BuildType({
                         Install-WindowsFeature -Name NET-Framework-Core
                     }
                 """.trimIndent()
+            }
+        }
+        step {
+            name = "Include Signing Keys"
+            type = "PrepareSigningEnvironment"
+
+            conditions {
+                equals("teamcity.build.branch.is_default", "true")
             }
         }
         powerShell {
@@ -67,11 +72,4 @@ object Build : BuildType({
         vcs {
         }
     }
-})
-
-object HttpsGithubComChocolateyBoxstarterGitRefsHeadsMaster : GitVcsRoot({
-    name = "https://github.com/chocolatey/boxstarter.git#refs/heads/master"
-    url = "https://github.com/chocolatey/boxstarter.git"
-    branch = "refs/heads/master"
-    branchSpec = "refs/heads/*"
 })
