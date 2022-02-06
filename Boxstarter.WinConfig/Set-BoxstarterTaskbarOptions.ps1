@@ -112,9 +112,18 @@ multi-monitor support and always combine icons on non-primary monitors.
         [Parameter(ParameterSetName='MultiMonitorOn')]
         [ValidateSet('Always','Full','Never')]
         [String]
-        $MultiMonitorCombine
+        $MultiMonitorCombine,
+
+        [Parameter(ParameterSetName = 'DisableSearchBox')]
+        [switch]
+        $DisableSearchBox,
+
+        [Parameter(ParameterSetName = 'EnableSearchBox')]
+        [switch]
+        $EnableSearchBox
     )
 
+    $baseKey = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion'
     $explorerKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer'
     $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
     $settingKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects2'
@@ -234,6 +243,15 @@ multi-monitor support and always combine icons on non-primary monitors.
         if ($alwaysShowIconsOff) {
             Set-ItemProperty -Path $explorerKey -Name 'EnableAutoTray' -Value 1
         }
+    }
+
+    if ($EnableSearchBox.IsPresent) {
+        # this will create the path if it doesn't exist
+        Set-ItemProperty -Path (Join-Path -Path $baseKey -ChildPath 'Search') -Name 'SearchBoxTaskbarMode' -Value 2 -Type DWord -Force
+    }
+    elseif ($DisableSearchBox.IsPresent) {
+        # this will create the path if it does not exist
+        Set-ItemProperty -Path (Join-Path -Path $baseKey -ChildPath 'Search') -Name 'SearchBoxTaskbarMode' -Value 0 -Type DWord -Force
     }
 
     Restart-Explorer
