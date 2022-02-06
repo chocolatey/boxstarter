@@ -78,11 +78,11 @@ Set-WindowsExplorerOptions -DisableShowHiddenFilesFoldersDrives -DisableShowProt
 <p>Sets options on the Windows Taskbar (formerly called Set-TaskbarOptions)</p>
 <p>AlwaysShowIconsOn/AlwaysShowIconsOff allows turning on or off always showing all icons in the notification area.</p>
 <pre>
-Set-BoxstarterTaskbarOptions -Size Small -Dock Top -Combine Always -AlwaysShowIconsOn -MultiMonitorOn -MultiMonitorMode All -MultiMonitorCombine Always
+Set-BoxstarterTaskbarOptions -Size Small -Dock Top -Combine Always -AlwaysShowIconsOn -MultiMonitorOn -MultiMonitorMode All -MultiMonitorCombine Always -EnableSearchBox
 </pre>
 <p>It is also possible to do the converse actions, if required.</p>
 <pre>
-Set-BoxstarterTaskbarOptions -Size Large -Dock Bottom -Combine Never -AlwaysShowIconsOff -MultiMonitorOff
+Set-BoxstarterTaskbarOptions -Size Large -Dock Bottom -Combine Never -AlwaysShowIconsOff -MultiMonitorOff -DisableSearchBox
 </pre>
 
 <h3>Update-ExecutionPolicy</h3>
