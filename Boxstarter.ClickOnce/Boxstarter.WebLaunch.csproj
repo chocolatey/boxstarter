@@ -140,6 +140,7 @@
   <PropertyGroup>
     <PostBuildEvent Condition="Exists($(CHOCOLATEY_OFFICIAL_CERT))">set /p CertificatePassword=&lt;%25CHOCOLATEY_OFFICIAL_CERT_PASSWORD%25
 "$(WindowsSDK80Path)bin\x64\signtool.exe" sign /f %25CHOCOLATEY_OFFICIAL_CERT%25 /p %25CertificatePassword%25 "$(ProjectDir)obj\debug\Boxstarter.WebLaunch.exe"</PostBuildEvent>
+    <PostBuildEvent Condition="'$(STORE_CHOCOLATEY_OFFICIAL_CERT)' == 'true' or '$(STORE_DEVTEST_CERT)' == 'true'">"$(WindowsSDK80Path)bin\x64\signtool.exe" sign /sm /n "%25CERT_SUBJECT_NAME%25" "$(ProjectDir)obj\debug\Boxstarter.WebLaunch.exe"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
