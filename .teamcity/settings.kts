@@ -34,7 +34,10 @@ project {
 object Build : BuildType({
     name = "Build"
 
-    artifactRules = "buildArtifacts => buildArtifacts"
+    artifactRules = """
+        buildArtifacts => buildArtifacts
+        web => web-%system.build.number%.zip
+    """.trimIndent()
 
     vcs {
         root(DslContext.settingsRoot)
