@@ -272,7 +272,7 @@ task Copy-PowerShellFiles -depends Clean-Artifacts {
     $exclude = @("bin", "obj", "*.pssproj")
 
     Copy-Item -Path $basedir\BuildScripts\chocolateyinstall.ps1 -Destination $tempNuGetDirectory
-    Copy-Item -Path $basedir\BuildScripts\chocolateyUninstall.ps1 -Destination $tempNuGetDirectory    
+    Copy-Item -Path $basedir\BuildScripts\chocolateyUninstall.ps1 -Destination $tempNuGetDirectory
     Copy-Item -Path $basedir\BuildScripts\setup.ps1 -Destination $tempNuGetDirectory
     Copy-Item -Path $basedir\BuildScripts\nuget\Boxstarter.Azure.PreInstall.ps1 -Destination $tempNuGetDirectory
     Copy-Item -Path $basedir\BuildScripts\BoxstarterChocolateyInstall.ps1 -Destination $tempNuGetDirectory
@@ -292,12 +292,18 @@ task Sign-PowerShellFiles -depends Copy-PowerShellFiles {
     $timestampServer = "http://timestamp.digicert.com"
     $certPfx = "$env:CHOCOLATEY_OFFICIAL_CERT"
     $certPasswordFile = "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
+    $tempNuGetDirectory = "$basedir\buildArtifacts\tempNuGetFolders"
+    $powerShellFiles = Get-ChildItem -Path $tempNuGetDirectory -Recurse -Include @("*.ps1", "*.psm1", "*.psd1") -File
 
     if($certPfx -And $certPasswordFile -And (Test-Path $certPfx) -And (Test-Path $certPasswordFile)) {
         $certPassword = Get-Content "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
         $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPfx, $certPassword)
-        $tempNuGetDirectory = "$basedir\buildArtifacts\tempNuGetFolders"
-        $powerShellFiles = Get-ChildItem -Path $tempNuGetDirectory -Recurse -Include @("*.ps1", "*.psm1", "*.psd1") -File
+    }
+    elseif($env:STORE_CHOCOLATEY_OFFICIAL_CERT -eq 'true' -or $env:STORE_DEVTEST_CERT -eq 'true') {
+        $cert = Get-ChildItem -Path Cert:\LocalMachine\My -CodeSigningCert | Where-Object { $_.Subject -eq "CN=`"$($env:CERT_SUBJECT_NAME)`"" }
+    }
+
+    if($cert) {
         Set-AuthenticodeSignature -Filepath $powerShellFiles -Cert $cert -TimeStampServer $timestampServer -IncludeChain NotRoot -HashAlgorithm SHA256
     }
     else {
