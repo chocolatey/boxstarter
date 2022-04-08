@@ -34,7 +34,14 @@ project {
 object Build : BuildType({
     name = "Build"
 
-    artifactRules = "buildArtifacts => buildArtifacts"
+    artifactRules = """
+        buildArtifacts => buildArtifacts
+        web => web-%system.build.number%.zip
+    """.trimIndent()
+
+    params {
+        param("env.CERT_SUBJECT_NAME", "Chocolatey Software, Inc.")
+    }
 
     vcs {
         root(DslContext.settingsRoot)
