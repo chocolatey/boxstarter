@@ -264,7 +264,7 @@ Task Restore-NuGetPackages {
 
 task Install-ChocoPkg {
     MkDir $basedir\Boxstarter.Chocolatey\chocolatey -ErrorAction SilentlyContinue
-    $chocoVersion = "0.11.3"
+    $chocoVersion = "1.1.0"
     $srcUrl = "https://community.chocolatey.org/api/v2/package/chocolatey/$chocoVersion"
     $targetFile = "chocolatey.$chocoVersion.nupkg"
     Push-Location $basedir\Boxstarter.Chocolatey\chocolatey
