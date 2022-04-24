@@ -28,9 +28,7 @@ try {
     $sublimeDir = "$env:programfiles\Sublime Text 2"
     mkdir "$sublimeDir\data"
     copy-item (Join-Path Get-PackageRoot($MyInvocation) 'sublime\*') "$sublimeDir\data" -Force -Recurse
-    Write-ChocolateySuccess 'MyPackage'
 } catch {
-  Write-ChocolateyFailure 'MyPackage' $($_.Exception.Message)
   throw
 }
 
