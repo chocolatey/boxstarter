@@ -192,6 +192,11 @@ function chocolatey {
     Write-BoxstarterMessage "Installing $($PackageNames.Count) packages" -Verbose
 
     foreach ($packageName in $PackageNames) {
+        # cannot use boxstarter to install chocolatey since v3
+        if ('chocolatey' -eq $packageName) {
+            Write-BoxstarterMessage "Chocolatey cannot be installed/upgraded using Boxstarter." -color ([ConsoleColor]::Yellow)
+            continue
+        }
         $PSBoundParameters.PackageNames = $packageName
         if ((Get-PassedArg -ArgumentName @("source", "s") -OriginalArgs $args) -eq "WindowsFeatures") {
             $dismInfo = (DISM /Online /Get-FeatureInfo /FeatureName:$packageName)
@@ -513,7 +518,7 @@ function Format-ExeArgs {
 
         #$p = $p | ForEach-Object { "$($_)" }
         if ($p.StartsWith("'")) {
-          $p = "`"$p`""
+            $p = "`"$p`""
         }
         
         $newArgs += $p 

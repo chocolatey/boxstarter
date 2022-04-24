@@ -495,6 +495,32 @@ Describe "Call-Chocolatey" {
 
 }
 
+Describe "Boxstarter Chocolatey edge cases" {
+
+    context "calls chocolatey with arbitrary package" {
+        $script:passedArgs = ""
+        Mock Call-Chocolatey {$global:LASTEXITCODE=0}
+
+        choco Install foobar -force:$false
+
+        it "passes expected params" {
+            Assert-MockCalled Call-Chocolatey -times 1
+        }
+    }
+
+    context "does NOT call chocolatey for installing chocolatey" {
+        $script:passedArgs = ""
+        Mock Call-Chocolatey {$global:LASTEXITCODE=0}
+
+        choco Install chocolatey -force:$false
+
+        it "passes expected params" {
+            Assert-MockCalled Call-Chocolatey -times 0
+        }
+    }
+
+}
+
 Describe "Get-PackageNamesFromInvocationLine" {
     It "extracts single package name from default invocation style" {
         $pkgNames = Get-PackageNamesFromInvocationLine @("-y", "-f", "packagename", "-s", "myfeed")
