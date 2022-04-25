@@ -312,7 +312,7 @@ task Sign-PowerShellFiles -depends Copy-PowerShellFiles {
         $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPfx, $certPassword)
     }
     elseif($env:STORE_CHOCOLATEY_OFFICIAL_CERT -eq 'true' -or $env:STORE_DEVTEST_CERT -eq 'true') {
-        $cert = Get-ChildItem -Path Cert:\LocalMachine\My -CodeSigningCert | Where-Object { $_.Subject -eq "CN=`"$($env:CERT_SUBJECT_NAME)`"" }
+        $cert = Get-ChildItem Cert:\LocalMachine\My | Where-Object Subject -like "*$($env:CERT_SUBJECT_NAME)*" }
     }
 
     if($cert) {
