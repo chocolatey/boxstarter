@@ -79,7 +79,11 @@ function Write-HostOverride {
 }
 
 # Need to import the module _BEFORE_ we use an alias to override the core func
-Import-Module $env:chocolateyinstall\helpers\chocolateyInstaller.psm1 -Global -DisableNameChecking
+if ($env:chocolateyinstall) {
+    # boxstarter might be the one to install chocolatey itself, in this case there's no module present
+    # -> this is not a problem as consecutive calls will re-load this file via the boxstarter extension
+    Import-Module $env:chocolateyinstall\helpers\chocolateyInstaller.psm1 -Global -DisableNameChecking
+}
 
 New-Alias Install-ChocolateyInstallPackage Install-ChocolateyInstallPackageOverride -Force
 New-Alias Write-Host Write-HostOverride -Force
