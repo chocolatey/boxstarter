@@ -58,7 +58,7 @@ Enable-PSRemoting -Force
 
 * [Boxstarter Website](https://boxstarter.org)
 * [Mailing List](https://groups.google.com/forum/#!forum/boxstarter)
-* [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [Github](https://github.com/chocolatey)
+* [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [GitHub](https://github.com/chocolatey)
 * [Blog](https://chocolatey.org/blog) / [Newsletter](https://us8.list-manage.com/subscribe?u=86a6d80146a0da7f2223712e4&id=73b018498d)
 * [Documentation](https://boxstarter.org/WhyBoxstarter)
 * [Gitter](https://gitter.im/chocolatey/boxstarter)

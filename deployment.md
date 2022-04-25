@@ -45,9 +45,9 @@ This wraps three tasks:
 
 Iterates all Chocolatey packages created in the above build and pushes them to the community Chocolatey community feed.
 
-### Push-Github
+### Push-GitHub
 
-Creates a new Github release in the Boxstarter repository.
+Creates a new GitHub release in the Boxstarter repository.
 
 ### Publish-Web
 

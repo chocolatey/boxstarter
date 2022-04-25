@@ -18,7 +18,7 @@ Install-BoxstarterPackage -PackageName https://gist.github.com/mwrock/8066325/ra
 <pre>
 New-PackageFromScript MyScript.ps1 MyPackage
 </pre>
-<p>This command takes either a file or http URL (like a <a href="https://gist.github.com">Github Gist</a>) that represents the install script. The <code>New-PackageFromScript</code> command will create a Chocolatey NuGet package with the contents of the script moved to the ChocolateyInstall.ps1 file. While this is an incredibly simple way to create a package for your Boxstarter installations, it does not provide much flexibility in customizing the nuspec manifest or adding other files to your install package.</p>
+<p>This command takes either a file or http URL (like a <a href="https://gist.github.com">GitHub Gist</a>) that represents the install script. The <code>New-PackageFromScript</code> command will create a Chocolatey NuGet package with the contents of the script moved to the ChocolateyInstall.ps1 file. While this is an incredibly simple way to create a package for your Boxstarter installations, it does not provide much flexibility in customizing the nuspec manifest or adding other files to your install package.</p>
 
 <h3>New-BoxstarterPackage</h3>
 <p>The New-BoxstarterPackage command creates a skeletal package with a minimal *.nuspec file and ChocolateyInstall.ps1 file.</p>

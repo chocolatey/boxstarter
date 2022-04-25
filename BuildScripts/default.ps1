@@ -31,7 +31,7 @@ Task default -depends Build
 Task Build -depends Build-Clickonce, Build-Web, Install-ChocoPkg, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-NuGet, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
-Task Push-Public -depends Push-Chocolatey, Push-Github, Publish-Web
+Task Push-Public -depends Push-Chocolatey, Push-GitHub, Publish-Web
 Task All-Tests -depends Test, Integration-Test
 Task Quick-Deploy -depends Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage
 
@@ -185,7 +185,7 @@ Task Push-Chocolatey -description 'Pushes the module to Chocolatey community sfe
     }
 }
 
-Task Push-Github {
+Task Push-GitHub {
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12;
     $headers = @{
         Authorization = 'Basic ' + [Convert]::ToBase64String(
