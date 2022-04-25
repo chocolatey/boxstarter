@@ -66,9 +66,8 @@ try {
     #Client SKUs need to enable firewall
     netsh advfirewall firewall add rule name="Open Port 80" dir=in action=allow protocol=TCP localport=80
 
-    Write-ChocolateySuccess 'NugetServer'
+    Write-Host 'NugetServer'
 } catch {
-  Write-ChocolateyFailure 'NugetServer' $($_.Exception.ToString())
   throw
 }
 </pre>

@@ -60,8 +60,6 @@ try {
     Install-ChocolateyVsixPackage autowrocktestable http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix
     Install-ChocolateyVsixPackage vscommands http://visualstudiogallery.msdn.microsoft.com/a83505c6-77b3-44a6-b53b-73d77cba84c8/file/74740/18/SquaredInfinity.VSCommands.VS11.vsix
     Install-WindowsUpdate -AcceptEula
-    Write-ChocolateySuccess 'example'
 } catch {
-  Write-ChocolateyFailure 'example' $($_.Exception.Message)
   throw
 }

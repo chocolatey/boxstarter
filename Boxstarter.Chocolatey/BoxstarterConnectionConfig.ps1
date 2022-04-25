@@ -10,4 +10,6 @@ public class BoxstarterConnectionConfig {
     public System.Management.Automation.Remoting.PSSessionOption PSSessionOption;
 }
 "@
-Add-Type -TypeDefinition $source
+if (-Not ([System.Management.Automation.PSTypeName]'BoxstarterConnectionConfig').Type) {
+    Add-Type -TypeDefinition $source
+}

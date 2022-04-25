@@ -80,7 +80,26 @@ Remove-BoxstarterTask
     }
 }
 
-function Get-ErrorFileName { "$env:temp\BoxstarterError.stream" }
+function Get-BoxstarterTaskContextTempDir {
+    $sysTemp = [System.Environment]::GetEnvironmentVariable('TEMP','Machine')
+    $stableTempDir = Join-Path $sysTemp "BoxstarterTemp"
+    if (-Not (Test-Path $stableTempDir)) {
+        try {
+            New-Item -ItemType Directory -Path $stableTempDir -Force | Out-Null
+        } 
+        catch {
+            Write-BoxstarterMessage "failed to create $stableTempDir"
+            throw
+        }
+    }
+    $stableTempDir
+}
+
+function Get-ErrorFileName { "$(Get-BoxstarterTaskContextTempDir)\BoxstarterError.stream" }
+
+function Get-StdOutFileName { "$(Get-BoxstarterTaskContextTempDir)\BoxstarterOutput.stream" }
+
+function Get-BoxstarterTaskFilename { "$(Get-BoxstarterTaskContextTempDir)\BoxstarterTask.ps1" }
 
 function Get-CliXmlStream($cliXmlFile, $stream) {
     $content = Get-Content $cliXmlFile
@@ -118,11 +137,11 @@ function Add-TaskFiles($command, $DotNetVersion) {
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("`$ProgressPreference='SilentlyContinue';$command"))
     $fileContent=@"
 $(if($DotNetVersion -ne $null){"`$env:COMPLUS_version='$DotNetVersion'"})
-Start-Process powershell -NoNewWindow -Wait -RedirectStandardError $(Get-ErrorFileName) -RedirectStandardOutput $env:temp\BoxstarterOutput.stream -WorkingDirectory '$PWD' -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
-Remove-Item $env:temp\BoxstarterTask.ps1 -ErrorAction SilentlyContinue
+Start-Process powershell -NoNewWindow -Wait -RedirectStandardError $(Get-ErrorFileName) -RedirectStandardOutput $(Get-StdOutFileName) -WorkingDirectory '$PWD' -ArgumentList "-noprofile -ExecutionPolicy Bypass -EncodedCommand $encoded"
+Remove-Item $(Get-BoxstarterTaskFilename) -ErrorAction SilentlyContinue
 "@
-    Set-Content $env:temp\BoxstarterTask.ps1 -value $fileContent -force
-    New-Item $env:temp\BoxstarterOutput.stream -Type File -Force | Out-Null
+    Set-Content (Get-BoxstarterTaskFilename) -value $fileContent -force
+    New-Item (Get-StdOutFileName) -Type File -Force | Out-Null
     New-Item (Get-ErrorFileName) -Type File -Force | Out-Null
     $encoded
 }
@@ -137,12 +156,12 @@ function start-Task($encoded){
     }
     Write-BoxstarterMessage "Launched task. Waiting for task to launch command..." -Verbose
     do{
-        if(!(Test-Path $env:temp\BoxstarterTask.ps1)){
+        if(!(Test-Path $(Get-BoxstarterTaskFilename))){
             Write-BoxstarterMessage "Task Completed before its process was captured." -Verbose
             break
         }
         $taskProc=gwmi Win32_Process -Filter "name = 'powershell.exe' and CommandLine like '%$encoded%'" | select ProcessId | % { $_.ProcessId } | ? { !($tasks -contains $_) }
-
+        Write-BoxstarterMessage "waiting for task to finish..." -Verbose
         Start-Sleep -Second 1
     }
     Until($taskProc -ne $null)
@@ -173,7 +192,7 @@ function Test-TaskTimeout($waitProc, $idleTimeout) {
 
 function Wait-ForTask($waitProc, $idleTimeout, $totalTimeout){
     $reader=New-Object -TypeName System.IO.FileStream -ArgumentList @(
-        "$env:temp\BoxstarterOutput.Stream",
+        "$(Get-BoxstarterTaskContextTempDir)\BoxstarterOutput.Stream",
         [system.io.filemode]::Open,[System.io.FileAccess]::ReadWrite,
         [System.IO.FileShare]::ReadWrite)
     try{
@@ -240,3 +259,4 @@ function Invoke-SilentKill($id, [switch]$wait) {
         $global:error.RemoveAt(0)
     }
 }
+

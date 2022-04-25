@@ -8,6 +8,10 @@ properties {
         $versionTag = $list[$list.Count-1].ToString()
         $version = $versionTag + "."
         $version += (git log $($version + '..') --pretty=oneline | measure-object).Count
+        $chocoPkgVersion = $version
+        if (-not $env:DO_BOXSTARTER_RELEASE) {
+            $chocoPkgVersion += '-beta'
+        }
         $changeset = (git log -1 $($versionTag + '..') --pretty=format:%H)
         if($changeset -eq $null) {
             $changeset = (git log -1 --pretty=format:%H)
@@ -15,6 +19,7 @@ properties {
     }
     else {
         $version="1.0.0"
+        $chocoPkgVersion = $version
     }
     $nugetExe = "$env:ChocolateyInstall\bin\nuget.exe"
     $ftpHost="waws-prod-bay-001.ftp.azurewebsites.windows.net"
@@ -23,9 +28,9 @@ properties {
 }
 
 Task default -depends Build
-Task Build -depends Build-Clickonce, Build-Web, Install-ChocoLib, Test, Package
+Task Build -depends Build-Clickonce, Build-Web, Install-ChocoPkg, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
-Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoLib, Create-ModuleZipForRemoting, Pack-NuGet, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
+Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-NuGet, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Chocolatey, Push-Github, Publish-Web
 Task All-Tests -depends Test, Integration-Test
 Task Quick-Deploy -depends Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage
@@ -75,7 +80,7 @@ task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
     exec { .$msbuildExe "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:BOXSTARTER_PUBLISH_PASSWORD }
 }
 
-Task Test -depends Install-ChocoLib, Pack-NuGet, Create-ModuleZipForRemoting {
+Task Test -depends Install-ChocoPkg, Pack-NuGet, Create-ModuleZipForRemoting {
     Push-Location "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     $pesterTestResultsFile = "$baseDir\buildArtifacts\TestResults.xml"
@@ -147,7 +152,7 @@ Task Pack-NuGet -depends Sign-PowerShellFiles -description 'Packs the modules an
     }
 
     PackDirectory "$baseDir\BuildPackages"
-    PackDirectory "$baseDir\BuildScripts\nuget" -AddReleaseNotes
+    PackDirectory "$baseDir\BuildScripts\nuget" -AddReleaseNotes -Version $chocoPkgVersion
     Move-Item "$baseDir\BuildScripts\nuget\*.nupkg" "$basedir\buildArtifacts"
 }
 
@@ -156,16 +161,16 @@ Task Package-DownloadZip -depends Clean-Artifacts {
       Remove-Item "$basedir\BuildArtifacts\Boxstarter.*.zip" -Force
     }
 
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\LICENSE.txt" }
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\NOTICE.txt" }
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\buildscripts\bootstrapper.ps1" }
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\buildscripts\Setup.bat" }
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\LICENSE.txt" }
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\NOTICE.txt" }
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\buildscripts\bootstrapper.ps1" }
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\buildscripts\Setup.bat" }
 }
 
 Task Deploy-DownloadZip -depends Package-DownloadZip {
     Remove-Item "$basedir\web\downloads" -Recurse -Force -ErrorAction SilentlyContinue
     mkdir "$basedir\web\downloads"
-    Copy-Item "$basedir\BuildArtifacts\Boxstarter.$version.zip" "$basedir\web\downloads"
+    Copy-Item "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\web\downloads"
 }
 
 Task Deploy-Bootstrapper {
@@ -189,25 +194,25 @@ Task Push-Github {
 
     $releaseNotes = Get-ReleaseNotes
     $postParams = ConvertTo-Json @{
-        tag_name="v$version"
+        tag_name="v$chocoPkgVersion"
         target_commitish=$changeset
-        name="v$version"
+        name="v$chocoPkgVersion"
         body=$releaseNotes.DocumentElement.'#text'
     } -Compress
 
     $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/chocolatey/boxstarter/releases/latest" -Method GET -Headers $headers
-    if($latest.tag_name -ne "v$version"){
+    if($latest.tag_name -ne "v$chocoPkgVersion"){
         Write-Host "Creating release"
         $response = Invoke-RestMethod -Uri "https://api.github.com/repos/chocolatey/boxstarter/releases" -Method POST -Body $postParams -Headers $headers
-        $uploadUrl = $response.upload_url.replace("{?name,label}","?name=boxstarter.$version.zip")
+        $uploadUrl = $response.upload_url.replace("{?name,label}","?name=boxstarter.$chocoPkgVersion.zip")
     }
     else {
-        $uploadUrl = $latest.upload_url.replace("{?name,label}","?name=boxstarter.$version.zip")
+        $uploadUrl = $latest.upload_url.replace("{?name,label}","?name=boxstarter.$chocoPkgVersion.zip")
     }
 
-    Write-Host "Uploading $basedir\BuildArtifacts\Boxstarter.$version.zip to $uploadUrl"
+    Write-Host "Uploading $basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip to $uploadUrl"
     try {
-        Invoke-RestMethod -Uri $uploadUrl -Method POST -ContentType "application/zip" -InFile "$basedir\BuildArtifacts\Boxstarter.$version.zip" -Headers $headers
+        Invoke-RestMethod -Uri $uploadUrl -Method POST -ContentType "application/zip" -InFile "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" -Headers $headers
     }
     catch{
         write-host $_ | Format-List * -force
@@ -257,14 +262,21 @@ Task Restore-NuGetPackages {
     exec { .$nugetExe restore "$baseDir\Boxstarter.sln" }
 }
 
-task Install-ChocoLib {
-    exec { .$nugetExe install chocolatey.lib -Version 0.10.5 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
-    exec { .$nugetExe install log4net -Version 2.0.3 -OutputDirectory $basedir\Boxstarter.Chocolatey\ }
+task Install-ChocoPkg {
     MkDir $basedir\Boxstarter.Chocolatey\chocolatey -ErrorAction SilentlyContinue
-    Copy-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3\lib\net40-full\* $basedir\Boxstarter.Chocolatey\chocolatey -Exclude *.xml
-    Copy-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.5\lib\* $basedir\Boxstarter.Chocolatey\chocolatey -Exclude *.xml
-    Remove-Item $basedir\Boxstarter.Chocolatey\log4net.2.0.3 -Recurse -Force
-    Remove-Item $basedir\Boxstarter.Chocolatey\chocolatey.lib.0.10.5 -Recurse -Force
+    $chocoVersion = "1.1.0"
+    $srcUrl = "https://community.chocolatey.org/api/v2/package/chocolatey/$chocoVersion"
+    $targetFile = "chocolatey.$chocoVersion.nupkg"
+    Push-Location $basedir\Boxstarter.Chocolatey\chocolatey
+    try {
+        if (-Not (Test-Path $targetFile)) {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Invoke-WebRequest -Uri $srcUrl -OutFile $targetFile
+        }
+    }
+    finally {
+        Pop-Location
+    }
 }
 
 task Copy-PowerShellFiles -depends Clean-Artifacts {
@@ -311,7 +323,7 @@ task Sign-PowerShellFiles -depends Copy-PowerShellFiles {
     }
 }
 
-function PackDirectory($path, [switch]$AddReleaseNotes){
+function PackDirectory($path, [switch]$AddReleaseNotes, $Version = $version){
     exec {
         $releaseNotes = Get-ReleaseNotes
         Get-ChildItem $path -Recurse -include *.nuspec |
@@ -323,7 +335,7 @@ function PackDirectory($path, [switch]$AddReleaseNotes){
                    $nuspec.package.metadata.ReplaceChild($newReleaseNotes, $oldReleaseNotes) | Out-Null
                    $nuspec.Save($_)
                  }
-                 .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $version
+                 .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $Version
               }
     }
 }

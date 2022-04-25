@@ -3,7 +3,8 @@ param (
     [switch]$Help,
     [string]$VmName,
     [string]$package,
-    [string]$testName
+    [string]$testName,
+    [switch]$DoRelease
 )
 $here = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
@@ -26,10 +27,14 @@ if($Help){
   return
 }
 
+if ($DoRelease) {
+    $env:DO_BOXSTARTER_RELEASE = $true
+}
 $psakeDir = (Get-ChildItem $env:ChocolateyInstall\lib\Psake*)
 if($psakeDir.length -gt 0) {$psakeDir = $psakeDir[-1]}
 ."$psakeDir\tools\psake\psake.ps1" "$here/default.ps1" $Action -ScriptPath $psakeDir\tools\psake -parameters $PSBoundParameters
 
+$env:DO_BOXSTARTER_RELEASE = $false
 if($psake.build_success -eq $false) {
   exit 1;
 }

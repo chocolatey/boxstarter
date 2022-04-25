@@ -97,9 +97,9 @@ Get-PackageRoot
     $installScript=@"
 try {
 
-    Write-ChocolateySuccess '$name'
+  Write-Host "Hello, $name"
 } catch {
-  Write-ChocolateyFailure '$name' `$(`$_.Exception.Message)
+  # throw an exception when something fails
   throw
 }
 "@

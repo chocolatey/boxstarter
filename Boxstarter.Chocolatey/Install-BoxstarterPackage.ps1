@@ -623,74 +623,123 @@ function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
     return $True
 }
 
-function Setup-BoxstarterModuleAndLocalRepo($session, $delegateSources){
-    if($LocalRepo){$Boxstarter.LocalRepo=$LocalRepo}
-    Write-BoxstarterMessage "Copying Boxstarter Modules and LocalRepo packages at $($Boxstarter.BaseDir) to $env:temp on $($Session.ComputerName)..."
-    Invoke-Command -Session $Session { mkdir $env:temp\boxstarter\BuildPackages -Force  | Out-Null }
-    Send-File "$($Boxstarter.BaseDir)\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\boxstarter.zip" $session
-    Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | % {
+function Setup-BoxstarterModuleAndLocalRepo($Session, $delegateSources) {
+    if ($LocalRepo) { $Boxstarter.LocalRepo = $LocalRepo }
+
+    Write-BoxstarterMessage "Copying Boxstarter Modules and LocalRepo packages at $($Boxstarter.BaseDir) to `$env:temp\Boxstarter on $($Session.ComputerName)..."
+    Invoke-Command -Session $Session { mkdir $env:temp\Boxstarter\BuildPackages -Force | Out-Null }
+    Send-File "$($Boxstarter.BaseDir)\Boxstarter.Chocolatey\Boxstarter.zip" "Boxstarter\Boxstarter.zip" $Session
+    Get-ChildItem "$($Boxstarter.LocalRepo)\*.nupkg" | ForEach-Object {
         Write-BoxstarterMessage "Copying $($_.Name) to $($Session.ComputerName)" -Verbose
-        Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $session
+        Send-File "$($_.FullName)" "Boxstarter\BuildPackages\$($_.Name)" $Session
     }
     Write-BoxstarterMessage "Expanding modules on $($Session.ComputerName)" -Verbose
     Invoke-Command -Session $Session {
         Set-ExecutionPolicy Bypass -Force
-        if ($PSVersionTable.PSVersion.Major -ge 4) {
-            try
-            {
-                Add-Type -AssemblyName System.IO.Compression.FileSystem
-                $archive = [System.IO.Compression.ZipFile]::OpenRead("$env:temp\Boxstarter\Boxstarter.zip")
 
-                foreach ($entry in $archive.Entries)
-                {
-                    $entryTargetFilePath = [System.IO.Path]::Combine("$env:temp\boxstarter", $entry.FullName)
-                    $entryDir = [System.IO.Path]::GetDirectoryName($entryTargetFilePath)
-
-                    if(!(Test-Path $entryDir))
-                    {
-                        New-Item -ItemType Directory -Path $entryDir -Force | Out-Null
-                    }
-
-                    if(!$entryTargetFilePath.EndsWith("/"))
-                    {
-                        [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $entryTargetFilePath, $true);
+        function Expand-ZipFile($ZipFilePath, $DestinationFolder) {
+            if ($PSVersionTable.PSVersion.Major -ge 4) {
+                try {
+                    Add-Type -AssemblyName System.IO.Compression.FileSystem
+                    $archive = [System.IO.Compression.ZipFile]::OpenRead($ZipFilePath)
+        
+                    foreach ($entry in $archive.Entries) {
+                        $entryTargetFilePath = [System.IO.Path]::Combine($DestinationFolder, $entry.FullName)
+                        $entryDir = [System.IO.Path]::GetDirectoryName($entryTargetFilePath)
+        
+                        if (!(Test-Path $entryDir)) {
+                            New-Item -ItemType Directory -Path $entryDir -Force | Out-Null
+                        }
+        
+                        if (!$entryTargetFilePath.EndsWith("/")) {
+                            [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $entryTargetFilePath, $true);
+                        }
                     }
                 }
+                catch {
+                    throw $_
+                }
             }
-            catch
-            {
-                throw $_
+            else {
+                #original method
+                $shellApplication = new-object -com shell.application
+                $zipPackage = $shellApplication.NameSpace($ZipFilePath)
+                $DestinationF = $shellApplication.NameSpace($DestinationFolder)
+                $DestinationF.CopyHere($zipPackage.Items(), 0x10)
             }
-        }
-        else {
-            #original method
-            $shellApplication = new-object -com shell.application
-            $zipPackage = $shellApplication.NameSpace("$env:temp\Boxstarter\Boxstarter.zip")
-            $destinationFolder = $shellApplication.NameSpace("$env:temp\boxstarter")
-            $destinationFolder.CopyHere($zipPackage.Items(),0x10)
         }
 
-        [xml]$configXml = Get-Content (Join-Path $env:temp\Boxstarter BoxStarter.config)
-        if($configXml.config.LocalRepo -ne $null) {
-            $configXml.config.RemoveChild(($configXml.config.ChildNodes | ? { $_.Name -eq "LocalRepo"}))
-            $configXml.Save((Join-Path $env:temp\Boxstarter BoxStarter.config))
-		}
+        Expand-ZipFile -ZipFilePath "$($env:temp)\Boxstarter\Boxstarter.zip" -DestinationFolder "$($env:temp)\Boxstarter"
+        
+        [xml]$configXml = Get-Content (Join-Path $env:temp\Boxstarter Boxstarter.config)
+        if ($configXml.config.LocalRepo -ne $null) {
+            $configXml.config.RemoveChild(($configXml.config.ChildNodes | ? { $_.Name -eq "LocalRepo" }))
+            $configXml.Save((Join-Path $env:temp\Boxstarter Boxstarter.config))
+        }
     }
     if ($delegateSources) {
         Write-BoxstarterMessage "Delegating Boxstarter NugetSources to remote host..."
-        $localCfg = (Join-Path $($Boxstarter.BaseDir) BoxStarter.config)
+        $localCfg = (Join-Path $($Boxstarter.BaseDir) Boxstarter.config)
         [xml]$configXml = Get-Content $localCfg
         [string]$theSources = $($configXml.config.NugetSources)
         Write-BoxstarterMessage "$localCfg - NugetSources: '$theSources'" -Verbose
         Invoke-Command -Session $Session {
             param([string]$theSources)
             Set-ExecutionPolicy Bypass -Force
-            $cfgPath = (Join-Path $env:temp\Boxstarter BoxStarter.config)
+            $cfgPath = (Join-Path $env:temp\Boxstarter Boxstarter.config)
             [xml]$configXml = Get-Content $cfgPath
             $configXml.config.NugetSources = $theSources
             $configXml.Save($cfgPath)
         } -ArgumentList $theSources
     }
+
+    # ensure Chocolatey is present on remote host ...
+    Invoke-Command -Session $Session {
+        Set-ExecutionPolicy Bypass -Force
+        if (Test-Path $env:ChocolateyInstall) {
+            Write-Host "$env:ChocolateyInstall is already present on remote host!"
+            return
+        }
+        Write-Host "installing Chocolatey on remote host..."
+        $chocoNupkg = Get-Item "$($env:temp)\Boxstarter\Boxstarter.Chocolatey\chocolatey\*.nupkg" | Select-Object -First 1
+
+        function Expand-ZipFile($ZipFilePath, $DestinationFolder) {
+            if ($PSVersionTable.PSVersion.Major -ge 4) {
+                try {
+                    Add-Type -AssemblyName System.IO.Compression.FileSystem
+                    $archive = [System.IO.Compression.ZipFile]::OpenRead($ZipFilePath)
+
+                    foreach ($entry in $archive.Entries) {
+                        $entryTargetFilePath = [System.IO.Path]::Combine($DestinationFolder, $entry.FullName)
+                        $entryDir = [System.IO.Path]::GetDirectoryName($entryTargetFilePath)
+
+                        if (!(Test-Path $entryDir)) {
+                            New-Item -ItemType Directory -Path $entryDir -Force | Out-Null
+                        }
+
+                        if (!$entryTargetFilePath.EndsWith("/")) {
+                            [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $entryTargetFilePath, $true);
+                        }
+                    }
+                }
+                catch {
+                    throw $_
+                }
+            }
+            else {
+                #original method
+                $shellApplication = new-object -com shell.application
+                $zipPackage = $shellApplication.NameSpace($ZipFilePath)
+                $DestinationF = $shellApplication.NameSpace($DestinationFolder)
+                $DestinationF.CopyHere($zipPackage.Items(), 0x10)
+            }
+        }
+
+        Expand-ZipFile -ZipFilePath $chocoNupkg.FullName -DestinationFolder "$($env:temp)\boxstarter_chocolatey"
+        Import-Module "$($env:temp)\boxstarter_chocolatey\tools\chocolateysetup.psm1" -DisableNameChecking
+        Initialize-Chocolatey
+    }
+    
 }
 
 function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $session) {

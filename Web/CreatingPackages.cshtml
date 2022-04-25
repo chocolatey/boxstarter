@@ -42,9 +42,8 @@ New-BoxstarterPackage -Name MyPackage -Description "I hope you enjoy MyPackage"
 <p>And a tools/ChocolateyInstall.ps1 with this code:</p>
 <pre>
 try {
-    Write-ChocolateySuccess 'MyPackage'
+  Write-Host 'MyPackage'
 } catch {
-  Write-ChocolateyFailure 'MyPackage' $($_.Exception.Message)
   throw
 }
 </pre>
