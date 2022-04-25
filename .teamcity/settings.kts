@@ -44,10 +44,6 @@ object Build : BuildType({
         step {
             name = "Include Signing Keys"
             type = "PrepareSigningEnvironment"
-
-            conditions {
-                equals("teamcity.build.branch.is_default", "true")
-            }
         }
         powerShell {
             name = "Build"
