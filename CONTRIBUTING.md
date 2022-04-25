@@ -50,8 +50,8 @@ What is generally not considered trivial:
 
 ### Get Buyoff Or Find Open Community Issues/Features
 
-* Through a GitHub issue (preferred), through the [mailing list](https://groups.google.com/forum/#!forum/boxstarter), or through [Gitter](https://gitter.im/chocolatey/boxstarter), talk about a feature you would like to see (or a bug fix), and why it should be in Boxstarter.
-    * If approved through the mailing list or in [Gitter chat](https://gitter.im/chocolatey/boxstarter), ensure the accompanying GitHub issue is created with information and a link back to the mailing list discussion (or the Gitter conversation).
+* Through a GitHub issue (preferred), through the [mailing list](https://groups.google.com/forum/#!forum/boxstarter), or through [Community Chat](https://ch0.co/community), talk about a feature you would like to see (or a bug fix), and why it should be in Boxstarter.
+    * If approved through the mailing list or in [Community Chat](https://ch0.co/community), ensure the accompanying GitHub issue is created with information and a link back to the mailing list discussion (or the Community Chat conversation).
 * Once you get a nod from one of the [Chocolatey Team](https://github.com/chocolatey?tab=members), you can start on the feature.
 * Alternatively, if a feature is on the issues list with the [Up For Grabs](https://github.com/chocolatey/boxstarter/issues?q=is%3Aopen+is%3Aissue+label%3A%22Up+For+Grabs%22) label, it is open for a community member (contributor) to patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
 

@@ -61,7 +61,7 @@ Enable-PSRemoting -Force
 * [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [GitHub](https://github.com/chocolatey)
 * [Blog](https://chocolatey.org/blog) / [Newsletter](https://us8.list-manage.com/subscribe?u=86a6d80146a0da7f2223712e4&id=73b018498d)
 * [Documentation](https://boxstarter.org/WhyBoxstarter)
-* [Gitter](https://gitter.im/chocolatey/boxstarter)
+* [Community Chat](https://ch0.co/community)
 
 ### Documentation
 
@@ -97,7 +97,7 @@ Prerequisites:
 * The issue has to do with Boxstarter itself or the [Boxstarter website](https://boxstarter.org) and is not a Chocolatey package issue.
 * Please check to see if your issue already exists with a quick search of the issues. Start with one relevant term and then add if you get too many results.
 * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/boxstarter/blob/master/CONTRIBUTING.md) guidelines.
-* You are not submitting a question - questions are better served as [emails](https://groups.google.com/forum/#!forum/boxstarter) or [Gitter chat questions](https://gitter.im/chocolatey/boxstarter).
+* You are not submitting a question - questions are better served as [emails](https://groups.google.com/forum/#!forum/boxstarter) or [Community Chat](https://ch0.co/community).
 * Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
 Submitting a ticket:
