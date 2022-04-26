@@ -33,7 +33,24 @@ Task All-Tests -depends Test, Integration-Test
 Task Quick-Deploy -depends Run-GitVersion, Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage
 
 task Run-GitVersion {
-    $output = . $gitVersionExe
+    Write-Host "Testing to see if running on TeamCity..."
+
+    if($env:TEAMCITY_VERSION) {
+        Write-Host "Running on TeamCity."
+
+        Write-Host "Running GitVersion with output type build server..."
+        . $gitVersionExe /output buildserver /nocache /nofetch
+
+        Write-Host "Running GitVersion again with output type json..."
+        $output = . $gitVersionExe /output json /nocache /nofetch
+    } else {
+        Write-Host "Not running on TeamCity."
+
+        Write-Host "Running GitVersion with output type json..."
+
+        $output = . $gitVersionExe /output json /nocache
+    }
+
     Write-Host "Writing output variable..."
     Write-Host $output
 
