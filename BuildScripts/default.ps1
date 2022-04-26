@@ -34,7 +34,13 @@ Task Quick-Deploy -depends Run-GitVersion, Build-Clickonce, Build-web, Package, 
 
 task Run-GitVersion {
     $output = . $gitVersionExe
+    Write-Host "Writing output variable..."
+    Write-Host $output
+
     $joined = $output -join "`n"
+    Write-Host "Writing joined variable..."
+    Write-Host $joined
+
     $versionInfo = $joined | ConvertFrom-Json
 
     $prerelease = $versionInfo.PreReleaseLabel
