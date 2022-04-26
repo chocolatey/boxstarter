@@ -1,39 +1,63 @@
 $psake.use_exit_on_error = $true
 properties {
     $baseDir = (Split-Path -parent $psake.build_script_dir)
-    if(Get-Command Git -ErrorAction SilentlyContinue) {
-        $list = [System.Collections.ArrayList]::new()
-        git tag | Where-Object { $_ -match '^[0-9\.]*$' } | ForEach-Object { $list.Add([Version]::new($_)) } | Out-Null
-        $list.Sort()
-        $versionTag = $list[$list.Count-1].ToString()
-        $version = $versionTag + "."
-        $version += (git log $($version + '..') --pretty=oneline | measure-object).Count
-        $chocoPkgVersion = $version
-        if (-not $env:DO_BOXSTARTER_RELEASE) {
-            $chocoPkgVersion += '-beta'
-        }
-        $changeset = (git log -1 $($versionTag + '..') --pretty=format:%H)
-        if($changeset -eq $null) {
-            $changeset = (git log -1 --pretty=format:%H)
-        }
+    $counter = $buildCounter
+
+    $tagName = git tag -l --points-at HEAD
+
+    if ($tagName) {
+        Write-Host "Found tag ${'$'}tagName"
+        $isTagged = $true
+    } else {
+        Write-Host "No tag found for current commit"
+        $isTagged = $false
     }
-    else {
-        $version="1.0.0"
-        $chocoPkgVersion = $version
-    }
+
+    $script:version="1.0.0"
+    $script:packageVersion = $version
+    $script:informationalVersion = $version
+    $script:changeset = "abcdef"
     $nugetExe = "$env:ChocolateyInstall\bin\nuget.exe"
     $ftpHost="waws-prod-bay-001.ftp.azurewebsites.windows.net"
     $msbuildExe="${env:programFiles(x86)}\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\msbuild.exe"
     $reportUnitExe = "$env:ChocolateyInstall\bin\ReportUnit.exe"
+    $gitVersionExe = "$env:ChocolateyInstall\lib\GitVersion.Portable\tools\gitversion.exe"
 }
 
 Task default -depends Build
-Task Build -depends Build-Clickonce, Build-Web, Install-ChocoPkg, Test, Package
+Task Build -depends Run-GitVersion, Build-Clickonce, Build-Web, Install-ChocoPkg, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-NuGet, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Chocolatey, Push-GitHub, Publish-Web
 Task All-Tests -depends Test, Integration-Test
-Task Quick-Deploy -depends Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage
+Task Quick-Deploy -depends Run-GitVersion, Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage
+
+task Run-GitVersion {
+    $output = . $gitVersionExe
+    $joined = $output -join "`n"
+    $versionInfo = $joined | ConvertFrom-Json
+
+    $prerelease = $versionInfo.PreReleaseLabel
+    $sha = $versionInfo.Sha.Substring(0,8)
+    $majorMinorPatch = $versionInfo.MajorMinorPatch
+    $buildDate = Get-Date -Format "yyyyMMdd"
+    $script:changeset = $versionInfo.Sha
+    $script:version = $versionInfo.AssemblySemVer
+
+    if ($isTagged) {
+        $script:packageVersion = $versionInfo.LegacySemVer
+        $script:informationalVersion = $versionInfo.InformationalVersion
+    } else {
+        $script:packageVersion = "$majorMinorPatch-$prerelease-$buildDate" + $(if ($counter) { "-$counter" })
+        $script:informationalVersion = "$majorMinorPatch-$prerelease-$buildDate-$sha"
+    }
+
+    Write-Host "Assembly Semantic Version: $version"
+    Write-Host "Assembly Informational Version: $informationalVersion"
+    Write-Host "Package Version: $packageVersion"
+
+    Write-Host "##teamcity[buildNumber '$packageVersion']"
+}
 
 task Create-ModuleZipForRemoting {
     if (Test-Path "$basedir\Boxstarter.Chocolatey\Boxstarter.zip") {
@@ -69,7 +93,7 @@ task Build-Web -depends Install-MSBuild, Restore-NuGetPackages {
 }
 
 task Publish-ClickOnce -depends Install-MSBuild {
-    exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version.0" }
+    exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version" }
     Remove-Item "$basedir\web\Launch" -Recurse -Force -ErrorAction SilentlyContinue
     MkDir "$basedir\web\Launch"
     Set-Content "$basedir\web\Launch\.gitattributes" -Value "* -text"
@@ -152,7 +176,7 @@ Task Pack-NuGet -depends Sign-PowerShellFiles -description 'Packs the modules an
     }
 
     PackDirectory "$baseDir\BuildPackages"
-    PackDirectory "$baseDir\BuildScripts\nuget" -AddReleaseNotes -Version $chocoPkgVersion
+    PackDirectory "$baseDir\BuildScripts\nuget" -AddReleaseNotes -Version $packageVersion
     Move-Item "$baseDir\BuildScripts\nuget\*.nupkg" "$basedir\buildArtifacts"
 }
 
@@ -161,16 +185,16 @@ Task Package-DownloadZip -depends Clean-Artifacts {
       Remove-Item "$basedir\BuildArtifacts\Boxstarter.*.zip" -Force
     }
 
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\LICENSE.txt" }
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\NOTICE.txt" }
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\buildscripts\bootstrapper.ps1" }
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\buildscripts\Setup.bat" }
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" "$basedir\LICENSE.txt" }
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" "$basedir\NOTICE.txt" }
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" "$basedir\buildscripts\bootstrapper.ps1" }
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" "$basedir\buildscripts\Setup.bat" }
 }
 
 Task Deploy-DownloadZip -depends Package-DownloadZip {
     Remove-Item "$basedir\web\downloads" -Recurse -Force -ErrorAction SilentlyContinue
     mkdir "$basedir\web\downloads"
-    Copy-Item "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\web\downloads"
+    Copy-Item "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" "$basedir\web\downloads"
 }
 
 Task Deploy-Bootstrapper {
@@ -194,25 +218,25 @@ Task Push-GitHub {
 
     $releaseNotes = Get-ReleaseNotes
     $postParams = ConvertTo-Json @{
-        tag_name="v$chocoPkgVersion"
+        tag_name="v$packageVersion"
         target_commitish=$changeset
-        name="v$chocoPkgVersion"
+        name="v$packageVersion"
         body=$releaseNotes.DocumentElement.'#text'
     } -Compress
 
     $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/chocolatey/boxstarter/releases/latest" -Method GET -Headers $headers
-    if($latest.tag_name -ne "v$chocoPkgVersion"){
+    if($latest.tag_name -ne "v$packageVersion"){
         Write-Host "Creating release"
         $response = Invoke-RestMethod -Uri "https://api.github.com/repos/chocolatey/boxstarter/releases" -Method POST -Body $postParams -Headers $headers
-        $uploadUrl = $response.upload_url.replace("{?name,label}","?name=boxstarter.$chocoPkgVersion.zip")
+        $uploadUrl = $response.upload_url.replace("{?name,label}","?name=boxstarter.$packageVersion.zip")
     }
     else {
-        $uploadUrl = $latest.upload_url.replace("{?name,label}","?name=boxstarter.$chocoPkgVersion.zip")
+        $uploadUrl = $latest.upload_url.replace("{?name,label}","?name=boxstarter.$packageVersion.zip")
     }
 
-    Write-Host "Uploading $basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip to $uploadUrl"
+    Write-Host "Uploading $basedir\BuildArtifacts\Boxstarter.$packageVersion.zip to $uploadUrl"
     try {
-        Invoke-RestMethod -Uri $uploadUrl -Method POST -ContentType "application/zip" -InFile "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" -Headers $headers
+        Invoke-RestMethod -Uri $uploadUrl -Method POST -ContentType "application/zip" -InFile "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" -Headers $headers
     }
     catch{
         write-host $_ | Format-List * -force
@@ -348,9 +372,12 @@ function Get-ReleaseNotes {
 function Update-AssemblyInfoFiles ([string] $version, [string] $commit) {
     $assemblyVersionPattern = 'AssemblyVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
     $fileVersionPattern = 'AssemblyFileVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
+    $assemblyInformationalVersionPattern = 'AssemblyInformationalVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
+
     $fileCommitPattern = 'AssemblyTrademark\("([a-f0-9]{40})?"\)'
     $assemblyVersion = 'AssemblyVersion("' + $version + '")';
     $fileVersion = 'AssemblyFileVersion("' + $version + '")';
+    $assemblyInformationalVersion = 'AssemblyInformationalVersion("' + $informationalVersion + '")';
     $commitVersion = 'AssemblyTrademark("' + $commit + '")';
 
     Get-ChildItem -path $baseDir -r -filter AssemblyInfo.cs | ForEach-Object {
@@ -365,7 +392,8 @@ function Update-AssemblyInfoFiles ([string] $version, [string] $commit) {
         (Get-Content $filename) | ForEach-Object {
             ForEach-Object {$_ -replace $assemblyVersionPattern, $assemblyVersion } |
             ForEach-Object {$_ -replace $fileVersionPattern, $fileVersion } |
-            ForEach-Object {$_ -replace $fileCommitPattern, $commitVersion }
+            ForEach-Object {$_ -replace $fileCommitPattern, $commitVersion } |
+            ForEach-Object {$_ -replace $assemblyInformationalVersionPattern, $assemblyInformationalVersion }
         } | Set-Content $filename
     }
 }
