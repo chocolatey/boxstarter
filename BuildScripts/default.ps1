@@ -26,7 +26,7 @@ properties {
 Task default -depends Build
 Task Build -depends Run-GitVersion, Build-Clickonce, Build-Web, Install-ChocoPkg, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce -description 'Versions, packages and pushes'
-Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-NuGet, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
+Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-Chocolatey, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Chocolatey
 Task All-Tests -depends Test, Integration-Test
 Task Quick-Deploy -depends Run-GitVersion, Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce
@@ -122,7 +122,7 @@ task Publish-ClickOnce -depends Install-MSBuild {
     Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\web\Launch" -Recurse -Force
 }
 
-Task Test -depends Install-ChocoPkg, Pack-NuGet, Create-ModuleZipForRemoting {
+Task Test -depends Install-ChocoPkg, Pack-Chocolatey, Create-ModuleZipForRemoting {
     Push-Location "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     $pesterTestResultsFile = "$baseDir\buildArtifacts\TestResults.xml"
@@ -147,7 +147,7 @@ Task Test -depends Install-ChocoPkg, Pack-NuGet, Create-ModuleZipForRemoting {
     Pop-Location
 }
 
-Task Integration-Test -depends Pack-NuGet, Create-ModuleZipForRemoting {
+Task Integration-Test -depends Pack-Chocolatey, Create-ModuleZipForRemoting {
     Push-Location "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     if($testName){
@@ -188,7 +188,7 @@ Task Clean-Artifacts {
     mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.WinConfig"
 }
 
-Task Pack-NuGet -depends Sign-PowerShellFiles -description 'Packs the modules and example packages' {
+Task Pack-Chocolatey -depends Sign-PowerShellFiles -description 'Packs the modules and example packages' {
     if (Test-Path "$baseDir\buildPackages\*.nupkg") {
       Remove-Item "$baseDir\buildPackages\*.nupkg" -Force
     }
@@ -307,7 +307,7 @@ function PackDirectory($path, $Version = $version){
     exec {
         Get-ChildItem $path -Recurse -include *.nuspec |
             ForEach-Object {
-                 .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $Version
+                 choco pack $_ --OutputDirectory $path --version $version
               }
     }
 }

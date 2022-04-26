@@ -11,6 +11,10 @@
     <title>Boxstarter WinConfig Module</title>
     <iconUrl>https://cdn.rawgit.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Windows environment module for Boxstarter</summary>
+    <packageSourceUrl>https://github.com/chocolatey/boxstarter/</packageSourceUrl>
+    <projectSourceUrl>https://github.com/chocolatey/boxstarter/</projectSourceUrl>
+    <bugTrackerUrl>https://github.com/chocolatey/boxstarter/issues</bugTrackerUrl>
     <description>Functions that Boxstarter uses to customize the windows environment.
 
 ## Package parameters
