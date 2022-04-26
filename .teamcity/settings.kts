@@ -7,10 +7,11 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 version = "2021.2"
 
 project {
-    buildType(Build)
+    buildType(Boxstarter)
 }
 
-object Build : BuildType({
+object Boxstarter : BuildType({
+    id = AbsoluteId("Boxstarter")
     name = "Build"
 
     artifactRules = """
