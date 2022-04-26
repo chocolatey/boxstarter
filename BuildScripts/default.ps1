@@ -27,7 +27,6 @@ Task default -depends Build
 Task Build -depends Run-GitVersion, Build-Clickonce, Build-Web, Install-ChocoPkg, Test, Package
 Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce -description 'Versions, packages and pushes'
 Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-Chocolatey, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
-Task Push-Public -depends Push-Chocolatey
 Task All-Tests -depends Test, Integration-Test
 Task Quick-Deploy -depends Run-GitVersion, Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce
 
@@ -218,13 +217,6 @@ Task Deploy-DownloadZip -depends Package-DownloadZip {
 Task Deploy-Bootstrapper {
     Remove-Item "$basedir\web\bootstrapper.ps1" -Force -ErrorAction SilentlyContinue
     Copy-Item "$basedir\buildscripts\bootstrapper.ps1" "$basedir\web\bootstrapper.ps1"
-}
-
-Task Push-Chocolatey -description 'Pushes the module to Chocolatey community sfeed' {
-    exec {
-        Get-ChildItem "$baseDir\buildArtifacts\*.nupkg" |
-            ForEach-Object { choco push $_  }
-    }
 }
 
 task Install-MSBuild {

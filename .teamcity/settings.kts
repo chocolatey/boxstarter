@@ -42,16 +42,31 @@ object Boxstarter : BuildType({
                 """.trimIndent()
             }
         }
+
         step {
             name = "Include Signing Keys"
             type = "PrepareSigningEnvironment"
         }
+
         powerShell {
             name = "Build"
             scriptMode = file {
                 path = "BuildScripts/build.ps1"
             }
             param("jetbrains_powershell_scriptArguments", "quick-deploy -buildCounter %build.counter%")
+        }
+
+        nuGetPublish {
+            name = "Publish Packages"
+
+            conditions {
+                matches("teamcity.build.branch", "^(develop|release/.*|hotfix/.*|tags/.*)${'$'}")
+            }
+
+            toolPath = "%teamcity.tool.NuGet.CommandLine.DEFAULT%"
+            packages = "buildArtifacts/*.nupkg"
+            serverUrl = "%env.NUGETDEV_SOURCE%"
+            apiKey = "%env.NUGETDEV_API_KEY%"
         }
     }
 
