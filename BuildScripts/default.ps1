@@ -69,8 +69,8 @@ task Run-GitVersion {
         $script:packageVersion = $versionInfo.LegacySemVer
         $script:informationalVersion = $versionInfo.InformationalVersion
     } else {
-        $script:packageVersion = "$majorMinorPatch-$prerelease-$buildDate" + $(if ($counter) { "-$counter" })
-        $script:informationalVersion = "$majorMinorPatch-$prerelease-$buildDate-$sha"
+        $script:packageVersion = "$majorMinorPatch" + $(if ($prerelease) { "-$prerelease" }) + "-$buildDate" + $(if ($counter) { "-$counter" })
+        $script:informationalVersion = "$majorMinorPatch" + $(if ($prerelease) { "-$prerelease" }) + "-$buildDate-$sha"
     }
 
     Write-Host "Assembly Semantic Version: $version"
