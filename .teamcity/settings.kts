@@ -51,7 +51,7 @@ object Boxstarter : BuildType({
             scriptMode = file {
                 path = "BuildScripts/build.ps1"
             }
-            param("jetbrains_powershell_scriptArguments", "quick-deploy -buildCounter %build.counter%"")
+            param("jetbrains_powershell_scriptArguments", "quick-deploy -buildCounter %build.counter%")
         }
     }
 
