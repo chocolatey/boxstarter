@@ -162,7 +162,7 @@ Task Version-Module -description 'Stamps the psd1 with the version and last chan
     Get-ChildItem "$baseDir\**\*.psd1" | ForEach-Object {
        $path = $_
         (Get-Content $path) |
-            ForEach-Object {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$packageVersion'" } |
+            ForEach-Object {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$version'" } |
                 ForEach-Object {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } |
                     Set-Content $path
     }
