@@ -22,7 +22,7 @@ object Boxstarter : BuildType({
 
     params {
         param("env.vcsroot.branch", "%vcsroot.branch%")
-        param("env.Git_Branch", "%teamcity.build.vcs.branch.ChocolateyGUI_ChocolateyGuiVcsRoot%")
+        param("env.Git_Branch", "%teamcity.build.vcs.branch.Boxstarter_BoxstarterVcsRoot%")
         param("teamcity.git.fetchAllHeads", "true")
         param("env.CERT_SUBJECT_NAME", "Chocolatey Software, Inc.")
     }
