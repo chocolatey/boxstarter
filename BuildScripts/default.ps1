@@ -28,12 +28,12 @@ properties {
 }
 
 Task default -depends Build
-Task Build -depends Build-Clickonce, Build-Web, Install-ChocoPkg, Test, Package
-Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
+Task Build -depends Build-Clickonce, Install-ChocoPkg, Test, Package
+Task Deploy -depends Build, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-NuGet, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
-Task Push-Public -depends Push-Chocolatey, Push-GitHub, Publish-Web
+Task Push-Public -depends Push-Chocolatey, Push-GitHub
 Task All-Tests -depends Test, Integration-Test
-Task Quick-Deploy -depends Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce, Update-Homepage
+Task Quick-Deploy -depends Build-Clickonce, Package, Publish-Clickonce, Update-Homepage
 
 task Create-ModuleZipForRemoting {
     if (Test-Path "$basedir\Boxstarter.Chocolatey\Boxstarter.zip") {
@@ -62,22 +62,12 @@ task Build-ClickOnce -depends Install-MSBuild, Install-Win8SDK, Restore-NuGetPac
     exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
 }
 
-task Build-Web -depends Install-MSBuild, Restore-NuGetPackages {
-    exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
-    exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Build /v:minimal /p:DownloadNuGetExe="true" }
-    Copy-Item "$baseDir\packages\bootstrap.3.0.2\content\*" "$baseDir\Web" -Recurse -Force -ErrorAction SilentlyContinue
-}
-
 task Publish-ClickOnce -depends Install-MSBuild {
     exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version.0" }
     Remove-Item "$basedir\web\Launch" -Recurse -Force -ErrorAction SilentlyContinue
     MkDir "$basedir\web\Launch"
     Set-Content "$basedir\web\Launch\.gitattributes" -Value "* -text"
     Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\web\Launch" -Recurse -Force
-}
-
-task Publish-Web -depends Install-MSBuild, Install-WebDeploy {
-    exec { .$msbuildExe "$baseDir\Web\Web.csproj" /p:DeployOnBuild=true /p:PublishProfile="boxstarter - Web Deploy" /p:VisualStudioVersion=12.0 /p:Password=$env:BOXSTARTER_PUBLISH_PASSWORD }
 }
 
 Task Test -depends Install-ChocoPkg, Pack-NuGet, Create-ModuleZipForRemoting {
@@ -167,17 +157,6 @@ Task Package-DownloadZip -depends Clean-Artifacts {
     exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\buildscripts\Setup.bat" }
 }
 
-Task Deploy-DownloadZip -depends Package-DownloadZip {
-    Remove-Item "$basedir\web\downloads" -Recurse -Force -ErrorAction SilentlyContinue
-    mkdir "$basedir\web\downloads"
-    Copy-Item "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\web\downloads"
-}
-
-Task Deploy-Bootstrapper {
-    Remove-Item "$basedir\web\bootstrapper.ps1" -Force -ErrorAction SilentlyContinue
-    Copy-Item "$basedir\buildscripts\bootstrapper.ps1" "$basedir\web\bootstrapper.ps1"
-}
-
 Task Push-Chocolatey -description 'Pushes the module to Chocolatey community sfeed' {
     exec {
         Get-ChildItem "$baseDir\buildArtifacts\*.nupkg" |
@@ -252,10 +231,6 @@ task Install-MSBuild {
 
 task Install-Win8SDK {
     if(!(Test-Path "$env:ProgramFiles\Windows Kits\8.1\bin\x64\signtool.exe")) { choco install windows-sdk-8.1 --version=8.100.26654.0 -y --no-progress }
-}
-
-task Install-WebDeploy {
-    if(!(Test-Path "$env:ProgramW6432\IIS\Microsoft Web Deploy V3")) { choco install webdeploy --version=3.6.20170627 -y --no-progress }
 }
 
 Task Restore-NuGetPackages {

@@ -15,7 +15,6 @@ object Build : BuildType({
 
     artifactRules = """
         buildArtifacts => buildArtifacts
-        web => web-%system.build.number%.zip
     """.trimIndent()
 
     params {
