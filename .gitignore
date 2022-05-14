@@ -30,3 +30,4 @@ PublishProfiles
 Backup/
 UpgradeLog*.htm
 .metals/
+.DS_Store
