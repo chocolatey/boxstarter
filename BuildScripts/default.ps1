@@ -29,11 +29,11 @@ properties {
 
 Task default -depends Build
 Task Build -depends Build-Clickonce, Install-ChocoPkg, Test, Package
-Task Deploy -depends Build, Publish-Clickonce, Update-Homepage -description 'Versions, packages and pushes to MyGet'
+Task Deploy -depends Build, Publish-Clickonce -description 'Versions, packages and pushes to MyGet'
 Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-NuGet, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task Push-Public -depends Push-Chocolatey, Push-GitHub
 Task All-Tests -depends Test, Integration-Test
-Task Quick-Deploy -depends Build-Clickonce, Package, Publish-Clickonce, Update-Homepage
+Task Quick-Deploy -depends Build-Clickonce, Package, Publish-Clickonce
 
 task Create-ModuleZipForRemoting {
     if (Test-Path "$basedir\Boxstarter.Chocolatey\Boxstarter.zip") {
@@ -196,12 +196,6 @@ Task Push-GitHub {
     catch{
         write-host $_ | Format-List * -force
     }
-}
-
-task Update-Homepage {
-     $versionPattern="[0-9]+(\.([0-9]+|\*)){1,3}"
-     $filename = "$baseDir\web\App_Code\Helper.cshtml"
-     (Get-Content $filename) | ForEach-Object {$_ -replace $versionPattern, ($version) } | Set-Content $filename
 }
 
 task Get-ClickOnceStats {
