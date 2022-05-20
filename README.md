@@ -6,6 +6,8 @@ Repeatable, reboot resilient windows environment installations made easy using C
 
 ## For more information and How Tos, visit [the official Boxstarter website](https://boxstarter.org)
 
+The source of the Boxstarter website can be found in the [boxstarter.org repository](https://github.com/chocolatey/boxstarter.org).
+
 ## Windows environment creation made easy
 
 * 100% Unattended Install with *pending reboot detection* and *automatic logon*.
