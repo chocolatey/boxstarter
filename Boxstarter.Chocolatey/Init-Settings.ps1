@@ -1,9 +1,11 @@
 $config = Get-BoxstarterConfig
-if(!$BoxStarter.LocalRepo){
-   $BoxStarter.LocalRepo=$config.LocalRepo
+if (!$Boxstarter.LocalRepo) {
+    $Boxstarter.LocalRepo = $config.LocalRepo
 }
-if($BoxStarter.LocalRepo.StartsWith("$env:windir")) {
-   $BoxStarter.LocalRepo = Join-Path $(Get-BoxstarterTempDir) "BuildPackages"
-   if(!(Test-Path $BoxStarter.LocalRepo)) { mkdir $BoxStarter.LocalRepo | Out-Null }
+if ($Boxstarter.LocalRepo.StartsWith("$env:windir")) {
+    $Boxstarter.LocalRepo = Join-Path $(Get-BoxstarterTempDir) "BuildPackages"
+    if (!(Test-Path $Boxstarter.LocalRepo)) { 
+        New-Item -ItemType Directory -Path $Boxstarter.LocalRepo -Force | Out-Null 
+    }
 }
-$Boxstarter.NugetSources=$config.NugetSources
+$Boxstarter.NugetSources = $config.NugetSources

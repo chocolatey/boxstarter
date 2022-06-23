@@ -1,4 +1,4 @@
-function Invoke-BoxStarter{
+function Invoke-Boxstarter{
 <#
 .SYNOPSIS
 Invokes the Boxstarter bootstrapper
@@ -81,17 +81,17 @@ Invoke-Reboot
       [Parameter(Position=7,Mandatory=0)]
       [switch]$StopOnPackageFailure
     )
-    $BoxStarter.IsRebooting = $false
+    $Boxstarter.IsRebooting = $false
     $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
     if (!(Test-Admin)) {
         New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | Out-Null
         Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate..."
-        $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psd1")
+        $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1")
         if($password){
             $encryptedPass = convertfrom-securestring -securestring $password
             $passwordArg = "-encryptedPassword $encryptedPass"
         }
-        $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($unNormalized.FullName)`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'}) $passwordArg"
+        $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($unNormalized.FullName)`";Invoke-Boxstarter $(if($RebootOk){'-RebootOk'}) $passwordArg"
         Start-Process powershell -verb runas -argumentlist $command
         return
     }
@@ -128,13 +128,13 @@ Invoke-Reboot
         return $true
     }
     catch {
-       Log-BoxStarterMessage ($_ | Out-String)
+       Log-BoxstarterMessage ($_ | Out-String)
        throw $_
     }
     finally{
         Cleanup-Boxstarter -KeepWindowOpen:$KeepWindowOpen -DisableRestart:$DisableRestart
         Stop-TimedSection $session
-        if($BoxStarter.IsRebooting) {
+        if($Boxstarter.IsRebooting) {
             RestartNow
         }
     }

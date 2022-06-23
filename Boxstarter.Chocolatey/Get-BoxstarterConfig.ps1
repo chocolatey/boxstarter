@@ -1,4 +1,4 @@
-function Get-BoxStarterConfig {
+function Get-BoxstarterConfig {
 <#
 .SYNOPSIS
 Retrieves persisted Boxstarter configuration settings.
@@ -14,7 +14,7 @@ about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey
 Set-BoxstarterConfig
 #>
-    [xml]$configXml = Get-Content (Join-Path $Boxstarter.BaseDir BoxStarter.config)
+    [xml]$configXml = Get-Content (Join-Path $Boxstarter.BaseDir Boxstarter.config)
     if($configXml.config.LocalRepo -ne $null){
         $localRepo=$configXml.config.LocalRepo
     }

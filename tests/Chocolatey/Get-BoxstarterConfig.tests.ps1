@@ -6,7 +6,7 @@ Describe "Get-BoxstarterConfig" {
     $currentBase = $Boxstarter.BaseDir
     $currentNugetSources = $Boxstarter.NugetSources
     $currentLocalRepo = $Boxstarter.LocalRepo
-    [xml]$configXml = Get-Content (Join-Path $Boxstarter.BaseDir BoxStarter.config)
+    [xml]$configXml = Get-Content (Join-Path $Boxstarter.BaseDir Boxstarter.config)
     $Boxstarter.BaseDir = $testRoot
 
     Context "When No LocalRepo is explicitly configured" {
