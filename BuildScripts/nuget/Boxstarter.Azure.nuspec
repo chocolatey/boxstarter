@@ -10,6 +10,10 @@
     <iconUrl>https://cdn.rawgit.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <projectUrl>https://Boxstarter.org</projectUrl>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <summary>Azure support for Boxstarter</summary>
+    <packageSourceUrl>https://github.com/chocolatey/boxstarter/</packageSourceUrl>
+    <projectSourceUrl>https://github.com/chocolatey/boxstarter/</projectSourceUrl>
+    <bugTrackerUrl>https://github.com/chocolatey/boxstarter/issues</bugTrackerUrl>
     <description>Boxstarter's Azure module includes functionality for targeting Azure VMs with the ability to save and restore checkpoints leveraging blob snapshots.
 
 ## Package parameters
@@ -19,7 +23,7 @@
     <tags>Boxstarter bootstrapper environment setup VM virtualization Azure</tags>
     <dependencies>
       <dependency id="Boxstarter" version="[$version$]" />
-      <dependency id="WindowsAzurePowershell" />
+      <dependency id="WindowsAzurePowershell" version="1.6.0.20180408" />
     </dependencies>
     <releaseNotes>
 See information here: https://github.com/chocolatey/boxstarter/releases

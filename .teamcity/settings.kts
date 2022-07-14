@@ -1,5 +1,6 @@
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.pullRequests
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.nuGetPublish
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
@@ -7,10 +8,11 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 version = "2021.2"
 
 project {
-    buildType(Build)
+    buildType(Boxstarter)
 }
 
-object Build : BuildType({
+object Boxstarter : BuildType({
+    id = AbsoluteId("Boxstarter")
     name = "Build"
 
     artifactRules = """
@@ -18,6 +20,9 @@ object Build : BuildType({
     """.trimIndent()
 
     params {
+        param("env.vcsroot.branch", "%vcsroot.branch%")
+        param("env.Git_Branch", "%teamcity.build.vcs.branch.Boxstarter_BoxstarterVcsRoot%")
+        param("teamcity.git.fetchAllHeads", "true")
         param("env.CERT_SUBJECT_NAME", "Chocolatey Software, Inc.")
     }
 
@@ -40,20 +45,31 @@ object Build : BuildType({
                 """.trimIndent()
             }
         }
+
         step {
             name = "Include Signing Keys"
             type = "PrepareSigningEnvironment"
-
-            conditions {
-                equals("teamcity.build.branch.is_default", "true")
-            }
         }
+
         powerShell {
             name = "Build"
             scriptMode = file {
                 path = "BuildScripts/build.ps1"
             }
-            param("jetbrains_powershell_scriptArguments", "quick-deploy")
+            param("jetbrains_powershell_scriptArguments", "quick-deploy -buildCounter %build.counter%")
+        }
+
+        nuGetPublish {
+            name = "Publish Packages"
+
+            conditions {
+                matches("teamcity.build.branch", "^(develop|release/.*|hotfix/.*|tags/.*)${'$'}")
+            }
+
+            toolPath = "%teamcity.tool.NuGet.CommandLine.DEFAULT%"
+            packages = "buildArtifacts/*.nupkg"
+            serverUrl = "%env.NUGETDEV_SOURCE%"
+            apiKey = "%env.NUGETDEV_API_KEY%"
         }
     }
 

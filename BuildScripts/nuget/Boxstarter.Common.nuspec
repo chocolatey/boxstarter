@@ -11,6 +11,10 @@
     <iconUrl>https://raw.githubusercontent.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
     <title>Boxstarter Common Module</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Common module for Boxstarter</summary>
+    <packageSourceUrl>https://github.com/chocolatey/boxstarter/</packageSourceUrl>
+    <projectSourceUrl>https://github.com/chocolatey/boxstarter/</projectSourceUrl>
+    <bugTrackerUrl>https://github.com/chocolatey/boxstarter/issues</bugTrackerUrl>
     <description>Provides common functions used by multiple Boxstarter Modules.
 
 ## Package parameters

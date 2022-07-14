@@ -1,39 +1,84 @@
 $psake.use_exit_on_error = $true
 properties {
     $baseDir = (Split-Path -parent $psake.build_script_dir)
-    if(Get-Command Git -ErrorAction SilentlyContinue) {
-        $list = [System.Collections.ArrayList]::new()
-        git tag | Where-Object { $_ -match '^[0-9\.]*$' } | ForEach-Object { $list.Add([Version]::new($_)) } | Out-Null
-        $list.Sort()
-        $versionTag = $list[$list.Count-1].ToString()
-        $version = $versionTag + "."
-        $version += (git log $($version + '..') --pretty=oneline | measure-object).Count
-        $chocoPkgVersion = $version
-        if (-not $env:DO_BOXSTARTER_RELEASE) {
-            $chocoPkgVersion += '-beta'
-        }
-        $changeset = (git log -1 $($versionTag + '..') --pretty=format:%H)
-        if($changeset -eq $null) {
-            $changeset = (git log -1 --pretty=format:%H)
-        }
+    $counter = $buildCounter
+
+    $tagName = git tag -l --points-at HEAD
+
+    if ($tagName) {
+        Write-Host "Found tag ${'$'}tagName"
+        $isTagged = $true
+    } else {
+        Write-Host "No tag found for current commit"
+        $isTagged = $false
     }
-    else {
-        $version="1.0.0"
-        $chocoPkgVersion = $version
-    }
+
+    $script:version="1.0.0"
+    $script:packageVersion = $version
+    $script:informationalVersion = $version
+    $script:changeset = "abcdef"
     $nugetExe = "$env:ChocolateyInstall\bin\nuget.exe"
-    $ftpHost="waws-prod-bay-001.ftp.azurewebsites.windows.net"
     $msbuildExe="${env:programFiles(x86)}\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\msbuild.exe"
     $reportUnitExe = "$env:ChocolateyInstall\bin\ReportUnit.exe"
+    $gitVersionExe = "$env:ChocolateyInstall\lib\GitVersion.Portable\tools\gitversion.exe"
 }
 
 Task default -depends Build
-Task Build -depends Build-Clickonce, Install-ChocoPkg, Test, Package
-Task Deploy -depends Build, Publish-Clickonce -description 'Versions, packages and pushes to MyGet'
-Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-NuGet, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
-Task Push-Public -depends Push-Chocolatey, Push-GitHub
+Task Build -depends Run-GitVersion, Build-Clickonce, Install-ChocoPkg, Test, Package
+Task Deploy -depends Build, Publish-Clickonce -description 'Versions, packages and pushes'
+Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-Chocolatey, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task All-Tests -depends Test, Integration-Test
-Task Quick-Deploy -depends Build-Clickonce, Package, Publish-Clickonce
+Task Quick-Deploy -depends Run-GitVersion, Build-Clickonce, Package, Publish-Clickonce
+
+task Run-GitVersion {
+    Write-Host "Testing to see if running on TeamCity..."
+
+    if($env:TEAMCITY_VERSION) {
+        Write-Host "Running on TeamCity."
+
+        Write-Host "Running GitVersion with output type build server..."
+        . $gitVersionExe /output buildserver /nocache /nofetch
+
+        Write-Host "Running GitVersion again with output type json..."
+        $output = . $gitVersionExe /output json /nocache /nofetch
+    } else {
+        Write-Host "Not running on TeamCity."
+
+        Write-Host "Running GitVersion with output type json..."
+
+        $output = . $gitVersionExe /output json /nocache
+    }
+
+    Write-Host "Writing output variable..."
+    Write-Host $output
+
+    $joined = $output -join "`n"
+    Write-Host "Writing joined variable..."
+    Write-Host $joined
+
+    $versionInfo = $joined | ConvertFrom-Json
+
+    $prerelease = $versionInfo.PreReleaseLabel
+    $sha = $versionInfo.Sha.Substring(0,8)
+    $majorMinorPatch = $versionInfo.MajorMinorPatch
+    $buildDate = Get-Date -Format "yyyyMMdd"
+    $script:changeset = $versionInfo.Sha
+    $script:version = $versionInfo.AssemblySemVer
+
+    if ($isTagged) {
+        $script:packageVersion = $versionInfo.LegacySemVer
+        $script:informationalVersion = $versionInfo.InformationalVersion
+    } else {
+        $script:packageVersion = "$majorMinorPatch" + $(if ($prerelease) { "-$prerelease" } else { "-rc" }) + "-$buildDate" + $(if ($counter) { "-$counter" })
+        $script:informationalVersion = "$majorMinorPatch" + $(if ($prerelease) { "-$prerelease" } else { "-rc" }) + "-$buildDate-$sha"
+    }
+
+    Write-Host "Assembly Semantic Version: $version"
+    Write-Host "Assembly Informational Version: $informationalVersion"
+    Write-Host "Package Version: $packageVersion"
+
+    Write-Host "##teamcity[buildNumber '$packageVersion']"
+}
 
 task Create-ModuleZipForRemoting {
     if (Test-Path "$basedir\Boxstarter.Chocolatey\Boxstarter.zip") {
@@ -63,14 +108,14 @@ task Build-ClickOnce -depends Install-MSBuild, Install-Win8SDK, Restore-NuGetPac
 }
 
 task Publish-ClickOnce -depends Install-MSBuild {
-    exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version.0" }
+    exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Publish /v:minimal /p:ApplicationVersion="$version" }
     Remove-Item "$basedir\web\Launch" -Recurse -Force -ErrorAction SilentlyContinue
     MkDir "$basedir\web\Launch"
     Set-Content "$basedir\web\Launch\.gitattributes" -Value "* -text"
     Copy-Item "$basedir\Boxstarter.Clickonce\bin\Debug\App.Publish\*" "$basedir\web\Launch" -Recurse -Force
 }
 
-Task Test -depends Install-ChocoPkg, Pack-NuGet, Create-ModuleZipForRemoting {
+Task Test -depends Install-ChocoPkg, Pack-Chocolatey, Create-ModuleZipForRemoting {
     Push-Location "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     $pesterTestResultsFile = "$baseDir\buildArtifacts\TestResults.xml"
@@ -95,7 +140,7 @@ Task Test -depends Install-ChocoPkg, Pack-NuGet, Create-ModuleZipForRemoting {
     Pop-Location
 }
 
-Task Integration-Test -depends Pack-NuGet, Create-ModuleZipForRemoting {
+Task Integration-Test -depends Pack-Chocolatey, Create-ModuleZipForRemoting {
     Push-Location "$baseDir"
     $pesterDir = "$env:ChocolateyInstall\lib\Pester"
     if($testName){
@@ -116,7 +161,7 @@ Task Version-Module -description 'Stamps the psd1 with the version and last chan
                     Set-Content $path
     }
     (Get-Content "$baseDir\BuildScripts\bootstrapper.ps1") |
-        ForEach-Object {$_ -replace "Version = .*`$", "Version = `"$version`"," } |
+        ForEach-Object {$_ -replace "Version = .*`$", "Version = `"$packageVersion`"," } |
             Set-Content "$baseDir\BuildScripts\bootstrapper.ps1"
 }
 
@@ -136,13 +181,13 @@ Task Clean-Artifacts {
     mkdir "$baseDir\buildArtifacts\tempNuGetFolders\Boxstarter.WinConfig"
 }
 
-Task Pack-NuGet -depends Sign-PowerShellFiles -description 'Packs the modules and example packages' {
+Task Pack-Chocolatey -depends Sign-PowerShellFiles -description 'Packs the modules and example packages' {
     if (Test-Path "$baseDir\buildPackages\*.nupkg") {
       Remove-Item "$baseDir\buildPackages\*.nupkg" -Force
     }
 
     PackDirectory "$baseDir\BuildPackages"
-    PackDirectory "$baseDir\BuildScripts\nuget" -AddReleaseNotes -Version $chocoPkgVersion
+    PackDirectory "$baseDir\BuildScripts\nuget" -Version $packageVersion
     Move-Item "$baseDir\BuildScripts\nuget\*.nupkg" "$basedir\buildArtifacts"
 }
 
@@ -151,69 +196,10 @@ Task Package-DownloadZip -depends Clean-Artifacts {
       Remove-Item "$basedir\BuildArtifacts\Boxstarter.*.zip" -Force
     }
 
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\LICENSE.txt" }
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\NOTICE.txt" }
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\buildscripts\bootstrapper.ps1" }
-    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" "$basedir\buildscripts\Setup.bat" }
-}
-
-Task Push-Chocolatey -description 'Pushes the module to Chocolatey community sfeed' {
-    exec {
-        Get-ChildItem "$baseDir\buildArtifacts\*.nupkg" |
-            ForEach-Object { cpush $_  }
-    }
-}
-
-Task Push-GitHub {
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12;
-    $headers = @{
-        Authorization = 'Basic ' + [Convert]::ToBase64String(
-            [Text.Encoding]::ASCII.GetBytes("$($env:BOXSTARTER_GITHUB_USERNAME):$($env:BOXSTARTER_GITHUB_TOKEN)"));
-    }
-
-    $releaseNotes = Get-ReleaseNotes
-    $postParams = ConvertTo-Json @{
-        tag_name="v$chocoPkgVersion"
-        target_commitish=$changeset
-        name="v$chocoPkgVersion"
-        body=$releaseNotes.DocumentElement.'#text'
-    } -Compress
-
-    $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/chocolatey/boxstarter/releases/latest" -Method GET -Headers $headers
-    if($latest.tag_name -ne "v$chocoPkgVersion"){
-        Write-Host "Creating release"
-        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/chocolatey/boxstarter/releases" -Method POST -Body $postParams -Headers $headers
-        $uploadUrl = $response.upload_url.replace("{?name,label}","?name=boxstarter.$chocoPkgVersion.zip")
-    }
-    else {
-        $uploadUrl = $latest.upload_url.replace("{?name,label}","?name=boxstarter.$chocoPkgVersion.zip")
-    }
-
-    Write-Host "Uploading $basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip to $uploadUrl"
-    try {
-        Invoke-RestMethod -Uri $uploadUrl -Method POST -ContentType "application/zip" -InFile "$basedir\BuildArtifacts\Boxstarter.$chocoPkgVersion.zip" -Headers $headers
-    }
-    catch{
-        write-host $_ | Format-List * -force
-    }
-}
-
-task Get-ClickOnceStats {
-    $creds = Get-Credential
-    mkdir "$basedir\sitelogs" -ErrorAction silentlycontinue
-    Push-Location "$basedir\sitelogs"
-    $ftpScript = @"
-user $($creds.UserName) $($creds.GetNetworkCredential().Password)
-cd LogFiles/http/RawLogs
-mget *
-bye
-"@
-    $ftpScript | ftp -i -n $ftpHost
-    if(!(Test-Path $env:ChocolateyInstall\lib\logparser*)) { choco install logparser --version=2.2.0.1 -y --no-progress }
-    $logParser = "${env:programFiles(x86)}\Log Parser 2.2\LogParser.exe"
-    .$logparser -i:w3c "SELECT Date, EXTRACT_VALUE(cs-uri-query,'package') as package, COUNT(*) as count FROM * where cs-uri-stem = '/launch/Boxstarter.WebLaunch.Application' Group by Date, package Order by Date, package" -rtp:-1
-    Pop-Location
-    Remove-Item "$basedir\sitelogs" -Recurse -Force
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" "$basedir\LICENSE.txt" }
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" "$basedir\NOTICE.txt" }
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" "$basedir\buildscripts\bootstrapper.ps1" }
+    exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" "$basedir\buildscripts\Setup.bat" }
 }
 
 task Install-MSBuild {
@@ -228,7 +214,7 @@ task Install-Win8SDK {
 }
 
 Task Restore-NuGetPackages {
-    exec { .$nugetExe restore "$baseDir\Boxstarter.sln" }
+    exec { .$nugetExe restore "$baseDir\Boxstarter.sln" -msbuildpath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin" }
 }
 
 task Install-ChocoPkg {
@@ -292,34 +278,25 @@ task Sign-PowerShellFiles -depends Copy-PowerShellFiles {
     }
 }
 
-function PackDirectory($path, [switch]$AddReleaseNotes, $Version = $version){
+function PackDirectory($path, $Version = $version){
     exec {
-        $releaseNotes = Get-ReleaseNotes
         Get-ChildItem $path -Recurse -include *.nuspec |
             ForEach-Object {
-                 if($AddReleaseNotes) {
-                   [xml]$nuspec = Get-Content $_
-                   $oldReleaseNotes = $nuspec.package.metadata.ChildNodes| Where-Object { $_.Name -eq 'releaseNotes' }
-                   $newReleaseNotes = $nuspec.ImportNode($releaseNotes.DocumentElement, $true)
-                   $nuspec.package.metadata.ReplaceChild($newReleaseNotes, $oldReleaseNotes) | Out-Null
-                   $nuspec.Save($_)
-                 }
-                 .$nugetExe pack $_ -OutputDirectory $path -NoPackageAnalysis -version $Version
+                 choco pack $_ --OutputDirectory $path --version $version
               }
     }
-}
-
-function Get-ReleaseNotes {
-    [xml](Get-Content "$baseDir\BuildScripts\releaseNotes.xml")
 }
 
 # Borrowed from Luis Rocha's Blog (http://www.luisrocha.net/2009/11/setting-assembly-version-with-windows.html)
 function Update-AssemblyInfoFiles ([string] $version, [string] $commit) {
     $assemblyVersionPattern = 'AssemblyVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
     $fileVersionPattern = 'AssemblyFileVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
+    $assemblyInformationalVersionPattern = 'AssemblyInformationalVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
+
     $fileCommitPattern = 'AssemblyTrademark\("([a-f0-9]{40})?"\)'
     $assemblyVersion = 'AssemblyVersion("' + $version + '")';
     $fileVersion = 'AssemblyFileVersion("' + $version + '")';
+    $assemblyInformationalVersion = 'AssemblyInformationalVersion("' + $informationalVersion + '")';
     $commitVersion = 'AssemblyTrademark("' + $commit + '")';
 
     Get-ChildItem -path $baseDir -r -filter AssemblyInfo.cs | ForEach-Object {
@@ -334,7 +311,8 @@ function Update-AssemblyInfoFiles ([string] $version, [string] $commit) {
         (Get-Content $filename) | ForEach-Object {
             ForEach-Object {$_ -replace $assemblyVersionPattern, $assemblyVersion } |
             ForEach-Object {$_ -replace $fileVersionPattern, $fileVersion } |
-            ForEach-Object {$_ -replace $fileCommitPattern, $commitVersion }
+            ForEach-Object {$_ -replace $fileCommitPattern, $commitVersion } |
+            ForEach-Object {$_ -replace $assemblyInformationalVersionPattern, $assemblyInformationalVersion }
         } | Set-Content $filename
     }
 }
