@@ -24,11 +24,11 @@ properties {
 }
 
 Task default -depends Build
-Task Build -depends Run-GitVersion, Build-Clickonce, Build-Web, Install-ChocoPkg, Test, Package
-Task Deploy -depends Build, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce -description 'Versions, packages and pushes'
+Task Build -depends Run-GitVersion, Build-Clickonce, Install-ChocoPkg, Test, Package
+Task Deploy -depends Build, Publish-Clickonce -description 'Versions, packages and pushes'
 Task Package -depends Clean-Artifacts, Version-Module, Install-ChocoPkg, Create-ModuleZipForRemoting, Pack-Chocolatey, Package-DownloadZip -description 'Versions the psd1 and packs the module and example package'
 Task All-Tests -depends Test, Integration-Test
-Task Quick-Deploy -depends Run-GitVersion, Build-Clickonce, Build-web, Package, Deploy-DownloadZip, Deploy-Bootstrapper, Publish-Clickonce
+Task Quick-Deploy -depends Run-GitVersion, Build-Clickonce, Package, Publish-Clickonce
 
 task Run-GitVersion {
     Write-Host "Testing to see if running on TeamCity..."
@@ -69,8 +69,8 @@ task Run-GitVersion {
         $script:packageVersion = $versionInfo.LegacySemVer
         $script:informationalVersion = $versionInfo.InformationalVersion
     } else {
-        $script:packageVersion = "$majorMinorPatch-$prerelease-$buildDate" + $(if ($counter) { "-$counter" })
-        $script:informationalVersion = "$majorMinorPatch-$prerelease-$buildDate-$sha"
+        $script:packageVersion = "$majorMinorPatch" + $(if ($prerelease) { "-$prerelease" } else { "-rc" }) + "-$buildDate" + $(if ($counter) { "-$counter" })
+        $script:informationalVersion = "$majorMinorPatch" + $(if ($prerelease) { "-$prerelease" } else { "-rc" }) + "-$buildDate-$sha"
     }
 
     Write-Host "Assembly Semantic Version: $version"
@@ -105,12 +105,6 @@ task Build-ClickOnce -depends Install-MSBuild, Install-Win8SDK, Restore-NuGetPac
     Update-AssemblyInfoFiles $version $changeset
     exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Clean /v:minimal }
     exec { .$msbuildExe "$baseDir\Boxstarter.ClickOnce\Boxstarter.WebLaunch.csproj" /t:Build /v:minimal }
-}
-
-task Build-Web -depends Install-MSBuild, Restore-NuGetPackages {
-    exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Clean /v:minimal }
-    exec { .$msbuildExe "$baseDir\Web\Web.csproj" /t:Build /v:minimal /p:DownloadNuGetExe="true" }
-    Copy-Item "$baseDir\packages\bootstrap.3.0.2\content\*" "$baseDir\Web" -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 task Publish-ClickOnce -depends Install-MSBuild {
@@ -162,7 +156,7 @@ Task Version-Module -description 'Stamps the psd1 with the version and last chan
     Get-ChildItem "$baseDir\**\*.psd1" | ForEach-Object {
        $path = $_
         (Get-Content $path) |
-            ForEach-Object {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$packageVersion'" } |
+            ForEach-Object {$_ -replace "^ModuleVersion = '.*'`$", "ModuleVersion = '$version'" } |
                 ForEach-Object {$_ -replace "^PrivateData = '.*'`$", "PrivateData = '$changeset'" } |
                     Set-Content $path
     }
@@ -208,17 +202,6 @@ Task Package-DownloadZip -depends Clean-Artifacts {
     exec { ."$env:chocolateyInstall\bin\7za.exe" a -tzip "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" "$basedir\buildscripts\Setup.bat" }
 }
 
-Task Deploy-DownloadZip -depends Package-DownloadZip {
-    Remove-Item "$basedir\web\downloads" -Recurse -Force -ErrorAction SilentlyContinue
-    mkdir "$basedir\web\downloads"
-    Copy-Item "$basedir\BuildArtifacts\Boxstarter.$packageVersion.zip" "$basedir\web\downloads"
-}
-
-Task Deploy-Bootstrapper {
-    Remove-Item "$basedir\web\bootstrapper.ps1" -Force -ErrorAction SilentlyContinue
-    Copy-Item "$basedir\buildscripts\bootstrapper.ps1" "$basedir\web\bootstrapper.ps1"
-}
-
 task Install-MSBuild {
     if(!(Test-Path "${env:programFiles(x86)}\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\msbuild.exe")) {
         choco install visualstudio2017buildtools -params '--add Microsoft.VisualStudio.Workload.WebBuildTools' --version=15.8.7.0 --no-progress -y
@@ -231,7 +214,7 @@ task Install-Win8SDK {
 }
 
 Task Restore-NuGetPackages {
-    exec { .$nugetExe restore "$baseDir\Boxstarter.sln" }
+    exec { .$nugetExe restore "$baseDir\Boxstarter.sln" -msbuildpath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin" }
 }
 
 task Install-ChocoPkg {

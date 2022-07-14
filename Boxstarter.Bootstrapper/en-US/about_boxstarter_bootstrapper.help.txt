@@ -14,7 +14,7 @@ DESCRIPTION
 ENABLING REBOOTS
 	By default, Boxstarter will not reboot a machine even when
 	Invoke-Reboot is called. In order to enable reboots, either the
-	-RebootOk switch parameter bust be set on Invoke-Boxstarter or
+	-RebootOk switch parameter must be set on Invoke-Boxstarter or
 	the RebootOk $Boxstarter property should be true.
 
 	If Reoots are enabled, calling INVOKE-REBOOT will prepare the

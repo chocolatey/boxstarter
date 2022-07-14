@@ -17,12 +17,6 @@ bin
 Boxstarter.Chocolatey/Boxstarter.zip
 Boxstarter.Chocolatey/Chocolatey
 Packages
-Web/Content
-Web/fonts
-Web/Scripts
-Web/Launch
-Web/downloads
-Web/bootstrapper.ps1
 PublishProfiles
 *.pfx
 .vagrant
@@ -30,3 +24,4 @@ PublishProfiles
 Backup/
 UpgradeLog*.htm
 .metals/
+.DS_Store
