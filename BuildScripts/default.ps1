@@ -214,7 +214,7 @@ task Install-Win8SDK {
 }
 
 Task Restore-NuGetPackages {
-    exec { .$nugetExe restore "$baseDir\Boxstarter.sln" }
+    exec { .$nugetExe restore "$baseDir\Boxstarter.sln" -msbuildpath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin" }
 }
 
 task Install-ChocoPkg {
