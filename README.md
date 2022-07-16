@@ -67,7 +67,7 @@ Enable-PSRemoting -Force
 
 ### Documentation
 
-Please see the [Boxstarter docs](https://boxstarter.org/WhyBoxstarter).
+Please see the [Boxstarter docs](https://boxstarter.org/whyboxstarter).
 
 ### Requirements
 
