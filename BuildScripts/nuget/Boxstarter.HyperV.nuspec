@@ -7,7 +7,7 @@
     <owners>Matt Wrock, Rob Reynolds, Gary Ewan Park</owners>
     <copyright>2018 Chocolatey Software, Inc, 2012 - 2018 Matt Wrock</copyright>
     <title>Boxstarter HyperV Module</title>
-    <iconUrl>https://cdn.rawgit.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
+    <iconUrl>https://img.chocolatey.org/logos/boxstarter-logo.png</iconUrl>
     <projectUrl>https://Boxstarter.org</projectUrl>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <summary>Hyper-V support for Boxstarter</summary>
