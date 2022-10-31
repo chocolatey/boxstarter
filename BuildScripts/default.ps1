@@ -58,12 +58,22 @@ task Run-GitVersion {
 
     $versionInfo = $joined | ConvertFrom-Json
 
-    $prerelease = $versionInfo.PreReleaseLabel
     $sha = $versionInfo.Sha.Substring(0,8)
     $majorMinorPatch = $versionInfo.MajorMinorPatch
     $buildDate = Get-Date -Format "yyyyMMdd"
     $script:changeset = $versionInfo.Sha
     $script:version = $versionInfo.AssemblySemVer
+
+    # Having a pre-release label of greater than 10 characters can cause problems when trying to run choco pack.
+    # Since we typically only see this when building a local feature branch, or a PR, let's just trim it down to
+    # the 10 character limit, and move on.
+    $prerelease = $versionInfo.PreReleaseLabel.Replace("-","").Substring(0,10)
+
+    # Chocolatey doesn't support a prerelease that starts with a digit.
+    # If we see a digit here, merely replace it with an `a` to get around this.
+    if ($prerelease -match "^\d") {
+        $prerelease = "a$($prerelease.Substring(1,9))"
+    }
 
     if ($isTagged) {
         $script:packageVersion = $versionInfo.LegacySemVer
