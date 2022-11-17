@@ -409,7 +409,7 @@ Describe "Install-BoxstarterPackage" {
         Remove-Item "$env:temp\Boxstarter" -Recurse -Force -ErrorAction SilentlyContinue
         $currentConfig=Get-Content "$($Boxstarter.BaseDir)\Boxstarter.Config"
         $currentRepo=$Boxstarter.LocalRepo
-        Set-BoxStarterConfig -LocalRepo $repo
+        Set-BoxstarterConfig -LocalRepo $repo
 
         Install-BoxstarterPackage -session $session -PackageName test-package3 -DisableReboots -LocalRepo $repo | Out-Null
 

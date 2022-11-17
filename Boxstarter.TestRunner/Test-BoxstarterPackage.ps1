@@ -73,10 +73,10 @@ Set-BoxstarterPackageNugetFeed
         if($options.RestoreCheckpoint){$vmArgs.CheckpointName=$options.RestoreCheckpoint}
         $vmArgs.Provider=$options.DeploymentVMProvider
         if($options.DeploymentVMProvider -eq "azure") {
-            Write-BoxStarterMessage "Using Azure VMs. Checking to see if these are shutdown..." -verbose
+            Write-BoxstarterMessage "Using Azure VMs. Checking to see if these are shutdown..." -verbose
             $options.DeploymentTargetNames | % {
                 $thisState = Test-VMStarted $options.DeploymentCloudServiceName $_
-                Write-BoxStarterMessage "Is $_ on: $thisState" -verbose
+                Write-BoxstarterMessage "Is $_ on: $thisState" -verbose
                 $cloudVMStates.$_ = $thisState
             }
         }
@@ -127,7 +127,7 @@ Set-BoxstarterPackageNugetFeed
         $global:VerbosePreference=$CurrentVerbosity
 
         $cloudVMStates.Keys | ? { $cloudVMStates.$_ -eq $false -and (Test-VMStarted $options.DeploymentCloudServiceName $_)} | % {
-            Write-BoxStarterMessage "Stopping $_..."
+            Write-BoxstarterMessage "Stopping $_..."
             Stop-AzureVM  -ServiceName $options.DeploymentCloudServiceName -Name $_ -Force | Out-Null
         }
     }

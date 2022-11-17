@@ -114,10 +114,10 @@ function Setup-BoxstarterModuleAndLocalRepo($BaseDir, $session){
         $zipPackage = $shellApplication.NameSpace("$env:temp\Boxstarter\Boxstarter.zip")
         $destinationFolder = $shellApplication.NameSpace("$env:temp\boxstarter")
         $destinationFolder.CopyHere($zipPackage.Items(),0x10)
-        [xml]$configXml = Get-Content (Join-Path $env:temp\Boxstarter BoxStarter.config)
+        [xml]$configXml = Get-Content (Join-Path $env:temp\Boxstarter Boxstarter.config)
         if($configXml.config.LocalRepo -ne $null) {
             $configXml.config.RemoveChild(($configXml.config.ChildNodes | ? { $_.Name -eq "LocalRepo"}))
-            $configXml.Save((Join-Path $env:temp\Boxstarter BoxStarter.config))
+            $configXml.Save((Join-Path $env:temp\Boxstarter Boxstarter.config))
         }
     }
 }

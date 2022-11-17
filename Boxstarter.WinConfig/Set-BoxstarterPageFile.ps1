@@ -119,7 +119,7 @@ Function Set-BoxstarterPageFile {
                     Get-WmiObject -Class Win32_PageFileSetting -Filter "Name='$($dl):\\pagefile.sys'" -ErrorAction Stop | Remove-WmiObject -ErrorAction Stop
                 }
                 catch {
-                    Write-BoxStarterMessage "Unable to disable the pagefile on '$($dl):'. (Error: $($_.Exception.Message))"
+                    Write-BoxstarterMessage "Unable to disable the pagefile on '$($dl):'. (Error: $($_.Exception.Message))"
                     return
                 }
             }

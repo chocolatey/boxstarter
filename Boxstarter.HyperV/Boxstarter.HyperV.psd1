@@ -1,7 +1,7 @@
 @{
 Description = 'Provides Cmdlets that will install a Boxstarter package on a Hyper-V VM'
 # Script module or binary module file associated with this manifest.
-ModuleToProcess = './boxstarter.HyperV.psm1'
+ModuleToProcess = './Boxstarter.HyperV.psm1'
 
 # Version number of this module.
 ModuleVersion = '2.13.0'

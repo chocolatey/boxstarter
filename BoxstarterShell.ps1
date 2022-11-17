@@ -14,12 +14,18 @@ if(!(Test-Admin)) {
     Exit
 }
 
+$OSMessage = @"
+You're running PowerShell $($PSVersionTable.PSVersion) on $($PSVersionTable.Platform).
+"@
+
+
 $Host.UI.RawUI.WindowTitle="Boxstarter Shell"
 cd $env:SystemDrive\
 Write-Output @"
 Welcome to the Boxstarter shell!
 The Boxstarter commands have been imported from $here and are available for you to run in this shell.
 You may also import them into the shell of your choice.
+$OSMessage
 
 Here are some commands to get you started:
 Install a Package:   Install-BoxstarterPackage

@@ -68,7 +68,7 @@ function Invoke-Chocolatey($chocoArgs) {
             Write-BoxstarterMessage "BoxstarterWrapper::Run($chocoArgs)..." -Verbose
             <#
             $chocoArgs | ForEach-Object {
-              Write-BoxStarterMessage " -> $_" -Verbose
+              Write-BoxstarterMessage " -> $_" -Verbose
             }
             #>
 

@@ -179,7 +179,7 @@ Set-BoxstarterConfig
             }
 
             $script = @"
-Import-Module (Join-Path -Path "$($Boxstarter.baseDir)" -ChildPath BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking; Invoke-ChocolateyBoxstarter $scriptStringArgs
+Import-Module (Join-Path -Path "$($Boxstarter.baseDir)" -ChildPath Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking; Invoke-ChocolateyBoxstarter $scriptStringArgs
 "@
 
             Invoke-Boxstarter -ScriptToCall ([ScriptBlock]::Create($script)) @invokeBoxstarterArgs

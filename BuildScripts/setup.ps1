@@ -122,8 +122,8 @@ function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
     # set permissions to mitigate possible privilege escalation
     Ensure-Permissions -folder $boxstarterPath
 
-    PersistBoxStarterPathToEnvironmentVariable "PSModulePath" $boxstarterPath
-    PersistBoxStarterPathToEnvironmentVariable "Path" $boxstarterPath
+    PersistBoxstarterPathToEnvironmentVariable "PSModulePath" $boxstarterPath
+    PersistBoxstarterPathToEnvironmentVariable "Path" $boxstarterPath
     $binPath =  "$here\..\..\..\bin"
     $boxModule=Get-Module Boxstarter.Chocolatey
     if($boxModule) {
@@ -216,7 +216,7 @@ function Create-Shortcut($location, $target, $targetArgs, $boxstarterPath) {
 
 	Move-Item -Path $tempFile $location -Force
 }
-function PersistBoxStarterPathToEnvironmentVariable($variableName, $boxstarterPath){
+function PersistBoxstarterPathToEnvironmentVariable($variableName, $boxstarterPath){
     # Remove user scoped vars from previous releases
     $userValue = [Environment]::GetEnvironmentVariable($variableName, 'User')
     if($userValue){

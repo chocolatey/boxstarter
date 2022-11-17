@@ -1,4 +1,4 @@
-function Set-BoxStarterConfig {
+function Set-BoxstarterConfig {
 <#
 .SYNOPSIS
 Sets persist-able Boxstarter configuration settings.
@@ -23,7 +23,7 @@ Get-BoxstarterConfig
     [CmdletBinding()]
     param([string]$LocalRepo, [string]$NugetSources)
 
-    [xml]$configXml = Get-Content (Join-Path $Boxstarter.BaseDir BoxStarter.config)
+    [xml]$configXml = Get-Content (Join-Path $Boxstarter.BaseDir Boxstarter.config)
 
     if($NugetSources){
         $boxstarter.NugetSources = $configXml.config.NugetSources = $NugetSources
@@ -36,5 +36,5 @@ Get-BoxstarterConfig
         $boxstarter.LocalRepo = $configXml.config.LocalRepo = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LocalRepo)
     }
 
-    $configXml.Save((Join-Path $Boxstarter.BaseDir BoxStarter.config))
+    $configXml.Save((Join-Path $Boxstarter.BaseDir Boxstarter.config))
 }

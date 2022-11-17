@@ -45,7 +45,7 @@ Invoke-BoxstarterBuild
         [string[]]$accounts=@("Everyone")
     )
     if(!(Test-Admin)) {
-        $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Chocolatey\BoxStarter.Chocolatey.psd1")
+        $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1")
         $command = "-ExecutionPolicy bypass -command Import-Module `"$($unNormalized.FullName)`";Set-BoxstarterShare @PSBoundParameters"
         Start-Process powershell -verb runas -argumentlist $command
         return

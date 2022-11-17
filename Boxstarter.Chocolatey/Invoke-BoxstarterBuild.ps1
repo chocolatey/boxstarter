@@ -1,10 +1,10 @@
-﻿function Invoke-BoxStarterBuild {
+﻿function Invoke-BoxstarterBuild {
 <#
 .SYNOPSIS
 Packs a specific package or all packages in the Boxstarter Repository
 
 .DESCRIPTION
-Invoke-BoxStarterBuild packs either a single package or all packages
+Invoke-BoxstarterBuild packs either a single package or all packages
 in the local repository. The packed .nupkg is placed in the root of
 the LocalRepo and is then able to be consumed by
 Invoke-ChocolateyBoxstarter.

@@ -377,7 +377,7 @@ Describe "Invoke-Boxstarter" {
             "$(Get-BoxstarterTempDir)\boxstarter.script" | should Contain "return"
         }
         it "will invoke-boxstarter via elevated console"{
-            Assert-MockCalled Start-Process -ParameterFilter {$filepath -eq "powershell" -and $verb -eq "runas" -and $argumentlist -like "*Invoke-BoxStarter*"}
+            Assert-MockCalled Start-Process -ParameterFilter {$filepath -eq "powershell" -and $verb -eq "runas" -and $argumentlist -like "*Invoke-Boxstarter*"}
         }
         it "will not stop update services" {
             Assert-MockCalled Stop-UpdateServices -times 0

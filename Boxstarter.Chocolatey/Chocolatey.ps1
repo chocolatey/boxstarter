@@ -58,7 +58,7 @@ function Write-HostOverride {
     )
 
     if ($null -ne $Boxstarter.ScriptToCall) { 
-        Log-BoxStarterMessage $object 
+        Log-BoxstarterMessage $object 
     }
 
     if ($Boxstarter.SuppressLogging) {

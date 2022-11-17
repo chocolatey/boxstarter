@@ -1,7 +1,7 @@
 @{
 Description = 'Provides Cmdlets that will install a boxstarter package on a Windows Azure VM'
 # Script module or binary module file associated with this manifest.
-ModuleToProcess = './boxstarter.Azure.psm1'
+ModuleToProcess = './Boxstarter.Azure.psm1'
 
 # Version number of this module.
 ModuleVersion = '2.13.0'
@@ -21,7 +21,8 @@ PowerShellVersion = '3.0'
 # Minimum version of the .NET Framework required by this module
 DotNetFrameworkVersion = '4.0'
 
-RequiredAssemblies = @( "$env:ProgramW6432\Microsoft SDKs\Azure\.NET SDK\v2.5\bin\plugins\Caching\Microsoft.WindowsAzure.StorageClient.dll" )
+# NOTE: assemblies loaded in psm1 (OS-dependent)
+RequiredAssemblies = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @('..\Boxstarter.Common\Boxstarter.Common.psd1','..\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1')
