@@ -42,6 +42,9 @@ Changes the behavior of the taskbar when using multiple displays. Valid inputs a
 .PARAMETER MultiMonitorCombine
 Changes the taskbar icon combination style for non-primary displays. Valid inputs are Always, Full, and Never.
 
+.PARAMETER NewsIcons
+Changes how the 'News and Interests' icons are displayed. Valid inputs are IconsText, Icons, and Never.
+
 .EXAMPLE
 Set-BoxstarterTaskbarOptions -Lock -AutoHide -AlwaysShowIconsOff -MultiMonitorOff
 
@@ -120,7 +123,11 @@ multi-monitor support and always combine icons on non-primary monitors.
 
         [Parameter(ParameterSetName = 'EnableSearchBox')]
         [switch]
-        $EnableSearchBox
+        $EnableSearchBox,
+
+        [ValidateSet('IconsText', 'Icons', 'Never')]
+        [String]
+        $NewsIcons
     )
 
     $baseKey = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion'
@@ -252,6 +259,23 @@ multi-monitor support and always combine icons on non-primary monitors.
     elseif ($DisableSearchBox.IsPresent) {
         # this will create the path if it does not exist
         Set-ItemProperty -Path (Join-Path -Path $baseKey -ChildPath 'Search') -Name 'SearchBoxTaskbarMode' -Value 0 -Type DWord -Force
+    }
+
+    switch ($NewsIcons) {
+        "IconsText" {
+            Set-ItemProperty -Path (Join-Path -Path $baseKey -ChildPath 'Feeds') -Name ShellFeedsTaskbarViewMode -Value 0
+            Set-ItemProperty -Path (Join-Path -Path $baseKey -ChildPath 'Feeds') -Name ShellFeedsTaskbarPreviousViewMode -Value 2
+        }
+
+        "Icons" {
+            Set-ItemProperty -Path (Join-Path -Path $baseKey -ChildPath 'Feeds') -Name ShellFeedsTaskbarViewMode -Value 1
+            Set-ItemProperty -Path (Join-Path -Path $baseKey -ChildPath 'Feeds') -Name ShellFeedsTaskbarPreviousViewMode -Value 0
+        }
+
+        "Never" {
+            Set-ItemProperty -Path (Join-Path -Path $baseKey -ChildPath 'Feeds') -Name ShellFeedsTaskbarViewMode -Value 2
+            Set-ItemProperty -Path (Join-Path -Path $baseKey -ChildPath 'Feeds') -Name ShellFeedsTaskbarPreviousViewMode -Value 0
+        }
     }
 
     Restart-Explorer
