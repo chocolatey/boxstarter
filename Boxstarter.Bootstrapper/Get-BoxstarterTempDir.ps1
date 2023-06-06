@@ -1,6 +1,6 @@
 function Get-BoxstarterTempDir {
 
-    if ($PSVersionTable.Platform -ne 'Windows') {
+    if ($PSVersionTable.Platform -eq 'Unix') {
         return '/tmp/Boxstarter'
     }
 
