@@ -412,6 +412,23 @@ Describe "Call-Chocolatey" {
         }
     }
 
+    context "when not verbose" {
+        $script:passedArgs = ""
+        Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }
+        $global:VerbosePreference="SilentlyContinue"
+        choco Install pkg
+        $global:VerbosePreference | Should Be "SilentlyContinue"
+
+        it "passes expected params" {
+            $passedArgs.count | Should Be 5
+            $passedArgs[0] | Should Be "Install"
+            $passedArgs[1] | Should Be "pkg"
+            $passedArgs[2] | Should Be "-Source"
+            # $passedArgs[3] -> feeds, may differ from system to system
+            $passedArgs[4] | Should Be "-y"
+        }
+    }
+
     context "when verbose" {
         $script:passedArgs = ""
         Mock Invoke-LocalChocolatey { $script:passedArgs = $chocoArgs }

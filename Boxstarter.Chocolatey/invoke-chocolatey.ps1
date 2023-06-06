@@ -80,7 +80,7 @@ function Invoke-Chocolatey($chocoArgs) {
                 UseNewEnvironment = $false
                 Wait              = $false
                 WorkingDirectory  = $targetWdir
-                Verbose           = $VerbosePreference
+                Verbose           = ($global:VerbosePreference -eq "Continue")
             }
             
             $p = Start-Process @pargs

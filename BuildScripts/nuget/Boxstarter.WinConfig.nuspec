@@ -9,7 +9,7 @@
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <id>Boxstarter.WinConfig</id>
     <title>Boxstarter WinConfig Module</title>
-    <iconUrl>https://cdn.rawgit.com/chocolatey/boxstarter/master/Web/Images/boxLogo_sm.png</iconUrl>
+    <iconUrl>https://img.chocolatey.org/logos/boxstarter-logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Windows environment module for Boxstarter</summary>
     <packageSourceUrl>https://github.com/chocolatey/boxstarter/</packageSourceUrl>
