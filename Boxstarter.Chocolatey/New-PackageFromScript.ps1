@@ -55,7 +55,7 @@ about_boxstarter_chocolatey
     $chocoInstall = [System.Environment]::GetEnvironmentVariable('ChocolateyInstall', 'MACHINE')
     if($chocoInstall -eq $null) {
         # Simply Installs choco repo and helpers
-        Call-Chocolatey -Command 'install' -PackageNames @('chocolatey')
+        Call-Chocolatey -Command '--version'
         $chocoInstall = [System.Environment]::GetEnvironmentVariable('ChocolateyInstall', 'MACHINE')
     }
     if($source -like "*://*"){
