@@ -18,7 +18,7 @@ object Boxstarter : BuildType({
     artifactRules = """
         +:buildArtifacts/Boxstarter.*.nupkg
         +:buildArtifacts/Boxstarter.*.zip
-        +:Web/Launch/*/* => webLaunch.zip
+        +:Web/Launch/**/* => webLaunch.zip
     """.trimIndent()
 
     params {
