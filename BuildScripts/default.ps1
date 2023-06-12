@@ -67,7 +67,7 @@ task Run-GitVersion {
     # Having a pre-release label of greater than 10 characters can cause problems when trying to run choco pack.
     # Since we typically only see this when building a local feature branch, or a PR, let's just trim it down to
     # the 10 character limit, and move on.
-    if ($versionInfo.PreReleaseLabel) {
+    if ($versionInfo.PreReleaseLabel -And $versionInfo.PreReleaseLabel.Length -gt 10) {
         $prerelease = $versionInfo.PreReleaseLabel.Replace("-","").Substring(0,10)
     }
 
