@@ -67,7 +67,7 @@ task Run-GitVersion {
     # Having a pre-release label of greater than 10 characters can cause problems when trying to run choco pack.
     # Since we typically only see this when building a local feature branch, or a PR, let's just trim it down to
     # the 10 character limit, and move on.
-    if ($versionInfo.PreReleaseLabel) {
+    if ($versionInfo.PreReleaseLabel -And $versionInfo.PreReleaseLabel.Length -gt 10) {
         $prerelease = $versionInfo.PreReleaseLabel.Replace("-","").Substring(0,10)
     }
 
@@ -284,6 +284,7 @@ task Sign-PowerShellFiles -depends Copy-PowerShellFiles {
 
     if($cert) {
         Set-AuthenticodeSignature -Filepath $powerShellFiles -Cert $cert -TimeStampServer $timestampServer -IncludeChain NotRoot -HashAlgorithm SHA256
+        Set-AuthenticodeSignature -Filepath "$basedir\BuildScripts\bootstrapper.ps1" -Cert $cert -TimeStampServer $timestampServer -IncludeChain NotRoot -HashAlgorithm SHA256
     }
     else {
         Write-Host "Unable to sign PowerShell files, as unable to locate certificate and/or password."

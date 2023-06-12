@@ -34,6 +34,8 @@ function Expand-ZipFile($ZipFilePath, $DestinationFolder) {
 
 function Invoke-Chocolatey($chocoArgs) {
     Write-BoxstarterMessage "Current runtime is $($PSVersionTable.CLRVersion)" -Verbose
+    # be sure not to include empty arguments when calling Start-Process
+    $chocoArgs = $chocoArgs.Where({ $_ -ne "" })
 
     if (-Not $env:ChocolateyInstall) {
         [System.Environment]::SetEnvironmentVariable('ChocolateyInstall', "$env:programdata\chocolatey", 'Machine')
