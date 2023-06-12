@@ -19,6 +19,7 @@ object Boxstarter : BuildType({
         +:buildArtifacts/Boxstarter.*.nupkg
         +:buildArtifacts/Boxstarter.*.zip
         +:Web/Launch/**/* => webLaunch.zip
+        -:Web/Launch/.gitattributes => webLaunch.zip
     """.trimIndent()
 
     params {
