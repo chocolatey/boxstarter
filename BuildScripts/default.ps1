@@ -284,6 +284,7 @@ task Sign-PowerShellFiles -depends Copy-PowerShellFiles {
 
     if($cert) {
         Set-AuthenticodeSignature -Filepath $powerShellFiles -Cert $cert -TimeStampServer $timestampServer -IncludeChain NotRoot -HashAlgorithm SHA256
+        Set-AuthenticodeSignature -Filepath "$basedir\BuildScripts\bootstrapper.ps1" -Cert $cert -TimeStampServer $timestampServer -IncludeChain NotRoot -HashAlgorithm SHA256
     }
     else {
         Write-Host "Unable to sign PowerShell files, as unable to locate certificate and/or password."
