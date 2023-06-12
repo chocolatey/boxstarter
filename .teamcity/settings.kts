@@ -20,6 +20,7 @@ object Boxstarter : BuildType({
         +:buildArtifacts/Boxstarter.*.zip
         +:Web/Launch/**/* => webLaunch.zip
         -:Web/Launch/.gitattributes => webLaunch.zip
+        +:BuildScripts/bootstrapper.ps1
     """.trimIndent()
 
     params {
