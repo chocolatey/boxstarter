@@ -79,7 +79,9 @@ If set, reboots are suppressed.
 The credentials to use for auto logins after reboots. If installing on
 a remote machine, this credential will also be used to establish the
 connection to the remote machine and also for any scheduled task that
-boxstarter needs to create and run under a local context.
+boxstarter needs to create and run under a local context. Note that auto
+login does not work when running from 32-bit PowerShell on a 64-bit
+Operating System.
 
 .PARAMETER KeepWindowOpen
 Enabling this switch will prevent the command window from closing and
@@ -133,6 +135,9 @@ is not using CredSSP. If the session is not using CredSSP, it may be
 denied access to network resources normally accessible to the Credential
 being used. If you do need to access network resources external to the
 session, you should use CredSSP when establishing the connection.
+
+Auto login will not work when running Boxstarter from a 32-bit PowerShell
+console on a 64-bit Operating System.
 
 .INPUTS
 ComputerName, ConnrectionURI and Session may all be specified on the
