@@ -79,15 +79,17 @@ If set, reboots are suppressed.
 The credentials to use for auto logins after reboots. If installing on
 a remote machine, this credential will also be used to establish the
 connection to the remote machine and also for any scheduled task that
-boxstarter needs to create and run under a local context.
+Boxstarter needs to create and run under a local context. Note that auto
+login does not work when running from 32-bit PowerShell on a 64-bit
+Operating System.
 
 .PARAMETER KeepWindowOpen
 Enabling this switch will prevent the command window from closing and
 prompt the user to pres the Enter key before the window closes. This
-is ideal when not invoking boxstarter from a console.
+is ideal when not invoking Boxstarter from a console.
 
 .Parameter LocalRepo
-This is the path to the local boxstarter repository where boxstarter
+This is the path to the local Boxstarter repository where Boxstarter
 should look for .nupkg files to install. By default this is located
 in the BuildPackages directory just under the root Boxstarter
 directory but can be changed with Set-BoxstarterConfig.
@@ -134,6 +136,9 @@ denied access to network resources normally accessible to the Credential
 being used. If you do need to access network resources external to the
 session, you should use CredSSP when establishing the connection.
 
+Auto login will not work when running Boxstarter from a 32-bit PowerShell
+console on a 64-bit Operating System.
+
 .INPUTS
 ComputerName, ConnrectionURI and Session may all be specified on the
 pipeline.
@@ -163,7 +168,7 @@ installation.
 Invoke-ChocolateyBoxstarter "example1","example2"
 
 This installs the example1 and example2 .nupkg files. If pending
-reboots are detected, boxstarter will restart the machine. Boxstarter
+reboots are detected, Boxstarter will restart the machine. Boxstarter
 will not perform automatic logins after restart since no Credential
 was given.
 
@@ -174,7 +179,7 @@ Install-BoxstarterPackage -Package https://gist.github.com/mwrock/6771863/raw/b5
 
 This installs the script uploaded to the github gist. The credentials
 of the user mwrock are used to automatically login the user if
-boxstarter needs to reboot the machine.
+Boxstarter needs to reboot the machine.
 
 .EXAMPLE
 $cred=Get-Credential mwrock
@@ -253,7 +258,7 @@ in the command line's current directory.
 $cred=Get-Credential mwrock
 Install-BoxstarterPackage \\server\share\script.ps1 -Credential $cred
 
-This invokes boxstarter and installs the script located at the
+This invokes Boxstarter and installs the script located at the
 specified share.
 
 .EXAMPLE
