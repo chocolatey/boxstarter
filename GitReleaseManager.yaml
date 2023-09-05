@@ -6,6 +6,7 @@ issue-labels-include:
 - Bug
 - Improvement
 - Documentation
+- Dependency Change
 issue-labels-exclude:
 - Internal Refactoring
 - BuildAutomation
@@ -20,6 +21,10 @@ issue-labels-alias:
     - name: Deprecate
       header: Deprecated Feature
       plural: Deprecated Features
+create:
+    include-sha-section: true
+    sha-section-heading: "SHA256 Hashes of the release artifacts"
+    sha-section-line-format: "- `{1}\t{0}`"
 close:
   use-issue-comments: true
   issue-comment: |-
