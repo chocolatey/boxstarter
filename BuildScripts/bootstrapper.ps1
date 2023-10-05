@@ -82,7 +82,6 @@ function Check-Chocolatey {
             }
             try {
                 $env:ChocolateyInstall = "$env:programdata\chocolatey"
-                New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
                 $url="https://chocolatey.org/api/v2/package/chocolatey/"
                 $wc=new-object net.webclient
                 $wp=[system.net.WebProxy]::GetDefaultProxy()
