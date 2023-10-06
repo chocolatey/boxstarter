@@ -2,7 +2,6 @@ function Bootstrap-Boxstarter {
     if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
         Write-Output "Chocolatey not installed. Downloading and installing..."
         $env:ChocolateyInstall = "$env:programdata\chocolatey"
-        New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
         Get-HttpToFile "https://chocolatey.org/install.ps1" "$env:temp\choco.ps1"
         . "$env:temp\choco.ps1"
     }
