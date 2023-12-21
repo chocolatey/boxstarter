@@ -68,7 +68,7 @@ Package Sources
 	directory ($Boxstarter.BaseDir). You can change the default by using the
 	Set-BoxstarterConfig function with the -LocalRepo argument.
 
-	- Chocolatey.org: The public Chocolatey community feed at https://chocolatey.org/api/v2
+	- Chocolatey.org: The public Chocolatey community feed at https://community.chocolatey.org/api/v2
 
 	The last remote source can be configured by editing
 	$($Boxstarter.BaseDir)\Boxstarter.Config.

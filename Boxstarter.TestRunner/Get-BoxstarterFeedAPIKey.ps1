@@ -15,7 +15,7 @@ a key to be associated with a feed.
 The URI of a NuGet feed for which the API key is being queried.
 
 .Example
-Get-BoxstarterFeedAPIKey "https://chocolatey.org/api/v2"
+Get-BoxstarterFeedAPIKey "https://community.chocolatey.org/api/v2"
 
 Retrieves the API Key used with the public Chocolatey community feed
 

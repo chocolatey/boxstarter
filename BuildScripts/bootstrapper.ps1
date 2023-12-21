@@ -82,7 +82,7 @@ function Check-Chocolatey {
             }
             try {
                 $env:ChocolateyInstall = "$env:programdata\chocolatey"
-                $url="https://chocolatey.org/api/v2/package/chocolatey/"
+                $url="https://community.chocolatey.org/api/v2/package/chocolatey/"
                 $wc=new-object net.webclient
                 $wp=[system.net.WebProxy]::GetDefaultProxy()
                 $wp.UseDefaultCredentials=$true
