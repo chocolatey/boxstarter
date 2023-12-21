@@ -132,7 +132,7 @@ Configuring a Dedicated Build Server
     ACCOUNT that your build server runs under.
 
     1. Install the Boxstarter TestRunner module on the build machine. You can
-       use Chocolatey and run cinst Boxstarter.TestRunner or launch
+       use Chocolatey and run choco install Boxstarter.TestRunner or launch
        https://boxstarter.org/package/nr/boxstarter.testrunner from IE.
     2. Although many of the deployment options are stored in a file inside the
        repository and will be available when your build server gets the latest

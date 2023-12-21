@@ -7,7 +7,7 @@ try {
     Set-TaskbarSmall
     Enable-RemoteDesktop
 
-    cinst VisualStudio2012Ultimate
+    choco install VisualStudio2012Ultimate
 
     try{
         $devenv = Get-Item "$($Boxstarter.programFiles86)\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe" -ErrorAction SilentlyContinue
@@ -17,29 +17,29 @@ try {
         }
     }catch{}
 
-    cinst fiddler4
-    cinst mssqlserver2012express
-    cinst git-credential-winstore
-    cinst console-devel
-    cinst sublimetext2
-    cinst skydrive
-    cinst poshgit
-    cinst dotpeek
-    cinst googlechrome
-    cinst Paint.net
-    cinst windirstat
-    cinst sysinternals
-    cinst NugetPackageExplorer
-    cinst resharper
-    cinst winrar
-    cinst windbg
+    choco install fiddler4
+    choco install mssqlserver2012express
+    choco install git-credential-winstore
+    choco install console-devel
+    choco install sublimetext2
+    choco install skydrive
+    choco install poshgit
+    choco install dotpeek
+    choco install googlechrome
+    choco install Paint.net
+    choco install windirstat
+    choco install sysinternals
+    choco install NugetPackageExplorer
+    choco install resharper
+    choco install winrar
+    choco install windbg
 
-    cinst Microsoft-Hyper-V-All -source windowsFeatures
-    cinst IIS-WebServerRole -source windowsfeatures
-    cinst IIS-HttpCompressionDynamic -source windowsfeatures
-    cinst IIS-ManagementScriptingTools -source windowsfeatures
-    cinst IIS-WindowsAuthentication -source windowsfeatures
-    cinst TelnetClient -source windowsFeatures
+    choco install Microsoft-Hyper-V-All -source windowsFeatures
+    choco install IIS-WebServerRole -source windowsfeatures
+    choco install IIS-HttpCompressionDynamic -source windowsfeatures
+    choco install IIS-ManagementScriptingTools -source windowsfeatures
+    choco install IIS-WindowsAuthentication -source windowsfeatures
+    choco install TelnetClient -source windowsFeatures
 
     $sublimeDir = "$env:programfiles\Sublime Text 2"
     Install-ChocolateyPinnedTaskBarItem "$env:windir\system32\mstsc.exe"

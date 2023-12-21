@@ -108,7 +108,7 @@ If specifying only one package, Boxstarter calls Chocolatey with the
 This means that regardless of whether or not the package had been
 installed previously, Boxstarter will attempt to download and reinstall it.
 This only holds true for the outer package. If the package contains calls
-to CINST for additional packages, those installs will not reinstall if
+to choco install for additional packages, those installs will not reinstall if
 previously installed.
 
 If an array of package names are passed to Install-BoxstarterPackage,
