@@ -8,12 +8,12 @@ Creates the script necessary for a scheduled task to run the given command. The 
 task will run immediately.
 
 .PARAMETER Command
-A Chocolatey command to execute within a scheduled task. For example "cinst fiddler".
+A Chocolatey command to execute within a scheduled task. For example "choco install fiddler".
 
 .EXAMPLE
 A Chocolatey command
 
-Invoke-BoxstarterFromTask "cinst rsat"
+Invoke-BoxstarterFromTask "choco install rsat"
 
 .LINK
 https://boxstarter.org

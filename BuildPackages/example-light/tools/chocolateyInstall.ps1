@@ -2,10 +2,10 @@ Update-ExecutionPolicy Unrestricted
 Set-ExplorerOptions -showHiddenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
 Enable-RemoteDesktop
 
-cinst console-devel
-cinst sublimetext2
-cinst sysinternals
-cinst TelnetClient -source windowsFeatures
+choco install console-devel
+choco install sublimetext2
+choco install sysinternals
+choco install TelnetClient -source windowsFeatures
 
 $sublimeDir = "$env:programfiles\Sublime Text 2"
 

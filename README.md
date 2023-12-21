@@ -36,7 +36,7 @@ The source of the Boxstarter website can be found in the [boxstarter.org reposit
 Import-Module Boxstarter.Chocolatey
 New-BoxstarterPackage HelloWorld
 Set-Content (Join-Path $Boxstarter.LocalRepo "HelloWorld\Tools\ChocolateyInstall.ps1") `
-  -Value "Write-Host `"Hello World! from `$env:COMPUTERNAME`";CINST Git" -Force
+  -Value "Write-Host `"Hello World! from `$env:COMPUTERNAME`";choco install Git" -Force
 Invoke-BoxstarterBuild HelloWorld
 ```
 

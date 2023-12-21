@@ -24,7 +24,7 @@ Invoke-ChocolateyBoxstarter MyPackage
 
 --ChocolateyInstall.ps1--
 try {
-    cinst sublimetext2
+    choco install sublimetext2
     $sublimeDir = "$env:programfiles\Sublime Text 2"
     mkdir "$sublimeDir\data"
     copy-item (Join-Path Get-PackageRoot($MyInvocation) 'sublime\*') "$sublimeDir\data" -Force -Recurse

@@ -4,8 +4,8 @@ try {
     }
 
     Write-boxstartermessage "installing test package"
-    cinst TelnetClient -source WindowsFeatures
-    cinst force-reboot
+    choco install TelnetClient -source WindowsFeatures
+    choco install force-reboot
 
     if($PSVersionTable.PSVersion -gt '2.0.0' -and ([bool]::Parse($env:IsRemote))) {
         cinst windirstat
