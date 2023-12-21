@@ -1,7 +1,5 @@
 # Boxstarter
 
-![https://ci.appveyor.com/api/projects/status/github/chocolatey/boxstarter](https://ci.appveyor.com/api/projects/status/github/chocolatey/boxstarter?svg=true&branch=master)
-
 Repeatable, reboot resilient windows environment installations made easy using Chocolatey packages.
 
 For more information and How Tos, visit [the official Boxstarter website](https://boxstarter.org).
