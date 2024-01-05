@@ -25,7 +25,7 @@ Set-BoxstarterDeployOptions
             DeploymentVMProvider=$null
             DeploymentCloudServiceName=$null
             RestoreCheckpoint=$null
-            DefaultNugetFeed=[Uri]"https://chocolatey.org/api/v2"
+            DefaultNugetFeed=[Uri]"https://community.chocolatey.org/api/v2"
             DefaultFeedAPIKey=$null
         }
     }

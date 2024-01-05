@@ -21,7 +21,7 @@ The GUID API Key to assiciate with the feed.
 These keys are persisted to a file in encrypted format.
 
 .Example
-Set-BoxstarterFeedAPIKey -NugetFeed "https://chocolatey.org/api/v2" `
+Set-BoxstarterFeedAPIKey -NugetFeed "https://community.chocolatey.org/api/v2" `
   -APIKey 5cbc38d9-1a94-430d-8361-685a9080a6b8
 
 Sets the API Key used with the public Chocolatey community feed to

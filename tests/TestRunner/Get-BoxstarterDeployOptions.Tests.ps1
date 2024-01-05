@@ -20,7 +20,7 @@ Describe "Get-BoxstarterDeployOptions" {
         $result = Get-BoxstarterDeployOptions
 
         it "should return the Chocolatey community feed as the default NuGet feed" {
-            $result.DefaultNugetFeed | should be "https://chocolatey.org/api/v2"
+            $result.DefaultNugetFeed | should be "https://community.chocolatey.org/api/v2"
         }
         it "should return localhost as the default deployment target" {
             $result.DeploymentTargetNames | should be "localhost"
