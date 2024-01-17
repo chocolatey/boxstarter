@@ -8,7 +8,7 @@ param (
 )
 $here = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 if(-not $env:ChocolateyInstall -or -not (Test-Path "$env:ChocolateyInstall")){
-    Invoke-Expression ((new-object net.webclient).DownloadString("https://bit.ly/psChocInstall"))
+    Invoke-Expression ((new-object net.webclient).DownloadString("https://ch0.co/psChocInstall"))
 }
 
 if(!(Test-Path $env:ChocolateyInstall\lib\Psake*)) { choco install psake --version=4.9.0 -y --no-progress }
