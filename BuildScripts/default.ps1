@@ -112,7 +112,7 @@ Task Run-GitVersion {
     Write-Host "##teamcity[buildNumber '$packageVersion']"
 }
 
-Task Create-ModuleZipForRemoting {
+Task Create-ModuleZipForRemoting -depends Compile-Modules {
     if (Test-Path "$baseDir/Boxstarter.Chocolatey/Boxstarter.zip") {
         Remove-Item "$baseDir/Boxstarter.Chocolatey/Boxstarter.zip" -Recurse -Force -ErrorAction SilentlyContinue
     }
@@ -121,10 +121,11 @@ Task Create-ModuleZipForRemoting {
     }
     Remove-Item "$env:temp/Boxstarter.zip" -Force -ErrorAction SilentlyContinue
     $boxstarterZip = "$baseDir/buildArtifacts/Boxstarter.zip"
-    ."$7z" a -tzip "$boxstarterZip" "$baseDir/Boxstarter.Common" | Out-Null
-    ."$7z" a -tzip "$boxstarterZip" "$baseDir/Boxstarter.WinConfig" | Out-Null
-    ."$7z" a -tzip "$boxstarterZip" "$baseDir/Boxstarter.Bootstrapper" | Out-Null
-    ."$7z" a -tzip "$boxstarterZip" "$baseDir/Boxstarter.Chocolatey" | Out-Null
+
+    @('Common', 'WinConfig', 'Bootstrapper', 'Chocolatey') | ForEach-Object {
+        ."$7z" a -tzip "$boxstarterZip" "$baseDir/buildArtifacts/tempNuGetFolders/Boxstarter.$_" | Out-Null
+    }
+
     ."$7z" a -tzip "$boxstarterZip" "$baseDir/Boxstarter.config" | Out-Null
     ."$7z" a -tzip "$boxstarterZip" "$baseDir/LICENSE.txt" | Out-Null
     ."$7z" a -tzip "$boxstarterZip" "$baseDir/NOTICE.txt" | Out-Null
