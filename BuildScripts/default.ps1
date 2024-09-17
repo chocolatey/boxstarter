@@ -10,7 +10,7 @@ Properties {
 
     $tagName = git tag -l --points-at HEAD
 
-    $script:isTagges = if ($tagName) {
+    $script:isTagged = if ($tagName) {
         Write-Host "Found tag ${'$'}tagName"
         $true
     }
