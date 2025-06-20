@@ -10,7 +10,7 @@ Properties {
 
     $tagName = git tag -l --points-at HEAD
 
-    $script:isTagges = if ($tagName) {
+    $script:isTagged = if ($tagName) {
         Write-Host "Found tag ${'$'}tagName"
         $true
     }
@@ -112,7 +112,7 @@ Task Run-GitVersion {
     Write-Host "##teamcity[buildNumber '$packageVersion']"
 }
 
-Task Create-ModuleZipForRemoting {
+Task Create-ModuleZipForRemoting -depends Compile-Modules, Get-ChocolateyNugetPkg {
     if (Test-Path "$baseDir/Boxstarter.Chocolatey/Boxstarter.zip") {
         Remove-Item "$baseDir/Boxstarter.Chocolatey/Boxstarter.zip" -Recurse -Force -ErrorAction SilentlyContinue
     }
@@ -121,17 +121,19 @@ Task Create-ModuleZipForRemoting {
     }
     Remove-Item "$env:temp/Boxstarter.zip" -Force -ErrorAction SilentlyContinue
     $boxstarterZip = "$baseDir/buildArtifacts/Boxstarter.zip"
-    ."$7z" a -tzip "$boxstarterZip" "$baseDir/Boxstarter.Common" | Out-Null
-    ."$7z" a -tzip "$boxstarterZip" "$baseDir/Boxstarter.WinConfig" | Out-Null
-    ."$7z" a -tzip "$boxstarterZip" "$baseDir/Boxstarter.Bootstrapper" | Out-Null
-    ."$7z" a -tzip "$boxstarterZip" "$baseDir/Boxstarter.Chocolatey" | Out-Null
+
+    @('Common', 'WinConfig', 'Bootstrapper', 'Chocolatey') | ForEach-Object {
+        ."$7z" a -tzip "$boxstarterZip" "$baseDir/buildArtifacts/tempNuGetFolders/Boxstarter.$_" | Out-Null
+    }
+
     ."$7z" a -tzip "$boxstarterZip" "$baseDir/Boxstarter.config" | Out-Null
     ."$7z" a -tzip "$boxstarterZip" "$baseDir/LICENSE.txt" | Out-Null
     ."$7z" a -tzip "$boxstarterZip" "$baseDir/NOTICE.txt" | Out-Null
     if ($taskList -eq 'test') {
         ."$7z" a -tzip $boxstarterZip "$basedir/Chocolatey" | Out-Null
     }
-    Move-Item "$basedir/buildArtifacts/Boxstarter.zip" "$basedir/Boxstarter.Chocolatey/Boxstarter.zip"
+    Copy-Item $boxstarterZip "$baseDir/buildArtifacts/tempNuGetFolders/Boxstarter.Chocolatey/"
+    Move-Item $boxstarterZip "$basedir/Boxstarter.Chocolatey/Boxstarter.zip"
 }
 
 Task Build-ClickOnce -depends Install-MSBuild, Install-Win8SDK, Restore-NuGetPackages -precondition { Test-IsReleaseBuildOS } {
@@ -148,7 +150,7 @@ Task Publish-ClickOnce -depends Install-MSBuild {
     Copy-Item "$basedir/Boxstarter.Clickonce/bin/Debug/App.Publish/*" "$basedir/web/Launch" -Recurse -Force
 }
 
-Task Test -depends Get-ChocolateyNugetPkg, Pack-Chocolatey, Create-ModuleZipForRemoting {
+Task Test -depends Get-ChocolateyNugetPkg, Pack-Chocolatey  {
     Push-Location "$baseDir"
     $pesterDir = "$env:ChocolateyInstall/lib/Pester"
     $pesterTestResultsFile = "$baseDir/buildArtifacts/TestResults.xml"
@@ -208,9 +210,17 @@ Task Clean-Artifacts {
     foreach ($mod in $boxstarterModules) {
         New-Item -ItemType Directory "$baseDir/buildArtifacts/tempNuGetFolders/Boxstarter.$mod" | Out-Null
     }
+
+    if (Test-Path "$baseDir/Boxstarter.Chocolatey/Boxstarter.zip") {
+        Remove-Item "$baseDir/Boxstarter.Chocolatey/Boxstarter.zip" -Recurse -Force
+    }
+
+    if (Test-Path "$baseDir/Boxstarter.Chocolatey/chocolatey") {
+        Remove-Item "$baseDir/Boxstarter.Chocolatey/chocolatey" -Recurse -Force
+    }
 }
 
-Task Pack-Chocolatey -depends Compile-Modules, Sign-PowerShellFiles -description 'Packs the modules and example packages' {
+Task Pack-Chocolatey -depends Compile-Modules, Sign-PowerShellFiles, Create-ModuleZipForRemoting -description 'Packs the modules and example packages' {
     if (Test-Path "$baseDir/BuildPackages/*.nupkg") {
         Remove-Item "$baseDir/BuildPackages/*.nupkg" -Force
     }
@@ -247,11 +257,12 @@ Task Restore-NuGetPackages -precondition { Test-IsReleaseBuildOS } {
 }
 
 Task Get-ChocolateyNugetPkg {
-    New-Item -ItemType Directory $basedir/Boxstarter.Chocolatey/chocolatey -ErrorAction SilentlyContinue | Out-Null
+    $chocoNupkgDir = "$basedir/Boxstarter.Chocolatey/chocolatey"
+    New-Item -ItemType Directory $chocoNupkgDir -ErrorAction SilentlyContinue | Out-Null
     $chocoVersion = '1.1.0'
     $srcUrl = "https://community.chocolatey.org/api/v2/package/chocolatey/$chocoVersion"
     $targetFile = "chocolatey.$chocoVersion.nupkg"
-    Push-Location $basedir/Boxstarter.Chocolatey/chocolatey
+    Push-Location $chocoNupkgDir
     try {
         if (-Not (Test-Path $targetFile)) {
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
