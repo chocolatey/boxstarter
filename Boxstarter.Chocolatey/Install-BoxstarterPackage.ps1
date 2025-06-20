@@ -506,7 +506,7 @@ function Install-BoxstarterPackageForSession($session, $PackageName, $DisableReb
         for($count = 1; $count -le 5; $count++) {
             try {
                 Write-BoxstarterMessage "Attempt #$count to copy Boxstarter modules to $($session.ComputerName)" -Verbose
-                Setup-BoxstarterModuleAndLocalRepo $session $delegateSources
+                Invoke-SetupBoxstarterModuleAndLocalRepo $session $delegateSources
                 break
             }
             catch {
@@ -628,7 +628,7 @@ function Enable-RemotingOnRemote ($sessionArgs, $ComputerName){
     return $True
 }
 
-function Setup-BoxstarterModuleAndLocalRepo($Session, $delegateSources) {
+function Invoke-SetupBoxstarterModuleAndLocalRepo($Session, $delegateSources) {
     if ($LocalRepo) { $Boxstarter.LocalRepo = $LocalRepo }
 
     Write-BoxstarterMessage "Copying Boxstarter Modules and LocalRepo packages at $($Boxstarter.BaseDir) to `$env:temp\Boxstarter on $($Session.ComputerName)..."
@@ -677,8 +677,8 @@ function Setup-BoxstarterModuleAndLocalRepo($Session, $delegateSources) {
         Expand-ZipFile -ZipFilePath "$($env:temp)\Boxstarter\Boxstarter.zip" -DestinationFolder "$($env:temp)\Boxstarter"
         
         [xml]$configXml = Get-Content (Join-Path $env:temp\Boxstarter Boxstarter.config)
-        if ($configXml.config.LocalRepo -ne $null) {
-            $configXml.config.RemoveChild(($configXml.config.ChildNodes | ? { $_.Name -eq "LocalRepo" }))
+        if ($null -ne $configXml.config.LocalRepo) {
+            $configXml.config.RemoveChild(($configXml.config.ChildNodes | Where-Object { $_.Name -eq "LocalRepo" }))
             $configXml.Save((Join-Path $env:temp\Boxstarter Boxstarter.config))
         }
     }
@@ -701,10 +701,26 @@ function Setup-BoxstarterModuleAndLocalRepo($Session, $delegateSources) {
     # ensure Chocolatey is present on remote host ...
     Invoke-Command -Session $Session {
         Set-ExecutionPolicy Bypass -Force
-        if (Test-Path $env:ChocolateyInstall) {
-            Write-Host "$env:ChocolateyInstall is already present on remote host!"
+        # we don't want to install chocolatey if it's alredy present!
+        if ($env:ChocolateyInstall) {
+            if (Test-Path $env:ChocolateyInstall) {
+                Write-Host "$env:ChocolateyInstall is already present on remote host!"
+                return
+            }
+        }
+        $defaultChocoBase = 'C:\ProgramData\chocolatey\'
+        # in case $env:ChocolateyInstall is not known in the remote session but choco is on the host,
+        # we want to ensure we do not re-install the bundled version of choco
+        # NOTE: there _are_ edge-cases where this won't work
+        if (Test-Path "${defaultChocoBase}choco.exe") {
+            Write-Host 'choco.exe is already present at remote host (default location)'
+            if (-Not $env:ChocolateyInstall) {
+                Write-Host 'NOTE: env:ChocolateyInstall manually set in this session.'
+                $env:ChocolateyInstall = $defaultChocoBase
+            }
             return
         }
+        # choco is not present on remote host, we do have to install it!
         Write-Host "installing Chocolatey on remote host..."
         $chocoNupkg = Get-Item "$($env:temp)\Boxstarter\Boxstarter.Chocolatey\chocolatey\*.nupkg" | Select-Object -First 1
 

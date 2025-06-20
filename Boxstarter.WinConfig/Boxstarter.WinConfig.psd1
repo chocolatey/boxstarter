@@ -47,7 +47,8 @@ CmdletsToExport = @(
   'Set-WindowsExplorerOptions',
   'Set-BoxstarterTaskbarOptions',
   'Disable-BingSearch', 
-  'Set-BoxstarterPageFile'
+  'Set-BoxstarterPageFile', 
+  'Disable-BoxstarterBrowserFirstRun'
 )
 
 # Variables to export from this module
@@ -69,4 +70,3 @@ PrivateData = '8459d49a8d5a049d8936519ccf045706c7b3eb23'
 # DefaultCommandPrefix = ''
 
 }
-

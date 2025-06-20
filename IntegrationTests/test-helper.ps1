@@ -18,7 +18,7 @@ function Invoke-LocalBoxstarterRun {
     $session = New-PsSession -ConnectionURI $Conn.ConnectionURI -Credential $Credential
     Remove-PreviousState $session
 
-    Setup-BoxstarterModuleAndLocalRepo $baseDir $session | Out-Null
+    Invoke-SetupBoxstarterModuleAndLocalRepo $baseDir $session | Out-Null
 
     start-task $session $credential $packageName
 
