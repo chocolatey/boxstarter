@@ -77,7 +77,7 @@ Install-WindowsUpdate -GetUpdatesFromMS:`$$GetUpdatesFromMS -AcceptEula:`$$Accep
         {
             Out-BoxstarterLog "$($Result.updates.count) Updates found"
             $currentCount = 0
-            foreach($update in ($result.updates | Where-Object {[string]::IsNullOrEmpty($_.Title )-eq $false}) ) {
+            foreach($update in ($result.updates | Where-Object {[string]::IsNullOrEmpty($_.Title ) -eq $false}) ) {
                 ++$currentCount
                 if(!($update.EulaAccepted)){
                     if($acceptEula) {
