@@ -1,5 +1,5 @@
 function Invoke-Reboot {
-<#
+    <#
 .SYNOPSIS
 Reboots the local machine ensuring Boxstarter restarts
 automatically after reboot and sets up autologon if it a
@@ -27,34 +27,37 @@ Invoke-Boxstarter
 about_boxstarter_bootstrapper
 about_boxstarter_variable_in_bootstrapper
 #>
-    if(!$Boxstarter.RebootOk) {
+    if (!$Boxstarter.RebootOk) {
         Write-BoxstarterMessage "A Reboot was requested but Reboots are suppressed. Either call Invoke-Boxstarter with -RebootOk or set `$Boxstarter.RebootOk to `$true"
         return
     }
-    if(!(Get-IsRemote -PowershellRemoting) -and !($Boxstarter.DisableRestart)){
-        if(!$Boxstarter.ScriptToCall) {
-            Write-BoxstarterMessage "Invoke-Reboot must be called from a Boxstarter package."
+    if (!(Get-IsRemote -PowershellRemoting) -and !($Boxstarter.DisableRestart)) {
+        if (!$Boxstarter.ScriptToCall) {
+            Write-BoxstarterMessage 'Invoke-Reboot must be called from a Boxstarter package.'
             return
         }
-        Write-BoxstarterMessage "writing restart file"
-        New-Item "$(Get-BoxstarterTempDir)\Boxstarter.script" -type file -value $boxstarter.ScriptToCall -force | Out-Null
+        Write-BoxstarterMessage 'writing restart file'
+        New-Item "$(Get-BoxstarterTempDir)\Boxstarter.script" -type file -Value $boxstarter.ScriptToCall -Force | Out-Null
         $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
-        $restartScript="Call PowerShell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$($Boxstarter.BaseDir)\Boxstarter.Bootstrapper\boxstarter.bootstrapper.psd1';Invoke-Boxstarter -RebootOk -NoPassword:`$$($Boxstarter.NoPassword.ToString())`""
-        New-Item "$startup\boxstarter-post-restart.bat" -type file -force -value $restartScript | Out-Null
+
+        # create the restart script
+        # no need to elevate here, Invoke-Bxstarter will Test-Admin and elevate if necessary
+        $restartScript = "Call PowerShell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$($Boxstarter.BaseDir)\Boxstarter.Bootstrapper\boxstarter.bootstrapper.psd1';Invoke-Boxstarter -RebootOk -NoPassword:`$$($Boxstarter.NoPassword.ToString())`""
+        New-Item "$startup\boxstarter-post-restart.bat" -type file -Force -Value $restartScript | Out-Null
     }
     try {
-        if(Get-Module Bitlocker -ListAvailable -ErrorAction Stop){
-            Get-BitlockerVolume -ErrorAction Stop | ? {$_.ProtectionStatus -eq "On"  -and $_.VolumeType -eq "operatingSystem"} | Suspend-Bitlocker -RebootCount 1 | Out-Null
+        if (Get-Module Bitlocker -ListAvailable -ErrorAction Stop) {
+            Get-BitlockerVolume -ErrorAction Stop | Where-Object { $_.ProtectionStatus -eq 'On' -and $_.VolumeType -eq 'operatingSystem' } | Suspend-Bitlocker -RebootCount 1 | Out-Null
         }
     }
     catch {
         $Global:Error.RemoveAt(0)
     } # There are several reports of the bitlocker module throwing errors
-    $Boxstarter.IsRebooting=$true
+    $Boxstarter.IsRebooting = $true
 
-    if($Boxstarter.SourcePID -ne $Null) {
+    if ($Boxstarter.SourcePID -ne $Null) {
         Write-BoxstarterMessage "Writing restart marker with pid $($Boxstarter.SourcePID) from $PID" -verbose
-        New-Item "$(Get-BoxstarterTempDir)\Boxstarter.$($Boxstarter.SourcePID).restart" -type file -value "" -force | Out-Null
+        New-Item "$(Get-BoxstarterTempDir)\Boxstarter.$($Boxstarter.SourcePID).restart" -type file -Value '' -Force | Out-Null
     }
     Restart
 }
