@@ -339,7 +339,7 @@ about_boxstarter_chocolatey
             $sessionArgs.Credential=$Credential
         }
 
-				$delegateSources = if ($DelegateChocoSources) { $true} else { $false }
+        $delegateSources = if ($DelegateChocoSources) { $true} else { $false }
 
         #If $sessions are being provided we assume remoting is setup on both ends
         #and don't need to test, configure and tear down
