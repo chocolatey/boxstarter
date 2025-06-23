@@ -1,21 +1,40 @@
+<#
+.SYNOPSIS
+Retrieves the User Account Control (UAC) consent prompt behavior.
+
+.LINK
+https://boxstarter.org
+Set-BoxstarterConsentPromptBehaviorAdmin
+#>
 function Get-BoxstarterConsentPromptBehaviorAdmin {
-    <#
-https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-gpsb/341747f5-6b5d-4d30-85fc-fa1cc04038d4
+    [CmdletBinding()]
 
-    #>
+    $hklmuac = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System'
 
-    $state = Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name ConsentPromptBehaviorAdmin -ErrorAction SilentlyContinue
-    if ($null -eq $state) {  
+    $uacState = Get-ItemProperty -Path $hklmuac -Name EnableLUA -ErrorAction SilentlyContinue
+    if ($null -eq $uacState) {
+        # UAC is disable -> consent prompt behavior is irrelevant
+        return $null
+    }
+
+    $stateAdmin = Get-ItemProperty -Path $hklmuac -Name ConsentPromptBehaviorAdmin -ErrorAction SilentlyContinue
+    if ($null -eq $stateAdmin) {  
         Write-BoxstarterMessage "ConsentPromptBehaviorAdmin is not set. Defaulting to 'AlwaysNotify'."
         return 'AlwaysNotify'
     }
-    switch ($state.ConsentPromptBehaviorAdmin) {
+
+    $statePrompt = Get-ItemProperty -Path $hklmuac -Name PromptOnSecureDesktop -ErrorAction SilentlyContinue
+    switch ($stateAdmin.ConsentPromptBehaviorAdmin) {
         0 { return 'NeverNotify' }
-        # 5 { return 'NotifyOnAppInstallWithoutDimming' }
-        5 { return 'NotifyOnAppInstall' }
+        5 { 
+            if ($statePrompt.PromptOnSecureDesktop -eq 0) {
+                return 'NotifyOnAppInstallWithoutDimming'
+            }
+            return 'NotifyOnAppInstall'
+        }
         2 { return 'AlwaysNotify' }
         default {
-            Write-BoxstarterMessage "Unknown ConsentPromptBehaviorAdmin value: $($state.ConsentPromptBehaviorAdmin). Defaulting to 'AlwaysNotify'."
+            Write-BoxstarterMessage "Unknown ConsentPromptBehaviorAdmin value: $($stateAdmin.ConsentPromptBehaviorAdmin). Defaulting to 'AlwaysNotify'."
             return 'AlwaysNotify'
         }
     }
