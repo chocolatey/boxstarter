@@ -18,7 +18,7 @@ function Get-BoxstarterConsentPromptBehaviorAdmin {
     }
 
     $stateAdmin = Get-ItemProperty -Path $hklmuac -Name ConsentPromptBehaviorAdmin -ErrorAction SilentlyContinue
-    if ($null -eq $stateAdmin) {  
+    if ($null -eq $stateAdmin) {
         Write-BoxstarterMessage "ConsentPromptBehaviorAdmin is not set. Defaulting to 'AlwaysNotify'."
         return 'AlwaysNotify'
     }
@@ -26,7 +26,7 @@ function Get-BoxstarterConsentPromptBehaviorAdmin {
     $statePrompt = Get-ItemProperty -Path $hklmuac -Name PromptOnSecureDesktop -ErrorAction SilentlyContinue
     switch ($stateAdmin.ConsentPromptBehaviorAdmin) {
         0 { return 'NeverNotify' }
-        5 { 
+        5 {
             if ($statePrompt.PromptOnSecureDesktop -eq 0) {
                 return 'NotifyOnAppInstallWithoutDimming'
             }

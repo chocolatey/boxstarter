@@ -11,11 +11,11 @@ function Set-BoxstarterConsentPromptBehaviorAdmin {
     param (
         [Parameter(Mandatory = $True)]
         [Validateset(
-            'NeverNotify', 
-            'NotifyOnAppInstallWithoutDimming', 
-            'NotifyOnAppInstall', 
-            'PromptForConsent', 
-            'PromptForCredentials', 
+            'NeverNotify',
+            'NotifyOnAppInstallWithoutDimming',
+            'NotifyOnAppInstall',
+            'PromptForConsent',
+            'PromptForCredentials',
             'AlwaysNotify')]
         [string]
         $ConsentPromptBehavior
