@@ -785,7 +785,7 @@ function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $sessio
             if($Boxstarter.IsRebooting){
                 $resultToReturn.Result="Rebooting"
             }
-            elseif($result=$true){
+            elseif($result -eq $true){
                 $resultToReturn.Result="Completed"
             }
             $resultToReturn.Errors = $Global:Error
