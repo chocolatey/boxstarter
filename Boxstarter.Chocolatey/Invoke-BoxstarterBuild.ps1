@@ -23,10 +23,9 @@ New-BoxstarterPackage
 #>
     [CmdletBinding()]
     param(
-        [Parameter(Position=0,ParameterSetName='name')]
+        [Parameter(Position=0)]
         [string]$name,
-        [Parameter(Position=0,ParameterSetName='all')]
-        [switch]$all,
+        [switch]$all, # keep for backwards compatibility (not used, but required for compatibility, equivalent to !name)
         [switch]$quiet
     )
     if(!$boxstarter -or !$boxstarter.LocalRepo){
@@ -45,22 +44,20 @@ New-BoxstarterPackage
                 Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $name or Install-BoxstarterPackage $name will run this package." -nologo
             }
         } else {
-             if($all){
-                Write-BoxstarterMessage "Scanning $($Boxstarter.LocalRepo) for package folders"
-                Get-ChildItem . | Where-Object { $_.PSIsContainer } | ForEach-Object {
-                    $directoriesExist = $true
-                    Write-BoxstarterMessage "Found directory $($_.name). Looking for $($_.name).nuspec"
-                    $nuspecCandidate = Join-Path -Path $_.Name -ChildPath "$($_.Name).nuspec"
-                    if(Test-Path $nuspecCandidate){
-                        Call-Chocolatey -Command Pack -PackageNames (Join-Path -Path . -ChildPath $nuspecCandidate) | Out-Null
-                        if(!$quiet){
-                            Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Install-BoxstarterPackage $($_.Name) will run this package." -nologo
-                        }
+            Write-BoxstarterMessage "Scanning $($Boxstarter.LocalRepo) for package folders"
+            Get-ChildItem . | Where-Object { $_.PSIsContainer } | ForEach-Object {
+                $directoriesExist = $true
+                Write-BoxstarterMessage "Found directory $($_.name). Looking for $($_.name).nuspec"
+                $nuspecCandidate = Join-Path -Path $_.Name -ChildPath "$($_.Name).nuspec"
+                if(Test-Path $nuspecCandidate){
+                    Call-Chocolatey -Command Pack -PackageNames (Join-Path -Path . -ChildPath $nuspecCandidate) | Out-Null
+                    if(!$quiet){
+                        Write-BoxstarterMessage "Your package has been built. Using Boxstarter.bat $($_.Name) or Install-BoxstarterPackage $($_.Name) will run this package." -nologo
                     }
                 }
-                if($directoriesExist -eq $null){
-                    Write-BoxstarterMessage "No Directories exist under $($boxstarter.LocalRepo)"
-                }
+            }
+            if($directoriesExist -eq $null){
+                Write-BoxstarterMessage "No Directories exist under $($boxstarter.LocalRepo)"
             }
         }
     }
