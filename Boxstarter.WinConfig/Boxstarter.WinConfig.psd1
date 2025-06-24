@@ -48,7 +48,9 @@ CmdletsToExport = @(
   'Set-BoxstarterTaskbarOptions',
   'Disable-BingSearch', 
   'Set-BoxstarterPageFile', 
-  'Disable-BoxstarterBrowserFirstRun'
+  'Disable-BoxstarterBrowserFirstRun',
+  'Get-BoxstarterConsentPromptBehaviorAdmin',
+  'Set-BoxstarterConsentPromptBehaviorAdmin'
 )
 
 # Variables to export from this module
