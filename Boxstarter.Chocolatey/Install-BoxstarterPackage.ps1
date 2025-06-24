@@ -339,7 +339,7 @@ about_boxstarter_chocolatey
             $sessionArgs.Credential=$Credential
         }
 
-				$delegateSources = if ($DelegateChocoSources) { $true} else { $false }
+        $delegateSources = if ($DelegateChocoSources) { $true} else { $false }
 
         #If $sessions are being provided we assume remoting is setup on both ends
         #and don't need to test, configure and tear down
@@ -785,7 +785,7 @@ function Invoke-RemoteBoxstarter($Package, $Credential, $DisableReboots, $sessio
             if($Boxstarter.IsRebooting){
                 $resultToReturn.Result="Rebooting"
             }
-            elseif($result=$true){
+            elseif($result -eq $true){
                 $resultToReturn.Result="Completed"
             }
             $resultToReturn.Errors = $Global:Error
