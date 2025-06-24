@@ -41,7 +41,7 @@ about_boxstarter_variable_in_bootstrapper
         $startup = "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup"
 
         # create the restart script
-        # no need to elevate here, Invoke-Bxstarter will Test-Admin and elevate if necessary
+        # no need to elevate here, Invoke-Boxstarter will Test-Admin and elevate if necessary
         $restartScript = "Call PowerShell -NoProfile -ExecutionPolicy bypass -command `"Import-Module '$($Boxstarter.BaseDir)\Boxstarter.Bootstrapper\boxstarter.bootstrapper.psd1';Invoke-Boxstarter -RebootOk -NoPassword:`$$($Boxstarter.NoPassword.ToString())`""
         New-Item "$startup\boxstarter-post-restart.bat" -type file -Force -Value $restartScript | Out-Null
     }
