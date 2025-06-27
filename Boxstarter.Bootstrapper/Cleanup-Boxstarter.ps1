@@ -18,7 +18,7 @@ function Cleanup-Boxstarter {
         Remove-Item "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC"
         Enable-UAC
         if ($uacLevel) {
-            Set-BoxstarterConsentPromptBehaviorAdmin -ConsentPromptBehaviorAdmin $uacLevel
+            Set-BoxstarterConsentPromptBehaviorAdmin -ConsentPromptBehavior $uacLevel
             Write-BoxstarterMessage "Re-enabled UAC with ConsentPromptBehaviorAdmin set to $uacLevel"
         }
     }
@@ -70,7 +70,7 @@ function Cleanup-Boxstarter {
             if (-Not (Test-Path "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC")) {
                 Set-Content "$(Get-BoxstarterTempDir)\BoxstarterReEnableUAC" $uacLevel
             }
-            Set-BoxstarterConsentPromptBehaviorAdmin -ConsentPromptBehaviorAdmin 'NeverNotify'
+            Set-BoxstarterConsentPromptBehaviorAdmin -ConsentPromptBehavior 'NeverNotify'
         }
     }
 
