@@ -128,11 +128,18 @@ function Install-Boxstarter($here, $ModuleName, $installArgs = "") {
     $boxModule=Get-Module Boxstarter.Chocolatey
     if($boxModule) {
         if($boxModule.Path -like "$env:LOCALAPPDATA\Apps\*") {
+            Write-Verbose "Boxstarter.Chocolatey Module is installed in a ClickOnce location."
             $clickonce=$true
         }
     }
-    if(!$clickonce){
-        Import-Module "$boxstarterPath\$ModuleName" -DisableNameChecking -Force -ErrorAction SilentlyContinue
+    if(-Not $clickonce){
+        Write-Verbose "Importing  $boxstarterPath\$ModuleName Module"
+        try {
+            Import-Module "$boxstarterPath\$ModuleName" -DisableNameChecking -Force -ErrorAction SilentlyContinue
+        } catch {
+            # TODO: I _think_ it is safe to ignore module import failure at this point - need to check!
+            Write-Verbose "An error occurred while importing the $ModuleName module from $boxstarterPath"
+        }
     }
     $successMsg = @"
 The $ModuleName Module has been copied to $boxstarterPath and added to your Module path.
