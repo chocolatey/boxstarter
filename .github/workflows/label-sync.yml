@@ -5,6 +5,10 @@ on:
     # Run at the end of the day (most likely UTC)
     - cron: "0 0 * * *"
   push:
+    branches:
+      - main
+      - master
+      - develop
     paths:
       - '.github/workflows/label-sync.yml'
     # Uncomment the following line if using a repository specific label file, also remove this comment line
