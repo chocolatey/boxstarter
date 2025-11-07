@@ -1,27 +1,31 @@
 issue-labels-include:
-- Breaking Change
-- Deprecate
-- Feature
-- C4B Feature
-- Bug
-- Improvement
-- Documentation
+  - Breaking Change
+  - Deprecate
+  - Enhancement
+  - Bug
+  - Documentation
+  - Dependency Change
 issue-labels-exclude:
-- Internal Refactoring
-- BuildAutomation
-- NO RELEASE NOTES
+  - Build Automation
+  - NO RELEASE NOTES
 issue-labels-alias:
-    - name:    Documentation
-      header:  Documentation
-      plural:  Documentation
-    - name: Bug
-      header: Bug Fix
-      plural: Bug Fixes
-    - name: Deprecate
-      header: Deprecated Feature
-      plural: Deprecated Features
+  - name:    Documentation
+    header:  Documentation
+    plural:  Documentation
+  - name:    Bug
+    header:  Bug Fix
+    plural:  Bug Fixes
+  - name:    Deprecate
+    header:  Deprecated Feature
+    plural:  Deprecated Features
+create:
+  include-sha-section: true
+  sha-section-heading: "SHA256 Hashes of the release artifacts"
+  sha-section-line-format: "- `{1}\t{0}`"
+  include-contributors: true
 close:
   use-issue-comments: true
+  set-due-date: true
   issue-comment: |-
     :tada: This issue has been resolved in version {milestone} :tada:
 
@@ -39,4 +43,4 @@ close:
       - [Boxstarter.WinConfig](https://community.chocolatey.org/packages/boxstarter.winconfig/{milestone})
     - [Boxstarter Website](https://boxstarter.org/)
 
-    Your **[GitReleaseManager](https://github.com/GitTools/GitReleaseManager)** bot :package::rocket:
+    Your **[GitReleaseManager](https://github.com/GitTools/GitReleaseManager)** bot :package: :rocket:
