@@ -12,9 +12,9 @@
     <title>Boxstarter Common Module</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Common module for Boxstarter</summary>
-    <packageSourceUrl>https://github.com/chocolatey/boxstarter/</packageSourceUrl>
-    <projectSourceUrl>https://github.com/chocolatey/boxstarter/</projectSourceUrl>
-    <bugTrackerUrl>https://github.com/chocolatey/boxstarter/issues</bugTrackerUrl>
+    <packageSourceUrl>https://github.com/chocolatey-community/boxstarter/</packageSourceUrl>
+    <projectSourceUrl>https://github.com/chocolatey-community/boxstarter/</projectSourceUrl>
+    <bugTrackerUrl>https://github.com/chocolatey-community/boxstarter/issues</bugTrackerUrl>
     <description>Provides common functions used by multiple Boxstarter Modules.
 
 ## Package parameters
@@ -23,7 +23,7 @@
     </description>
     <tags>boxstarter</tags>
     <releaseNotes xmlns="">
-See information here: https://github.com/chocolatey/boxstarter/releases
+See information here: https://github.com/chocolatey-community/boxstarter/releases
 </releaseNotes>
   </metadata>
   <files>

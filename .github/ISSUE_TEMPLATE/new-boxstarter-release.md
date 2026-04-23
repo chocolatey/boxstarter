@@ -7,7 +7,7 @@ assignees: ''
 ---
 
 > [!NOTE]
-> This release process documents the process of deploying a new version of [Boxstarter](https://github.com/chocolatey/boxstarter).
+> This release process documents the process of deploying a new version of [Boxstarter](https://github.com/chocolatey-community/boxstarter).
 
 
 - [ ] GitHub Milestone: <insert link here, once milestone has been created>
@@ -26,7 +26,7 @@ assignees: ''
   - [ ] A support/* branch if doing a backport/bugfix release for an earlier supported version, or
   - [ ] The hotfix/* or release/* branch, if a beta package is being released, or
   - [ ] The develop branch, if an alpha package is being released.
-- [ ] Make sure that all issues in the upcoming milestone have exactly one of the [GitReleaseManager category labels](https://github.com/chocolatey/boxstarter/blob/develop/GitReleaseManager.yaml#L1-L9) associated with them or [one of the ignored labels](https://github.com/chocolatey/boxstarter/blob/develop/GitReleaseManager.yaml#L11-L13).
+- [ ] Make sure that all issues in the upcoming milestone have exactly one of the [GitReleaseManager category labels](https://github.com/chocolatey-community/boxstarter/blob/develop/GitReleaseManager.yaml#L1-L9) associated with them or [one of the ignored labels](https://github.com/chocolatey-community/boxstarter/blob/develop/GitReleaseManager.yaml#L11-L13).
 - [ ] If the GitHub milestone issues are still open, confirm that that are done before moving on. If they are in fact done, apply the `4 - Done` label and close the issue.
 - [ ] Run the following command to generate release notes `.\GitReleaseManager.exe create -c <target-branch> -m <milestone> -n <milestone> --token <token> -o chocolatey -r boxstarter`
   - [ ] NOTE: Boxstarter build process does not include the installation of GitReleaseManager, so you will need to have it installed, either through Chocolatey or .NET Global Tools.
@@ -38,7 +38,7 @@ assignees: ''
 - [ ] This step should only be done if this is NOT a beta release. Merge the hotfix or release branch into the target branch. This could be either master or support branch
   - [ ] `git checkout <target branch name>`
   - [ ] `git merge --no-ff <branch name>` i.e. hotfix/4.1.1 or release/4.2.0 whatever branch you are working on just now
-- [ ] Push the changes to [upstream repository](https://github.com/chocolatey/boxstarter)
+- [ ] Push the changes to [upstream repository](https://github.com/chocolatey-community/boxstarter)
   - [ ] `git push upstream` - here upstream is assumed to be the above repository
   - [ ] `git push origin` - here origin is assumed to be your fork on the above repository
 - [ ] Assuming everyone is happy, Publish the GitHub release
@@ -51,7 +51,7 @@ assignees: ''
     $assets = (ls "*") -join ','
     .\GitReleaseManager addasset -t 3.0.3 -o chocolatey -r boxstarter --token "<token_here>" -a "$assets"
     ```
-- [ ] Move closed issues to  `5 - Released` at [https://github.com/chocolatey/boxstarter/issues?q=is%3Aissue+is%3Aclosed+label%3A%224+-+Done%22](https://github.com/chocolatey/boxstarter/issues?q=is%3Aissue+is%3Aclosed+label%3A%224+-+Done%22)
+- [ ] Move closed issues to  `5 - Released` at [https://github.com/chocolatey-community/boxstarter/issues?q=is%3Aissue+is%3Aclosed+label%3A%224+-+Done%22](https://github.com/chocolatey-community/boxstarter/issues?q=is%3Aissue+is%3Aclosed+label%3A%224+-+Done%22)
   - [ ] NOTE: This step should only be performed if this is a stable release. If an alpha/beta release, these issues won't be moved to released until the stable release is completed
 - [ ] Use GitReleaseManager to close the milestone to that all associated issues are updated with a message saying that this has been released
   - [ ] NOTE: This step should only be performed if this is a stable release. While on an alpha/beta release we don't want to update the issues, since this will happen on the final stable release.
@@ -75,7 +75,7 @@ assignees: ''
   - [ ] NOTE: These steps should only be completed if there are no plans to do subsequent alpha/beta releases for this package version.
   - [ ] `git branch -d <hotfix or release branch name>`
   - [ ] If the hotfix or release branch was pushed to the upstream repository, delete it from there as well
-- [ ] Push the changes to [upstream repository](https://github.com/chocolatey/boxstarter)
+- [ ] Push the changes to [upstream repository](https://github.com/chocolatey-community/boxstarter)
   - [ ] `git push upstream` - here upstream is assumed to be the above repository
   - [ ] `git push origin` - here origin is assumed to be your fork on the above repository
 - [ ] Next we need to update the boxstarter.org website with the new version of Boxstarter

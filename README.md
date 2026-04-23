@@ -4,7 +4,7 @@ Repeatable, reboot resilient windows environment installations made easy using C
 
 For more information and How Tos, visit [the official Boxstarter website](https://boxstarter.org).
 
-The source of the Boxstarter website can be found in the [boxstarter.org repository](https://github.com/chocolatey/boxstarter.org).
+The source of the Boxstarter website can be found in the [boxstarter.org repository](https://github.com/chocolatey-community/boxstarter.org).
 
 ## Windows Environment Creation Made Easy
 
@@ -79,7 +79,7 @@ Boxstarter requires the following to work:
 
 ### License / Credits
 
-Apache 2.0 - see [LICENSE](https://github.com/chocolatey/boxstarter/blob/master/LICENSE.txt) and [NOTICE](https://github.com/chocolatey/boxstarter/blob/master/NOTICE.txt) files.
+Apache 2.0 - see [LICENSE](https://github.com/chocolatey-community/boxstarter/blob/master/LICENSE.txt) and [NOTICE](https://github.com/chocolatey-community/boxstarter/blob/master/NOTICE.txt) files.
 
 ## Etiquette Regarding Communication
 
@@ -95,9 +95,9 @@ Observe the following help for submitting an issue.
 ### Prerequisites
 
 * When creating an issue, please ensure you read the guidance at the top which includes links for Contributing and Submitting Issues documentation.
-* The issue has to do with Boxstarter itself and is not a [Boxstarter website issue](https://github.com/chocolatey/boxstarter.org), Chocolatey package issue, a Chocolatey product issue.
+* The issue has to do with Boxstarter itself and is not a [Boxstarter website issue](https://github.com/chocolatey-community/boxstarter.org), Chocolatey package issue, a Chocolatey product issue.
 * Please check to see if your issue already exists with a quick search of both open and closed issues. Start with one relevant term and then add if you get too many results.
-* You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/boxstarter/blob/master/CONTRIBUTING.md) guidelines.
+* You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey-community/boxstarter/blob/master/CONTRIBUTING.md) guidelines.
 * You are not submitting a question - questions are better served as [emails](https://groups.google.com/forum/#!forum/boxstarter) or [Community Chat](https://ch0.co/community).
 * Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
@@ -113,8 +113,8 @@ Observe the following help for submitting an issue.
 
 ## Contributing
 
-If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [CONTRIBUTING](https://github.com/chocolatey/boxstarter/blob/master/CONTRIBUTING.md).
+If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [CONTRIBUTING](https://github.com/chocolatey-community/boxstarter/blob/master/CONTRIBUTING.md).
 
 ## Committers
 
-Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey/boxstarter/blob/master/COMMITTERS.md).
+Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey-community/boxstarter/blob/master/COMMITTERS.md).
