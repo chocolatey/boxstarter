@@ -15,7 +15,7 @@ on:
     #  - '.github/labels.yml'
 
 permissions:
-  content: read # Required to read the config file from the repository
+  contents: read # Required to read the config file from the repository
   issues: write # Required to create/update/delete labels
 
 jobs:
