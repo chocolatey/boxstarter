@@ -259,7 +259,7 @@ Task Restore-NuGetPackages -precondition { Test-IsReleaseBuildOS } {
 Task Get-ChocolateyNugetPkg {
     $chocoNupkgDir = "$basedir/Boxstarter.Chocolatey/chocolatey"
     New-Item -ItemType Directory $chocoNupkgDir -ErrorAction SilentlyContinue | Out-Null
-    $chocoVersion = '1.1.0'
+    $chocoVersion = '2.4.3'
     $srcUrl = "https://community.chocolatey.org/api/v2/package/chocolatey/$chocoVersion"
     $targetFile = "chocolatey.$chocoVersion.nupkg"
     Push-Location $chocoNupkgDir
